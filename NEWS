@@ -1,7 +1,7 @@
 Overview of changes in version 0.4.00:
 
   - Handling OpenOffice documents
-  - Using libYMP
+  - Using libYGP
   - Re-formatted the files in UNIX-style (only LF to separate lines)
 
 Overview of changes in version 0.3.02:
