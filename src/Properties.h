@@ -24,6 +24,7 @@
 struct Properties  {
    std::string strTitle;
    std::string strComment;
+   std::string strAuthor;
 
    void clear () {
       strTitle = strComment = ""; }
