@@ -26,6 +26,8 @@
 
 #include <gzo-cfg.h>
 
+#include <mcheck.h>
+
 #include <ctype.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -62,6 +64,7 @@
 #include <XDirSrch.h>
 #include <PathSrch.h>
 #include <IVIOAppl.h>
+#include <INIFile.h>
 
 #include "Writer.h"
 #include "ParseJPG.h"
@@ -89,7 +92,7 @@ class Application : public IVIOApplication {
    Application (const int argc, const char* argv[])
       : IVIOApplication (argc, argv, lo), options (0), outputStyle (TEXT)
       , ageOfNewFiles (30 * 24 * 60 * 60), pTextForNewFiles (NULL)
-      , pFormat (DEFAULT_FORMAT), pTitle (NULL)
+      , format (DEFAULT_FORMAT), title ("")
 #ifdef ENABLE_THREADS
       , listFiles (), mxListFiles (), aThreads (0), mxThreads (), mxOutput ()
 #endif
@@ -101,6 +104,7 @@ class Application : public IVIOApplication {
   ~Application () { }
 
  protected:
+   virtual void readINIFile (const char* pFile);
    virtual bool handleOption (const char option);
 
    // Program-handling
@@ -147,8 +151,8 @@ class Application : public IVIOApplication {
    const char* pTextForNewFiles;
    unsigned int options;
 
-   const char* pFormat;
-   const char* pTitle;
+   std::string format;
+   std::string title;
    Writer* writer;
 
 #ifdef ENABLE_THREADS
@@ -195,7 +199,7 @@ const Application::FILEHANDLERS Application::handlers[] = {
 
 
 const IVIOApplication::longOptions Application::lo[] = {
-   { "help", 'h' },
+   { IVIOAPPL_HELP_OPTION },
    { "recursive", 'r' },
    { "format", 'f' },
    { "title", 'T' },
@@ -205,6 +209,7 @@ const IVIOApplication::longOptions Application::lo[] = {
    { "show-errors", 'e' },
    { "all", 'a' },
    { "new", 'n' },
+   { "ini-file", 'I' },
    { "version", 'V' },
    { "output", 'o' },
    { NULL, '\0' } };
@@ -229,6 +234,7 @@ void Application::showHelp () const {
                 "  -n, --new=TIME:TEXT ... Show TEXT for files younger than TIME days (def: 30)\n"
                 "  -i, --include=LIST .... Files to inspect\n"
                 "  -x, --exclude=LIST .... Files to not inspect\n"
+                "  -I, --ini-file=FILE ... Read further options from specified file\n"
                 "  -V, --version ......... Output version information and exit\n"
                 "  -h, -?, --help ........ Displays this help and exit\n"
                 "  File(s) ... Files to analyze (the last part can contain wildcards)\n\n"
@@ -286,9 +292,9 @@ bool Application::handleOption (const char option) {
 
    case 'e': options |= SHOW_ERRORS; break;
 
-   case 'f': pFormat = getOptionValue (); break;
+   case 'f': format = getOptionValue (); break;
 
-   case 'T': pTitle = getOptionValue (); break;
+   case 'T': title = getOptionValue (); break;
 
    case 'n': {
       const char* pNew = getOptionValue ();
@@ -321,6 +327,14 @@ bool Application::handleOption (const char option) {
 
    case 'a': options |= SHOW_ALL; break;
 
+   case 'I': {
+      const char* pFile = getOptionValue ();
+      if (pFile)
+         readINIFile (pFile);
+      else
+         cerr << PACKAGE "-warning: No file specified! Ignoring option\n";
+      break; }
+
    case 'V': std::cout << description () << '\n'; exit (0);
 
    default:
@@ -342,6 +356,8 @@ int Application::perform (int argc, const char* argv[]) {
       return -1;
    }
 
+   assert (format.size ());
+
    typedef Writer* (*CREATEWRITER) (const char*, unsigned long, const char*);
    static struct {
       unsigned int opt;
@@ -351,11 +367,11 @@ int Application::perform (int argc, const char* argv[]) {
 
    for (unsigned int i (0); i < (sizeof (t) / sizeof (t[0])); ++i)
       if (outputStyle == t[i].opt) {
-         writer = t[i].fnc (pFormat, ageOfNewFiles, pTextForNewFiles);
+         writer = t[i].fnc (format.c_str (), ageOfNewFiles, pTextForNewFiles);
       }
    assert (writer);
 
-   writer->printStart (cout, pTitle);
+   writer->printStart (cout, title.size () ? title.c_str () : NULL);
 
    std::string file;
    for (unsigned int j (0); j < argc; ++j) {
@@ -605,6 +621,39 @@ void Application::convertFromUnicode (Properties& prop) {
       }
 }
 
+/*--------------------------------------------------------------------------*/
+//Purpose   : Reads the options of the INI-file
+//Parameters: pFile: Pointer to filename
+//Requieres : pFile not NULL
+/*--------------------------------------------------------------------------*/
+void Application::readINIFile (const char* pFile) {
+   TRACE ("Application::readINIFile (const char*) - " << pFile);
+   assert (pFile);
+
+   std::string Style;
+   INIFILE (pFile);
+   INISECTION (Output);
+   INIATTR2 (Output, std::string, format, Format);
+   INIATTR2 (Output, std::string, title, Title);
+   INIATTR (Output, std::string, Style);
+
+   try {
+      unsigned int rc (INIFILE_READ ());
+   }
+   catch (std::string& error) {
+      TRACE ("Application::readINIFile (const char*) - Error reading INI-file '"
+             << pFile << "'\nReason: " << error);
+   }
+
+   if (Style == "HTML")
+      outputStyle = HTML;
+   else if (Style == "text")
+      outputStyle = TEXT;
+   else
+      cerr << PACKAGE "-warning: The INI-file '" << pFile << "' contains an "
+         "invalid entry for the output style (" << Style << ")! Using text\n";
+}
+
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Entrypoint of application
@@ -613,6 +662,7 @@ void Application::convertFromUnicode (Properties& prop) {
 //Returns   : int: Status
 /*--------------------------------------------------------------------------*/
 int main (int argc, const char* argv[]) {
+   mtrace ();
    Application::initI18n ();
    Application appl (argc, argv);
    return appl.run ();
