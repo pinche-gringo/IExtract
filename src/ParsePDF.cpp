@@ -1,7 +1,7 @@
 //$Id$
 
 //PROJECT     : Extract
-//SUBSYSTEM   : ParsePDFF
+//SUBSYSTEM   : ParsePDF
 //REFERENCES  :
 //TODO        :
 //BUGS        :
