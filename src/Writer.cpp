@@ -115,9 +115,11 @@ void Writer::printSeparator (std::ostream& out, const File& file,
       case 'P':
       case 'U': {
          std::string path (file.path ());
+#if SYSTEM != UNIX
          unsigned int pos (0);
          while ((pos = path.find (File::DIRSEPARATOR, pos)) != std::string::npos)
             path.replace (pos, 1, 1, '/');
+#endif
 
          if (data[pos] == 'U')
             path += file.name ();
@@ -175,9 +177,11 @@ void Writer::OutIterator::getSubstitute (const char ctrl, std::string& subst) co
    case 'U': {
       Check3 (file);
       subst = file->path ();
+#if SYSTEM != UNIX
       unsigned int pos (0);
       while ((pos = subst.find (File::DIRSEPARATOR, pos)) != std::string::npos)
          subst.replace (pos, 1, 1, '/');
+#endif
 
       if (ctrl == 'U')
          subst += file->name ();
