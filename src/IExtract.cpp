@@ -437,9 +437,13 @@ bool Application::handleOption (const char option) {
    case 'i':  {
       const char* files = getOptionValue ();
       if (files) {
-         filelist += option;
-         filelist += files;
-         filelist += YGP::PathSearch::PATHSEPARATOR;
+         std::string node;
+         YGP::PathSearch list (filelist);
+         while (!(node = list.getNextNode ()).empty ()) {
+            filelist += option;
+            filelist += node;
+            filelist += YGP::PathSearch::PATHSEPARATOR;
+         }
       }
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
