@@ -85,9 +85,11 @@ Compilers and Options
 How to build Extract (Windows)
 ------------------------------
 
-Principally you can compile the tool with:
+At the moment there exists only a makefile for Visual C++ (6.0). To build
+enter the directory where you extracted the sources and execute the included
+batch file by typing:
 
-   make [GCC | MSC]
+   make
 
 The Makefile tries to link with the static version of the libYGP library. To
 make this work, the environment variables LIB and INCLUDE must be set to the
@@ -98,3 +100,8 @@ approbiate paths. E.g.:
 
 Make does *not* set the environment for the compiler, so you might need to run
 VCVars32.bat before compiling!
+
+
+* Common options/targets for make:
+
+  - clean                          # Deletes the files created during the make
