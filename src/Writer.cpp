@@ -103,10 +103,12 @@ void HTMLWriter::printMessage (std::ostream& out, const File& file,
    out << "<tr valign=top><td>";
    if (pStrNew && isNew (file))
       out << pStrNew;
+   out << "</td><td><a href=\"" << file.path ()
+       << file.name () << "\">";
    if (options & SHOW_PATH)
       out << file.path ();
    out << file.name () << "</td><td>-</td><td>" << msg
-       << "</td><td>-</td><td><</td></tr>\n";
+       << "</td></tr>\n";
 }
 
 /*--------------------------------------------------------------------------*/
