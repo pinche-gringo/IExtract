@@ -3,12 +3,12 @@
 
 
 Utility to extract the description out of certain file-types
-Copyright (C) 2002 - 2004 Markus Schwab <g17m0@lycos.com>
+Copyright (C) 2002 - 2005 Markus Schwab <g17m0@lycos.com>
 -----------------------------------------------------------------------
 
 
-At the moment only the following documents are supported (identified according
-to the extension - so don't cheat ;) ):
+At the moment only the following documents are supported (identified by the
+extension - so don't cheat ;) ):
 
   - JPEG: Extracts the properties according two styles; either one simple
  	  comment (as written by e.g. The GIMP) or a more complex versions
@@ -44,8 +44,7 @@ Windows
 
 Is supported (principally), though because of missing standards not that easy
 (at least, if you have a different setup than me). See the (end of the) file
-INSTALL. Note that the libYGP library is linked statically (and not used as
-a DLL).
+INSTALL.
 
 
 Documentation
