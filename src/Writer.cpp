@@ -75,7 +75,15 @@ unsigned int Writer::columns () const {
 }
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Prints a separating text between directories
+//Purpose   : Prints a separating text between directories. The following
+//            characters are substituted:
+//              'e': With the end-of-data as defined by the writer class
+//              's': With the start-of-data as defined by the writer class
+//              'n': With the name of the file
+//              'N': With path and name of the file
+//              'p': With the path of the file
+//              'P': With the path of the file in UNIX style (separated by /)
+//              'U': With path and name of the file in UNIX style (separated by /)
 //Parameters: out: Stream where to put the output
 //            file: File specifying directory
 //            data: Text to print for separation
@@ -101,6 +109,17 @@ void Writer::printSeparator (std::ostream& out, const File& file,
       case 'N': out << file.path () << file.name (); break;
 
       case 'p': out << file.path (); break;
+
+      case 'P':
+      case 'U': {
+         std::string path (file.path ());
+         unsigned int pos (0);
+         while ((pos = path.find (File::DIRSEPARATOR, pos)) != std::string::npos)
+            path.replace (pos, 1, '/');
+
+         if (data[pos] == 'U')
+            path += file.name ();
+         break; }
       }
       oldPos = pos + 1;
    }
@@ -134,7 +153,9 @@ bool Writer::OutIterator::isAtName () const {
 //              'n': With the name of the file
 //              'N': With path and name of the file
 //              'p': With the path of the file
+//              'P': With the path of the file in UNIX style (separated by /)
 //              't': With the title (of the properties)
+//              'U': With path and name of the file in UNIX style (separated by /)
 //              Other chars: With the character itself
 //Parameters: ctrl: Control character
 //            subst: String with which to replace the character
@@ -162,6 +183,18 @@ void Writer::OutIterator::getSubstitute (const char ctrl, std::string& subst) co
    case 'p': Check3 (file); subst = file->path (); break;
 
    case 't': subst = p->strTitle; break;
+
+   case 'P':
+   case 'U': {
+      Check3 (file);
+      subst = file->path ();
+      unsigned int pos (0);
+      while ((pos = subst.find (File::DIRSEPARATOR, pos)) != std::string::npos)
+         subst.replace (pos, 1, '/');
+
+      if (ctrl == 'U')
+         subst += file->name ();
+         break; }
 
    default:
       subst = ctrl;
@@ -275,35 +308,16 @@ void HTMLWriter::printMessage (std::ostream& out, const File& file,
 
    out << "<tr valign=top>";
    if (strNew.size ()) {
-      out << "<td>";
-      if (isNew (file))
-         out << strNew;
-      out << "</td>";
+      out << "<td>E</td>";
    }
 
-   unsigned int cols (columns ());
-   TRACE9 ("HTMLWriter::printMessage (ostream&, const File&, const std::string&) - "
-           << cols << " Columns");
-   OutIterator i (format, file);
-   while (i) {
-      out << "<td>";
-      if (i.isAtName ())
-         out << "<a href=\"" << file.path () << file.name () << "\">" << *i
-             << "</a>";
-      out << "</td>";
-      --cols;
-      if (i.isAtName ())
-         break;
-      ++i;
-   }
-
-   TRACE5 ("HTMLWriter::printMessage (ostream&, const File&, const std::string&) - "
-           << msg << " for " << cols << " Columns");
-   out << "<td colspan=" << cols << '>' << msg << "</td></tr>\n";
+   out << "<a href=\"" << file.path () << file.name () << "\">" << file.name ()
+       << "</a></td><td colspan=" << (columns () - 1) << '>' << msg
+       << "</td></tr>\n";
 }
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Prints the endfor an HTML-table
+//Purpose   : Prints the end for an HTML-table
 //Parameters: out: Stream where to put the output
 /*--------------------------------------------------------------------------*/
 void HTMLWriter::printEnd (std::ostream& out) const {
@@ -366,7 +380,7 @@ void TextWriter::printMessage (std::ostream& out, const File& file,
                                const std::string& msg) const {
    Check3 (msg);
    if (strNew.size () && isNew (file))
-      out << strNew << ": ";
+      out << "E: " << ": ";
    out << file.name () << " - " << msg << '\n';
 }
 
@@ -440,27 +454,12 @@ void LaTeXWriter::printMessage (std::ostream& out, const File& file,
 
    if (strNew.size ()) {
       if (isNew (file))
-         out << strNew;
+         out << "E:";
       out << '&';
    }
 
-   unsigned int cols (columns ());
-   TRACE9 ("LaTeXWriter::printMessage (ostream&, const File&, const std::string&) - "
-           << cols << " Columns");
-   OutIterator i (format, file);
-   while (i) {
-      if (i.isAtName ())
-         out << *i;
-      out << '&';
-      --cols;
-      if (i.isAtName ())
-         break;
-      ++i;
-   }
-
-   TRACE5 ("LaTeXWriter::printMessage (ostream&, const File&, const std::string&) - "
-           << msg << " for " << cols << " Columns");
-   out << "{\\multicolumn{" << cols << "}l{" << msg << "}\\\\\n";
+   out << file.name () << "&{\\multicolumn{" << (columns () - 1) << "}l{"
+       << msg << "}\\\\\n";
 }
 
 /*--------------------------------------------------------------------------*/
