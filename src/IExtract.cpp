@@ -164,6 +164,7 @@ class Application : public YGP::IVIOApplication {
 
    Writer* writer;
    std::string filelist;
+   std::string append, prepend;
 
    enum { TEXT = 0, HTML, LATEX, XML } outputStyle;
 
@@ -205,11 +206,15 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
    { "exclude", 'x' },
    { "show-errors", 'e' },
    { "separate", 's' },
-   { "all", 'a' },
+   { "add-unknown", 'u' },
    { "new", 'n' },
    { "ini-file", 'f' },
    { "version", 'V' },
    { "output", 'o' },
+   { "append", 'a' },
+   { "app-file", 'A' },
+   { "prepend", 'p' },
+   { "pre-file", 'P' },
    { NULL, '\0' } };
 
 
@@ -273,11 +278,14 @@ void Application::showHelp () const {
       << "\n\n  -r, --recursive ....... " << _("Recurse into subdirectories")
       << "\n  -o, --output=STYLE .... " << _("Sets the output-style (text, HTML XML or LaTeX)")
       << "\n  -F, --format=FORMAT ... " << _("Format of output; default: ") << DEFAULT_FORMAT
-      << "\n                          " << _("and for XML:") << DEFAULT_XML_FORMAT
       << "\n  -T, --title=TITLE ..... " << _("Title of output")
-      << "\n  -s, --separate=TEXT ... " << _("Separate subdirectories with TEXT (default: empty);\n                          implies recursion into subdirectories (--recursive)")
+      << "\n  -s, --separate=TEXT ... " << _("Separate subdirectories with TEXT (default: empty);\n\t\t\t  implies recursion into subdirectories (--recursive)")
+      << "\n  -p, --prepend=HEAD .... " << _("Text to print before any output")
+      << "\n  -P, --pre-file=FILE ... " << _("File to print before any output")
+      << "\n  -a, --append=FOOT ..... " << _("Text to print at the end of the output")
+      << "\n  -A, --app-file=FILE ... " << _("File to print at the end of the output")
       << "\n  -e, --show-errors ..... " << _("Puts error messages (additionally) into the output")
-      << "\n  -a, --all ............. " << _("Show all files (including unknown types) in output")
+      << "\n  -u, --add-unknown ..... " << _("Show all files (including unknown types) in output")
 #ifdef ENABLE_THREADS
       << "\n  -t, --threads=NR ...... " << _("Number of threads for examining files (default: 1)")
 #endif
@@ -331,7 +339,7 @@ void Application::showHelp () const {
       << "   [Output]\n"
       "   Format=<a href=\")%N\" title=\"%c\">%n</a>|%t|%a|%D\n"
       "   Title=File|Title|Author|Date\n"
-      "   TextForNewFiles=<img src=../images/new.gif>\n"
+      "   TextForNewFiles=<img src=\"../images/new.gif\">\n"
       "   MaxAgeForNewFiles=15\n"
       "   DirSeparatorText=%eListing of %n%s\n"
       "   Style=HTML\n\n"
@@ -341,7 +349,7 @@ void Application::showHelp () const {
       "  - MP3 (*.mp3)\n"
       "  - PDF (*.pdf)\n"
       "  - OpenOffice (Write (*.sxw), Calc (*.sxc), Impress (*.sxi), Math (*.sxm)"
-          " & Draw (*.sxd))\n"
+          " &\n    Draw (*.sxd))\n"
       "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
       "  - RTF (*.rtf)\n"
       "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n";
@@ -363,7 +371,7 @@ bool Application::handleOption (const char option) {
          iniOpts.separate = pSep;
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
-         error.replace (error.find ("%1"), 2, 1, 's');
+         error.replace (error.find ("%1"), 2, 1, option);
          std::cerr << PACKAGE << error;
          break; } }
       // Don't add a break in OK case, as -s implies -r!
@@ -409,7 +417,7 @@ bool Application::handleOption (const char option) {
       }
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
-         error.replace (error.find ("%1"), 2, 1, 'F');
+         error.replace (error.find ("%1"), 2, 1, option);
          std::cerr << PACKAGE << error;
       }
       break; }
@@ -420,7 +428,7 @@ bool Application::handleOption (const char option) {
          iniOpts.title = pTitle;
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
-         error.replace (error.find ("%1"), 2, 1, 'T');
+         error.replace (error.find ("%1"), 2, 1, option);
          std::cerr << PACKAGE << error;
       }
       break; }
@@ -431,7 +439,7 @@ bool Application::handleOption (const char option) {
       unsigned int time (0);
       if (!pNew) {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
-         error.replace (error.find ("%1"), 2, 1, 'n');
+         error.replace (error.find ("%1"), 2, 1, option);
          std::cerr << PACKAGE << error;
       }
       else if ((time = strtoul (pNew, &pEnd, 10)),
@@ -465,12 +473,12 @@ bool Application::handleOption (const char option) {
       }
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
-         error.replace (error.find ("%1"), 2, 1, 'x');
+         error.replace (error.find ("%1"), 2, 1, option);
          std::cerr << PACKAGE << error;
       }
       break; }
 
-   case 'a': options |= SHOW_ALL; break;
+   case 'u': options |= SHOW_ALL; break;
 
    case 'f': {
       const char* pFile = getOptionValue ();
@@ -478,7 +486,48 @@ bool Application::handleOption (const char option) {
          readINIFile (pFile);
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
-         error.replace (error.find ("%1"), 2, 1, 'f');
+         error.replace (error.find ("%1"), 2, 1, option);
+         std::cerr << PACKAGE << error;
+      }
+      break; }
+
+   case 'p':
+   case 'a': {
+      const char* text = getOptionValue ();
+      if (text)
+         ((option == 'p') ? prepend : append) += text;
+      else {
+         std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
+         error.replace (error.find ("%1"), 2, 1, option);
+         std::cerr << PACKAGE << error;
+      }
+      break; }
+
+   case 'P':
+   case 'A': {
+      const char* file = getOptionValue ();
+      if (file) {
+         std::ifstream input (file, std::ios::in | std::ios::binary);
+         if (!input) {
+            std::string error (_("-error: `%1' is not a (readable) file! Ignoring option `%2'!\n"));
+            error.replace (error.find ("%1"), 2, file);
+            error.replace (error.find ("%2"), 2, 1, option);
+            std::cerr << PACKAGE << error;
+         }
+         else {
+            std::string& target ((option == 'P') ? prepend : append);
+
+            static const unsigned int bufLen (512);
+            char buffer[bufLen];
+
+            // Read as long as there is data/or an error occurs
+            while (input.read (buffer, bufLen), input.gcount ())
+               target.append (buffer, input.gcount ());
+         }
+      }
+      else {
+         std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
+         error.replace (error.find ("%1"), 2, 1, option);
          std::cerr << PACKAGE << error;
       }
       break; }
@@ -506,26 +555,26 @@ int Application::perform (int argc, const char* argv[]) {
       return -1;
    }
 
-   if ((outputStyle == XML) && !(chgFlag & 1)) {
+   if ((outputStyle == XML) && !(chgFlag & 1))
       iniOpts.format = DEFAULT_XML_FORMAT;
-   }
 
    Check3 (iniOpts.format.size ());
 
    typedef Writer* (*CREATEWRITER) (const std::string&, const std::string&,
                                     unsigned long);
-   static struct {
-      int opt;
-      CREATEWRITER fnc;
-   } t[] = { { TEXT, (CREATEWRITER)&TextWriter::create },
-             { HTML, (CREATEWRITER)&HTMLWriter::create },
-             { LATEX, (CREATEWRITER)&LaTeXWriter::create },
-             { XML, (CREATEWRITER)&XMLWriter::create } };
 
-   for (unsigned int i (0); i < (sizeof (t) / sizeof (t[0])); ++i)
-      if (outputStyle == t[i].opt)
-         writer = t[i].fnc (iniOpts.format, iniOpts.newText, iniOpts.ageOfNewFiles);
+   // This declaration must be in the same order as the outputStyle enum
+   CREATEWRITER fnc[] = { (CREATEWRITER)&TextWriter::create,
+                          (CREATEWRITER)&HTMLWriter::create,
+                          (CREATEWRITER)&LaTeXWriter::create,
+                          (CREATEWRITER)&XMLWriter::create };
+
+   Check3 (outputStyle < (sizeof (fnc) / sizeof (fnc[0])));
+   writer = fnc[outputStyle] (iniOpts.format, iniOpts.newText, iniOpts.ageOfNewFiles);
    Check3 (writer);
+
+   if (prepend.size ())
+      std::cout << prepend;
 
    writer->printStart (std::cout, iniOpts.title);
 
@@ -541,6 +590,9 @@ int Application::perform (int argc, const char* argv[]) {
    }
 
    writer->printEnd (std::cout);
+
+   if (append.size ())
+      std::cout << append;
    return 0;
 }
 
