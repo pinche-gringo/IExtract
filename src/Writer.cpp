@@ -189,7 +189,7 @@ void Writer::getSubstitute (const char ctrl, std::string& subst, const YGP::File
       break; }
 
    case 'e': {
-      const char* ext (strrchr (file.name (), '.'));
+	  const char* ext = strrchr (file.name (), '.');
       ext = ext ? ext + 1 : "";
       subst = extend ? changeSpecialFileChars (ext) : ext;
       break;
@@ -197,7 +197,7 @@ void Writer::getSubstitute (const char ctrl, std::string& subst, const YGP::File
 
    case 'E': {
       std::string tmp;
-      const char* ext (strrchr (file.name (), '.'));
+      const char* ext = strrchr (file.name (), '.');
       if (ext) {
          tmp = file.name ();
          tmp.erase (ext - file.name ());
@@ -416,7 +416,7 @@ std::string HTMLWriter::changeSpecialFileChars (const std::string& value) const 
    std::string chg (value);
    for (unsigned int i (0); i < chg.size (); ++i)
       if (chg[i] == ' ') {
-         chg.replace (i, 1, "\%20");
+         chg.replace (i, 1, "%20");
          i += 3;
       }
    return chg;
