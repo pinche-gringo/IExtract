@@ -30,7 +30,7 @@
 // Note TRACELEVEL 9 is not recomended as the title very likely contains
 // special characters!
 #include <YGP/Check.h>
-#include <YGP/Trace_.h>
+#include <YGP/Trace.h>
 
 #include "ParseJPG.h"
 #include "Properties.h"

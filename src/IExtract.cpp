@@ -58,7 +58,7 @@
 #endif
 
 #include <YGP/Check.h>
-#include <YGP/Trace_.h>
+#include <YGP/Trace.h>
 #include <YGP/XStream.h>
 #include <YGP/DirSrch.h>
 #include <YGP/XDirSrch.h>

@@ -28,7 +28,7 @@
 #include <IExtract-cfg.h>
 
 #include <YGP/Check.h>
-#include <YGP/Trace_.h>
+#include <YGP/Trace.h>
 
 #include "Properties.h"
 #include "ParseSOffice.h"
