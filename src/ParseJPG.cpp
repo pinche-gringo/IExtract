@@ -51,15 +51,15 @@ ParseJPEG::ParseJPEG ()
    , title ("\\*", "Comment", *this, &ParseJPEG::foundTitle, 1, 1, false)
    , type ("\\*", "Type of entry", *this, &ParseJPEG::foundType, 4, 4, false)
    , number ("\\*", "Number of records", *this, &ParseJPEG::foundNumber, 2, 2, false)
-   , length1 ("\\*", "Length", *this, &ParseJPEG::foundLength, 2, 2, false)
-   , length2 ("\\*", "Length", *this, &ParseJPEG::foundLength2, 2, 2, false)
+   , length1 ("\\*", "Length (MSB first)", *this, &ParseJPEG::foundLength, 2, 2, false)
+   , length2 ("\\*", "Length (LSB first)", *this, &ParseJPEG::foundLength2, 2, 2, false)
    , offset ("\\*", "Offset", *this, &ParseJPEG::foundOffset, 4, 4, false)
    , skip ("\\*", "Skipping chars", 16, false, false)
    , ignore ("\xff", "Ignore til special", 512, true, false)
    , selFormat (_selFormat, "Possible comments", 1, 1, false)
    , seqFormat1 (_seqFormat1, "Format style 1", 1, 1, false)
    , seqFormat2 (_seqFormat2, "Format style 2", 1, 1, false)
-   , selProperties (_selProperties, "Properties", 1, 1, false)
+   , selProperties (_selProperties, "Properties", 1, 0, false)
    , seqPropShort (_seqPropShort, "Short properties", 1, 1, false)
    , seqPropLong (_seqPropLong, "Long properties", 1, 1, false)
    , seqEntries (_seqEntries, "List of property entries", *this,
@@ -79,6 +79,9 @@ ParseJPEG::ParseJPEG ()
    _seqFormat1[1] = &skip;
    _seqFormat1[2] = &selProperties;
    _seqFormat1[3] = NULL;
+
+   _seqFormat2[0] = &seqPropLong;
+   _seqFormat2[1] = NULL;
 
    _selProperties[0] = &seqPropShort;
    _selProperties[1] = &seqPropLong;
@@ -117,7 +120,7 @@ ParseJPEG::ParseJPEG ()
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
    assert (prop); assert (pTitle);
-   TRACE1 ("ParseJPEG::foundTitle (const char*, unsigned int) - Title: "
+   TRACE9 ("ParseJPEG::foundTitle (const char*, unsigned int) - Title: "
           << string (pTitle, len) << " -> " << len << " chars");
 
    static string Properties::* values[] = { &Properties::strTitle,
@@ -130,8 +133,6 @@ int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
                  << lengths[i] << " chars");
          (prop->*(values[i])).assign (pTitle + offsets[i] - cRead, lengths[i] - 2);
       }
-
-   jpegImage.setMaxCard (1);
    return ParseObject::PARSE_OK;
 }
 
@@ -141,14 +142,13 @@ int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundLength (const char* length, unsigned int) {
-   assert (length);
-   lengths[1] = ((unsigned char)(*length) << 8) + (unsigned char)length[1];
+   assert (length); lengths[1] = ((unsigned char)(*length) << 8) + (unsigned char)length[1];
+   TRACE8 ("ParseJPEG::foundLength (const char*, unsigned int): " << lengths[1]);
    if (lengths[1])
       title.setMaxCard (lengths[1]);
    
    skip.setMinCard (14);
    skip.setMaxCard (14);
-   TRACE8 ("ParseJPEG::foundLength (const char*, unsigned int): " << lengths[1]);
    return ParseObject::PARSE_OK;
 }
 
@@ -161,7 +161,7 @@ int ParseJPEG::foundLength2 (const char* length, unsigned int) {
    assert (length);
    int offset (getTypeIndex (actEntry));
    if (offset != -1) {
-      lengths[offset] = *(unsigned int*)length;
+      lengths[offset] = *(unsigned short*)length;
       TRACE9 ("ParseWord::foundLength2 (const char*) - " << lengths[offset]
               << " (0x" << hex << lengths[offset] << dec << ')');
    }
@@ -175,7 +175,8 @@ int ParseJPEG::foundLength2 (const char* length, unsigned int) {
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundNumber (const char* nr, unsigned int) {
    assert (nr);
-   seqEntries.setMaxCard (cEntries = (*(unsigned int*)nr));
+   seqEntries.setMaxCard (cEntries = (*(unsigned short*)nr));
+   seqEntries.setMinCard (cEntries);
    length2.setMaxCard (4);
    TRACE8 ("ParseJPEG::foundNumber (const char*, unsigned int): " << cEntries);
    lengths[1] = 0;
@@ -225,10 +226,14 @@ int ParseJPEG::foundPropertiesHeader (const char*, unsigned int) {
    skip.setMaxCard (4);
    cRead += 14;
 
-   TRACE8 ("ParseJPEG::foundPropertiesHeader (const char*) - Setting title length to "
+   TRACE8 ("ParseJPEG::foundPropertiesHeader (const char*) - Title length: "
            << title.getMaxCard () - cRead - 8);
-   assert (title.getMaxCard () > cRead);
-   title.setMaxCard (title.getMaxCard () - cRead - 8);
+   if (title.getMaxCard () <= (cRead + 8))
+      _seqPropLong[6] = NULL;
+   else {
+      assert (title.getMaxCard () > (cRead + 8));
+      title.setMaxCard (title.getMaxCard () - cRead - 8);
+   }
    return ParseObject::PARSE_OK;
 }
 
