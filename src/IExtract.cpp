@@ -123,7 +123,7 @@ const IVIOApplication::longOptions Application::lo[] = {
 //Purpose   : Displays the help
 /*--------------------------------------------------------------------------*/
 void Application::showHelp () const {
-   std::cout << "Extracts (depending on the file-type) a description out of files"
+   std::cout << "Extracts a description out of files (depending on the file-type)"
                 "\n\nUsage: "
              << PACKAGE " [OPTIONS] <File(s)>\n\n"
                 "  -r, --recursive ...... Recurse into subdirectories\n"
@@ -134,8 +134,8 @@ void Application::showHelp () const {
                 "  -v, --verbose, ....... Displays the processed files (be verbose)\n"
                 "  -V, --version ........ Output version information and exit\n"
                 "  -h, -?, --help ....... Displays this help and exit\n"
-                "  File(s) ... File to analyze\n\n"
-                "Currently supported documents are: HTML, WinWord, Excel & Powerpoint\n";
+                "  File(s) ... File to analyze (the last part can contain wildcards)\n\n"
+                "Currently supported files are: HTML, JPEG, WinWord, Excel & Powerpoint\n";
 }
 
 /*--------------------------------------------------------------------------*/
@@ -148,7 +148,7 @@ bool Application::handleOption (const char option) {
    assert (option != '\0');
 
    switch (option) {
-   case 's': options |= RECURSIVE; break;
+   case 'r': options |= RECURSIVE; break;
 
    case 'o': {
       const char* pType = getOptionValue ();
@@ -205,8 +205,15 @@ int Application::perform (int argc, const char* argv[]) {
 
    writer->printStart (cout);
 
-   for (unsigned int j (0); j < argc; ++j)
-      handleFiles (*writer, argv[j]);
+   std::string file;
+   for (unsigned int j (0); j < argc; ++j) {
+      file = argv[j];
+      if (DirectorySearch::isValid (argv[j])) {
+         file += File::DIRSEPARATOR;
+         file += "*";
+      }
+      handleFiles (*writer, file.c_str ());
+   }
 
    writer->printEnd (cout);
    return 0;
@@ -224,10 +231,7 @@ void Application::handleFiles (Writer& writer, const char* pFile) const {
       std::cout << "Handling file(s) " << pFile << '\n'; std::cout.flush (); }
 
    DirectorySearch ds (pFile);
-   const File* file = ds.find ((options & RECURSIVE)
-                               ? (IDirectorySearch::FILE_NORMAL
-                                  | IDirectorySearch::FILE_DIRECTORY)
-                               : IDirectorySearch::FILE_NORMAL);
+   const File* file = ds.find (IDirectorySearch::FILE_NORMAL);
    while (file) {
       if (options & VERBOSE) {
          std::cout << "Handling file " << file->name () << '\n'; std::cout.flush (); }
@@ -235,46 +239,54 @@ void Application::handleFiles (Writer& writer, const char* pFile) const {
       std::string strFile (file->path ());
       strFile += file->name ();
 
-      if (file->isDirectory ()) {
-         if (strcmp (file->name (), ".") && strcmp (file->name (), "..")) {
-            strFile += File::DIRSEPARATOR;
-            strFile += "*";
-            handleFiles (writer, strFile.c_str ());
+      HANDLER fnc = getFileTypeHandler (strrchr (file->name (), '.'));
+      if (fnc) {
+         Xifstream ifile;
+         ifile.open (strFile.c_str (), ios::in | ios::binary);
+         if (!ifile) {
+            std::cerr << PACKAGE "-error: File " << strFile.c_str ()
+                      << " can't be opened!\nReason: ";
+            perror ("");
          }
-      }
-      else {
-         HANDLER fnc = getFileTypeHandler (strrchr (file->name (), '.'));
-         if (fnc) {
-            Xifstream ifile;
-            ifile.open (strFile.c_str (), ios::in | ios::binary);
-            if (!ifile) {
-               std::cerr << PACKAGE "-error: File " << strFile.c_str ()
-                         << " can't be opened!\nReason: ";
-               perror ("");
-            }
-            else {
-               ifile.init ();
+         else {
+            ifile.init ();
 
-               try {
-                  writer.printFile (cout, *file, (this->*fnc) ((Xistream&)ifile));
-               }
-               catch (std::string& err) {
-                  std::cerr << PACKAGE "-error: " << err.c_str ();
-                  writer.printFile (cout, *file,
-                                    ((options & SHOW_ERRORS)
-                                     ? "Error while processing" : NULL));
-               } // end-catch
-            } // end-else file could be opened
-         } // endif handler found
-         else
-            if (options & SHOW_ALL)
+            try {
+               writer.printFile (cout, *file, (this->*fnc) ((Xistream&)ifile));
+            }
+            catch (std::string& err) {
+               std::cerr << PACKAGE "-error: " << err.c_str ();
                writer.printFile (cout, *file,
                                  ((options & SHOW_ERRORS)
-                                  ? "Unknown file-type" : NULL));
-      }
-
+                                  ? "Error while processing" : NULL));
+            } // end-catch
+         } // end-else file could be opened
+      } // endif handler found
+      else
+         if (options & SHOW_ALL)
+            writer.printFile (cout, *file,
+                              ((options & SHOW_ERRORS)
+                               ? "Unknown file-type" : NULL));
       file = ds.next ();
    } // end-while
+
+
+   // Now handle subdirectories (if specified)
+   if (options & RECURSIVE) {
+      std::string files (ds.getFileSpec ());      // Use same filespecification
+
+      file = ds.find (ds.getDirectory () + "*", DirectorySearch::FILE_DIRECTORY);
+      while (file) {
+         if (IDirectorySearch::isSpecial (file->name ())) {
+            std::string strFile (file->path ());
+            strFile += file->name ();
+            strFile += File::DIRSEPARATOR;
+            strFile += files;
+            handleFiles (writer, strFile.c_str ());
+         }
+         file = ds.next ();
+      }
+   }
 }
 
 /*--------------------------------------------------------------------------*/
