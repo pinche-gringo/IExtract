@@ -6,7 +6,8 @@ SUBDIRS = m4  intl src doc po
 # Windows-compiler might need its own Makefile
 dist-hook:
 	mkdir $(distdir)/Windows
-	cp -p $(srcdir)/Windows/*.ds? $(srcdir)/Windows/*.mak $(distdir)/Windows
+	cp -p $(srcdir)/Windows/*.ds? $(srcdir)/Windows/*.mak \
+	      $(srcdir)/Windows/*.h $(distdir)/Windows
 	cp -p  $(srcdir)/Make.bat $(distdir)/
 
 ACLOCAL_AMFLAGS = -I m4
