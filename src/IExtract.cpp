@@ -24,9 +24,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#undef  ENABLE_THREADS
-//#define ENABLE_THREADS
-
 #include <gzo-cfg.h>
 
 #include <assert.h>
@@ -128,7 +125,7 @@ class Application : public IVIOApplication {
    static const FILEHANDLERS handlers[];
 
    void handleFiles (const char* pFile) const;
-   void processFile (const File& file) const;
+   void processFile (const File& file, HANDLER fnc) const;
 #ifdef ENABLE_THREADS
    void* processThread (void*);
 #endif
@@ -149,11 +146,24 @@ class Application : public IVIOApplication {
 #ifdef ENABLE_THREADS
    vector<Thread*> aThreads;
    Mutex           mxThreads;
-
    Mutex           mxOutput;
 
-   Mutex        mxListFiles;
-   queue<File>  listFiles;
+   typedef struct FileFunction : public File {
+      HANDLER fnc;
+      FileFunction () : File (), fnc (NULL) { }
+      FileFunction (const struct File& file) : File (file) { }
+      FileFunction (const struct FileFunction& ffnc) : File (ffnc)
+         , fnc (ffnc.fnc) { }
+
+      const struct FileFunction& operator= (const struct FileFunction& ffnc) {
+         if (this != &ffnc) {
+            File::operator= (ffnc);
+            fnc = ffnc.fnc;
+         }
+         return *this; }
+   } FILEFNC;
+   Mutex           mxListFiles;
+   queue<FILEFNC>  listFiles;
 #endif
 
    string filelist;
@@ -359,44 +369,57 @@ void Application::handleFiles (const char* pFile) const {
 
    const File* file = ds.find (IDirectorySearch::FILE_NORMAL);
    while (file) {
+      HANDLER fnc = getFileTypeHandler (strrchr (file->name (), '.'));
+      if (fnc) {
 #ifdef ENABLE_THREADS
-      LOCKFILES
-      while (listFiles.size () > 100) {
-         UNLOCKFILES
-         sleep (0);
          LOCKFILES
-      }
-      ((Application*)this)->listFiles.push (*file);
-      UNLOCKFILES
+         while (listFiles.size () > 100) {
+            UNLOCKFILES
+            sleep (0);
+            LOCKFILES
+         }
+         ((Application*)this)->listFiles.push (*file);
+         ((Application*)this)->listFiles.back ().fnc = fnc;
+         UNLOCKFILES
 
-      LOCKTHREADS
-      if (aThreads.size () < aThreads.capacity ())
-         try {
-            ((Application*)this)->aThreads.push_back (
-               OThread<Application>::create2 ((Application*)this,
-                                              &Application::processThread, NULL));
-         }
-         catch (std::string& err) {
-            cerr << PACKAGE "-error: " << err << '\n';
-         }
-      UNLOCKTHREADS
+         LOCKTHREADS
+         if (aThreads.size () < aThreads.capacity ())
+            try {
+               ((Application*)this)->aThreads.push_back (
+                  OThread<Application>::create2 ((Application*)this,
+                                                &Application::processThread, NULL));
+            }
+            catch (std::string& err) {
+               cerr << PACKAGE "-error: " << err << '\n';
+            }
+         UNLOCKTHREADS
 #else
-      processFile (*file);
+         processFile (*file, fnc);
 #endif
+      } // endif handler found
+      else
+         if (options & SHOW_ALL) {
+            LOCKOUTPUT
+            writer->printMessage (cout, *file,
+                                 (options & SHOW_ERRORS) ? "Unknown file-type" : "");
+            UNLOCKOUTPUT
+         }
       file = ds.next ();
    } // end-while
 
 #ifdef ENABLE_THREADS
    // Wait for threads to terminte
-   TRACE9 ("Wait for threads");
    while (true) {
       LOCKTHREADS
       if (aThreads.empty ()) {
          UNLOCKTHREADS
          break;
       }
+      TRACE9 ("Application::handleFiles (const char*) - Wait for thread "
+              << aThreads[0]->getID ());
+      Thread* thread =aThreads[0];
       UNLOCKTHREADS
-      Thread::waitForThread (*aThreads[0]);
+      Thread::waitForThread (*thread);
    }
 #endif
 
@@ -424,7 +447,7 @@ void Application::handleFiles (const char* pFile) const {
 /*--------------------------------------------------------------------------*/
 void* Application::processThread (void* pThread) {
    assert (pThread);
-   File file;
+   FILEFNC file;
 
    while (true) {
       LOCKFILES
@@ -434,7 +457,9 @@ void* Application::processThread (void* pThread) {
          UNLOCKFILES
          TRACE1 ("Application::processThread (void*) - File " << file.name ()
                   << "; Remaining: " << listFiles.size ());
-         processFile (file);
+         assert (file.fnc);
+         assert (file.fnc == getFileTypeHandler (strrchr (file.name (), '.')));
+         processFile (file, file.fnc);
       }
       else {
          UNLOCKFILES
@@ -453,50 +478,41 @@ void* Application::processThread (void* pThread) {
 /*--------------------------------------------------------------------------*/
 //Purpose   : Processes a single file with a known handler
 //Parameters: pFile: File to processs
+//            fnc: Handling function
 /*--------------------------------------------------------------------------*/
-void Application::processFile (const File& file) const {
+void Application::processFile (const File& file, HANDLER fnc) const {
    TRACE1 ("Application::processFile (const File&) const - " << file.name ());
 
-   HANDLER fnc = getFileTypeHandler (strrchr (file.name (), '.'));
-   if (fnc) {
-      std::string strFile (file.path ());
-      strFile += file.name ();
+   std::string strFile (file.path ());
+   strFile += file.name ();
 
-      Xifstream ifile;
-      ifile.open (strFile.c_str (), ios::in | ios::binary);
-      if (!ifile) {
-         LOCKOUTPUT
-         std::cerr << PACKAGE "-error: File " << strFile.c_str ()
-                  << " can't be opened!\nReason: ";
-         perror ("");
-         UNLOCKOUTPUT
-      }
-      else {
-         ifile.init ();
-
-         try {
-            Properties prop;
-            (this->*fnc) ((Xistream&)ifile, prop);
-            LOCKOUTPUT
-            writer->printFile (cout, file, prop);
-            UNLOCKOUTPUT
-         }
-         catch (std::string& err) {
-            LOCKOUTPUT
-            std::cerr << PACKAGE "-error: " << err.c_str () << '\n';
-            writer->printMessage (cout, file,
-                                 (options & SHOW_ERRORS) ? "Error while processing" : "");
-            UNLOCKOUTPUT
-         } // end-catch
-      } // end-else file could be opened
+   Xifstream ifile;
+   ifile.open (strFile.c_str (), ios::in | ios::binary);
+   if (!ifile) {
+      LOCKOUTPUT
+      std::cerr << PACKAGE "-error: File " << strFile.c_str ()
+               << " can't be opened!\nReason: ";
+      perror ("");
+      UNLOCKOUTPUT
    }
-   else
-      if (options & SHOW_ALL) {
+   else {
+      ifile.init ();
+
+      try {
+         Properties prop;
+         (this->*fnc) ((Xistream&)ifile, prop);
          LOCKOUTPUT
-         writer->printMessage (cout, file,
-                               (options & SHOW_ERRORS) ? "Unknown file-type" : "");
+         writer->printFile (cout, file, prop);
          UNLOCKOUTPUT
       }
+      catch (std::string& err) {
+         LOCKOUTPUT
+         std::cerr << PACKAGE "-error: " << err.c_str () << '\n';
+         writer->printMessage (cout, file,
+                              (options & SHOW_ERRORS) ? "Error while processing" : "");
+         UNLOCKOUTPUT
+      } // end-catch
+   } // end-else file could be opened
 }
 
 /*--------------------------------------------------------------------------*/
