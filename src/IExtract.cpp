@@ -1,3 +1,4 @@
+
 //$Id$
 
 //PROJECT     : Extract
@@ -113,7 +114,7 @@ class Application : public IVIOApplication {
    virtual int         perform (int argc, const char* argv[]);
    virtual const char* name () const { return PACKAGE; }
    virtual const char* description () const
-      { return PACKAGE " V" VERSION "." MICRO_VERSION " - Compiled on " __DATE__ " - " __TIME__
+      { return PACKAGE " V" VERSION " - Compiled on " __DATE__ " - " __TIME__
                "\n\nAuthor: Markus Schwab; e-Mail: g17m0@lycos.com"
                "\nDistributed under the terms of the GNU General Public License"; }
 
@@ -217,6 +218,7 @@ const IVIOApplication::longOptions Application::lo[] = {
    { "include", 'i' },
    { "exclude", 'x' },
    { "show-errors", 'e' },
+   { "separate", 's' },
    { "all", 'a' },
    { "new", 'n' },
    { "ini-file", 'I' },
@@ -236,6 +238,8 @@ void Application::showHelp () const {
                 "  -o, --output=STYLE .... Sets the output-style (text, HTML or LaTeX)\n"
                 "  -f, --format=FORMAT ... Format of output (default: " DEFAULT_FORMAT "\n"
                 "  -T, --title=TITLE ..... Title of output\n"
+                "  -s, --separate=TEXT ... Separate subdirectories with TEXT (default: empty);\n"
+                "                          implies recursion into subdirectories (--recursive)\n"
                 "  -e, --show-errors ..... Puts error messages (additionally) into output\n"
                 "  -a, --all ............. Show all files (including unknown types) in output\n"
 #ifdef ENABLE_THREADS
@@ -264,8 +268,16 @@ void Application::showHelp () const {
                 "       %(LETTERS) is substituted with first of the above substitutions\n"
                 "          producing a non-empty string (e.g. %(nt) is the filename if not \n"
                 "          empty or else the title.)\n\n"
-                "TITLE specifies the headers for the output; seperateod with (|); columns must\n"
+                "       In every other constellation the '%' is removed!\n"
+                "TITLE specifies the headers for the output; separated with (|); columns must\n"
                 "      contain at least one character\n\n"
+                "TEXT specifies the text to separate subdirectories; with the following\n"
+                "     conversion strings:\n"
+                "       %e prints the end-of-output for the specified output style\n"
+                "       %n is substituted with the name of the directory\n"
+                "       %N is substituted with the path and name of the directory\n"
+                "       %p is substituted with the path of the directory\n"
+                "       %s prints the start-of-output for the specified output style\n\n"
                 "The format of the INI file is like this (entries can be missing):\n\n"
                 "   [Output]\n"
                 "   Format=<a href=\"%N\" title=\"%c\">%n</a>|%t|%a|%D\n"
@@ -289,6 +301,15 @@ bool Application::handleOption (const char option) {
    Check3 (option != '\0');
 
    switch (option) {
+   case 's': {
+      const char* pSep = getOptionValue ();
+      if (pSep) 
+         iniOpts.separate = pSep;
+      else {
+         cerr << PACKAGE "-warning: Option s needs an argument! Ignoring option!";
+         break; } }
+      // Don't add a break in OK case, as -s implies -r!
+      
    case 'r': options |= RECURSIVE; break;
 
    case 'o': {
@@ -320,9 +341,21 @@ bool Application::handleOption (const char option) {
 
    case 'e': options |= SHOW_ERRORS; break;
 
-   case 'f': iniOpts.format = getOptionValue (); break;
+   case 'f': {
+      const char* pFormat = getOptionValue ();
+      if (pFormat) 
+         iniOpts.format = pFormat;
+      else
+         cerr << PACKAGE "-warning: Option f needs an argument! Ignoring option!";
+      break; }
 
-   case 'T': iniOpts.title = getOptionValue (); break;
+   case 'T': {
+      const char* pTitle = getOptionValue ();
+      if (pTitle) 
+         iniOpts.title = pTitle;
+      else
+         cerr << PACKAGE "-warning: Option t needs an argument! Ignoring option!";
+      break; }
 
    case 'n': {
       const char* pNew = getOptionValue ();
@@ -348,9 +381,13 @@ bool Application::handleOption (const char option) {
    case 'x':
    case 'i':  {
       const char* files = getOptionValue ();
-      filelist += option;
-      filelist += files;
-      filelist += PathSearch::PATHSEPARATOR;
+      if (files) {
+         filelist += option;
+         filelist += files;
+         filelist += PathSearch::PATHSEPARATOR;
+      }
+      else
+         cerr << PACKAGE "-warning: Option x needs an argument! Ignoring option!";
       break; }
 
    case 'a': options |= SHOW_ALL; break;
@@ -386,7 +423,8 @@ int Application::perform (int argc, const char* argv[]) {
 
    Check3 (iniOpts.format.size ());
 
-   typedef Writer* (*CREATEWRITER) (const char*, unsigned long, const char*);
+   typedef Writer* (*CREATEWRITER) (const std::string&, const std::string&,
+                                    unsigned long);
    static struct {
       unsigned int opt;
       CREATEWRITER fnc;
@@ -395,13 +433,11 @@ int Application::perform (int argc, const char* argv[]) {
              { LATEX, (CREATEWRITER)&LaTeXWriter::create } };
 
    for (unsigned int i (0); i < (sizeof (t) / sizeof (t[0])); ++i)
-      if (outputStyle == t[i].opt) {
-         writer = t[i].fnc (iniOpts.format.c_str (), ageOfNewFiles,
-                            iniOpts.newText.size () ? iniOpts.newText.c_str () : NULL);
-      }
+      if (outputStyle == t[i].opt)
+         writer = t[i].fnc (iniOpts.format, iniOpts.newText, ageOfNewFiles);
    Check3 (writer);
 
-   writer->printStart (cout, iniOpts.title.size () ? iniOpts.title.c_str () : NULL);
+   writer->printStart (cout, iniOpts.title);
 
    std::string file;
    for (unsigned int j (0); j < argc; ++j) {
@@ -497,7 +533,10 @@ void Application::handleFiles (const char* pFile) const {
 
       file = ds.find (ds.getDirectory () + "*", DirectorySearch::FILE_DIRECTORY);
       while (file) {
-         if (IDirectorySearch::isSpecial (file->name ())) {
+         if (!IDirectorySearch::isSpecial (file->name ())) {
+            LOCKOUTPUT
+            writer->printSeparator (cout, *file, iniOpts.separate, iniOpts.title);
+            UNLOCKOUTPUT
             std::string strFile (file->path ());
             strFile += file->name ();
             strFile += File::DIRSEPARATOR;
@@ -580,7 +619,7 @@ void Application::processFile (const File& file, HANDLER fnc) const {
          err = ((options & SHOW_ERRORS)
                 ? std::string ("Error while processing: ") + err
                 : "");
-         writer->printMessage (cout, file, err.c_str ());
+         writer->printMessage (cout, file, err);
          UNLOCKOUTPUT
       } // end-catch
    } // end-else file could be opened
