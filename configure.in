@@ -5,8 +5,8 @@ AC_REVISION($Revision$)
 AC_INIT()
 
 MAJOR_VERSION=0
-MINOR_VERSION=3
-MICRO_VERSION=02
+MINOR_VERSION=4
+MICRO_VERSION=00
 RELEASE=$MAJOR_VERSION.$MINOR_VERSION
 VERSION=$RELEASE.$MICRO_VERSION
 AC_SUBST(VERSION)
@@ -37,7 +37,7 @@ dnl Checks for programs.
 
 dnl Checks for libraries.
 AC_CHECK_LIB(stdc++, main)
-PKG_CHECK_MODULES(ATTR, Attr >= 0.6.10, [],
+PKG_CHECK_MODULES(YMP, YMP >= 0.6.10, [],
                   [AC_MSG_ERROR(Need libAttr to make); exit])
 
 dnl Checks for header files.
