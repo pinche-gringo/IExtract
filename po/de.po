@@ -1,0 +1,780 @@
+# Deutsche Übersetzung der IExtract-Meldungen
+# Copyright (C) 2003 Markus Schwab
+# Markus Schwab <g17m0@lycos.com>, 2003
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: IExtract V0.3 ($Revision$)\n"
+"POT-Creation-Date: 2003-01-27 00:05-0500\n"
+"PO-Revision-Date: 2003-01-26 18:46-0500\n"
+"Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
+"Language-Team: Aleman <??@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8-bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1\n"
+
+#: src/IExtract.cpp:120
+#, ycp-format
+msgid ""
+"Compiled on %1 at %2\n"
+"\n"
+"Author: Markus Schwab; email: g17m0@lycos.com\n"
+"Distributed under the terms of the GNU General Public License"
+msgstr ""
+"Übersetzt am %1 um %2\n"
+"\n"
+"Autor: Markus Schwab; e-Mail: g17m0@lycos.com\n"
+"Vertrieben unter den Bedingungen der GNU General Public License"
+
+#: src/IExtract.cpp:242
+msgid ""
+"Extracts a description out of files (depending on the file-type)\n"
+"\n"
+"Usage:"
+msgstr ""
+"Liest die Beschreibung aus verschiedenen Dateien (abhängig vom Filetyp)\n"
+"\n"
+"Aufruf:"
+
+#: src/IExtract.cpp:243
+msgid "[OPTIONS] <File(s)>"
+msgstr "[OPTIONEN] <Datei(en)>"
+
+#: src/IExtract.cpp:244
+msgid "Recurse into subdirectories"
+msgstr "Rekursiver Vergleich von Unterverzeichnissen"
+
+#: src/IExtract.cpp:245
+msgid "Sets the output-style (text, HTML or LaTeX)"
+msgstr "Setzt den Ausgabestil (text, HTML oder LaTeX)"
+
+#: src/IExtract.cpp:246
+msgid "Format of output; default: "
+msgstr "Format der Ausgabe; Default: "
+
+#: src/IExtract.cpp:247
+msgid "Title of output"
+msgstr "Titel der Ausgabe"
+
+#: src/IExtract.cpp:248
+msgid ""
+"Separate subdirectories with TEXT (default: empty);\n"
+"implies recursion into subdirectories (--recursive)"
+msgstr ""
+"Trenne Unterverzeichnisse mit TEXT (Default: Leer);\n"
+"                           Impliziert Rekursion in Unterverzeichnisse\n"
+"                           (Option --recursive)"
+
+#: src/IExtract.cpp:249
+msgid "Puts error messages (additionally) into the output"
+msgstr "Schreibt (zusätzlich) Fehlermeldungen in die Ausgabe"
+
+#: src/IExtract.cpp:250
+msgid "Show all files (including unknown types) in output"
+msgstr "Zeige alle Dateien (auch unbekannte Typen) in Ausgabe"
+
+#: src/IExtract.cpp:252
+msgid "Number of threads for examining files (default: 1)"
+msgstr ""
+"Nummer der Hintergrundprozesse (Threads) zur Untersuchung der\n"
+"Dateien (Default: 1)"
+
+#: src/IExtract.cpp:254
+msgid "Show TEXT for files younger than DAYS days (def: 30)"
+msgstr "Zeige TEXT für Dateien jünger als DAYS Tage (Def: 30)"
+
+#: src/IExtract.cpp:255
+msgid "Files to inspect"
+msgstr "Spezifiziert die zu untersuchenden Dateien"
+
+#: src/IExtract.cpp:256
+msgid "Files not to inspect"
+msgstr "Spezifiziert die nicht zu untersuchenden Dateien"
+
+#: src/IExtract.cpp:257
+msgid "Read further options from specified file"
+msgstr "Lies weitere Optionen aus der angegebenen Datei"
+
+#: src/IExtract.cpp:258
+msgid "Output version information and exit"
+msgstr "Ausgabe der Versionsinformation und beenden"
+
+#: src/IExtract.cpp:259
+msgid "Displays this help and exit\n"
+msgstr "Ausgabe dieser Hilfe und beenden\n"
+
+#: src/IExtract.cpp:260
+msgid ""
+"  File(s) ... Files to analyze (the last part can contain wildcards)\n"
+"\n"
+msgstr ""
+"  Datei(en) ... Zu untersuchende Dateien (der letzte Teil kann Platzhalter\n"
+"                enthalten\n"
+"\n"
+
+#: src/IExtract.cpp:261
+msgid ""
+"DAYS (in option -n) may be omited or may have an multiplier suffix: m for "
+"30.\n"
+"\n"
+msgstr ""
+"DAYS kann fehlen oder einen Multiplikator als Anhang haben: m für 30.\n"
+"\n"
+
+#: src/IExtract.cpp:262
+msgid ""
+"LIST is a list of files; seperated with the path-separator of the operating\n"
+msgstr ""
+"LIST ist eine Liste von Dateien; getrennt mit dem Pfad-Separator des "
+"Betriebs-\n"
+
+#: src/IExtract.cpp:263
+msgid ""
+"     system (':' for UNICES, ';' for Windows). E.g. *.html:*.doc\n"
+"\n"
+msgstr ""
+"     systems (der Doppelpunkt (:) für UNIX, der Strichpunkt (;) für "
+"Windows).\n"
+"     Z.B.: [^iI]*.html:*.doc\n"
+"\n"
+
+#: src/IExtract.cpp:264
+msgid "FORMAT specifies how to print the entries;\n"
+msgstr "FORMAT specifieziert, wie die Einträge geschrieben werden sollen:\n"
+
+#: src/IExtract.cpp:265
+msgid "       %a is substituted with the author\n"
+msgstr "       %a wird mit dem Autor ersetzt\n"
+
+#: src/IExtract.cpp:266
+#, c-format
+msgid "       %c is substituted with the comment\n"
+msgstr "       %c wird mit dem Kommentar ersetzt\n"
+
+#: src/IExtract.cpp:267
+#, c-format
+msgid "       %d is substituted with the modification time of the file\n"
+msgstr "       %d wird mit dem Datum der letzten Änderung der Datei ersetzt\n"
+
+#: src/IExtract.cpp:268
+msgid ""
+"       %D is substituted with the modification time of the file (day only)\n"
+msgstr "       %d wird mit dem Tag der letzten Änderung der Datei ersetzt\n"
+
+#: src/IExtract.cpp:269
+#, c-format
+msgid "       %n is substituted with the name of the file\n"
+msgstr "       %n wird mit dem Namen der Datei ersetzt\n"
+
+#: src/IExtract.cpp:270
+msgid "       %N is substituted with path and name of the file\n"
+msgstr "       %N wird mit dem Pfad und dem Namen der Datei ersetzt\n"
+
+#: src/IExtract.cpp:271
+#, c-format
+msgid "       %p is substituted with the path of the file\n"
+msgstr "       %p wird mit dem Pfad der Datei ersetzt\n"
+
+#: src/IExtract.cpp:272
+msgid ""
+"       %P is substituted with the path of the file in UNIX style (with /)\n"
+msgstr ""
+"       %P wird mit dem Pfad der Datei im UNIX-Stil (Verzeichnisse getrennt "
+"mit\n"
+"          einem Schrägstrich (/)) ersetzt\n"
+
+#: src/IExtract.cpp:273
+#, c-format
+msgid "       %s is substituted with the size of the file\n"
+msgstr "       %s wird mit der Dateigröße ersetzt\n"
+
+#: src/IExtract.cpp:274
+msgid "       %S is substituted with the size of the file (human readable)\n"
+msgstr ""
+"       %S wird mit der Dateigröße (in einem für den Menschen lesbaren "
+"Format)\n"
+"          ersetzt\n"
+
+#: src/IExtract.cpp:275
+msgid "       %t is substituted with the title\n"
+msgstr "       %t wird mit dem gefundenen Titel ersetzt\n"
+
+#: src/IExtract.cpp:276
+msgid ""
+"       %U is substituted with path and name of the file in UNIX style "
+"(with /)\n"
+msgstr ""
+"       %U wird mit dem Pfad und dem Namen der Datei im UNIX-Stil "
+"(Verzeichnisse\n"
+"          getrennt mit einem Schrägstrich (/)) ersetzt\n"
+
+#: src/IExtract.cpp:277
+msgid ""
+"       %(LETTERS) is substituted with first of the above substitutions\n"
+msgstr ""
+"       %(LETTERS) wird mit der ersten der obigen Ersetzungen ersetzt, die "
+"einen\n"
+
+#: src/IExtract.cpp:278
+msgid ""
+"          producing a non-empty string (e.g. %(tn) is the titel if not \n"
+msgstr ""
+"          nicht-leeren String ergibt (z.B.: %(tn) ist der Titel, wenn vor-\n"
+
+#: src/IExtract.cpp:279
+msgid ""
+"          empty or else the filename.)\n"
+"\n"
+msgstr ""
+"          handen, sonst der Dateiname)\n"
+"\n"
+
+#: src/IExtract.cpp:280
+#, c-format
+msgid ""
+"       In every other constellation the '%' is removed!\n"
+"\n"
+msgstr ""
+"          In jeder anderen Zusammensetzung wird das Prozent lediglich "
+"entfernt!\n"
+"\n"
+
+#: src/IExtract.cpp:281
+msgid ""
+"TITLE specifies the headers for the output; separated with (|); columns "
+"must\n"
+msgstr ""
+"TITLE spezifiziert den Kopf der Ausgabe; die Spalten werden mit dem "
+"Schrägstrich\n"
+
+#: src/IExtract.cpp:282
+msgid ""
+"      contain at least one character\n"
+"\n"
+msgstr ""
+"      getrennt; jede Spalte muß zumindest ein Zeichen aufweisen\n"
+"\n"
+
+#: src/IExtract.cpp:283
+msgid ""
+"TEXT specifies the text to separate subdirectories; with the following\n"
+msgstr ""
+"TEXT spezifiziert den Text, der die einzelnen Unterverzeichnisse trennt; "
+"die\n"
+
+#: src/IExtract.cpp:284
+msgid "     conversion strings:\n"
+msgstr "     folgenden Platzhalter werden unterstützt:\n"
+
+#: src/IExtract.cpp:285
+#, c-format
+msgid "       %e prints the end-of-output for the specified output style\n"
+msgstr ""
+"       %e wird mit dem Ende-der-Ausgabe (des jeweiligen Stils) ersetzt\n"
+
+#: src/IExtract.cpp:286
+#, c-format
+msgid "       %n is substituted with the name of the directory\n"
+msgstr "       %n wird mit dem Namen des Verzeichnisses ersetzt\n"
+
+#: src/IExtract.cpp:287
+msgid "       %N is substituted with the full path of the directory\n"
+msgstr "       %N wird mit dem Pfad zum und Namen des Verzeichnisses ersetzt\n"
+
+#: src/IExtract.cpp:288
+#, c-format
+msgid "       %p is substituted with the path to the directory\n"
+msgstr "       %p wird mit dem Pfad zum Verzeichnis ersetzt\n"
+
+#: src/IExtract.cpp:289
+msgid ""
+"       %P is substituted with the path to the directory in UNIX style "
+"(with /)\n"
+msgstr ""
+"       %P wird mit dem Pfad zum Verzeichnis im UNIX-Stil (Verzeichnisse "
+"getrennt\n"
+"          mit einem Schrägstrich (/)) ersetzt\n"
+
+#: src/IExtract.cpp:290
+#, c-format
+msgid "       %s prints the start-of-output for the specified output style\n"
+msgstr ""
+"        %s wird mit dem Start-der-Ausgabe (des jeweiligen Stils) ersetzt\n"
+
+#: src/IExtract.cpp:291
+msgid ""
+"       %U is substituted with the full path of the dir in UNIX style "
+"(with /)\n"
+"\n"
+msgstr ""
+"       %U wird mit dem Pfad zum und Names des Verzeichnissses im UNIX-Stil\n"
+"          (Verzeichnisse getrennt mit einem Schrägstrich (/)) ersetzt\n"
+
+#: src/IExtract.cpp:292
+msgid ""
+"The format of the INI file is like this (entries can be missing):\n"
+"\n"
+msgstr ""
+"INI-Files haben folgendes Format (Einträge können fehlen):\n"
+"\n"
+
+#: src/IExtract.cpp:300
+msgid "Currently supported files are:"
+msgstr "Unterstützte Dateientypen sind:"
+
+#: src/IExtract.cpp:324 src/IExtract.cpp:367 src/IExtract.cpp:378
+#: src/IExtract.cpp:415 src/IExtract.cpp:428
+#, ycp-format
+msgid "-warning: Option `%1' needs an argument! Ignoring option!\n"
+msgstr "-Warnung: Option \"%1\" benötigt ein Argument! Ignoriere Option!\n"
+
+#: src/IExtract.cpp:339
+#, ycp-format
+msgid "-warning: Style of output `%1' is not valid! Using text\n"
+msgstr "-Warning: \"%1\" ist kein gültiger Ausgabestil! Verwende text\n"
+
+#: src/IExtract.cpp:353
+msgid "-warning: Invalid number of threads!\n"
+msgstr "-Warnung: Ungültige Anzahl von Threads (Hintergrundprozessen)!\n"
+
+#: src/IExtract.cpp:391
+#, ycp-format
+msgid ""
+"-warning: Argument for new files `%1' is not valid! Ignoring option `n'\n"
+msgstr ""
+"-Warnung: \"%1\" ist kein gültiges Argument für neue Datein!\n"
+"Ignoriere Option \"n\"\n"
+
+#: src/IExtract.cpp:437
+#, ycp-format
+msgid "-warning: Ignoring invalid option `%1'\n"
+msgstr "-Warnung: Ignoriere unbekannte Option \"%1\"\n"
+
+#: src/IExtract.cpp:531 src/IExtract.cpp:655
+msgid "-error: "
+msgstr "-Fehler: "
+
+#: src/IExtract.cpp:542
+msgid "Unknown file-type"
+msgstr "Unbekannter Dateityp"
+
+#: src/IExtract.cpp:636
+#, ycp-format
+msgid ""
+"-error: File `%1' can't be opened!\n"
+"Reason: "
+msgstr ""
+"Datei \"%1\" kann nicht geöffnet werden!\n"
+"Ursache: "
+
+#: src/IExtract.cpp:657
+msgid "Error while processing: "
+msgstr "Error beim Bearbeiten: "
+
+#: src/IExtract.cpp:791
+#, ycp-format
+msgid ""
+"-warning: The INI-file `%1' contains an invalid entry for the output style (`"
+"%2')! Using text\n"
+msgstr "-Warnung: Das INI-File \"%1\" enthält einen ungültigen Eintrag für den Ausgabestil (\"%2\")! Verwende text\n"
+
+#: src/ParsePDF.cpp:56
+msgid "Tag for offset of cross reference table"
+msgstr "Tag für den Offset der Cross-Referenz-Tabelle"
+
+#: src/ParsePDF.cpp:57
+msgid "Offset of cross reference table"
+msgstr "Offset der Cross-Referenz-Tabelle"
+
+#: src/ParsePDF.cpp:58
+msgid "Start of startxref-tag"
+msgstr "Start des startxref-Tags"
+
+#: src/ParsePDF.cpp:59
+msgid "Unused data"
+msgstr "Unverwendeter Wert"
+
+#: src/ParsePDF.cpp:60
+msgid "Tag for cross reference table"
+msgstr "Tag für Cross-Referenz-Tabelle"
+
+#: src/ParsePDF.cpp:61 src/ParsePDF.cpp:62
+msgid "Number of cross reference entries"
+msgstr "Anzahl der Cross-Referenz-Tabelleneinträge"
+
+#: src/ParsePDF.cpp:63
+msgid "Offset of object"
+msgstr "Offset eines Objektes"
+
+#: src/ParsePDF.cpp:64
+msgid "Tag for trailer"
+msgstr "Tag für Anhang"
+
+#: src/ParsePDF.cpp:65
+msgid "Start of object"
+msgstr "Start eines Objektes"
+
+#: src/ParsePDF.cpp:66
+msgid "Reference to info object"
+msgstr "Referenz zum Info-Object"
+
+#: src/ParsePDF.cpp:67
+msgid "Reference to other trailer"
+msgstr "Referenz zu einem anderen Anhang"
+
+#: src/ParsePDF.cpp:68
+msgid "Offset of /Prev entry"
+msgstr "Offset des /Prev-Eintrags"
+
+#: src/ParsePDF.cpp:69
+msgid "ID of object"
+msgstr "ID des Objektes"
+
+#: src/ParsePDF.cpp:70
+msgid "ID of object (repeated)"
+msgstr "ID des Objektes (wiederholt)"
+
+#: src/ParsePDF.cpp:71
+msgid "Generation"
+msgstr ""
+
+#: src/ParsePDF.cpp:72
+msgid "Tag for an object"
+msgstr "Tag für ein Objekt"
+
+#: src/ParsePDF.cpp:73
+msgid "Start of value ('(')"
+msgstr "Start des Wertes ('(')"
+
+#: src/ParsePDF.cpp:74
+msgid "Start of value ('<')"
+msgstr "Start des Wertes ('<')"
+
+#: src/ParsePDF.cpp:75
+msgid "End of value"
+msgstr "Ende des Wertes"
+
+#: src/ParsePDF.cpp:76
+msgid "End of object"
+msgstr "Ende des Objektes"
+
+#: src/ParsePDF.cpp:77
+msgid "Tag for title"
+msgstr "Tag für Titel"
+
+#: src/ParsePDF.cpp:78
+msgid "Tag for author"
+msgstr "Tag für Autor"
+
+#: src/ParsePDF.cpp:79
+msgid "Tag for comment (subject)"
+msgstr "Tag für Kommentar (Subjekt)"
+
+#: src/ParseHTML.cpp:55 src/ParsePDF.cpp:80
+msgid "Value of entry"
+msgstr "Wert des Eintrags"
+
+#: src/ParsePDF.cpp:81
+msgid "Pointer to position of cross reference table"
+msgstr "Verweis zur Position der Cross-Referenz-Tabelle"
+
+#: src/ParsePDF.cpp:82
+msgid "Position of cross reference table"
+msgstr "Position der Cross-Referenz-Tabelle"
+
+#: src/ParsePDF.cpp:83
+msgid "Cross reference table"
+msgstr "Cross-Referenz-Tabelle"
+
+#: src/ParsePDF.cpp:84
+msgid "Entries in cross reference table"
+msgstr "Einträge der Cross-Referenz-Tabelle"
+
+#: src/ParsePDF.cpp:85
+msgid "Trailer"
+msgstr "Anhang"
+
+#: src/ParsePDF.cpp:86
+msgid "Trailer values"
+msgstr "Werte des Anhangs"
+
+#: src/ParsePDF.cpp:87
+msgid "Info entry"
+msgstr "Info-Eintrag"
+
+#: src/ParsePDF.cpp:88
+msgid "Prev entry"
+msgstr "Prev-Eintrag"
+
+#: src/ParsePDF.cpp:89
+msgid "Info object"
+msgstr "Info-Objekt"
+
+#: src/ParsePDF.cpp:90
+msgid "Info values"
+msgstr "Info-Werte"
+
+#: src/ParsePDF.cpp:91
+msgid "Start of values"
+msgstr "Start der Werte"
+
+#: src/ParsePDF.cpp:92
+msgid "Valid type"
+msgstr "Gültiger Typ"
+
+#: src/ParsePDF.cpp:400
+msgid "Document does not contain neither an /Info nor a /Prev entry"
+msgstr "Dokument enthält weder einen /Info- noch einen /Prev-Eintrag"
+
+#: src/ParseHTML.cpp:49
+msgid "Start of HTML-tag"
+msgstr "Beginn eines HTML-Tags"
+
+#: src/ParseHTML.cpp:49
+msgid "End of HTML-tag"
+msgstr "Ende eines HTML-Tags"
+
+#: src/ParseHTML.cpp:50
+msgid "Meta tag"
+msgstr "Meta-Tag"
+
+#: src/ParseHTML.cpp:51 src/ParseHTML.cpp:52
+msgid "Title-tag"
+msgstr "Title-Tag"
+
+#: src/ParseHTML.cpp:53
+msgid "End of header"
+msgstr "Ende des Headers"
+
+#: src/ParseHTML.cpp:54 src/ParseWord.cpp:93
+msgid "Title of document"
+msgstr "Titel des Dokuments"
+
+#: src/ParseHTML.cpp:56
+msgid "Other HTML tag"
+msgstr "Anderes HTML-Tag"
+
+#: src/ParseHTML.cpp:57
+msgid "Unused information"
+msgstr "Unbenuzte Information"
+
+#: src/ParseHTML.cpp:58
+msgid "Quote"
+msgstr "Anführungszeichen"
+
+#: src/ParseHTML.cpp:59
+msgid "Equal sign"
+msgstr "Ist-gleich-Zeichen"
+
+#: src/ParseHTML.cpp:60
+msgid "Name of meta tag"
+msgstr "Name des Meta-Tags"
+
+#: src/ParseHTML.cpp:61
+msgid "Content specifier"
+msgstr "Inhaltsbezeichner"
+
+#: src/ParseHTML.cpp:62
+msgid "Description"
+msgstr "Beschreibung"
+
+#: src/ParseHTML.cpp:63
+msgid "Author"
+msgstr "Autor"
+
+#: src/ParseHTML.cpp:64
+msgid "Description in Dublin Core"
+msgstr "Beschreibung im Dublin Core-Format"
+
+#: src/ParseHTML.cpp:65
+msgid "Author in Dublin Core"
+msgstr "Autor im Dublin Core-Format"
+
+#: src/ParseHTML.cpp:66
+msgid "Title in Dublin Core"
+msgstr "Titel im Dublin Core-Format"
+
+#: src/ParseHTML.cpp:67
+msgid "Meta entry"
+msgstr "Meta-Eintrag"
+
+#: src/ParseHTML.cpp:68
+msgid "Name entry for meta tag"
+msgstr "Name-Eintrag für ein Meta-Tag"
+
+#: src/ParseHTML.cpp:69 src/ParseWord.cpp:97
+msgid "Title entry"
+msgstr "Titel-Eintrag"
+
+#: src/ParseHTML.cpp:70
+msgid "Recogniced meta tags"
+msgstr "Bekanntes Meta-Tag"
+
+#: src/ParseHTML.cpp:71
+msgid "Meta entries"
+msgstr "Meta-Einträge"
+
+#: src/ParseHTML.cpp:72
+msgid "Valid HTML command"
+msgstr "Gültiger HTML-Befehl"
+
+#: src/ParseHTML.cpp:73
+msgid "Valid HTML tag"
+msgstr "Gültiges HTML-Tag"
+
+#: src/ParseHTML.cpp:74
+msgid "HTML document"
+msgstr "HTML-Dokument"
+
+#: src/ParseSOffice.cpp:63
+msgid "StarOffice ID"
+msgstr "StarOffice-ID"
+
+#: src/ParseSOffice.cpp:64
+msgid "Unused contents 2"
+msgstr "Unbenutzter Inhalt (2)"
+
+#: src/ParseSOffice.cpp:65
+msgid "Start of StarOffice IDs"
+msgstr "Start der StarOffice-ID"
+
+#: src/ParseSOffice.cpp:66
+msgid "Length of data-entry"
+msgstr "Länge des Dateneintrags"
+
+#: src/ParseSOffice.cpp:67
+msgid "Property-entry"
+msgstr "Eigenschaften-Eintrag"
+
+#: src/ParseJPG.cpp:113 src/ParseSOffice.cpp:68 src/ParseWord.cpp:100
+msgid "Properties"
+msgstr "Eigenschaften"
+
+#: src/ParseSOffice.cpp:69
+msgid "Entries of properties"
+msgstr "Einträge der Eigenschaften"
+
+#: src/ParseSOffice.cpp:70
+msgid "StarOffice document"
+msgstr "StarOffice-Dokument"
+
+#: src/ParseWord.cpp:86
+msgid "ID for title"
+msgstr "ID für Titel"
+
+#: src/ParseWord.cpp:87
+msgid "ID for values (I)"
+msgstr "ID für Werte (I)"
+
+#: src/ParseWord.cpp:88
+msgid "ID for values (II)"
+msgstr "ID für Werte (II)"
+
+#: src/ParseWord.cpp:89
+msgid "Number of entries"
+msgstr "Anzahl der Einträge"
+
+#: src/ParseJPG.cpp:105 src/ParseWord.cpp:90
+msgid "Type of entry"
+msgstr "Typ des Eintrags"
+
+#: src/ParseWord.cpp:91
+msgid "Offset of Comment"
+msgstr "Offset des Kommentars"
+
+#: src/ParseWord.cpp:92
+msgid "Length of title"
+msgstr "Länge des Titels"
+
+#: src/ParseWord.cpp:94
+msgid "Other command"
+msgstr "Anderer Befehl"
+
+#: src/ParseWord.cpp:95
+msgid "Content"
+msgstr "Inhalt"
+
+#: src/ParseWord.cpp:96
+msgid "Start of value ID"
+msgstr "Start der Werte-ID"
+
+#: src/ParseWord.cpp:98
+msgid "Entry description"
+msgstr "Eintragsbeschreibung"
+
+#: src/ParseWord.cpp:101
+msgid "Word document"
+msgstr "MS-Office Dokument"
+
+#: src/ParseJPG.cpp:98
+msgid "JPEG-ID"
+msgstr ""
+
+#: src/ParseJPG.cpp:99
+msgid "ID of format 1"
+msgstr "ID des Format 1"
+
+#: src/ParseJPG.cpp:100
+msgid "ID of short comments"
+msgstr "ID eines Kurzkommentars"
+
+#: src/ParseJPG.cpp:101
+msgid "ID of long comments"
+msgstr "ID der langen Kommentare"
+
+#: src/ParseJPG.cpp:102
+msgid "ID of XXL comments"
+msgstr "ID der XXL-Kommentare"
+
+#: src/ParseJPG.cpp:103
+msgid "Comment"
+msgstr "Kommentar"
+
+#: src/ParseJPG.cpp:104
+msgid "Comment values"
+msgstr "Kommentar-Werte"
+
+#: src/ParseJPG.cpp:106
+msgid "Number of records"
+msgstr "Anzahl der Einträge"
+
+#: src/ParseJPG.cpp:107
+msgid "Length (MSB first)"
+msgstr "Länge (MSB zuerst)"
+
+#: src/ParseJPG.cpp:108
+msgid "Length (LSB first)"
+msgstr "Länge (LSB zuerst)"
+
+#: src/ParseJPG.cpp:109
+msgid "Offset"
+msgstr "Offset"
+
+#: src/ParseJPG.cpp:111
+msgid "Possible comments"
+msgstr "Mögliche Kommentare"
+
+#: src/ParseJPG.cpp:112
+msgid "Format style 1"
+msgstr "Formatstil 1"
+
+#: src/ParseJPG.cpp:114
+msgid "Short properties"
+msgstr "Kurze Eigenschaften"
+
+#: src/ParseJPG.cpp:115
+msgid "Long properties"
+msgstr "Lange Eigenschaften"
+
+#: src/ParseJPG.cpp:116
+msgid "XXL properties"
+msgstr "XXL Eigenschaften"
+
+#: src/ParseJPG.cpp:117
+msgid "List of property entries"
+msgstr "Liste der Eigenschafteneinträge"
+
+#: src/ParseJPG.cpp:119
+msgid "JPEG image"
+msgstr "JPEG-Bild"

@@ -1,0 +1,12 @@
+# $Id$
+#
+# List of source files containing translatable strings.
+#     
+# Package source files
+src/IExtract.cpp
+src/ParsePDF.cpp
+src/ParseHTML.cpp
+src/ParseMP3.cpp
+src/ParseSOffice.cpp
+src/ParseWord.cpp
+src/ParseJPG.cpp
