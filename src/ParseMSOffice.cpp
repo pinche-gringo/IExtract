@@ -32,6 +32,8 @@
 #include <Trace_.h>
 
 #include "ParseWord.h"
+#include "Properties.h"
+
 
 static const unsigned LEN_CONTENT     = 1024;
 
@@ -47,7 +49,8 @@ static const unsigned int TYPE_COMMENT = 6;
 //Parameters: pClassname: Name of class containing parser-data
 /*--------------------------------------------------------------------------*/
 ParseWord::ParseWord()
-   : len (0), cEntries (0), actEntry (-1U), offTitle (-1U), offComment (-1U), cRead (0)
+   : len (0), cEntries (0), actEntry (-1U), offTitle (-1U), offComment (-1U)
+   , cRead (0), prop (NULL)
    , id (ID, "ID for title", 16, 16, false)
    , skip ("\\*", "Unused information", 4, 4, false)
    , nrEntries ("\\*", "Number of entries", *this, &ParseWord::foundNrEntries, 4, 4, false)
@@ -90,6 +93,7 @@ ParseWord::ParseWord()
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the number of entries has been parsed
+//Parameters: pEntries: Pointer to number of entries
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundNrEntries (const char* pEntries, unsigned int) {
@@ -104,6 +108,7 @@ int ParseWord::foundNrEntries (const char* pEntries, unsigned int) {
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the number of entries has been parsed
+//Parameters: pType: Pointer to found type
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundType (const char* pType, unsigned int) {
@@ -121,6 +126,7 @@ int ParseWord::foundType (const char* pType, unsigned int) {
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the offset of the comment-entry was found
+//Parameters: offset: Pointer to offset
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundOffset (const char* offset, unsigned int) {
@@ -137,6 +143,7 @@ int ParseWord::foundOffset (const char* offset, unsigned int) {
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the length of the title was read
+//Parameters: length: Pointer to length
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundLength (const char* length, unsigned int) {
@@ -149,6 +156,8 @@ int ParseWord::foundLength (const char* length, unsigned int) {
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after a title was read
+//Parameters: pTitle: Pointer to title
+//            len: Length of title
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
@@ -157,6 +166,7 @@ int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
    TRACE1 ("ParseWord::foundTitle (const char*, unsigned int): " << pTitle
            << " (" << len << " bytes)");
 
+   assert (prop);
    if (actEntry == TYPE_TITLE) {
       if (offComment != -1U) {
          actEntry = TYPE_COMMENT;
@@ -165,10 +175,10 @@ int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
          TRACE7 ("ParseWord::foundTitle (const char*) - Skipping " << offComment
                  << " bytes for comment");
       }
-      strTitle.assign (pTitle, len - 1);
+      prop->strTitle.assign (pTitle, len - 1);
    }
    else {
-      strComment.assign (pTitle, len - 1);
+      prop->strComment.assign (pTitle, len - 1);
       offComment = -1U;
    }
 

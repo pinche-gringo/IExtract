@@ -38,8 +38,9 @@ static const unsigned LEN_COMMAND     = 1024;
 //Parameters: pClassname: Name of class containing parser-data
 /*--------------------------------------------------------------------------*/
 ParseHTML::ParseHTML ()
-   : startTag ("<", "Start of HTML-tag"), endTag (">", "End of HTML-tag")
-   , tagTitle ("TITLE", "title-tag"), tagEndTitle ("/TITLE", "/title-tag")
+   : prop (NULL) 
+   , startTag ("<", "Start of HTML-tag"), endTag (">", "End of HTML-tag")
+   , tagTitle ("TITLE", "title-tag")
    , title ("<", "Title of document", *this, &ParseHTML::foundTitle, LEN_TITLE)
    , otherTag (">", "Other HTML tag", LEN_TAG)
    , ignore ("<", "Content", LEN_COMMAND)
@@ -51,9 +52,7 @@ ParseHTML::ParseHTML ()
    _seqTitle[0] = &tagTitle;
    _seqTitle[1] = &endTag;
    _seqTitle[2] = &title;
-   _seqTitle[3] = &startTag;
-   _seqTitle[4] = &tagEndTitle;
-   _seqTitle[5] = NULL;
+   _seqTitle[3] = NULL;
 
    _selCmd[0] = &seqTitle;
    _selCmd[1] = &otherTag;
@@ -75,7 +74,8 @@ ParseHTML::ParseHTML ()
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseHTML::foundTitle (const char* pTitle, unsigned int len) {
-   strTitle.assign (pTitle, len);
+   assert (prop);
+   prop->strTitle.assign (pTitle, len);
    htmlDoc.setMaxCard (1);
    return ParseObject::PARSE_OK;
 }

@@ -17,9 +17,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#include <string>
 
 #include <Parse.h>
+
+class Properties;
 
 
 // Class to extract the title (of the properties) of a Word document
@@ -28,9 +29,9 @@ class ParseWord  {
    ParseWord ();
    ~ParseWord () { }
 
-   std::string parse (Xistream& stream) throw (std::string) {
-      wordDoc.parse (stream);
-      return strComment.empty () ? strTitle : strComment; }
+   void parse (Xistream& stream, Properties& result) throw (std::string) {
+      prop = &result;
+      wordDoc.parse (stream); }
 
  private:
    // Callback-methods for type of parsed elementes
@@ -73,8 +74,8 @@ class ParseWord  {
    unsigned int cEntries;
    unsigned int actEntry;
    unsigned int len;
-   std::string  strTitle;
-   std::string  strComment;
+
+   Properties* prop;
 };
 
 #endif

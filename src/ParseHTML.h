@@ -21,6 +21,8 @@
 
 #include <Parse.h>
 
+#include "Properties.h"
+
 
 // Class to extract the title of an HTML-file
 class ParseHTML  {
@@ -28,9 +30,9 @@ class ParseHTML  {
    ParseHTML ();
    ~ParseHTML () { }
 
-   std::string parse (Xistream& stream) throw (std::string) {
-      htmlDoc.parse (stream);
-      return strTitle; }
+   void parse (Xistream& stream, Properties& result) throw (std::string) {
+      prop = &result;
+      htmlDoc.parse (stream); }
 
  private:
    // Callback-methods for type of parsed elementes
@@ -41,7 +43,6 @@ class ParseHTML  {
    ParseExact      startTag;
    ParseExact      endTag;
    ParseUpperExact tagTitle;
-   ParseUpperExact tagEndTitle;
    OMParseText     title;
    ParseText       otherTag;
    ParseText       ignore;
@@ -51,12 +52,12 @@ class ParseHTML  {
    ParseSelection selCmd;
    ParseSelection htmlDoc;                                    // Startsequence
 
-   ParseObject* _seqTitle[6];
+   ParseObject* _seqTitle[4];
    ParseObject* _selCmd[3];
    ParseObject* _seqTag[4];
    ParseObject* _htmlDoc[3];
 
-   std::string strTitle;
+   Properties*  prop;
 };
 
 #endif
