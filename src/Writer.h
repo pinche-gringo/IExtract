@@ -1,10 +1,6 @@
 #ifndef WRITER_H
 #define WRITER_H
 
-#include <iosfwd>
-
-struct File;
-
 //$Id$
 
 // This program is free software; you can redistribute it and/or modify
@@ -21,6 +17,12 @@ struct File;
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+#include <iosfwd>
+
+#include <string>
+
+struct File;
+
 
 // Baseclass of output classes
 class Writer {
@@ -30,7 +32,7 @@ class Writer {
 
    virtual void printStart (std::ostream& out) const { };
    virtual void printFile (std::ostream& out, const File& file,
-                           const char* pDescription) const = 0;
+                           const std::string& description) const = 0;
    virtual void printEnd (std::ostream& out) const { };
 
    typedef enum { SHOW_PATH = 0x1 } showOptions;
@@ -48,7 +50,7 @@ class HTMLWriter : public Writer {
 
    virtual void printStart (std::ostream& out) const;
    virtual void printFile (std::ostream& out, const File& file,
-                           const char* pDescription) const;
+                           const std::string& description) const;
    virtual void printEnd (std::ostream& out) const;
 
    static HTMLWriter* create (unsigned int options) {
@@ -63,7 +65,7 @@ class TextWriter : public Writer {
    virtual ~TextWriter ();
 
    virtual void printFile (std::ostream& out, const File& file,
-                           const char* pDescription) const;
+                           const std::string& description) const;
 
    static TextWriter* create (unsigned int options) {
       return new TextWriter (options); }
