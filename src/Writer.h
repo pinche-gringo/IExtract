@@ -1,0 +1,73 @@
+#ifndef WRITER_H
+#define WRITER_H
+
+#include <iosfwd>
+
+struct File;
+
+//$Id$
+
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+
+// Baseclass of output classes
+class Writer {
+ public:
+   Writer (unsigned int showOptions = 0) : options (showOptions) { }
+   virtual ~Writer ();
+
+   virtual void printStart (std::ostream& out) const { };
+   virtual void printFile (std::ostream& out, const File& file,
+                           const char* pDescription) const = 0;
+   virtual void printEnd (std::ostream& out) const { };
+
+   typedef enum { SHOW_PATH = 0x1 } showOptions;
+
+ protected:
+   unsigned int options;
+};
+
+
+// Class to write fileinfo in HTML format
+class HTMLWriter : public Writer {
+ public:
+   HTMLWriter (unsigned int showOptions = 0) : Writer (showOptions) { }
+   virtual ~HTMLWriter ();
+
+   virtual void printStart (std::ostream& out) const;
+   virtual void printFile (std::ostream& out, const File& file,
+                           const char* pDescription) const;
+   virtual void printEnd (std::ostream& out) const;
+
+   static HTMLWriter* create (unsigned int options) {
+      return new HTMLWriter (options); }
+};
+
+
+// Class to write fileinfo in text format
+class TextWriter : public Writer {
+ public:
+   TextWriter (unsigned int showOptions = 0) : Writer (showOptions) { }
+   virtual ~TextWriter ();
+
+   virtual void printFile (std::ostream& out, const File& file,
+                           const char* pDescription) const;
+
+   static TextWriter* create (unsigned int options) {
+      return new TextWriter (options); }
+};
+
+
+#endif
