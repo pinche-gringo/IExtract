@@ -38,10 +38,6 @@ class ParsePDF {
    ParsePDF (const ParsePDF& other);
    const ParsePDF& operator= (const ParsePDF& other);
 
-   static unsigned int convertToInt (char ch) {
-      ch -= '0';
-      return ch > 0xa ? ch - 0xa : ch; }
-
    // Callback-methods for type of parsed elementes
    int foundValue (const char*, unsigned int);
    int foundTitle (const char*, unsigned int);
