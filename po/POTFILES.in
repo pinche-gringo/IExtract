@@ -7,6 +7,7 @@ src/IExtract.cpp
 src/ParsePDF.cpp
 src/ParseHTML.cpp
 src/ParseMP3.cpp
+src/ParseOOffice.cpp
 src/ParseSOffice.cpp
 src/ParseWord.cpp
 src/ParseJPG.cpp
