@@ -35,8 +35,9 @@
    Leave the following blank line there!!  Autoheader needs it.  */
 
 
-/* Define for MICRO_VERSION */
-#define MICRO_VERSION "00"
+/* Version number of package */
+#define RELEASE "0.3"
+#define VERSION RELEASE ".01"
 
 
 /* Leave that blank line there!!  Autoheader needs it.
@@ -212,9 +213,6 @@
 
 /* Define if you have the ANSI C header files. */
 #define STDC_HEADERS 1
-
-/* Version number of package */
-#define VERSION "0.3.00"
 
 /* Define if your processor stores words with the most significant byte first
    (like Motorola and SPARC, unlike Intel and VAX). */
