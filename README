@@ -1,5 +1,5 @@
-                       Extract
-                       =======
+                       IExtract
+                       ========
 
 
 Utility to extract a description for certain file-types
@@ -24,10 +24,9 @@ to the extension - so don't cheat ;) ):
 	  dialog is extracted.
   - MP3 files: Extracts the contents of the ID3 tag.
 
-The found results can be written either in text, HTML (table) or LaTeX
-(tabular) format. Note that there is no extra formatting of the text (like
-checking for LaTeX or HTML special characters) or special formatting of the
-output.
+The found results can be written either in text, HTML (table), XML (defaults to
+XHTML) or LaTeX (tabular) format. Note that there is some extra formatting of
+the text (like checking for LaTeX or HTML special characters) done.
 
 
 Installation

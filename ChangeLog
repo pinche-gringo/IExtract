@@ -1,3 +1,42 @@
+2003-03-26  Markus Schwab  <g17m0@lycos.com>
+
+	* NEWS, ChangeLog, README: Changes of Version 0.3.01 documented
+
+	* src/IExtract.cpp:
+	  Copyright reformated in one line; thanks to gettext
+
+	* po/de.po, po/en.po, po/es.po:
+	  New messages added (for XML); Line numbers actualized
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Features of 0.3.01 docommented
+
+	* Windows/IExtract-cfg.h, configure.in:
+	  Vesion to 0.3.01
+
+	* src/Writer.cpp, src/Writer.h:
+	  Removed OutIterator; Changing special characters
+
+	* src/ParseMP3.cpp:
+	  Stripping also \0, but returning allways at least one character
+
+	* src/ParseHTML.cpp, src/ParsePDF.cpp, src/ParseSOffice.cpp, src/ParseWord.cpp:
+	  Removed warnings when compiling with -Wall
+
+	* src/IExtract.cpp, src/Writer.cpp, src/Writer.h:
+	  Output in XML-style (defaults to XHTML)
+
+2003-02-24  Markus Schwab  <g17m0@lycos.com>
+
+	* Windows/IExtract.dsp, Windows/VCExtract.mak: Include-pahts corrected
+
+	* Windows/IExtract-cfg.h: Initial reviion
+
+2003-02-22  Markus Schwab  <g17m0@lycos.com>
+
+	* src/IExtract.cpp, src/ParseHTML.cpp, src/ParseJPG.cpp, src/ParseMP3.cpp, src/ParsePDF.cpp, src/ParsePDF.h, src/ParseSOffice.cpp, src/ParseWord.cpp, src/ParseWord.h:
+	Using namespace std explicitely
+
 2003-02-13  Markus Schwab  <g17m0@lycos.com>
 
 	* NEWS, ChangeLog: Changes of Version 0.3.00 documented

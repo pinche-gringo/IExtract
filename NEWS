@@ -1,3 +1,9 @@
+Overview of changes in version 0.3.01:
+
+  - Change special characters for LaTeX, HTML and XML documents.
+  - Removed warnings when compiling with -Wall
+  - Added possibility to print XML output
+
 Overview of changes in version 0.3.00:
 
   - Enhanced search in MS office documents
