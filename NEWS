@@ -1,4 +1,15 @@
-Overview of changes in version 0.2.03
+Overview of changes in version 0.3.00:
+
+  - Enhanced search in MS office documents
+  - Added handling of MP3 files
+  - Added format-options %S and %s for the size of the found file
+  - Also handling PHP-files (as HTML)
+  - Internationalization
+  - Documentation (English, german, spanish)
+  - Options to in/exclude directories in search
+  - Option to read options from a file changed to 'f' and format to 'F'
+
+Overview of changes in version 0.2.03:
 
   - Added option to print text for every new subdirectory
   - Sanity checks for option processing
@@ -7,7 +18,7 @@ Overview of changes in version 0.2.03
   - Output of paths can be in UNIX-style (mainly important for web pages)
   - Fixed handling of TextForNewFiles read from INI-file
 
-Overview of changes in version 0.2.02
+Overview of changes in version 0.2.02:
 
   - Added support for PDF files
   - Option "-e" reports also the error of the parser in the output
@@ -15,7 +26,7 @@ Overview of changes in version 0.2.02
   - Handling also MS Office docs having OLE (?) objects between property header
     and the actual properties (whyever they are doing that?!)
 
-Overview of changes in version 0.2.01
+Overview of changes in version 0.2.01:
 
   - Added handling of StarOffice documents
   - Code should also work on bigendian machines; hard to test on PCs though ;)
@@ -25,7 +36,7 @@ Overview of changes in version 0.2.01
   - Also read text for new files from INI file
   - Help text improved
 
-Overview of changes in version 0.2.00
+Overview of changes in version 0.2.00:
 
   - Option to pass a text for new entries
   - Options to select files (in/exclude them)
@@ -37,6 +48,6 @@ Overview of changes in version 0.2.00
   - Reading comment styles as created by PhotoShop (another JPEG format?!)
 
 
-Overview of changes in version 0.1.00
+Overview of changes in version 0.1.00:
 
   - Handling JPG, HTML & M$ office documents

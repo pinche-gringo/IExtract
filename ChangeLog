@@ -1,3 +1,75 @@
+2003-02-13  Markus Schwab  <g17m0@lycos.com>
+
+	* NEWS, ChangeLog: Changes of Version 0.3.00 documented
+
+	* README: Docu-dir added
+
+	* src/IExtract.cpp: Name of options changed
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Updated addressof of FSF
+
+2003-02-10  Markus Schwab  <g17m0@lycos.com>
+
+	* po/de.po, po/en.po, po/es.po: Actualized
+
+2003-02-01  Markus Schwab  <g17m0@lycos.com>
+
+	* doc/IExtract.html.es: Minor fixes
+
+	* doc/IExtract.html.en, doc/IExtract.html.es, doc/IExtract.html.de:
+	  Links to versions in other languages added; Improved and fixed
+
+2003-01-28  Markus Schwab  <g17m0@lycos.com>
+
+	* po/en.po, po/es.po: New file.
+
+2003-01-27  Markus Schwab  <g17m0@lycos.com>
+
+	* Makefile.am, configure.in: I18n enabled
+
+	* acconfig.h: New file.
+
+	* src/ParseHTML.cpp, src/ParseJPG.cpp, src/ParsePDF.cpp, src/ParseSOffice.cpp, src/ParseWord.cpp:
+	  I18n
+
+	* src/Writer.cpp: UNIX-style only set on non-UNIX-systems
+
+	* src/IExtract.cpp: I18n; Handling *php & *sht-files; Minor fixes
+
+	* po/POTFILES.in, po/de.po: New file.
+
+2003-01-26  Markus Schwab  <g17m0@lycos.com>
+
+	* doc/IExtract.html.de, doc/IExtract.html.en: Minor changes and corrections
+
+	* doc/Makefile.am: Translations added to distribution
+
+	* doc/IExtract.html.es: New file.
+
+2003-01-25  Markus Schwab  <g17m0@lycos.com>
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/Makefile.am: New file.
+
+	* Windows/VCExtract.mak, Windows/IExtract.dsp: Version to 0.3.00; ParseMP3 added
+
+2003-01-16  Markus Schwab  <g17m0@lycos.com>
+
+	* src/Writer.cpp, src/Writer.h:
+	  Posibility to print size added; isAtName deleted; Fixed HTML-printMessage
+
+	* src/ParseMP3.cpp, src/ParseMP3.h: New file.
+
+	* src/Makefile.am: ParseMP3 added
+
+	* src/IExtract.cpp:
+	  Handling of MP3-files aded; Help text changed to max. 80 chars/line
+
+2003-01-11  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseWord.cpp, src/ParseWord.h:
+	  Checking for 2 separators between property header and data
+
 2002-12-17  Markus Schwab  <g17m0@lycos.com>
 
 	* NEWS, ChangeLog: Changes in Version 0.2.03 documented
