@@ -73,13 +73,14 @@ ParsePDF::ParsePDF ()
      , tagTitle ("/Title", _("Tag for title"), *this, &ParsePDF::foundTitle)
      , tagAuthor ("/Author", _("Tag for author"), *this, &ParsePDF::foundAuthor)
      , tagComment ("/Subject", _("Tag for comment (subject)"), *this, &ParsePDF::foundComment)
-     , value (")>", _("Value of entry"), *this, &ParsePDF::foundValue, 512)
+     , value (")>", _("Value of entry"), *this, &ParsePDF::foundValue, 512, 0)
      , startOfValue1 ("(", _("Start of value ('(')"), *this, &ParsePDF::foundParenthesis)
      , startOfValue2 ("<", _("Start of value ('<')"), *this, &ParsePDF::foundBracket)
      , endOfValue (")", _("End of value"))
      , selXRef (_selXRef, _("Pointer to position of cross reference table"), -1U, 0)
      , seqXRef (_seqXRef, _("Position of cross reference table"))
      , seqXRefTable (_seqXRefTable, _("Cross reference table"))
+     , seqXRefSubsection (_seqXRefSubsection, _("Cross reference table subsection"), -1U)
      , seqXRefTableEntries (_seqXRefTableEntries, _("Entries in cross reference table"), 0, 0)
      , seqTrailer (_seqTrailer, _("Trailer"))
      , selValues (_selValues, _("Trailer values"), -1U, 0)
@@ -101,11 +102,14 @@ ParsePDF::ParsePDF ()
    _seqXRef[3] = NULL;
 
    _seqXRefTable[0] = &idXRef;
-   _seqXRefTable[1] = &nrStart;
-   _seqXRefTable[2] = &count;
-   _seqXRefTable[3] = &seqXRefTableEntries;
-   _seqXRefTable[4] = &seqTrailer;
-   _seqXRefTable[5] = NULL;
+   _seqXRefTable[1] = &seqXRefSubsection;
+   _seqXRefTable[2] = &seqTrailer;
+   _seqXRefTable[3] = NULL;
+
+   _seqXRefSubsection[0] = &nrStart;
+   _seqXRefSubsection[1] = &count;
+   _seqXRefSubsection[2] = &seqXRefTableEntries;
+   _seqXRefSubsection[3] = NULL;
 
    _seqXRefTableEntries[0] = &offObject;
    _seqXRefTableEntries[1] = &skip;
@@ -349,7 +353,7 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
 
    if (actEntry != NONE) {
       TRACE9 ("ParsePDF::foundValue (const char*, unsigned int) - Assigning: "
-              << pValue + 1);
+              << (((*pValue == '(') || (*pValue == '<')) ? (pValue + 1) : pValue));
 
       static std::string Properties::* values[] =
          { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };

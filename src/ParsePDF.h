@@ -96,6 +96,7 @@ class ParsePDF {
    YGP::ParseSelection selXRef;
    YGP::ParseSequence  seqXRef;
    YGP::ParseSequence  seqXRefTable;
+   YGP::ParseSequence  seqXRefSubsection;
    YGP::ParseSequence  seqXRefTableEntries;
    YGP::ParseSequence  seqTrailer;
    YGP::ParseSelection selValues;
@@ -108,7 +109,8 @@ class ParsePDF {
 
    YGP::ParseObject* _selXRef[4];
    YGP::ParseObject* _seqXRef[4];
-   YGP::ParseObject* _seqXRefTable[6];
+   YGP::ParseObject* _seqXRefTable[4];
+   YGP::ParseObject* _seqXRefSubsection[4];
    YGP::ParseObject* _seqXRefTableEntries[3];
    YGP::ParseObject* _seqTrailer[4];
    YGP::ParseObject* _selValues[5];
