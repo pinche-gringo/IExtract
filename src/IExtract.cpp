@@ -35,6 +35,7 @@
 #include <DirSrch.h>
 #include <IVIOAppl.h>
 
+#include "Writer.h"
 #include "ParseHTML.h"
 #include "ParseWord.h"
 
@@ -53,6 +54,7 @@ class Application : public IVIOApplication {
    virtual bool handleOption (const char option);
 
    // Program-handling
+   virtual bool shallShowInfo () const { return true; }
    virtual int         perform (int argc, const char* argv[]);
    virtual const char* name () const { return PACKAGE; }
    virtual const char* description () const
@@ -71,16 +73,16 @@ class Application : public IVIOApplication {
    Application (const Application&);
    const Application& operator= (const Application&);
 
-   void handleFiles (const char* pFile) const;
-   void showFile (const char* pFile, const char* pDesc) const;
+   void handleFiles (Writer& writer, const char* pFile) const;
 
    char* processHTML (Xistream& hFile) const throw (std::string);
    char* processOffice (Xistream& hFile) const throw (std::string);
 
-   enum opts { VERBOSE = 0x1, RECURSIVE = 0x2, SHOW_ERRORS = 0x4 };
+   enum { RECURSIVE = 0x1, VERBOSE = 0x2, SHOW_ALL = 0x4, SHOW_ERRORS = 0x8 };
+   unsigned int showOptions;
    unsigned int options;
 
-   enum { TEXT, HTML } outputStyle;
+   enum { TEXT = 0, HTML } outputStyle;
 
    typedef char* (Application::*HANDLER) (Xistream& hFile) const;
    typedef struct {
@@ -108,6 +110,8 @@ const IVIOApplication::longOptions Application::lo[] = {
    { "help", 'h' },
    { "recursive", 's' },
    { "show-errors", 'e' },
+   { "show-path", 'p' },
+   { "all", 'a' },
    { "verbose", 'v' },
    { "version", 'V' },
    { "output", 'o' },
@@ -124,8 +128,10 @@ void Application::showHelp () const {
                 "  -s, --recursive ...... Recurse into subdirectories\n"
                 "  -o, --output=STYLE ... Sets the output-style (text or HTML)\n"
                 "  -e, --show-errors .... Puts error messages (additionally) into output\n"
+                "  -p, --show-path ...... Print path for files in output\n"
+                "  -a, --all ............ Show all files (including unknown types) in output\n"
                 "  -v, --verbose, ....... Displays the processed files (be verbose)\n"
-                "  -V, version .......... Output version information and exit\n"
+                "  -V, --version ........ Output version information and exit\n"
                 "  -h, -?, --help ....... Displays this help and exit\n"
                 "  File(s) ... File to analyze\n\n"
                 "Currently supported documents are: HTML, WinWord, Excel & Powerpoint\n";
@@ -141,7 +147,7 @@ bool Application::handleOption (const char option) {
    assert (option != '\0');
 
    switch (option) {
-   case 'r': options |= RECURSIVE; break;
+   case 's': options |= RECURSIVE; break;
 
    case 'o': {
       const char* pType = getOptionValue ();
@@ -155,7 +161,11 @@ bool Application::handleOption (const char option) {
 
    case 'e': options |= SHOW_ERRORS; break;
 
+   case 'p': showOptions |= Writer::SHOW_PATH; break;
+
    case 'v': options |= VERBOSE; break;
+
+   case 'a': options |= SHOW_ALL; break;
 
    case 'V': options |= VERBOSE; std::cout << description () << '\n'; exit (0);
 
@@ -178,29 +188,39 @@ int Application::perform (int argc, const char* argv[]) {
       return -1;
    }
 
-   if (outputStyle == HTML)
-      cout << "<table>\n";
+   typedef Writer* (*CREATEWRITER) (unsigned int);
+   static struct {
+      unsigned int opt;
+      CREATEWRITER fnc;
+   } t[] = { { TEXT, (CREATEWRITER)&TextWriter::create },
+             { HTML, (CREATEWRITER)&HTMLWriter::create } };
 
-   for (unsigned int i (0); i < argc; ++i) {
-      if (options & VERBOSE) {
-         std::cout << "Handling file(s) " << argv[i] << '\n'; std::cout.flush (); }
-      handleFiles (argv[i]);
-   }
+   Writer* writer = NULL;
+   for (unsigned int i (0); i < (sizeof (t) / sizeof (t[0])); ++i)
+      if (outputStyle == t[i].opt) {
+         writer = t[i].fnc (showOptions);
+      }
+   assert (writer);
 
-   if (outputStyle == HTML)
-      cout << "</table>\n";
+   writer->printStart (cout);
 
+   for (unsigned int j (0); j < argc; ++j)
+      handleFiles (*writer, argv[j]);
+
+   writer->printEnd (cout);
    return 0;
 }
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Performs the job of the applications
-//Parameters: argc: Number of parameters (without options)
-//            argv: Array with pointer to arguments
-//Returns   : int: Status
+//Purpose   : Expands the filespecification and processes every file
+//Parameters: writer: Class to use for output
+//            pFile: Filespecification; may contain wildcards
+//Requires  : pFile not NULL
 /*--------------------------------------------------------------------------*/
-void Application::handleFiles (const char* pFile) const {
+void Application::handleFiles (Writer& writer, const char* pFile) const {
    assert (pFile);
+   if (options & VERBOSE) {
+      std::cout << "Handling file(s) " << pFile << '\n'; std::cout.flush (); }
 
    DirectorySearch ds (pFile);
    const File* file = ds.find ((options & RECURSIVE)
@@ -218,7 +238,7 @@ void Application::handleFiles (const char* pFile) const {
          if (strcmp (file->name (), ".") && strcmp (file->name (), "..")) {
             strFile += File::DIRSEPARATOR;
             strFile += "*";
-            handleFiles (strFile.c_str ());
+            handleFiles (writer, strFile.c_str ());
          }
       }
       else {
@@ -236,45 +256,27 @@ void Application::handleFiles (const char* pFile) const {
 
                try {
                   char* pDescription = (this->*fnc) ((Xistream&)ifile);
-                  assert (pDescription);
-                  showFile (strFile.c_str (), pDescription);
-                  free (pDescription);
+                  writer.printFile (cout, *file, pDescription);
+                  if (pDescription)
+                     free (pDescription);
                }
                catch (std::string& err) {
                   std::cerr << PACKAGE "-error: " << err.c_str ();
-                  showFile (strFile.c_str (),
-                            ((options & SHOW_ERRORS)
-                             ? "Error while processing" : ""));
+                  writer.printFile (cout, *file,
+                                    ((options & SHOW_ERRORS)
+                                     ? "Error while processing" : NULL));
                } // end-catch
             } // end-else file could be opened
          } // endif handler found
          else
-            showFile (strFile.c_str (),
-                      (options & SHOW_ERRORS) ? "Unknown file-type" : "");
+            if (options & SHOW_ALL)
+               writer.printFile (cout, *file,
+                                 ((options & SHOW_ERRORS)
+                                  ? "Unknown file-type" : NULL));
       }
 
       file = ds.next ();
    } // end-while
-}
-
-/*--------------------------------------------------------------------------*/
-//Purpose   : Displays a filename with its description
-//Parameters: pFile: Name of file
-//            pDesc: Description of file; can be NULL
-//Requires  : pFile not NULL
-/*--------------------------------------------------------------------------*/
-void Application::showFile (const char* pFile, const char* pDesc) const {
-   assert (pFile);
-
-   if (outputStyle == HTML)
-      cout << "<tr><td>&nbsp;&nbsp;<a href=" << pFile << '>';
-   std::cout << pFile;
-   if (outputStyle == HTML)
-      cout << "</td><td>";
-   cout << " - " << (pDesc ? pDesc : "");
-   if (outputStyle == HTML)
-      cout << "</td></tr>";
-   cout << '\n';
 }
 
 /*--------------------------------------------------------------------------*/
