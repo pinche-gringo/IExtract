@@ -7,7 +7,7 @@ IExtract_SOURCES=IExtract.cpp ParseHTML.cpp ParseHTML.h ParseWord.cpp \
 	         ParseWord.h Writer.cpp Writer.h ParseJPG.cpp ParseJPG.h\
 		 Properties.h ParseSOffice.cpp ParseSOffice.h Options.h\
 		 ParsePDF.h ParsePDF.cpp ParseMP3.cpp ParseMP3.h \
-		 ParseOOffice.cpp ParseOOffice.h
+		 ParseOOffice.cpp ParseOOffice.h ParseRTF.cpp ParseRTF.h
 
 EXTRA_DIST=Options.meta
 
