@@ -311,19 +311,19 @@ std::string Writer::getNextNode (const YGP::File& file, const Properties& prop) 
       else if (token[pos + 1] != '(')
          getSubstitute (token[nPos = pos + 1], substitute, file, prop);
       else {
-         nPos = pos + 1;
+         nPos = pos + 2;
          do {
             getSubstitute (token[nPos], substitute, file, prop);
          } while (substitute.empty () && (token[++nPos] != ')') && token[nPos]);
 
          // Now skip to next closing bracket
          if (token[nPos])
-            if ((nPos = token.find (')', nPos)) != std::string::npos)
-               ++nPos;
-            else
+            if ((nPos = token.find (')', nPos)) == std::string::npos)
                nPos = token.size ();
       } // end-else '(' found
 
+      TRACE9 ("Replacing " << pos << '-' << (nPos - pos + 1) << " of " << token
+              << " with " << substitute);
       token.replace (pos, nPos - pos + 1, substitute);
       nPos = pos + substitute.length ();
    }
