@@ -107,7 +107,9 @@
       <dd><p>PDF-Dokumente beinhalten ein sogenanntes <i>Document Information
             directory</i> mit verschiedenen Eintr&auml;gen. Der Inhalt dieses
           Verzeichnisses wird ausgelesen (mit dem "Subject"-Schl&uuml;ssel als
-          Kommentar).</p></dd>
+          Kommentar).</p>
+
+        <p>Verschl&uuml;esselte Dokumente werden nicht entschl&uuml;sselt!</p></dd>
       </dd>
 
       <dt><b>StarOffice Dokumente</b></dt>

@@ -109,7 +109,9 @@
       <dd><p>Documentos de PDF contienen un llamado <i>Document Information
             directory</i> (Directorio de informaciones del documento) con varias
           llaves. El contento de aquel directorio est&aacute; extraido (con el
-          contenido de la llave "Subject" (sujecto) como comentario).</p></dd>
+          contenido de la llave "Subject" (sujecto) como comentario).</p>
+
+        <p>&iexcl;Datos codificados no est&aacute;n decifrados!</p></dd>
       </dd>
 
       <dt><b>Documentos de StarOffice</b></dt>
@@ -215,7 +217,7 @@
               por los demas suprime ese cambio adicional.</li>
           </ul>
 
-          <p>En todas las otras formas el  '%' est&aacute; borrado!</p></td></tr>
+          <p>&iexcl;En todas las otras formas el  '%' est&aacute; borrado!</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-T,&nbsp;--title=T&Iacute;TULO</b></td>
