@@ -7,19 +7,19 @@
 CFG=IExtract - Win32 Debug
 !MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
 !MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den Befehl
-!MESSAGE 
+!MESSAGE
 !MESSAGE NMAKE /f "IExtract.mak".
-!MESSAGE 
+!MESSAGE
 !MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
 !MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
-!MESSAGE 
+!MESSAGE
 !MESSAGE NMAKE /f "IExtract.mak" CFG="IExtract - Win32 Debug"
-!MESSAGE 
+!MESSAGE
 !MESSAGE Für die Konfiguration stehen zur Auswahl:
-!MESSAGE 
+!MESSAGE
 !MESSAGE "IExtract - Win32 Release" (basierend auf  "Win32 (x86) Console Application")
 !MESSAGE "IExtract - Win32 Debug" (basierend auf  "Win32 (x86) Console Application")
-!MESSAGE 
+!MESSAGE
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\General\Common" /I "..\..\General\Windows" /D "NDEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.2" /D MICRO_VERSION="01" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.2\" /D MICRO_VERSION=\"01\" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\General\Common" /I "..\..\General\Windows" /D "NDEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.2" /D MICRO_VERSION="03" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.2\" /D MICRO_VERSION=\"03\" /YX /FD /c
 # ADD BASE RSC /l 0x407 /d "NDEBUG"
 # ADD RSC /l 0x407 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -74,7 +74,7 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 
-!ENDIF 
+!ENDIF
 
 # Begin Target
 
@@ -122,6 +122,10 @@ SOURCE=..\src\IExtract.cpp
 # Begin Source File
 
 SOURCE=..\..\General\Common\INIFile.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\General\Common\Entity.cpp
 # End Source File
 # Begin Source File
 
@@ -222,6 +226,10 @@ SOURCE=..\..\General\Common\IDirSrch.h
 # Begin Source File
 
 SOURCE=..\..\General\Common\INIFile.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\General\Common\Entity.h
 # End Source File
 # Begin Source File
 
