@@ -36,29 +36,55 @@ class ParseHTML  {
 
  private:
    // Callback-methods for type of parsed elementes
+   int foundValue (const char*, unsigned int);
    int foundTitle (const char*, unsigned int);
+   int foundAuthor (const char*, unsigned int);
+   int foundComment (const char*, unsigned int);
+   int foundEndOfHead (const char*, unsigned int);
 
    typedef OFParseText<ParseHTML> OMParseText;
+   typedef OFParseUpperExact<ParseHTML> OMParseUpperExact;
 
-   ParseExact      startTag;
-   ParseExact      endTag;
-   ParseUpperExact tagTitle;
-   ParseUpperExact tagEndTitle;
-   OMParseText     title;
-   ParseText       otherTag;
-   ParseText       ignore;
+   ParseExact        startTag;
+   ParseExact        endTag;
+   ParseUpperExact   tagMeta;
+   OMParseUpperExact tagTitle;
+   ParseUpperExact   tagEndTitle;
+   ParseUpperExact   tagEndHead;
+   OMParseText       title;
+   OMParseText       value;
+   ParseText         otherTag;
+   ParseText         ignore;
+
+   // Elements to parse meta contents
+   ParseExact      quote;
+   ParseExact      equal;
+   ParseUpperExact name;
+   ParseUpperExact content;
+
+   // Supported meta-content
+   OMParseUpperExact description;
+   OMParseUpperExact author;
+   OMParseUpperExact DCdescription;
+   OMParseUpperExact DCauthor;
+   OMParseUpperExact DCtitle;
 
    ParseSequence  seqTag;
    ParseSequence  seqTitle;
+   ParseSequence  seqMetaCmd;
+   ParseSelection selMetaTags;
    ParseSelection selCmd;
    ParseSelection htmlDoc;                                    // Startsequence
 
+   ParseObject* _seqMetaCmd[12];
    ParseObject* _seqTitle[6];
-   ParseObject* _selCmd[3];
+   ParseObject* _selCmd[5];
+   ParseObject* _selMetaTags[6];
    ParseObject* _seqTag[4];
    ParseObject* _htmlDoc[3];
 
    Properties*  prop;
+   enum { NONE = -1, TITLE = 0, AUTHOR, COMMENT } actEntry;
 };
 
 #endif

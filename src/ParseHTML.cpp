@@ -44,17 +44,52 @@ static const unsigned LEN_COMMAND     = 1024;
 //Parameters: pClassname: Name of class containing parser-data
 /*--------------------------------------------------------------------------*/
 ParseHTML::ParseHTML ()
-   : prop (NULL)
-   , startTag ("<", "Start of HTML-tag"), endTag (">", "End of HTML-tag")
-   , tagTitle ("TITLE", "title-tag")
-   , tagEndTitle ("/TITLE", "title-tag")
-   , title ("<", "Title of document", *this, &ParseHTML::foundTitle, LEN_TITLE)
-   , otherTag (">", "Other HTML tag", LEN_TAG)
-   , ignore ("<", "Content", LEN_COMMAND)
-   , seqTitle (_seqTitle, "Title entry")
-   , selCmd (_selCmd, "Valid HTML command")
-   , seqTag (_seqTag, "Valid HTML tag")
-   , htmlDoc (_htmlDoc, "HTML document", -1, 1) {
+   : prop (NULL), actEntry (NONE)
+     , startTag ("<", "Start of HTML-tag"), endTag (">", "End of HTML-tag")
+     , tagMeta ("META", "meta-tag")
+     , tagTitle ("TITLE", "title-tag", *this, &ParseHTML::foundTitle)
+     , tagEndTitle ("/TITLE", "title-tag")
+     , tagEndHead ("/HEAD", "End of header")
+     , title ("<", "Title of document", *this, &ParseHTML::foundValue, LEN_TITLE)
+     , value ("\">", "Value of entry", *this, &ParseHTML::foundValue, LEN_TITLE)
+     , otherTag (">", "Other HTML tag", LEN_TAG)
+     , ignore ("<", "Unused information", LEN_COMMAND)
+     , quote ("\"", "Quote", 1, 0)
+     , equal ("=", "Equal sign", 1, 0)
+     , name ("NAME", "Name of meta tag")
+     , content ("CONTENT", "Content specifier")
+     , description ("DESCRIPTION", "Description", *this, &ParseHTML::foundComment)
+     , author ("AUTHOR", "Author", *this, &ParseHTML::foundAuthor)
+     , DCdescription  ("DC.DESCRIPTION", "Description in Dublin Core", *this, &ParseHTML::foundComment)
+     , DCauthor ("DC.CREATOR", "Author in Dublin Core", *this, &ParseHTML::foundAuthor)
+     , DCtitle ("DC.TITLE", "Title in Dublin Core", *this, &ParseHTML::foundTitle)
+     , seqMetaCmd (_seqMetaCmd, "Meta tag")
+     , seqTitle (_seqTitle, "Title entry")
+     , selMetaTags (_selMetaTags, "Recogniced meta tags", 1, 0)
+     , selCmd (_selCmd, "Valid HTML command")
+     , seqTag (_seqTag, "Valid HTML tag")
+     , htmlDoc (_htmlDoc, "HTML document", -1, 1) {
+
+   _seqMetaCmd[0] = &tagMeta;
+   _seqMetaCmd[1] = &name;
+   _seqMetaCmd[2] = &equal;
+   _seqMetaCmd[3] = &quote;
+   _seqMetaCmd[4] = &selMetaTags;
+   _seqMetaCmd[5] = &quote;
+   _seqMetaCmd[6] = &content;
+   _seqMetaCmd[7] = &equal;
+   _seqMetaCmd[8] = &quote;
+   _seqMetaCmd[9] = &value;
+   _seqMetaCmd[10] = &quote;
+   _seqMetaCmd[11] = NULL;
+
+   _selMetaTags[0] = &description;
+   _selMetaTags[1] = &author;
+   _selMetaTags[2] = &DCdescription;
+   _selMetaTags[3] = &DCauthor;
+   _selMetaTags[4] = &DCtitle;
+   _selMetaTags[5] = &value;
+   _selMetaTags[6] = NULL;
 
    _seqTitle[0] = &tagTitle;
    _seqTitle[1] = &endTag;
@@ -64,8 +99,10 @@ ParseHTML::ParseHTML ()
    _seqTitle[5] = NULL;
 
    _selCmd[0] = &seqTitle;
-   _selCmd[1] = &otherTag;
-   _selCmd[2] = NULL;
+   _selCmd[1] = &seqMetaCmd;
+   _selCmd[2] = &tagEndHead;
+   _selCmd[3] = &otherTag;
+   _selCmd[4] = NULL;
 
    _seqTag[0] = &startTag;
    _seqTag[1] = &selCmd;
@@ -82,9 +119,50 @@ ParseHTML::ParseHTML ()
 //Purpose   : Callback after a title was read
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
-int ParseHTML::foundTitle (const char* pTitle, unsigned int len) {
-   assert (prop);
-   prop->strTitle.assign (pTitle, len);
+int ParseHTML::foundValue (const char* pTitle, unsigned int len) {
+   if (actEntry != NONE) {
+      static string Properties::* values[] =
+         { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
+
+      assert (prop);
+      (prop->*(values[actEntry])).assign (pTitle, len);
+      actEntry = NONE;
+   }
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after a title tag was read
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseHTML::foundTitle (const char*, unsigned int) {
+   actEntry = TITLE;
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after an author-tag was read
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseHTML::foundAuthor (const char*, unsigned int) {
+   actEntry = AUTHOR;
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after a comment tag was read
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseHTML::foundComment (const char*, unsigned int) {
+   actEntry = COMMENT;
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after a title tag was read
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseHTML::foundEndOfHead (const char*, unsigned int) {
    htmlDoc.setMaxCard (1);
    return ParseObject::PARSE_OK;
 }
