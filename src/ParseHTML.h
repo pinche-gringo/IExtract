@@ -83,7 +83,7 @@ class ParseHTML  {
    YGP::ParseObject* _selMetaCmds[3];
    YGP::ParseObject* _seqTitle[6];
    YGP::ParseObject* _selCmd[5];
-   YGP::ParseObject* _selMetaTags[6];
+   YGP::ParseObject* _selMetaTags[7];
    YGP::ParseObject* _seqTag[4];
    YGP::ParseObject* _htmlDoc[3];
 
