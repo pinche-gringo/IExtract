@@ -29,8 +29,6 @@
 
 #include <strstream>
 
-#define CHECK 9
-#define TRACELEVEL 9
 #include <Check.h>
 #include <Trace_.h>
 
@@ -58,7 +56,8 @@ ParsePDF::ParsePDF ()
      , tagTrailer ("trailer", "Tag for trailer")
      , startObj ("<<", "Start of object")
      , objInfo ("/Info", "Reference to info object")
-     , objPrev ("/Prev", "Referenct to other trailer")
+     , objPrev ("/Prev", "Reference to other trailer")
+     , objOffPrev ("\\9", "Offset of /Prev entry", *this, &ParsePDF::foundPrevOffset, 10, 1)
      , idObject ("\\9", "ID of object", *this, &ParsePDF::foundObjectID, 10)
      , idObj ("1", "ID of object (repeated)")
      , number ("\\9", "Generation", 10)
@@ -118,7 +117,7 @@ ParsePDF::ParsePDF ()
    _seqInfo[3] = NULL;
 
    _seqPrev[0] = &objPrev;
-   _seqPrev[1] = &offObject;
+   _seqPrev[1] = &objOffPrev;
    _seqPrev[2] = NULL;
 
    _seqInfoObj[0] = &idObj;
@@ -149,12 +148,24 @@ ParsePDF::~ParsePDF () {
 
 
 /*--------------------------------------------------------------------------*/
+//Purpose   : Callback after the offset of /Prev entry was read
+//Parameters: pLength: Pointer to offset
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParsePDF::foundPrevOffset (const char* pOffset, unsigned int) {
+   TRACE9 ("ParsePDF::foundPrevOffset (const char*, unsigned int) - " << pOffset);
+   Check3 (pOffset);
+   offPrev = atoi (pOffset);
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the offset of the cross reference table was read
 //Parameters: pLength: Pointer to offset
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundOffset (const char* pOffset, unsigned int) {
-   TRACE5 ("ParsePDF::foundOffset (const char*, unsigned int) - " << pOffset);
+   TRACE9 ("ParsePDF::foundOffset (const char*, unsigned int) - " << pOffset);
    Check3 (pOffset); Check3 (file);
 
    file->seekg (atoi (pOffset), ios::beg);
@@ -197,14 +208,11 @@ int ParsePDF::foundNumber (const char* pNumber, unsigned int) {
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundObjOffset (const char* pOffset, unsigned int) {
-   TRACE5 ("ParsePDF::foundObjOffset (const char*, unsigned int) - " << pOffset);
+   TRACE9 ("ParsePDF::foundObjOffset (const char*, unsigned int) - " << pOffset
+           << " for object " << actObject);
    Check3 (pOffset); Check3 (file);
 
-   aOffsets[actObject] = atoi (pOffset);
-   if (actObject == infoObject)
-      parseInfoObject ();
-   else
-      actObject++;
+   aOffsets[actObject++] = atoi (pOffset);
    return ParseObject::PARSE_OK;
 }
 
@@ -302,14 +310,29 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
    Check3 (pValue);
 
    if (actEntry != NONE) {
+      TRACE9 ("ParsePDF::foundValue (const char*, unsigned int) - Assigning: "
+              << pValue + 1);
+
       static string Properties::* values[] =
          { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
 
-      assert (prop);
-      assert ((sizeof (values) / sizeof (values[0])) > actEntry);
-      TRACE9 ("ParsePDF::foundValue (const char*, unsigned int) - Assigning: "
-              << pValue + 1);
-      (prop->*(values[actEntry])).assign (pValue + 1, len - 1);
+      Check3 (prop);
+      Check3 ((sizeof (values) / sizeof (values[0])) > actEntry);
+      Check1 ((*pValue == '(') || (*pValue == ')'));
+
+      if (*pValue == '(')
+         (prop->*(values[actEntry])).assign (pValue + 1, len - 1);
+      else {
+         prop->*(values[actEntry]) = "";
+
+         Check1 (!(len & 1));
+         while (len) {
+            prop->*(values[actEntry]) += ((convertToInt (*pValue) << 4)
+                                          + convertToInt (pValue[1]));
+            pValue += 2;
+            len -= 1;
+         }
+      }
       actEntry = NONE;
    }
    return ParseObject::PARSE_OK;
@@ -328,10 +351,16 @@ void ParsePDF::parse (Xistream& stream, Properties& result) throw (std::string) 
 
    // Now parse first cross reference table (including trailer)
    unsigned int rc (obj.selXRef.parse (stream));
-   if (!rc) {
-      // If an info object was found and this object is already know: Parse it
-      if ((obj.infoObject != -1U) && obj.aOffsets[obj.infoObject])
-         obj.parseInfoObject ();
+   while (!(rc || obj.aOffsets[obj.infoObject])) {
+      if (!obj.offPrev)
+         throw (std::string ("Document does not contain neither an /Info"
+                             " nor a /Prev entry"));
+
+      stream.seekg (obj.offPrev, ios::beg);
+      obj.offPrev = 0;
+      rc = obj.seqXRefTable.parse (stream);
    }
+   if (obj.aOffsets[obj.infoObject])
+      obj.parseInfoObject ();
 }
 

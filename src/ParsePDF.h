@@ -38,12 +38,17 @@ class ParsePDF {
    ParsePDF (const ParsePDF& other);
    const ParsePDF& operator= (const ParsePDF& other);
 
+   static unsigned int convertToInt (char ch) {
+      ch -= '0';
+      return ch > 0xa ? ch - 0xa : ch; }
+
    // Callback-methods for type of parsed elementes
    int foundValue (const char*, unsigned int);
    int foundTitle (const char*, unsigned int);
    int foundAuthor (const char*, unsigned int);
    int foundComment (const char*, unsigned int);
    int foundOffset (const char*, unsigned int);
+   int foundPrevOffset (const char*, unsigned int);
    int foundNumber (const char*, unsigned int);
    int foundStartNumber (const char*, unsigned int);
    int foundObjOffset (const char*, unsigned int);
@@ -70,6 +75,7 @@ class ParsePDF {
    ParseExact      startObj;
    ParseExact      objInfo;
    ParseExact      objPrev;
+   OMParseAttomic  objOffPrev;
    OMParseAttomic  idObject;
    ParseExact      idObj;
    ParseAttomic    number;
