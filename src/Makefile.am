@@ -12,4 +12,4 @@ IExtract_SOURCES=IExtract.cpp ParseHTML.cpp ParseHTML.h ParseWord.cpp \
 EXTRA_DIST=Options.meta
 
 Options.meta: Options.h
-	mgeni Options.h Options.meta
+	mgeni.pl Options.h>Options.meta
