@@ -289,7 +289,8 @@ char* Application::processHTML (Xistream& hFile) const throw (std::string) {
       std::cout << "Processing HTML-file\n";
 
    ParseHTML obj;
-   return strdup (obj.parse (hFile));
+   const char* p = obj.parse (hFile);
+   return p ? strdup (p) : NULL;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -299,10 +300,11 @@ char* Application::processHTML (Xistream& hFile) const throw (std::string) {
 /*--------------------------------------------------------------------------*/
 char* Application::processOffice (Xistream& hFile) const throw (std::string) {
    if (options & VERBOSE)
-      std::cout << "Processing MS Office document";
+      std::cout << "Processing MS Office document\n";
 
    ParseWord obj;
-   return strdup (obj.parse (hFile));
+   const char* p = obj.parse (hFile);
+   return p ? strdup (p) : NULL;
 }
 
 /*--------------------------------------------------------------------------*/
