@@ -19,9 +19,12 @@
 
 #include <string>
 
+#ifdef ENABLE_THREADS
+#  define MULTIBUFFER
+#endif
 #include <Parse.h>
 
-#include "Properties.h"
+struct Properties;
 
 
 // Class to extract the title of an HTML-file

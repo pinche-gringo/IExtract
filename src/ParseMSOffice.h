@@ -18,9 +18,12 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
+#ifdef ENABLE_THREADS
+#  define MULTIBUFFER
+#endif
 #include <Parse.h>
 
-class Properties;
+struct Properties;
 
 
 // Class to extract the title (of the properties) of a Word document
