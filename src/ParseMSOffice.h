@@ -17,7 +17,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-
+//#define ENABLE_THREADS
+#undef ENABLE_THREADS
 #ifdef ENABLE_THREADS
 #  define MULTIBUFFER
 #endif
@@ -50,22 +51,22 @@ class ParseWord  {
    typedef OFParseAttomic<ParseWord>  OMParseAttomic;
    typedef OFParseSequence<ParseWord> OMParseSequence;
 
-   ParseExact     id;
-   ParseAttomic   skip;
-   OMParseAttomic nrEntries;
-   OMParseAttomic type;
-   OMParseAttomic offset;
-   OMParseAttomic length;
-   OMParseText    title;
-   ParseAttomic   skipIDStart;
-   ParseText      ignore;
+   ParseExact      id;
+   ParseAttomic    skip;
+   OMParseAttomic  nrEntries;
+   OMParseAttomic  type;
+   OMParseAttomic  offset;
+   OMParseAttomic  length;
+   OMParseText     title;
+   ParseAttomic    skipIDStart;
+   ParseTextIgnore ignore;
 
    ParseSequence   seqTitle;
    OMParseSequence seqEntries;
    ParseSequence   seqProperties;
    ParseSelection  wordDoc;                                    // Startsequence
 
-   ParseObject* _wordDoc[4];
+   ParseObject* _wordDoc[5];
    ParseObject* _seqProperties[9];
    ParseObject* _seqTitle[3];
    ParseObject* _seqEntries[3];
