@@ -1,3 +1,11 @@
+Overview of changes in version 0.6.00:
+
+  - Handling OGG audio files
+  - Added option to sort found files
+  - Added option to ignore last extension of files
+  - HTML-titles can be empty
+  - Needing libYGP 0.7.10
+
 Overview of changes in version 0.5.21:
 
   - Moved general Writer-methods to libYGP
@@ -23,7 +31,7 @@ Overview of changes in version 0.5.11:
 
 Overview of changes in version 0.5.10:
 
-  - Fixed in/exluding of files (how could I overlook that?)
+  - Fixed in/exluding of files (how could I miss that?)
   - Added option to include only the name (without extension) of file to output
   - Conversion of special characters can be switched on or off in output
 

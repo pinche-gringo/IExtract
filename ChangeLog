@@ -1,6 +1,61 @@
-2005-01-20  Markus Schwab  <markus@markus.linuxnet.ve>
+2005-03-21  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.6.00 commented
+
+	* po/de.po, po/en.po, po/es.po: Added messages of OGG-parser
+
+	* configure.in: Version to 0.6.00; Needing libYGP 0.7.10
+
+	* po/POTFILES.in: Added ParseOGG
+
+	* doc/IExtract.html.es, doc/IExtract.html.de, doc/IExtract.html.en:
+	  Added handling of OGG audio files
+
+	* src/Options.h, src/ParseMP3.h, src/ParseOOffice.h, src/ParsePDF.h:
+	  Removed virtual from destructor
+
+	* src/IExtract.cpp: Added parsing of OGG files
+
+	* src/Makefile.am: Added ParseOGG
+
+	* src/ParseOGG.cpp, src/ParseOGG.h: New file.
+
+2005-03-09  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseMP3.cpp: Formatting changed
+
+2005-03-08  Markus Schwab  <g17m0@lycos.com>
+
+	* README: Changed copyright; minor corrections
+
+	* src/ParseHTML.cpp: Allowing titles to be empty
+
+2005-03-06  Markus Schwab  <g17m0@lycos.com>
+
+	* po/de.po, po/en.po, po/es.po:
+	  Added messages for new options -s and -X
+
+	* src/IExtract.cpp: Added option to ignore last extension (if unknown)
+
+	* doc/IExtract.html.es, doc/IExtract.html.de, doc/IExtract.html.en:
+	  New options --sort and --ingore-ext added
+
+	* src/IExtract.cpp, src/Options.h:
+	  Added options to sort the found files
+
+	* src/Makefile.am: Adapted to new mgeni
+
+2005-01-31  Markus Schwab  <g17m0@lycos.com>
+
+	* po/de.po: Changing format
+
+	* po/Makevars: Added MSGID_BUGS_ADDRESS
+
+2005-01-20  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.5.21 commented
+
+	* po/de.po: Fixed c-format declaration
 
 	* configure.in: Needing libYGP 0.7.00
 
