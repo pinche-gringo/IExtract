@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.3 ($Revision$)\n"
-"POT-Creation-Date: 2003-06-18 18:31-0500\n"
+"POT-Creation-Date: 2003-12-12 17:08-0500\n"
 "PO-Revision-Date: 2003-06-18 18:36-0500\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: ESPAÑOL <??@li.org>\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8-bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1\n"
 
-#: src/IExtract.cpp:112
+#: src/IExtract.cpp:111
 msgid ""
 "Compiled on %1 at %2\n"
 "\n"
@@ -26,7 +26,7 @@ msgstr ""
 "Escritor: Markus Schwab; correo-e: g17m0@lycos.com\n"
 "Distributado bajo los condicones de la GNU Licensia General Público"
 
-#: src/IExtract.cpp:261
+#: src/IExtract.cpp:260
 msgid ""
 "Extracts a description out of files (depending on the file-type)\n"
 "\n"
@@ -36,31 +36,31 @@ msgstr ""
 "\n"
 "Modo de empleo:"
 
-#: src/IExtract.cpp:262
+#: src/IExtract.cpp:261
 msgid "[OPTIONS] <File(s)>"
 msgstr "[OPCIONES| <Archivo(s)>"
 
-#: src/IExtract.cpp:263
+#: src/IExtract.cpp:262
 msgid "Recurse into subdirectories"
 msgstr "Busca también en carpetas bajos"
 
-#: src/IExtract.cpp:264
+#: src/IExtract.cpp:263
 msgid "Sets the output-style (text, HTML XML or LaTeX)"
 msgstr "Especifa el estilo de la salida (text, HTML, XML o LaTeX)"
 
-#: src/IExtract.cpp:265
+#: src/IExtract.cpp:264
 msgid "Format of output; default: "
 msgstr "Formato de la salida; por defecto: "
 
-#: src/IExtract.cpp:266
+#: src/IExtract.cpp:265
 msgid "and for XML:"
 msgstr "y por XML: "
 
-#: src/IExtract.cpp:267
+#: src/IExtract.cpp:266
 msgid "Title of output"
 msgstr "Título de la salida"
 
-#: src/IExtract.cpp:268
+#: src/IExtract.cpp:267
 msgid ""
 "Separate subdirectories with TEXT (default: empty);\n"
 "                          implies recursion into subdirectories (--recursive)"
@@ -68,45 +68,45 @@ msgstr ""
 "Separa carpetas bajos con TEXT (por defecto: vacio);\n"
 "                          implica recursión en carpetas (--recursive)"
 
-#: src/IExtract.cpp:269
+#: src/IExtract.cpp:268
 msgid "Puts error messages (additionally) into the output"
 msgstr "Pone también el mensaje del error en la salida"
 
-#: src/IExtract.cpp:270
+#: src/IExtract.cpp:269
 msgid "Show all files (including unknown types) in output"
 msgstr "Mostra todos los archivos (también tipos inconocidos)"
 
-#: src/IExtract.cpp:272
+#: src/IExtract.cpp:271
 msgid "Number of threads for examining files (default: 1)"
 msgstr "Número de procesos del fondo (threads) adicional (por defecto: 1)"
 
-#: src/IExtract.cpp:274
+#: src/IExtract.cpp:273
 msgid "Show TEXT for files younger than DAYS days (def: 30)"
 msgstr ""
 "Mostra TEXT por archivos más joven que DAYS (por\n"
 "                          defecto: 30)"
 
-#: src/IExtract.cpp:275
+#: src/IExtract.cpp:274
 msgid "Files to inspect"
 msgstr "Ficheros para inspectar"
 
-#: src/IExtract.cpp:276
+#: src/IExtract.cpp:275
 msgid "Files not to inspect"
 msgstr "Ficheros para no inspectar"
 
-#: src/IExtract.cpp:277
+#: src/IExtract.cpp:276
 msgid "Read further options from specified file"
 msgstr "Lee más opciones desde el archivo especificado"
 
-#: src/IExtract.cpp:278
+#: src/IExtract.cpp:277
 msgid "Output version information and exit"
 msgstr "Informa de la versión y finaliza"
 
-#: src/IExtract.cpp:279
+#: src/IExtract.cpp:278
 msgid "Displays this help and exit\n"
 msgstr "Muestra este texto de ayuda y finaliza\n"
 
-#: src/IExtract.cpp:280
+#: src/IExtract.cpp:279
 msgid ""
 "  File(s) ... Files to analyze (the last part can contain wildcards)\n"
 "\n"
@@ -115,7 +115,7 @@ msgstr ""
 "                 fijadores de posiciones)\n"
 "\n"
 
-#: src/IExtract.cpp:281
+#: src/IExtract.cpp:280
 msgid ""
 "DAYS (in option -n) may be omited or may have an multiplier suffix: m for "
 "30.\n"
@@ -124,14 +124,14 @@ msgstr ""
 "DAYS puede hacer falta o tener un apéndice de multiplicación: m por 30.\n"
 "\n"
 
-#: src/IExtract.cpp:282
+#: src/IExtract.cpp:281
 msgid ""
 "LIST is a list of files; seperated with the path-separator of the operating\n"
 msgstr ""
 "LIST es una lista de archivos; separada por la la letra seperado del camino "
 "del\n"
 
-#: src/IExtract.cpp:283
+#: src/IExtract.cpp:282
 msgid ""
 "     system (':' for UNICES, ';' for Windows). E.g. *.html:*.doc\n"
 "\n"
@@ -141,51 +141,51 @@ msgstr ""
 "     P.e.: *.html:*.doc\n"
 "\n"
 
-#: src/IExtract.cpp:284
+#: src/IExtract.cpp:283
 msgid "FORMAT specifies how to print the entries;\n"
 msgstr "FORMAT especifica el formato de la salida;\n"
 
-#: src/IExtract.cpp:285
+#: src/IExtract.cpp:284
 msgid "       The pipe symbol (|) separates columns\n"
 msgstr "       La raya vertical (|) separa los columnas\n"
 
-#: src/IExtract.cpp:286
+#: src/IExtract.cpp:285
 #, c-format
 msgid "       %a is substituted with the author\n"
 msgstr "       %a está cambiado por el autor\n"
 
-#: src/IExtract.cpp:287
+#: src/IExtract.cpp:286
 #, c-format
 msgid "       %c is substituted with the comment\n"
 msgstr "       %c está cambiado por el comentario\n"
 
-#: src/IExtract.cpp:288
+#: src/IExtract.cpp:287
 #, c-format
 msgid "       %d is substituted with the modification time of the file\n"
 msgstr ""
 "       %d está cambiado por la fecha y la hora del último cambio del "
 "archivo\n"
 
-#: src/IExtract.cpp:289
+#: src/IExtract.cpp:288
 msgid ""
 "       %D is substituted with the modification time of the file (day only)\n"
 msgstr "       %D está cambiado por la fecha del último cambio del archivo\n"
 
-#: src/IExtract.cpp:290
+#: src/IExtract.cpp:289
 #, c-format
 msgid "       %n is substituted with the name of the file\n"
 msgstr "       %n está cambiado por el nombre del archivo\n"
 
-#: src/IExtract.cpp:291
+#: src/IExtract.cpp:290
 msgid "       %N is substituted with path and name of the file\n"
 msgstr "       %N está cambiado por nombre y camino del archivo\n"
 
-#: src/IExtract.cpp:292
+#: src/IExtract.cpp:291
 #, c-format
 msgid "       %p is substituted with the path of the file\n"
 msgstr "       %p está cambiado por el camino del archivo\n"
 
-#: src/IExtract.cpp:293
+#: src/IExtract.cpp:292
 msgid ""
 "       %P is substituted with the path of the file in UNIX style (with /)\n"
 msgstr ""
@@ -193,23 +193,23 @@ msgstr ""
 "con\n"
 "          un slash (/))\n"
 
-#: src/IExtract.cpp:294
+#: src/IExtract.cpp:293
 #, c-format
 msgid "       %s is substituted with the size of the file\n"
 msgstr "       %s está cambiado por el tamaño del archivo\n"
 
-#: src/IExtract.cpp:295
+#: src/IExtract.cpp:294
 #, c-format
 msgid "       %S is substituted with the size of the file (human readable)\n"
 msgstr ""
 "       %S está cambiado por el tamaño del archivo en estilo para seres "
 "humanos\n"
 
-#: src/IExtract.cpp:296
+#: src/IExtract.cpp:295
 msgid "       %t is substituted with the title\n"
 msgstr "       %t está cambiado por el título\n"
 
-#: src/IExtract.cpp:297
+#: src/IExtract.cpp:296
 msgid ""
 "       %U is substituted with path and name of the file in UNIX style "
 "(with /)\n"
@@ -218,21 +218,21 @@ msgstr ""
 "(separado\n"
 "          con un slash (/))\n"
 
-#: src/IExtract.cpp:298
+#: src/IExtract.cpp:297
 msgid ""
 "       %(LETTERS) is substituted with first of the above substitutions\n"
 msgstr ""
 "       %(LETRAS) está cambiado por el primer cambio (de las reglas "
 "anteriores)\n"
 
-#: src/IExtract.cpp:299
+#: src/IExtract.cpp:298
 msgid ""
 "          producing a non-empty string (e.g. %(tn) is the titel if not \n"
 msgstr ""
 "         que produce un text no vacio (p.e. %(tn) será el titulo (si hay) o "
 "el\n"
 
-#: src/IExtract.cpp:300
+#: src/IExtract.cpp:299
 msgid ""
 "          empty or else the filename.)\n"
 "\n"
@@ -240,7 +240,7 @@ msgstr ""
 "         nombre del archivo)\n"
 "\n"
 
-#: src/IExtract.cpp:302
+#: src/IExtract.cpp:301
 #, no-c-format
 msgid ""
 "       In every other constellation the '%' is removed!\n"
@@ -249,7 +249,7 @@ msgstr ""
 "       En todas las otras formas el '%' está borrado!\n"
 "\n"
 
-#: src/IExtract.cpp:303
+#: src/IExtract.cpp:302
 msgid ""
 "TITLE specifies the headers for the output; separated with (|); columns "
 "must\n"
@@ -257,7 +257,7 @@ msgstr ""
 "TITLE especifica la cabeza por la salida; separada por la raya vertical "
 "(|);\n"
 
-#: src/IExtract.cpp:304
+#: src/IExtract.cpp:303
 msgid ""
 "      contain at least one character\n"
 "\n"
@@ -265,37 +265,37 @@ msgstr ""
 "      cada columna tiene que contener al menos una letra!\n"
 "\n"
 
-#: src/IExtract.cpp:305
+#: src/IExtract.cpp:304
 msgid ""
 "TEXT specifies the text to separate subdirectories; with the following\n"
 msgstr ""
 "TEXT especifica el texto por separar carpetas bajas; el signo del perciento "
 "(%)\n"
 
-#: src/IExtract.cpp:306
+#: src/IExtract.cpp:305
 msgid "     conversion strings:\n"
 msgstr "     indica que la letra siguente tiene significada especial:\n"
 
-#: src/IExtract.cpp:307
+#: src/IExtract.cpp:306
 #, c-format
 msgid "       %e prints the end-of-output for the specified output style\n"
 msgstr "       %e imprima el fin-de-la-salida por el estilo especificado\n"
 
-#: src/IExtract.cpp:308
+#: src/IExtract.cpp:307
 #, c-format
 msgid "       %n is substituted with the name of the directory\n"
 msgstr "       %n está cambiado por el nombre del la carpeta\n"
 
-#: src/IExtract.cpp:309
+#: src/IExtract.cpp:308
 msgid "       %N is substituted with the full path of the directory\n"
 msgstr "       %N está cambiado por el nombre y el camino de la carpeta\n"
 
-#: src/IExtract.cpp:310
+#: src/IExtract.cpp:309
 #, c-format
 msgid "       %p is substituted with the path to the directory\n"
 msgstr "       %p está cambiado por el camino hasta la carpeta\n"
 
-#: src/IExtract.cpp:311
+#: src/IExtract.cpp:310
 msgid ""
 "       %P is substituted with the path to the directory in UNIX style "
 "(with /)\n"
@@ -304,12 +304,12 @@ msgstr ""
 "(separado\n"
 "          por un slash (/)).\n"
 
-#: src/IExtract.cpp:312
+#: src/IExtract.cpp:311
 #, c-format
 msgid "       %s prints the start-of-output for the specified output style\n"
 msgstr "       %s imprima la empieza-de-la-salida por el estilo especifado\n"
 
-#: src/IExtract.cpp:313
+#: src/IExtract.cpp:312
 msgid ""
 "       %U is substituted with the full path of the dir in UNIX style "
 "(with /)\n"
@@ -319,7 +319,7 @@ msgstr ""
 "UNIX\n"
 "          (separado por un slash (/))\n"
 
-#: src/IExtract.cpp:314
+#: src/IExtract.cpp:313
 msgid ""
 "     As with FORMAT, the pipe symbol (|) separates columns.\n"
 "\n"
@@ -327,7 +327,7 @@ msgstr ""
 "     Como con FORMAT, la raya vertical (|) separa a los columnas.\n"
 "\n"
 
-#: src/IExtract.cpp:315
+#: src/IExtract.cpp:314
 msgid ""
 "The format of the INI file is like this (entries can be missing):\n"
 "\n"
@@ -336,42 +336,42 @@ msgstr ""
 "faltar):\n"
 "\n"
 
-#: src/IExtract.cpp:323
+#: src/IExtract.cpp:322
 msgid "Currently supported files are:"
 msgstr "Los documentos siguentos son procesados:"
 
-#: src/IExtract.cpp:347 src/IExtract.cpp:393 src/IExtract.cpp:404
-#: src/IExtract.cpp:415 src/IExtract.cpp:445 src/IExtract.cpp:458
+#: src/IExtract.cpp:346 src/IExtract.cpp:392 src/IExtract.cpp:403
+#: src/IExtract.cpp:414 src/IExtract.cpp:448 src/IExtract.cpp:461
 msgid "-warning: Option `%1' needs an argument! Ignoring option!\n"
 msgstr "-aviso: Opción '%1' necesita un argumento! Ignoro opción!\n"
 
-#: src/IExtract.cpp:363
+#: src/IExtract.cpp:362
 msgid "-warning: Style of output `%1' is not valid! Using text\n"
 msgstr "-aviso: Estilo de la salida '%1' no es valido! Uso text\n"
 
-#: src/IExtract.cpp:377
+#: src/IExtract.cpp:376
 msgid "-warning: Invalid number of threads!\n"
 msgstr "-aviso: El número de los proceses del fondo (threads) no es valido!\n"
 
-#: src/IExtract.cpp:421
+#: src/IExtract.cpp:420
 msgid ""
 "-warning: Argument for new files `%1' is not valid! Ignoring option `n'\n"
 msgstr ""
 "-aviso: Argumento por archivos nuevos '%1' no es valido! Ignoro opción 'n'\n"
 
-#: src/IExtract.cpp:467
+#: src/IExtract.cpp:470
 msgid "-warning: Ignoring invalid option `%1'\n"
 msgstr "-aviso: Ignoro opción invalida '%1'\n"
 
-#: src/IExtract.cpp:566 src/IExtract.cpp:690
+#: src/IExtract.cpp:569 src/IExtract.cpp:693
 msgid "-error: "
 msgstr ""
 
-#: src/IExtract.cpp:577
+#: src/IExtract.cpp:580
 msgid "Unknown file-type"
 msgstr "Tipo del archivo inconocido"
 
-#: src/IExtract.cpp:671
+#: src/IExtract.cpp:674
 msgid ""
 "-error: File `%1' can't be opened!\n"
 "Reason: "
@@ -379,11 +379,11 @@ msgstr ""
 "-error: No se puede abrir archivo '%1'!\n"
 "Causa: "
 
-#: src/IExtract.cpp:692
+#: src/IExtract.cpp:695
 msgid "Error while processing: "
 msgstr "Error procesando: "
 
-#: src/IExtract.cpp:839
+#: src/IExtract.cpp:842
 msgid ""
 "-warning: The INI-file `%1' contains an invalid entry for the output style (`"
 "%2')! Using text\n"
@@ -471,7 +471,7 @@ msgstr "ID por el autor"
 msgid "Tag for comment (subject)"
 msgstr "ID por el comentario (subject)"
 
-#: src/ParsePDF.cpp:76 src/ParseHTML.cpp:54
+#: src/ParsePDF.cpp:76 src/ParseHTML.cpp:55
 msgid "Value of entry"
 msgstr "Valor de una entrada"
 
@@ -539,103 +539,103 @@ msgstr "Empiezo de los valores"
 msgid "Document does not contain neither an /Info nor a /Prev entry"
 msgstr "Documento no contiene ni una entrada \"/Info\" ni una \"/Prev\""
 
-#: src/ParseHTML.cpp:48
+#: src/ParseHTML.cpp:49
 msgid "Start of HTML-tag"
 msgstr "Empiezo de un tag HTML"
 
-#: src/ParseHTML.cpp:48
+#: src/ParseHTML.cpp:49
 msgid "End of HTML-tag"
 msgstr "Fin de un tag HTML"
 
-#: src/ParseHTML.cpp:49
+#: src/ParseHTML.cpp:50
 msgid "Meta tag"
 msgstr "Tag \"meta\""
 
-#: src/ParseHTML.cpp:50 src/ParseHTML.cpp:51
+#: src/ParseHTML.cpp:51 src/ParseHTML.cpp:52
 msgid "Title-tag"
 msgstr "Tag \"title\""
 
-#: src/ParseHTML.cpp:52
+#: src/ParseHTML.cpp:53
 msgid "End of header"
 msgstr "Fin de la cabeza"
 
-#: src/ParseHTML.cpp:53 src/ParseWord.cpp:93
+#: src/ParseHTML.cpp:54 src/ParseWord.cpp:93
 msgid "Title of document"
 msgstr "Título del documento"
 
-#: src/ParseHTML.cpp:55
+#: src/ParseHTML.cpp:56
 msgid "Other HTML tag"
 msgstr "Otro tag HTML"
 
-#: src/ParseHTML.cpp:56
+#: src/ParseHTML.cpp:57
 msgid "Unused information"
 msgstr "Dato inusado"
 
-#: src/ParseHTML.cpp:57
+#: src/ParseHTML.cpp:58
 msgid "Quote"
 msgstr "Comilla"
 
-#: src/ParseHTML.cpp:58
+#: src/ParseHTML.cpp:59
 msgid "Equal sign"
 msgstr "Signo de igualidad"
 
-#: src/ParseHTML.cpp:59
+#: src/ParseHTML.cpp:60
 msgid "Name of meta tag"
 msgstr "Nombre del tag \"meta\""
 
-#: src/ParseHTML.cpp:60
+#: src/ParseHTML.cpp:61
 msgid "Content specifier"
 msgstr "Especificador del contento"
 
-#: src/ParseHTML.cpp:61
+#: src/ParseHTML.cpp:62
 msgid "Description"
 msgstr "Descripción"
 
-#: src/ParseHTML.cpp:62
+#: src/ParseHTML.cpp:63
 msgid "Author"
 msgstr "Autor"
 
-#: src/ParseHTML.cpp:63
+#: src/ParseHTML.cpp:64
 msgid "Description in Dublin Core"
 msgstr "Descripción en el formato \"Dublin Core\""
 
-#: src/ParseHTML.cpp:64
+#: src/ParseHTML.cpp:65
 msgid "Author in Dublin Core"
 msgstr "Autor en el formato \"Dublin Core\""
 
-#: src/ParseHTML.cpp:65
+#: src/ParseHTML.cpp:66
 msgid "Title in Dublin Core"
 msgstr "Título en el formato \"Dublin Core\""
 
-#: src/ParseHTML.cpp:66
+#: src/ParseHTML.cpp:67
 msgid "Valid HTML tag"
 msgstr "Tag HTML valido"
 
-#: src/ParseHTML.cpp:67 src/ParseWord.cpp:97
+#: src/ParseHTML.cpp:68 src/ParseWord.cpp:97
 msgid "Title entry"
 msgstr "Entrada por el título"
 
-#: src/ParseHTML.cpp:68
+#: src/ParseHTML.cpp:69
 msgid "Meta entry"
 msgstr "Entrada \"meta\""
 
-#: src/ParseHTML.cpp:69
+#: src/ParseHTML.cpp:70
 msgid "Name entry for meta tag"
 msgstr "Entrada por el nombre del tag \"meta\""
 
-#: src/ParseHTML.cpp:70
+#: src/ParseHTML.cpp:71
 msgid "Meta entries"
 msgstr "Entradas \"meta\""
 
-#: src/ParseHTML.cpp:71
+#: src/ParseHTML.cpp:72
 msgid "Recogniced meta tags"
 msgstr "Tag \"meta\" conocido"
 
-#: src/ParseHTML.cpp:72
+#: src/ParseHTML.cpp:73
 msgid "Valid HTML command"
 msgstr "Comando HTML valido"
 
-#: src/ParseHTML.cpp:73
+#: src/ParseHTML.cpp:74
 msgid "HTML document"
 msgstr "Documento HTML"
 
