@@ -41,6 +41,7 @@ class ParseHTML  {
    int foundAuthor (const char*, unsigned int);
    int foundComment (const char*, unsigned int);
    int foundEndOfHead (const char*, unsigned int);
+   int foundEndScript (const char*, unsigned int);
 
    typedef YGP::OFParseText<ParseHTML> OMParseText;
    typedef YGP::OFParseUpperExact<ParseHTML> OMParseUpperExact;
@@ -61,6 +62,8 @@ class ParseHTML  {
    YGP::ParseExact      equal;
    YGP::ParseUpperExact name;
    YGP::ParseUpperExact content;
+   YGP::ParseUpperExact script;
+   OMParseUpperExact    endScript;
 
    // Supported meta-content
    OMParseUpperExact description;
@@ -73,16 +76,20 @@ class ParseHTML  {
    YGP::ParseSequence  seqTitle;
    YGP::ParseSequence  seqMetaCmd;
    YGP::ParseSequence  seqMetaName;
+   YGP::ParseSequence  seqScript;
    YGP::ParseSelection selMetaCmds;
    YGP::ParseSelection selMetaTags;
+   YGP::ParseSelection selScriptContent;
    YGP::ParseSelection selCmd;
    YGP::ParseSelection htmlDoc;                                    // Startsequence
 
    YGP::ParseObject* _seqMetaName[11];
    YGP::ParseObject* _seqMetaCmd[3];
    YGP::ParseObject* _selMetaCmds[3];
+   YGP::ParseObject* _seqScript[5];
+   YGP::ParseObject* _selScriptContent[4];
    YGP::ParseObject* _seqTitle[6];
-   YGP::ParseObject* _selCmd[5];
+   YGP::ParseObject* _selCmd[6];
    YGP::ParseObject* _selMetaTags[7];
    YGP::ParseObject* _seqTag[4];
    YGP::ParseObject* _htmlDoc[3];

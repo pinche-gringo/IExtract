@@ -59,6 +59,8 @@ ParseHTML::ParseHTML ()
      , equal ("=", _("Equal sign"), 1, 0, true)
      , name ("NAME", _("Name of meta tag"))
      , content ("CONTENT", _("Content specifier"))
+     , script ("SCRIPT", _("Script tag"))
+     , endScript ("</SCRIPT", _("End-Script tag"), *this, &ParseHTML::foundEndScript)
      , description ("DESCRIPTION", _("Description"), *this, &ParseHTML::foundComment)
      , author ("AUTHOR", _("Author"), *this, &ParseHTML::foundAuthor)
      , DCdescription  ("DC.DESCRIPTION", _("Description in Dublin Core"), *this, &ParseHTML::foundComment)
@@ -68,8 +70,10 @@ ParseHTML::ParseHTML ()
      , seqTitle (_seqTitle, _("Title entry"))
      , seqMetaCmd (_seqMetaCmd, _("Meta entry"))
      , seqMetaName (_seqMetaName, _("Name entry for meta tag"))
+     , seqScript (_seqScript, _("Script sequence"))
      , selMetaCmds (_selMetaCmds, _("Meta entries"))
      , selMetaTags (_selMetaTags, _("Recogniced meta tags"), 1, 0)
+     , selScriptContent (_selScriptContent, _("Script content"), -1U)
      , selCmd (_selCmd, _("Valid HTML command"))
      , htmlDoc (_htmlDoc, _("HTML document"), -1U, 1), prop (NULL), actEntry (NONE) {
 
@@ -111,8 +115,20 @@ ParseHTML::ParseHTML ()
    _selCmd[0] = &seqTitle;
    _selCmd[1] = &seqMetaCmd;
    _selCmd[2] = &tagEndHead;
-   _selCmd[3] = &otherTag;
-   _selCmd[4] = NULL;
+   _selCmd[3] = &seqScript;
+   _selCmd[4] = &otherTag;
+   _selCmd[5] = NULL;
+
+   _seqScript[0] = &script;
+   _seqScript[1] = &otherTag;
+   _seqScript[2] = &endTag;
+   _seqScript[3] = &selScriptContent;
+   _seqScript[4] = NULL;
+
+   _selScriptContent[0] = &endScript;
+   _selScriptContent[1] = &startTag;
+   _selScriptContent[2] = &ignore;
+   _selScriptContent[3] = NULL;
 
    _seqTag[0] = &startTag;
    _seqTag[1] = &selCmd;
@@ -169,10 +185,19 @@ int ParseHTML::foundComment (const char*, unsigned int) {
 }
 
 //-----------------------------------------------------------------------------
-/// Callback after a title tag was read
+/// Callback after the end of the header was found
 /// \returns \c int: Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
 int ParseHTML::foundEndOfHead (const char*, unsigned int) {
    htmlDoc.setMaxCard (1);
+   return YGP::ParseObject::PARSE_OK;
+}
+
+//-----------------------------------------------------------------------------
+/// Callback after the end of a script was found
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+int ParseHTML::foundEndScript (const char*, unsigned int) {
+   selScriptContent.setMaxCard (1);
    return YGP::ParseObject::PARSE_OK;
 }
