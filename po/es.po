@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.5 ($Revision$)\n"
-"POT-Creation-Date: 2004-01-22 01:41-0500\n"
-"PO-Revision-Date: 2004-01-03 19:36-0500\n"
+"POT-Creation-Date: 2004-01-28 18:43-0500\n"
+"PO-Revision-Date: 2004-01-28 20:37-0500\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: ESPAÑOL <??@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -514,42 +514,46 @@ msgid "Cross reference table"
 msgstr "Table de la referencia"
 
 #: src/ParsePDF.cpp:83
+msgid "Cross reference table subsection"
+msgstr "Subsección de la tabla de la referencia"
+
+#: src/ParsePDF.cpp:84
 msgid "Entries in cross reference table"
 msgstr "Entradas de la tabla de la referencia"
 
-#: src/ParsePDF.cpp:84
+#: src/ParsePDF.cpp:85
 msgid "Trailer"
 msgstr "Apéndice"
 
-#: src/ParsePDF.cpp:85
+#: src/ParsePDF.cpp:86
 msgid "Trailer values"
 msgstr "Valores del apéndice"
 
-#: src/ParsePDF.cpp:86
+#: src/ParsePDF.cpp:87
 msgid "Info entry"
 msgstr "Entrada \"Info\""
 
-#: src/ParsePDF.cpp:87
+#: src/ParsePDF.cpp:88
 msgid "Prev entry"
 msgstr "Entrada \"Prev\""
 
-#: src/ParsePDF.cpp:88
+#: src/ParsePDF.cpp:89
 msgid "Info object"
 msgstr "Objecto \"Info\""
 
-#: src/ParsePDF.cpp:89
+#: src/ParsePDF.cpp:90
 msgid "Info values"
 msgstr "Valores de la información"
 
-#: src/ParsePDF.cpp:90
+#: src/ParsePDF.cpp:91
 msgid "Valid type"
 msgstr "Tipo valido"
 
-#: src/ParsePDF.cpp:91
+#: src/ParsePDF.cpp:92
 msgid "Start of values"
 msgstr "Empiezo de los valores"
 
-#: src/ParsePDF.cpp:400
+#: src/ParsePDF.cpp:404
 msgid "Document does not contain neither an /Info nor a /Prev entry"
 msgstr "Documento no contiene ni una entrada \"/Info\" ni una \"/Prev\""
 
@@ -582,74 +586,98 @@ msgid "Other HTML tag"
 msgstr "Otro tag HTML"
 
 #: src/ParseHTML.cpp:57
+msgid "Type of script"
+msgstr "Tipo del script"
+
+#: src/ParseHTML.cpp:58
+msgid "Other META entry"
+msgstr "Otro tag META"
+
+#: src/ParseHTML.cpp:59
 msgid "Unused information"
 msgstr "Dato inusado"
 
-#: src/ParseHTML.cpp:58
+#: src/ParseHTML.cpp:60
 msgid "Quote"
 msgstr "Comilla"
 
-#: src/ParseHTML.cpp:59
+#: src/ParseHTML.cpp:61
 msgid "Equal sign"
 msgstr "Signo de igualidad"
 
-#: src/ParseHTML.cpp:60
+#: src/ParseHTML.cpp:62
 msgid "Name of meta tag"
 msgstr "Nombre del tag \"meta\""
 
-#: src/ParseHTML.cpp:61
+#: src/ParseHTML.cpp:63
 msgid "Content specifier"
 msgstr "Especificador del contento"
 
-#: src/ParseHTML.cpp:62
+#: src/ParseHTML.cpp:64
+msgid "Script tag"
+msgstr "Tag \"script\""
+
+#: src/ParseHTML.cpp:65
+msgid "End-Script tag"
+msgstr "Fin del tag \"script\""
+
+#: src/ParseHTML.cpp:66
 msgid "Description"
 msgstr "Descripción"
 
-#: src/ParseHTML.cpp:63
+#: src/ParseHTML.cpp:67
 msgid "Author"
 msgstr "Autor"
 
-#: src/ParseHTML.cpp:64
+#: src/ParseHTML.cpp:68
 msgid "Description in Dublin Core"
 msgstr "Descripción en el formato \"Dublin Core\""
 
-#: src/ParseHTML.cpp:65
+#: src/ParseHTML.cpp:69
 msgid "Author in Dublin Core"
 msgstr "Autor en el formato \"Dublin Core\""
 
-#: src/ParseHTML.cpp:66
+#: src/ParseHTML.cpp:70
 msgid "Title in Dublin Core"
 msgstr "Título en el formato \"Dublin Core\""
 
-#: src/ParseHTML.cpp:67
+#: src/ParseHTML.cpp:71
 msgid "Valid HTML tag"
 msgstr "Tag HTML valido"
 
-#: src/ParseHTML.cpp:68 src/ParseWord.cpp:97
+#: src/ParseHTML.cpp:72 src/ParseWord.cpp:97
 msgid "Title entry"
 msgstr "Entrada por el título"
 
-#: src/ParseHTML.cpp:69
+#: src/ParseHTML.cpp:73
 msgid "Meta entry"
 msgstr "Entrada \"meta\""
 
-#: src/ParseHTML.cpp:70
+#: src/ParseHTML.cpp:74
 msgid "Name entry for meta tag"
 msgstr "Entrada por el nombre del tag \"meta\""
 
-#: src/ParseHTML.cpp:71
+#: src/ParseHTML.cpp:75
+msgid "Script sequence"
+msgstr "Sequencia de script"
+
+#: src/ParseHTML.cpp:76
 msgid "Meta entries"
 msgstr "Entradas \"meta\""
 
-#: src/ParseHTML.cpp:72
+#: src/ParseHTML.cpp:77
 msgid "Recogniced meta tags"
 msgstr "Tag \"meta\" conocido"
 
-#: src/ParseHTML.cpp:73
+#: src/ParseHTML.cpp:78
+msgid "Script content"
+msgstr "Script"
+
+#: src/ParseHTML.cpp:79
 msgid "Valid HTML command"
 msgstr "Comando HTML valido"
 
-#: src/ParseHTML.cpp:74
+#: src/ParseHTML.cpp:80
 msgid "HTML document"
 msgstr "Documento HTML"
 

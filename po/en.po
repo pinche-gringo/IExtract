@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.5 ($Revision$)\n"
-"POT-Creation-Date: 2004-01-22 01:41-0500\n"
+"POT-Creation-Date: 2004-01-28 18:43-0500\n"
 "PO-Revision-Date: 2004-01-03 19:32-0500\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: ENGLISH <??@li.org>\n"
@@ -449,42 +449,46 @@ msgid "Cross reference table"
 msgstr ""
 
 #: src/ParsePDF.cpp:83
-msgid "Entries in cross reference table"
+msgid "Cross reference table subsection"
 msgstr ""
 
 #: src/ParsePDF.cpp:84
-msgid "Trailer"
+msgid "Entries in cross reference table"
 msgstr ""
 
 #: src/ParsePDF.cpp:85
-msgid "Trailer values"
+msgid "Trailer"
 msgstr ""
 
 #: src/ParsePDF.cpp:86
-msgid "Info entry"
+msgid "Trailer values"
 msgstr ""
 
 #: src/ParsePDF.cpp:87
-msgid "Prev entry"
+msgid "Info entry"
 msgstr ""
 
 #: src/ParsePDF.cpp:88
-msgid "Info object"
+msgid "Prev entry"
 msgstr ""
 
 #: src/ParsePDF.cpp:89
-msgid "Info values"
+msgid "Info object"
 msgstr ""
 
 #: src/ParsePDF.cpp:90
-msgid "Valid type"
+msgid "Info values"
 msgstr ""
 
 #: src/ParsePDF.cpp:91
+msgid "Valid type"
+msgstr ""
+
+#: src/ParsePDF.cpp:92
 msgid "Start of values"
 msgstr ""
 
-#: src/ParsePDF.cpp:400
+#: src/ParsePDF.cpp:404
 msgid "Document does not contain neither an /Info nor a /Prev entry"
 msgstr ""
 
@@ -517,74 +521,98 @@ msgid "Other HTML tag"
 msgstr ""
 
 #: src/ParseHTML.cpp:57
-msgid "Unused information"
+msgid "Type of script"
 msgstr ""
 
 #: src/ParseHTML.cpp:58
-msgid "Quote"
+msgid "Other META entry"
 msgstr ""
 
 #: src/ParseHTML.cpp:59
-msgid "Equal sign"
+msgid "Unused information"
 msgstr ""
 
 #: src/ParseHTML.cpp:60
-msgid "Name of meta tag"
+msgid "Quote"
 msgstr ""
 
 #: src/ParseHTML.cpp:61
-msgid "Content specifier"
+msgid "Equal sign"
 msgstr ""
 
 #: src/ParseHTML.cpp:62
-msgid "Description"
+msgid "Name of meta tag"
 msgstr ""
 
 #: src/ParseHTML.cpp:63
-msgid "Author"
+msgid "Content specifier"
 msgstr ""
 
 #: src/ParseHTML.cpp:64
-msgid "Description in Dublin Core"
+msgid "Script tag"
 msgstr ""
 
 #: src/ParseHTML.cpp:65
-msgid "Author in Dublin Core"
+msgid "End-Script tag"
 msgstr ""
 
 #: src/ParseHTML.cpp:66
-msgid "Title in Dublin Core"
+msgid "Description"
 msgstr ""
 
 #: src/ParseHTML.cpp:67
-msgid "Valid HTML tag"
+msgid "Author"
 msgstr ""
 
-#: src/ParseHTML.cpp:68 src/ParseWord.cpp:97
-msgid "Title entry"
+#: src/ParseHTML.cpp:68
+msgid "Description in Dublin Core"
 msgstr ""
 
 #: src/ParseHTML.cpp:69
-msgid "Meta entry"
+msgid "Author in Dublin Core"
 msgstr ""
 
 #: src/ParseHTML.cpp:70
-msgid "Name entry for meta tag"
+msgid "Title in Dublin Core"
 msgstr ""
 
 #: src/ParseHTML.cpp:71
-msgid "Meta entries"
+msgid "Valid HTML tag"
 msgstr ""
 
-#: src/ParseHTML.cpp:72
-msgid "Recogniced meta tags"
+#: src/ParseHTML.cpp:72 src/ParseWord.cpp:97
+msgid "Title entry"
 msgstr ""
 
 #: src/ParseHTML.cpp:73
-msgid "Valid HTML command"
+msgid "Meta entry"
 msgstr ""
 
 #: src/ParseHTML.cpp:74
+msgid "Name entry for meta tag"
+msgstr ""
+
+#: src/ParseHTML.cpp:75
+msgid "Script sequence"
+msgstr ""
+
+#: src/ParseHTML.cpp:76
+msgid "Meta entries"
+msgstr ""
+
+#: src/ParseHTML.cpp:77
+msgid "Recogniced meta tags"
+msgstr ""
+
+#: src/ParseHTML.cpp:78
+msgid "Script content"
+msgstr ""
+
+#: src/ParseHTML.cpp:79
+msgid "Valid HTML command"
+msgstr ""
+
+#: src/ParseHTML.cpp:80
 msgid "HTML document"
 msgstr ""
 
