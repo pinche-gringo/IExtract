@@ -85,10 +85,11 @@ class Application : public IVIOApplication {
    Application (const int argc, const char* argv[])
       : IVIOApplication (argc, argv, lo), options (0), outputStyle (TEXT)
       , ageOfNewFiles (30 * 24 * 60 * 60), pTextForNewFiles (NULL)
+      , pFormat ("%n-%t%a%c%d"), pTitle (NULL)
 #ifdef ENABLE_THREADS
       , listFiles (), mxListFiles (), aThreads (0), mxThreads (), mxOutput ()
 #endif
-      , showOptions (0), writer (NULL) {
+      , writer (NULL) {
 #ifdef ENABLE_THREADS
       aThreads.reserve (1);
 #endif
@@ -136,11 +137,12 @@ class Application : public IVIOApplication {
       throw (std::string);
 
    enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4 };
-   unsigned int showOptions;
    unsigned long ageOfNewFiles;
    const char* pTextForNewFiles;
    unsigned int options;
 
+   const char* pFormat;
+   const char* pTitle;
    Writer* writer;
 
 #ifdef ENABLE_THREADS
@@ -189,11 +191,12 @@ const Application::FILEHANDLERS Application::handlers[] = {
 const IVIOApplication::longOptions Application::lo[] = {
    { "help", 'h' },
    { "recursive", 'r' },
+   { "format", 'f' },
+   { "title", 'T' },
    { "threads", 't' },
    { "include", 'i' },
    { "exclude", 'x' },
    { "show-errors", 'e' },
-   { "show-path", 'p' },
    { "all", 'a' },
    { "new", 'n' },
    { "version", 'V' },
@@ -210,8 +213,9 @@ void Application::showHelp () const {
              << PACKAGE " [OPTIONS] <File(s)>\n\n"
                 "  -r, --recursive ....... Recurse into subdirectories\n"
                 "  -o, --output=STYLE .... Sets the output-style (text or HTML)\n"
+                "  -f, --format=FORMAT ... Format of output (default: %n-%t%a%c%d)\n"
+                "  -T, --title=TITLE ..... Title of output"
                 "  -e, --show-errors ..... Puts error messages (additionally) into output\n"
-                "  -p, --show-path ....... Print path for files in output\n"
                 "  -a, --all ............. Show all files (including unknown types) in output\n"
 #ifdef ENABLE_THREADS
                 "  -t, --threads=NR ...... Number of threads for examining files (default: 0)\n"
@@ -225,6 +229,16 @@ void Application::showHelp () const {
                 "TIME (in option -n) may be omited or may have an multiplier suffix: m for 30.\n\n"
                 "NODES is a list of files; seperated with the path-separator of the operating\n"
                 "      system (':' for UNICES, ';' for Windows)\n\n"
+                "FORMAT specifies how to print the entries;\n"
+                "       %a is substituted with the author\n"
+                "       %c is substituted with the comment\n"
+                "       %d is substituted with the modification time of the file\n"
+                "       %n is substituted with the name of the file\n"
+                "       %N is substituted with path and name of the file\n"
+                "       %p is substituted with the path of the file\n"
+                "       %t is substituted with the title\n\n"
+                "TITLE specifies the headers for the output; seperateod with (|); columns must\n"
+                "      contain at least one character\n\n"
                 "Currently supported files are: HTML, JPEG, WinWord, Excel & Powerpoint\n";
 }
 
@@ -266,7 +280,9 @@ bool Application::handleOption (const char option) {
 
    case 'e': options |= SHOW_ERRORS; break;
 
-   case 'p': showOptions |= Writer::SHOW_PATH; break;
+   case 'f': pFormat = getOptionValue (); break;
+
+   case 'T': pTitle = getOptionValue (); break;
 
    case 'n': {
       const char* pNew = getOptionValue ();
@@ -320,7 +336,7 @@ int Application::perform (int argc, const char* argv[]) {
       return -1;
    }
 
-   typedef Writer* (*CREATEWRITER) (unsigned int, unsigned long, const char*);
+   typedef Writer* (*CREATEWRITER) (const char*, unsigned long, const char*);
    static struct {
       unsigned int opt;
       CREATEWRITER fnc;
@@ -329,11 +345,11 @@ int Application::perform (int argc, const char* argv[]) {
 
    for (unsigned int i (0); i < (sizeof (t) / sizeof (t[0])); ++i)
       if (outputStyle == t[i].opt) {
-         writer = t[i].fnc (showOptions, ageOfNewFiles, pTextForNewFiles);
+         writer = t[i].fnc (pFormat, ageOfNewFiles, pTextForNewFiles);
       }
    assert (writer);
 
-   writer->printStart (cout);
+   writer->printStart (cout, pTitle);
 
    std::string file;
    for (unsigned int j (0); j < argc; ++j) {
@@ -572,6 +588,7 @@ Application::HANDLER Application::getFileTypeHandler (const char* pExt) const {
 //Returns   : int: Status
 /*--------------------------------------------------------------------------*/
 int main (int argc, const char* argv[]) {
+   Application::initI18n ();
    Application appl (argc, argv);
    return appl.run ();
 }
