@@ -27,7 +27,6 @@
 
 #include <IExtract-cfg.h>
 
-#define CHECK 9
 #include <YGP/Check.h>
 
 #include "ParseRTF.h"
