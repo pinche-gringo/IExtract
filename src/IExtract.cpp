@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 10.08.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2004
+//COPYRIGHT   : Copyright (C) 2002 - 2005
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -130,7 +130,7 @@ class Application : public YGP::IVIOApplication {
    const Application& operator= (const Application&);
 
    typedef void (Application::*HANDLER) (YGP::Xistream& hFile, Properties& result) const;
-   HANDLER getFileTypeHandler (const char* pExt) const;
+   HANDLER getFileTypeHandler (const std::string& ext) const;
 
    typedef std::map<const std::string, HANDLER> handlerMap;
    typedef std::pair<const std::string, HANDLER> handlerValue;
@@ -156,7 +156,7 @@ class Application : public YGP::IVIOApplication {
    void processStarOffice (YGP::Xistream& hFile, Properties& result) const
       throw (std::string);
 
-   enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4 };
+   enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4, TRUNC_EXTENSION };
 
    unsigned int options;
 
@@ -217,6 +217,7 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
    { "prepend", 'p' },
    { "pre-file", 'P' },
    { "sort", 'S' },
+   { "ignore-ext", 'X' },
    { NULL, '\0' } };
 
 
@@ -226,7 +227,7 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
 /// \Param argc: Number of parameters to the program
 /// \param argv: Array holding (pointer to) arguments
 //----------------------------------------------------------------------------
-Application::Application (const int argc, const char* argv[]) 
+Application::Application (const int argc, const char* argv[])
     : YGP::IVIOApplication (argc, argv, lo), options (0), chgFlag (0), iniOpts ()
     , writer (NULL), outputStyle (TEXT)
 #ifdef ENABLE_THREADS
@@ -295,7 +296,8 @@ void Application::showHelp () const {
       << "\n  -i, --include=LIST .... " << _("Files to inspect")
       << "\n  -x, --exclude=LIST .... " << _("Files not to inspect")
       << "\n  -f, --ini-file=FILE ... " << _("Read further options from specified file")
-      << "\n  -S, --sort ..... ...... " << _("Sort found files according to ORDER (default: none)")
+      << "\n  -S, --sort ..... ...... " << _("Sort found files alphabetically")
+      << "\n  -X, --ignore-ext ...... " << _("Ignore last extension (if unknown)")
       << "\n  -V, --version ......... " << _("Output version information and exit")
       << "\n  -h, -?, --help ........ " << _("Displays this help and exit\n")
       << _("  File(s) ... Files to analyze (the last part can contain wildcards)\n\n")
@@ -321,11 +323,9 @@ void Application::showHelp () const {
       << _("       %(LETTERS) is substituted with first of the above substitutions\n"
            "          producing a non-empty string (e.g. %(tn) is the titel if not \n"
            "          empty or else the filename.)\n")
-       // xgettext:no-c-format
-      << _("       %*LETTER changes the substitution slightly. For file names it causes a\n"
+/* xgettext:no-c-format */ << _("       %*LETTER changes the substitution slightly. For file names it causes a\n"
            "          conversion of special characters; for the others it suppresses them\n\n")
-       // xgettext:no-c-format
-      << _("       In every other constellation the '%' is removed!\n\n")
+/* xgettext:no-c-format */ << _("       In every other constellation the '%' is removed!\n\n")
       << _("TITLE specifies the headers for the output; separated with (|); columns must\n")
       << _("      contain at least one character\n\n")
       << _("TEXT specifies the text to separate subdirectories; with the following\n")
@@ -345,7 +345,8 @@ void Application::showHelp () const {
       "   TextForNewFiles=<img src=\"../images/new.gif\">\n"
       "   MaxAgeForNewFiles=15\n"
       "   DirSeparatorText=%eListing of %n%s\n"
-      "   Style=HTML\n\n"
+      "   Style=HTML\n"
+      "   SortFiles=1\n\n"
       << _("Currently supported files are:")
       << "\n  - HTML (*.html, *.htm, *.shtml, *.shtm, *.sht, *.php)\n"
       "  - JPEG (*.jpeg, *.jpg)\n"
@@ -539,6 +540,8 @@ bool Application::handleOption (const char option) {
       iniOpts.sort = true;
       break;
 
+   case 'X': options |= TRUNC_EXTENSION; break;
+
    case 'V': std::cout << description () << '\n'; exit (0);
 
    default: {
@@ -625,8 +628,20 @@ void Application::handleFiles (const char* pFile) const {
    } // end-while
 
    const YGP::File* file = ds.find (YGP::IDirectorySearch::FILE_NORMAL);
+   std::string name;
    while (file) {
-      HANDLER fnc = getFileTypeHandler (strrchr (file->name (), '.'));
+      name = file->name ();
+      unsigned int pos (name.rfind ('.'));
+      HANDLER fnc (NULL);
+      if (pos != std::string::npos) {
+	 fnc = getFileTypeHandler (name.substr (pos + 1));
+	 if (!fnc && (options & TRUNC_EXTENSION)) {
+	    unsigned int pos2 (name.rfind ('.', pos - 1));
+	    Check3 ((pos2 != std::string::npos) ? (pos2 < pos) : (pos2 != pos));
+	    if (pos2 != std::string::npos)
+	       fnc = getFileTypeHandler (name.substr (++pos2, pos - pos2));
+	 }
+      }
       if (fnc) {
 #ifdef ENABLE_THREADS
          LOCKFILES
@@ -872,17 +887,13 @@ void Application::processJPG (YGP::Xistream& hFile, Properties& result) const
 
 //-----------------------------------------------------------------------------
 /// Returns a handling function to a filetype
-/// \param pExt: Pointer to file extensions
+/// \param ext: File extensions
 /// \returns \c HANDLER: Method to handle this filetype; NULL in case of error
 //-----------------------------------------------------------------------------
-Application::HANDLER Application::getFileTypeHandler (const char* pExt) const {
-   if (pExt && *pExt++) {
-      handlerMap::const_iterator i (handlers.find (pExt));
-      if (i != handlers.end ())
-         return i->second;
-   }
-
-   return NULL;
+Application::HANDLER Application::getFileTypeHandler (const std::string& ext) const {
+   TRACE9 ("Application::getFileTypeHandler (const std::string&) - " << ext);
+   handlerMap::const_iterator i (handlers.find (ext));
+   return (i != handlers.end ()) ? i->second : NULL;
 }
 
 //-----------------------------------------------------------------------------
