@@ -21,7 +21,7 @@
 #include <Parse.h>
 
 
-class Properties;
+struct Properties;
 
 
 // Class to extract the properties of a JPEG image
@@ -36,24 +36,47 @@ class ParseJPEG  {
 
  private:
    // Callback-methods for type of parsed elementes
-   int foundID (const char*, unsigned int);
+   int foundType (const char*, unsigned int);
+   int foundNumber (const char*, unsigned int);
    int foundTitle (const char*, unsigned int);
    int foundLength (const char*, unsigned int);
+   int foundLength2 (const char*, unsigned int);
+   int foundOffset (const char*, unsigned int);
 
    typedef OFParseText<ParseJPEG>    OMParseText;
    typedef OFParseExact<ParseJPEG>   OMParseExact;
    typedef OFParseAttomic<ParseJPEG> OMParseAttomic;
 
    ParseExact     idJPEG;
-   OMParseExact   tagComment;
+   ParseExact     idComment2;
+   ParseExact     tagComment1;
+   ParseExact     tagComment2;
    OMParseText    title;
-   OMParseAttomic length;
+   OMParseAttomic type;
+   OMParseAttomic number;
+   OMParseAttomic length1;
+   OMParseAttomic length2;
+   OMParseAttomic offset;
    ParseAttomic   ignore;
 
+   ParseSelection selComment;
+   ParseSequence  seqComment1;
+   ParseSequence  seqComment2;
+   ParseSequence  seqEntries;
    ParseSequence  jpegImage;                                  // Startsequence
 
-   ParseObject*   _jpegImage[6];
+   ParseObject*   _selComment[3];
+   ParseObject*   _seqEntries[4];
+   ParseObject*   _seqComment1[4];
+   ParseObject*   _seqComment2[7];
+   ParseObject*   _jpegImage[4];
 
+   unsigned int offTitle;
+   unsigned int offComment;
+
+   unsigned int cRead;
+   unsigned int actEntry;
+   unsigned int cEntries;
    Properties*  prop;
 };
 

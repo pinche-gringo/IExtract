@@ -32,38 +32,60 @@
 #include "Properties.h"
 
 
+#define TYPE_TITLE    0x019b9c
+#define TYPE_COMMENT  0x019c9c
+
 /*--------------------------------------------------------------------------*/
 //Purpose   : (Default-)Constructor
 //Parameters: pClassname: Name of class containing parser-data
 /*--------------------------------------------------------------------------*/
 ParseJPEG::ParseJPEG ()
    : idJPEG ("\xff\xd8\xff\xe0\x00\x10\x4a\x46\x49\x46\x00\x01", "JPEG-ID", 12, 12, false)
-     , tagComment ("\xff\xfe", "ID for comment", *this, &ParseJPEG::foundID, 2, 0, false)
-   , length ("\\*", "Length", *this, &ParseJPEG::foundLength, 2, 2, false)
+   , idComment2 ("Exif\0\0", "Tag of comment style 2", 6, 6, false)
+   , tagComment1 ("\xff\xfe", "ID of comment style 1", 2, 2, false)
+   , tagComment2 ("\xff\xe1", "ID of comment style 2", 2, 2, false)
+   , number ("\\*", "Number of records", *this, &ParseJPEG::foundNumber, 2, 2, false)
+   , length1 ("\\*", "Length", *this, &ParseJPEG::foundLength, 2, 2, false)
+   , length2 ("\\*", "Length", *this, &ParseJPEG::foundLength2, 2, 2, false)
+   , type ("\\*", "Type of entry", *this, &ParseJPEG::foundType, 4, 4, false)
    , title ("\0", "Comment", *this, &ParseJPEG::foundTitle, 1, 1, false)
+   , offset("\\*", "Offset", *this, &ParseJPEG::foundOffset, 4, 4, false)
    , ignore ("\\*", "Unused information", 8, 8, false)
-   , jpegImage (_jpegImage, "JPEG image", 1, 1) {
+   , selComment (_selComment, "Possible comments", 1, 0, false)
+   , seqComment1 (_seqComment1, "Comment style 1", 1, 1, false)
+   , seqComment2 (_seqComment2, "Comment style 2", 1, 1, false)
+   , seqEntries (_seqEntries, "List of property entries", 1, 1, false)
+   , jpegImage (_jpegImage, "JPEG image", 1, 1)
+   , cRead (0), actEntry (TYPE_TITLE), cEntries (0) {
 
    _jpegImage[0] = &idJPEG;
    _jpegImage[1] = &ignore;
-   _jpegImage[2] = &tagComment;
-   _jpegImage[3] = &length;
-   _jpegImage[4] = &title;
-   _jpegImage[5] = NULL;
+   _jpegImage[2] = &selComment;
+   _jpegImage[3] = NULL;
+
+   _selComment[0] = &seqComment1;
+   _selComment[1] = &seqComment2;
+   _selComment[2] = NULL;
+
+   _seqComment1[0] = &tagComment1;
+   _seqComment1[1] = &length1;
+   _seqComment1[2] = &title;
+   _seqComment1[3] = NULL;
+
+   _seqComment2[0] = &tagComment2;
+   _seqComment2[1] = &length1;
+   _seqComment2[2] = &idComment2;
+   _seqComment2[3] = &ignore;
+   _seqComment2[4] = &number;
+    _seqComment2[5] = &seqEntries;
+   _seqComment2[6] = NULL;
+
+   _seqEntries[0] = &type;
+   _seqEntries[1] = &length2;
+   _seqEntries[2] = &offset;
+   _seqEntries[3] = NULL;
 }
 
-
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after a ID was found (or not found!)
-//Parameters: len: Length of ID
-//Returns   : int: Status: ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
-int ParseJPEG::foundID (const char*, unsigned int len) {
-   assert (prop);
-   if (len < 2)
-      _jpegImage[3] = NULL;
-   return ParseObject::PARSE_OK;
-}
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after a title was read
@@ -85,9 +107,68 @@ int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundLength (const char* length, unsigned int) {
    assert (length);
-   unsigned int len ((*length << 8) + length[1]);
+   unsigned int len (((unsigned char)(*length) << 8) + (unsigned char)length[1]);
    if (len)
       title.setMaxCard (len);
    TRACE8 ("ParseJPEG::foundLength (const char*, unsigned int): " << len);
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after the length of the title was read
+//Parameters: length: Pointer to length
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseJPEG::foundLength2 (const char* length, unsigned int) {
+   assert (length);
+   unsigned int len (*(unsigned int*)length);
+   if (len)
+      title.setMaxCard (len);
+   TRACE8 ("ParseJPEG::foundLength (const char*, unsigned int): " << len);
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after the number of entries has been read
+//Parameters: nr: Pointer to number of entries
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseJPEG::foundNumber (const char* nr, unsigned int) {
+   assert (nr);
+   seqEntries.setMaxCard (cEntries = (*(unsigned int*)nr));
+   length2.setMaxCard (4);
+   TRACE8 ("ParseJPEG::foundNumber (const char*, unsigned int): " << cEntries);
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after the type of an entry has been parsed
+//Parameters: pType: Pointer to found type
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseJPEG::foundType (const char* pType, unsigned int) {
+   assert (pType);
+   actEntry = *(unsigned int*)pType;
+   TRACE9 ("ParseWord::foundType (const char*) - " << hex << actEntry << dec);
+   cRead += 10;
+   return ParseObject::PARSE_OK;
+}
+
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after the offset of an entry has been parsed
+//Parameters: pOffset: Pointer to found offset
+//            len: Length of data
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseJPEG::foundOffset (const char* pOffset, unsigned int len) {
+   assert (pOffset);
+   if ((actEntry == TYPE_TITLE) || (actEntry == TYPE_COMMENT)) {
+      ((actEntry == TYPE_TITLE) ? offTitle : offComment)
+         = *(unsigned int*)pOffset;
+      TRACE9 ("ParseWord::foundOffset (const char*) - "
+              << *(unsigned int*)pOffset << " (0x"
+              << hex << *(unsigned int*)pOffset << dec << ')');
+   }
    return ParseObject::PARSE_OK;
 }
