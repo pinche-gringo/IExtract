@@ -1,2 +1,95 @@
+2002-10-17  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog: Actualized for V0.1.00
+
+	* configure.in: New file.
+
+	* README:
+	Minor changes; Handling of JPEGs added
+
+	* Makefile.am:
+	Added project files for VC to distribution
+
+	* Make.bat: New file.
+
+	* NEWS: Features of V0.1.00 explained
+
+	* src/Writer.cpp, src/Writer.h:
+	Prepared to print more information
+
+	* src/ParseHTML.cpp, src/ParseHTML.h, src/ParseWord.cpp, src/ParseWord.h:
+	Prepared to parse more information
+
+	* src/Makefile.am:
+	ParseJPG and Properties.h added
+
+	* src/Properties.h: New file.
+
+	* src/IExtract.cpp:
+	Handling JPEG images; Prepared to parse more information
+
+	* src/ParseJPG.cpp, src/ParseJPG.h:
+	New file.
+
+	* src/IExtract.cpp:
+	Handling of subdirectories corrected (search all with passed filespecification)
+
+	* src/Writer.cpp, src/Writer.h:
+	const char* for descriptions changed to std::string
+
+2002-10-16  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseWord.cpp:
+	Fixed (wrong) skipping of WS; skipping to comment; assignment of found title
+
+	* src/ParseWord.cpp, src/ParseWord.h:
+	Inspecting properties-header for extracting information
+
+	* src/ParseHTML.cpp, src/ParseHTML.h:
+	Adapted to new parser interface (found passes length); title-tag ignores case
+
+	* src/IExtract.cpp:
+	Adapted to new parser-interface (returning strings)
+
+2002-10-15  Markus Schwab  <g17m0@lycos.com>
+
+	* Windows/VCExtract.mak: Writer added
+
+	* Windows/IExtract.dsp: New file.
+
+2002-10-12  Markus Schwab  <g17m0@lycos.com>
+
+	* src/Writer.cpp:
+	Changed ostream to iostram
+
+	* src/Makefile.am: Writer added
+
+	* src/IExtract.cpp:
+	Sanity check before strdup found result
+
+	* src/Writer.cpp, src/Writer.h:
+	New file.
+
+	* src/ParseHTML.cpp: Using new-style IO
+
+	* src/IExtract.cpp:
+	Using writer-class for output; Options to show unknown extension & path
+
+2002-10-11  Markus Schwab  <g17m0@lycos.com>
+
+	* Windows/IExtract.dsw: New file.
+
+	* Windows/VCExtract.mak:
+	Adapted to new file-structure
+
+	* src/IExtract.cpp:
+	Output-style flexible; Options to controll handling added
+
+	* README:
+	Install-part moved to install; Windows-help added; Bugreport added
+
+	* Makefile.am, src/Makefile.am, INSTALL, AUTHORS, ChangeLog, NEWS, README, Windows/VCExtract.mak, src/IExtract.cpp, src/ParseHTML.cpp, src/ParseHTML.h, src/ParseWord.cpp, src/ParseWord.h:
+	New file.
+
 2002-10-08 Markus Schwab <g17m0@lycos.com>
 	* Project created
