@@ -25,6 +25,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <ctime>
+#include <cstring>
 #include <clocale>
 
 #include <iostream>
@@ -151,6 +152,26 @@ void Writer::getSubstitute (const char ctrl, std::string& subst, const YGP::File
    case 'd': {
       YGP::ATimestamp stamp (file.time ());
       subst = (ctrl == 'D') ? stamp.ADate::toString () : stamp.toString (); break; }
+
+   case 'e': {
+      const char* ext (strrchr (file.name (), '.'));
+      subst = changeSpecialChars (ext ? ext + 1 : "");
+      break;
+   }
+
+   case 'E': {
+      std::string tmp;
+      const char* ext (strrchr (file.name (), '.'));
+      if (ext) {
+         tmp = file.name ();
+         tmp.erase (ext - file.name ());
+         ext = tmp.c_str ();
+      }
+      else
+         ext = file.name ();
+      subst = changeSpecialChars (ext ? ext : "");
+      break;
+   }
 
    case 'n': subst = changeSpecialChars (file.name ()); break;
 
