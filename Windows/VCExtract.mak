@@ -37,7 +37,10 @@ ALL : "$(OUTDIR)\IExtract.exe"
 
 
 CLEAN :
+	-@erase "$(INTDIR)\ADate.obj"
 	-@erase "$(INTDIR)\ANumeric.obj"
+	-@erase "$(INTDIR)\ATime.obj"
+	-@erase "$(INTDIR)\ATStamp.obj"
 	-@erase "$(INTDIR)\DirSrch.obj"
 	-@erase "$(INTDIR)\File.obj"
 	-@erase "$(INTDIR)\FileRExp.obj"
@@ -50,6 +53,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ParseWord.obj"
 	-@erase "$(INTDIR)\PathSrch.obj"
 	-@erase "$(INTDIR)\StackTrc.obj"
+	-@erase "$(INTDIR)\Thread.obj"
 	-@erase "$(INTDIR)\Tokenize.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\Writer.obj"
@@ -61,7 +65,7 @@ CLEAN :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 CPP=cl.exe
-CPP_PROJ=/nologo /ML /W3 /GX /O2 /I "..\..\General\Common" /I "..\..\General\Windows" /D "NDEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.1" /D MICRO_VERSION="00" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.1\" /D MICRO_VERSION=\"00\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "..\..\General\Common" /I "..\..\General\Windows" /D "NDEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.1" /D MICRO_VERSION="00" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.1\" /D MICRO_VERSION=\"00\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -110,14 +114,18 @@ LINK32_OBJS= \
 	"$(INTDIR)\IVIOAppl.obj" \
 	"$(INTDIR)\Parse.obj" \
 	"$(INTDIR)\ParseHTML.obj" \
+	"$(INTDIR)\ParseJPG.obj" \
 	"$(INTDIR)\ParseWord.obj" \
-	"$(INTDIR)\StackTrc.obj" \
-	"$(INTDIR)\Writer.obj" \
-	"$(INTDIR)\XStrBuf.obj" \
-	"$(INTDIR)\Tokenize.obj" \
 	"$(INTDIR)\PathSrch.obj" \
+	"$(INTDIR)\StackTrc.obj" \
+	"$(INTDIR)\Thread.obj" \
+	"$(INTDIR)\Tokenize.obj" \
+	"$(INTDIR)\Writer.obj" \
 	"$(INTDIR)\XDirSrch.obj" \
-	"$(INTDIR)\ParseJPG.obj"
+	"$(INTDIR)\XStrBuf.obj" \
+	"$(INTDIR)\ADate.obj" \
+	"$(INTDIR)\ATime.obj" \
+	"$(INTDIR)\ATStamp.obj"
 
 "$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -136,7 +144,10 @@ ALL : "$(OUTDIR)\IExtract.exe"
 
 
 CLEAN :
+	-@erase "$(INTDIR)\ADate.obj"
 	-@erase "$(INTDIR)\ANumeric.obj"
+	-@erase "$(INTDIR)\ATime.obj"
+	-@erase "$(INTDIR)\ATStamp.obj"
 	-@erase "$(INTDIR)\DirSrch.obj"
 	-@erase "$(INTDIR)\File.obj"
 	-@erase "$(INTDIR)\FileRExp.obj"
@@ -149,6 +160,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ParseWord.obj"
 	-@erase "$(INTDIR)\PathSrch.obj"
 	-@erase "$(INTDIR)\StackTrc.obj"
+	-@erase "$(INTDIR)\Thread.obj"
 	-@erase "$(INTDIR)\Tokenize.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
@@ -163,7 +175,7 @@ CLEAN :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 CPP=cl.exe
-CPP_PROJ=/nologo /MLd /W3 /Gm /GX /ZI /Od /I "..\..\General\Common" /I "..\..\General\Windows" /D "_DEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.1" /D MICRO_VERSION="00" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.1\" /D MICRO_VERSION=\"00\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
+CPP_PROJ=/nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\General\Common" /I "..\..\General\Windows" /D "_DEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.1" /D MICRO_VERSION="00" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.1\" /D MICRO_VERSION=\"00\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -212,14 +224,18 @@ LINK32_OBJS= \
 	"$(INTDIR)\IVIOAppl.obj" \
 	"$(INTDIR)\Parse.obj" \
 	"$(INTDIR)\ParseHTML.obj" \
+	"$(INTDIR)\ParseJPG.obj" \
 	"$(INTDIR)\ParseWord.obj" \
-	"$(INTDIR)\StackTrc.obj" \
-	"$(INTDIR)\Writer.obj" \
-	"$(INTDIR)\XStrBuf.obj" \
-	"$(INTDIR)\Tokenize.obj" \
 	"$(INTDIR)\PathSrch.obj" \
+	"$(INTDIR)\StackTrc.obj" \
+	"$(INTDIR)\Thread.obj" \
+	"$(INTDIR)\Tokenize.obj" \
+	"$(INTDIR)\Writer.obj" \
 	"$(INTDIR)\XDirSrch.obj" \
-	"$(INTDIR)\ParseJPG.obj"
+	"$(INTDIR)\XStrBuf.obj" \
+	"$(INTDIR)\ADate.obj" \
+	"$(INTDIR)\ATime.obj" \
+	"$(INTDIR)\ATStamp.obj"
 
 "$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -239,9 +255,27 @@ LINK32_OBJS= \
 
 
 !IF "$(CFG)" == "IExtract - Win32 Release" || "$(CFG)" == "IExtract - Win32 Debug"
+SOURCE=..\..\General\Common\ADate.cpp
+
+"$(INTDIR)\ADate.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\..\General\Common\ANumeric.cpp
 
 "$(INTDIR)\ANumeric.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\General\Common\ATime.cpp
+
+"$(INTDIR)\ATime.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\General\Common\ATStamp.cpp
+
+"$(INTDIR)\ATStamp.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -314,6 +348,12 @@ SOURCE=..\..\General\Common\PathSrch.cpp
 SOURCE=..\..\General\Common\StackTrc.cpp
 
 "$(INTDIR)\StackTrc.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\General\Common\Thread.cpp
+
+"$(INTDIR)\Thread.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
