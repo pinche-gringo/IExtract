@@ -25,9 +25,6 @@ NULL=
 NULL=nul
 !ENDIF 
 
-CPP=cl.exe
-RSC=rc.exe
-
 !IF  "$(CFG)" == "IExtract - Win32 Release"
 
 OUTDIR=.\Release
@@ -52,13 +49,47 @@ CLEAN :
 	-@erase "$(INTDIR)\ParseWord.obj"
 	-@erase "$(INTDIR)\StackTrc.obj"
 	-@erase "$(INTDIR)\vc60.idb"
+	-@erase "$(INTDIR)\Writer.obj"
 	-@erase "$(INTDIR)\XStrBuf.obj"
 	-@erase "$(OUTDIR)\IExtract.exe"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /ML /W3 /GX /O2 /I "..\..\General\Common" /I "..\..\General\Windows" /D "NDEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.1" /D MICRO_VERSION="00" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.1\" /D MICRO_VERSION=\"00\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+
+.c{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(INTDIR)}.obj::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.c{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cpp{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+.cxx{$(INTDIR)}.sbr::
+   $(CPP) @<<
+   $(CPP_PROJ) $< 
+<<
+
+RSC=rc.exe
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\IExtract.bsc" 
 BSC32_SBRS= \
@@ -66,18 +97,19 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"$(OUTDIR)\IExtract.pdb" /machine:I386 /out:"$(OUTDIR)\IExtract.exe" 
 LINK32_OBJS= \
-	"$(INTDIR)\ParseHTML.obj" \
-	"$(INTDIR)\ParseWord.obj" \
-	"$(INTDIR)\IExtract.obj" \
+	"$(INTDIR)\ANumeric.obj" \
 	"$(INTDIR)\DirSrch.obj" \
 	"$(INTDIR)\File.obj" \
+	"$(INTDIR)\FileRExp.obj" \
 	"$(INTDIR)\IDirSrch.obj" \
+	"$(INTDIR)\IExtract.obj" \
 	"$(INTDIR)\IVIOAppl.obj" \
 	"$(INTDIR)\Parse.obj" \
+	"$(INTDIR)\ParseHTML.obj" \
+	"$(INTDIR)\ParseWord.obj" \
 	"$(INTDIR)\StackTrc.obj" \
-	"$(INTDIR)\XStrBuf.obj" \
-	"$(INTDIR)\ANumeric.obj" \
-	"$(INTDIR)\FileRExp.obj"
+	"$(INTDIR)\Writer.obj" \
+	"$(INTDIR)\XStrBuf.obj"
 
 "$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -109,6 +141,7 @@ CLEAN :
 	-@erase "$(INTDIR)\StackTrc.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
+	-@erase "$(INTDIR)\Writer.obj"
 	-@erase "$(INTDIR)\XStrBuf.obj"
 	-@erase "$(OUTDIR)\IExtract.exe"
 	-@erase "$(OUTDIR)\IExtract.ilk"
@@ -117,33 +150,8 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
+CPP=cl.exe
 CPP_PROJ=/nologo /MLd /W3 /Gm /GX /ZI /Od /I "..\..\General\Common" /I "..\..\General\Windows" /D "_DEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.1" /D MICRO_VERSION="00" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.1\" /D MICRO_VERSION=\"00\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
-BSC32=bscmake.exe
-BSC32_FLAGS=/nologo /o"$(OUTDIR)\IExtract.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes /pdb:"$(OUTDIR)\IExtract.pdb" /debug /machine:I386 /out:"$(OUTDIR)\IExtract.exe" /pdbtype:sept 
-LINK32_OBJS= \
-	"$(INTDIR)\ParseHTML.obj" \
-	"$(INTDIR)\ParseWord.obj" \
-	"$(INTDIR)\IExtract.obj" \
-	"$(INTDIR)\DirSrch.obj" \
-	"$(INTDIR)\File.obj" \
-	"$(INTDIR)\IDirSrch.obj" \
-	"$(INTDIR)\IVIOAppl.obj" \
-	"$(INTDIR)\Parse.obj" \
-	"$(INTDIR)\StackTrc.obj" \
-	"$(INTDIR)\XStrBuf.obj" \
-	"$(INTDIR)\ANumeric.obj" \
-	"$(INTDIR)\FileRExp.obj"
-
-"$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-!ENDIF 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -174,6 +182,35 @@ LINK32_OBJS= \
    $(CPP) @<<
    $(CPP_PROJ) $< 
 <<
+
+RSC=rc.exe
+BSC32=bscmake.exe
+BSC32_FLAGS=/nologo /o"$(OUTDIR)\IExtract.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes /pdb:"$(OUTDIR)\IExtract.pdb" /debug /machine:I386 /out:"$(OUTDIR)\IExtract.exe" /pdbtype:sept 
+LINK32_OBJS= \
+	"$(INTDIR)\ANumeric.obj" \
+	"$(INTDIR)\DirSrch.obj" \
+	"$(INTDIR)\File.obj" \
+	"$(INTDIR)\FileRExp.obj" \
+	"$(INTDIR)\IDirSrch.obj" \
+	"$(INTDIR)\IExtract.obj" \
+	"$(INTDIR)\IVIOAppl.obj" \
+	"$(INTDIR)\Parse.obj" \
+	"$(INTDIR)\ParseHTML.obj" \
+	"$(INTDIR)\ParseWord.obj" \
+	"$(INTDIR)\StackTrc.obj" \
+	"$(INTDIR)\Writer.obj" \
+	"$(INTDIR)\XStrBuf.obj"
+
+"$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+!ENDIF 
 
 
 !IF "$(NO_EXTERNAL_DEPS)" != "1"
@@ -249,6 +286,12 @@ SOURCE=..\src\ParseWord.cpp
 SOURCE=..\..\General\Common\StackTrc.cpp
 
 "$(INTDIR)\StackTrc.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\src\Writer.cpp
+
+"$(INTDIR)\Writer.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
