@@ -627,31 +627,33 @@ void Application::convertFromUnicode (Properties& prop) {
 //Requieres : pFile not NULL
 /*--------------------------------------------------------------------------*/
 void Application::readINIFile (const char* pFile) {
-   TRACE ("Application::readINIFile (const char*) - " << pFile);
+   TRACE5 ("Application::readINIFile (const char*) - " << pFile);
    assert (pFile);
 
    std::string Style;
-   INIFILE (pFile);
-   INISECTION (Output);
-   INIATTR2 (Output, std::string, format, Format);
-   INIATTR2 (Output, std::string, title, Title);
-   INIATTR (Output, std::string, Style);
-
    try {
+      INIFILE (pFile);
+      INISECTION (Output);
+      INIATTR2 (Output, std::string, format, Format);
+      INIATTR2 (Output, std::string, title, Title);
+      INIATTR (Output, std::string, Style);
+
       unsigned int rc (INIFILE_READ ());
    }
    catch (std::string& error) {
-      TRACE ("Application::readINIFile (const char*) - Error reading INI-file '"
-             << pFile << "'\nReason: " << error);
+      TRACE1 ("Application::readINIFile (const char*) - Error reading INI-file '"
+              << pFile << "'\nReason: " << error);
    }
 
-   if (Style == "HTML")
-      outputStyle = HTML;
-   else if (Style == "text")
-      outputStyle = TEXT;
-   else
-      cerr << PACKAGE "-warning: The INI-file '" << pFile << "' contains an "
-         "invalid entry for the output style (" << Style << ")! Using text\n";
+   if (Style.size ()) {
+      if (Style == "HTML")
+         outputStyle = HTML;
+      else if (Style == "text")
+         outputStyle = TEXT;
+      else
+         cerr << PACKAGE "-warning: The INI-file '" << pFile << "' contains an "
+            "invalid entry for the output style ('" << Style << "')! Using text\n";
+   }
 }
 
 
