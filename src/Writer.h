@@ -45,6 +45,8 @@ class Writer {
                         const std::string& sep, const std::string& title = "") const;
 
  protected:
+   virtual std::string changeSpecialChars (const std::string& val) const { return val; }
+
    bool isNew (const File& file) const {
       return file.time () > limit; }
 
@@ -52,52 +54,16 @@ class Writer {
 
    unsigned int      options;
    const std::string strNew;
-   const std::string format;
 
-   class OutIterator {
-      friend class Writer;
+   std::string getNextNode (const File& file, const Properties& prop) const;
+   void getSubstitute (const char ctrl, std::string& substitute, const File& file,
+                       const Properties& prop) const;
 
-    public:
-      OutIterator (const std::string& format, const File& outfile)
-         : file (&outfile), p (NULL), columns_ (format) { columns_.getNextNode ('|'); }
-      OutIterator (const std::string&  format, const File& outfile, 
-                   const struct Properties& prop)
-         : file (&outfile), p (&prop), columns_ (format) { columns_.getNextNode ('|'); }
-      ~OutIterator () { }
-
-      std::string operator++ () {
-         return columns_.getNextNode ('|');
-      }
-      std::string operator++ (int) {
-         std::string old (columns_.getActNode ());
-         columns_.getNextNode ('|');
-         return old;
-      }
-
-      operator void*() const { return (void*)columns_.getActNode ().size (); }
-      bool operator! () const { return columns_.getActNode ().empty (); }
-
-      std::string operator* () const;
-
-    private:
-      OutIterator (const std::string& format) : columns_ (format), p (NULL), file (NULL) {
-         columns_.getNextNode ('|'); }
-
-      void getSubstitute (const char ctrl, std::string& substitute) const;
-
-      static std::string convertToHumanString (unsigned long value);
-
-      Tokenize columns_;
-
-      const File* file;
-      const struct Properties* p;
-
-      OutIterator (const OutIterator&);
-      OutIterator& operator= (const OutIterator&);
-   };
+   static std::string convertToHumanString (unsigned long value);
 
  private:
    unsigned long limit;
+   Tokenize columns_;
 };
 
 
@@ -118,14 +84,16 @@ class HTMLWriter : public Writer {
    static HTMLWriter* create (const std::string& format, const std::string& strNew,
                               unsigned long age = 0) {
       return new HTMLWriter (format, strNew, age); }
+
+   virtual std::string changeSpecialChars (const std::string& value) const;
 };
 
 
 // Class to write fileinfo in XML format
-class XMLWriter : public Writer {
+class XMLWriter : public HTMLWriter {
  public:
    XMLWriter (const std::string& format, const std::string& strNew,
-                 unsigned long age = 0) : Writer (format, strNew, age) { }
+                 unsigned long age = 0) : HTMLWriter (format, strNew, age) { }
    virtual ~XMLWriter ();
 
    virtual void printStart (std::ostream& out, const std::string& title) const;
@@ -178,6 +146,9 @@ class LaTeXWriter : public Writer {
    static LaTeXWriter* create (const std::string& format, const std::string& strNew,
                                unsigned long age = 0) {
       return new LaTeXWriter (format, strNew, age); }
+
+ protected:
+   virtual std::string changeSpecialChars (const std::string& val) const;
 };
 
 

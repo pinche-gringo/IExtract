@@ -49,7 +49,7 @@
 /*--------------------------------------------------------------------------*/
 Writer::Writer (const std::string& format, const std::string& New,
                 unsigned long age)
-   : strNew (New), format (format) {
+   : strNew (New), columns_ (format) {
    Check3 (strNew.size () ? age : 1);
 
    limit = time (NULL) - age;
@@ -67,12 +67,10 @@ Writer::~Writer () {
 //Returns   : unsigned int: Number of columns
 /*--------------------------------------------------------------------------*/
 unsigned int Writer::columns () const {
-   unsigned int cols (0);
-   OutIterator i (format);
-   while (i) {
-      ++i;
+   unsigned int cols (1);
+   Tokenize t (columns_);
+   while (!t.getNextNode ('|').empty ())
       ++cols;
-   }
    return cols;
 }
 
@@ -148,35 +146,35 @@ void Writer::printSeparator (std::ostream& out, const File& file,
 //              Other chars: With the character itself
 //Parameters: ctrl: Control character
 //            subst: String with which to replace the character
+//            file: File subsituting various placeholders
+//            prop: Properties subsituting various placeholders
 /*--------------------------------------------------------------------------*/
-void Writer::OutIterator::getSubstitute (const char ctrl, std::string& subst) const {
+void Writer::getSubstitute (const char ctrl, std::string& subst, const File& file,
+                            const Properties& prop) const {
    switch (ctrl) {
-   case 'a': if (p) subst = p->strAuthor; break;
+   case 'a': subst = changeSpecialChars (prop.strAuthor); break;
 
-   case 'c': if (p) subst = p->strComment; break;
+   case 'c': subst = changeSpecialChars (prop.strComment); break;
 
    case 'D':
    case 'd': {
-      Check3 (file);
-      ATimestamp stamp (file->time ());
+      ATimestamp stamp (file.time ());
       subst = (ctrl == 'D') ? stamp.ADate::toString () : stamp.toString (); break; }
 
-   case 'n': Check3 (file); subst = file->name (); break;
+   case 'n': subst = changeSpecialChars (file.name ()); break;
 
    case 'N':
-      Check3 (file);
-      subst = file->path ();
-      subst += file->name ();
+      subst = changeSpecialChars (file.path ());
+      subst += changeSpecialChars (file.name ());
       break;
 
-   case 'p': Check3 (file); subst = file->path (); break;
+   case 'p': subst = changeSpecialChars (file.path ()); break;
 
-   case 't': subst = p->strTitle; break;
+   case 't': subst = changeSpecialChars (prop.strTitle); break;
 
    case 'P':
    case 'U': {
-      Check3 (file);
-      subst = file->path ();
+      subst = changeSpecialChars (file.path ());
 #if SYSTEM != UNIX
       unsigned int pos (0);
       while ((pos = subst.find (File::DIRSEPARATOR, pos)) != std::string::npos)
@@ -184,23 +182,22 @@ void Writer::OutIterator::getSubstitute (const char ctrl, std::string& subst) co
 #endif
 
       if (ctrl == 'U')
-         subst += file->name ();
+         subst += changeSpecialChars (file.name ());
          break; }
 
    case 's':
    case 'S': {
-      Check3 (file);
-      ANumeric size (file->size ());
+      ANumeric size (file.size ());
       subst = "";
-      subst = ((ctrl == 'S') ? convertToHumanString (file->size ())
-               : ANumeric::toString (file->size ()));
+      subst = ((ctrl == 'S') ? convertToHumanString (file.size ())
+               : ANumeric::toString (file.size ()));
       break; }
 
    default:
       subst = ctrl;
    }
 
-   TRACE9 ("Writer::OutIterator::getSubstitute (const char, std::string&) - Replacing '"
+   TRACE9 ("Writer::getSubstitute (const char, std::string&) - Replacing '"
            << ctrl << "' with " << subst);
 }
 
@@ -208,7 +205,7 @@ void Writer::OutIterator::getSubstitute (const char ctrl, std::string& subst) co
 //Purpose   : Returns the next token; special characters are expanded
 //Returns   : std::string: Next (expanded) token
 /*--------------------------------------------------------------------------*/
-std::string Writer::OutIterator::convertToHumanString (unsigned long value) {
+std::string Writer::convertToHumanString (unsigned long value) {
    if (value < 1000)
       return ANumeric::toString (value);
 
@@ -235,26 +232,31 @@ std::string Writer::OutIterator::convertToHumanString (unsigned long value) {
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Returns the next token; special characters are expanded
+//Parameters: file: File subsituting various placeholders
+//            prop: Properties subsituting various placeholders
 //Returns   : std::string: Next (expanded) token
 /*--------------------------------------------------------------------------*/
-std::string Writer::OutIterator::operator* () const {
-   Check3 (file);
-
+std::string Writer::getNextNode (const File& file, const Properties& prop) const {
    int pos (0);
-   std::string token (columns_.getActNode ());
+   std::string token (const_cast<Writer*> (this)->columns_.getNextNode ('|'));
+   if (token.empty ()) {
+      const_cast<Writer*> (this)->columns_.reset ();
+      return token;
+   }
 
-   TRACE2 ("Writer::OutIterator::operator* () - Node = '" << token << '\'');
+   TRACE2 ("Writer::getNextNode (const File&, const Properties&) - Node = '"
+           << token << '\'');
 
    std::string substitute;
    unsigned int nPos (0);
    while (((pos = token.find ('%', nPos)) != std::string::npos)
           && (pos < token.size ())) {
       if (token[pos + 1] != '(')
-         getSubstitute (token[nPos = pos + 1], substitute);
+         getSubstitute (token[nPos = pos + 1], substitute, file, prop);
       else {
          nPos = pos + 1;
          do {
-            getSubstitute (token[nPos], substitute);
+            getSubstitute (token[nPos], substitute, file, prop);
          } while (substitute.empty () && (token[++nPos] != ')') && token[nPos]);
 
          // Now skip to next closing bracket
@@ -268,7 +270,7 @@ std::string Writer::OutIterator::operator* () const {
       token.replace (pos, nPos - pos + 1, substitute);
       ++pos;
    }
-   return token;
+   return token.empty () ? " " : token;
 }
 
 
@@ -296,7 +298,7 @@ void HTMLWriter::printStart (std::ostream& out, const std::string& title) const 
       std::string node;
       while ((node = titles.getNextNode ('|')).size ())
          out << "<td>" << node << "</td>";
-      out << "</tr></thead>";
+      out << "</tr></thead>\n";
    }
    out << "<tbody>";
 }
@@ -317,12 +319,35 @@ void HTMLWriter::printFile (std::ostream& out, const File& file,
       out << "</td>";
    }
 
-   OutIterator i (format, file, prop);
-   while (i) {
-      out << "<td>" << *i << "</td>";
-      ++i;
-   }
+   std::string value;
+   while (!((value = getNextNode (file, prop)).empty ()))
+      out << "<td>" << value << "</td>";
    out << "</tr>\n";
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Changes the HTML special characters quote ("), ampersand (&),
+//            apostrophe ('), less (<) and greater (>) to HTML-values
+//Parameters: value: String to change
+//Returns   : Changed string
+/*--------------------------------------------------------------------------*/
+std::string HTMLWriter::changeSpecialChars (const std::string& value) const {
+   TRACE5 ("HTMLWriter::changeSpecialChars (const std::string&) - Changing: " << value);
+
+   std::string chg (value);
+   static const char toChange[] = { '&', '<', '>', '\'', '"' };
+   static const char* changeTo[] = { "&amp;", "&lt;", "&gt;", "&apos;", "&quot;" };
+   Check3 (sizeof (toChange) == (sizeof (changeTo) / sizeof (changeTo[0])));
+
+   for (unsigned int i (0); i < chg.size (); ++i)
+      for (unsigned int j (0); j < sizeof (toChange); ++j)
+         if (chg[i] == toChange[j]) {
+            TRACE9 ("HTMLWriter::changeSpecialChars (const std::string&) - Changing "
+                    << chg[i] << " with " << changeTo[j]);
+            chg.replace (i, 1, changeTo[j]);
+            i += strlen (changeTo[j]);
+         }
+   return chg;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -333,7 +358,7 @@ void HTMLWriter::printFile (std::ostream& out, const File& file,
 /*--------------------------------------------------------------------------*/
 void HTMLWriter::printMessage (std::ostream& out, const File& file,
                                const std::string& msg) const {
-   Check3 (msg);
+   Check3 (!msg.empty ());
 
    out << "<tr valign=top>";
    if (strNew.size ()) {
@@ -387,15 +412,12 @@ void TextWriter::printFile (std::ostream& out, const File& file,
    if (strNew.size () && isNew (file))
       out << strNew << ": ";
 
-   OutIterator i (format, file, prop);
-   std::string result;
-   while (i) {
-      result = *i;
-      out << result;
-      if (result.size ())
+   std::string value;
+   while (!((value = getNextNode (file, prop)).empty ()))
+      if (value.size ()) {
+         out << value;;
           out << ' ';
-      ++i;
-   }
+      }
    out << '\n';
 }
 
@@ -407,7 +429,7 @@ void TextWriter::printFile (std::ostream& out, const File& file,
 /*--------------------------------------------------------------------------*/
 void TextWriter::printMessage (std::ostream& out, const File& file,
                                const std::string& msg) const {
-   Check3 (msg);
+   Check3 (!msg.empty ());
    if (strNew.size () && isNew (file))
       out << "E: " << ": ";
    out << file.name () << " - " << msg << '\n';
@@ -461,13 +483,11 @@ void LaTeXWriter::printFile (std::ostream& out, const File& file,
       out << '&';
    }
 
-   OutIterator i (format, file, prop);
-   while (i) {
-      out << *i;
-      ++i;
-      if (i)
-         out << '&';
-   }
+   std::string value;
+   if (!((value = getNextNode (file, prop)).empty ()))
+      out << value;
+   while (!((value = getNextNode (file, prop)).empty ()))
+      out << '&' << value;
    out << "\\\\\n";
 }
 
@@ -479,7 +499,7 @@ void LaTeXWriter::printFile (std::ostream& out, const File& file,
 /*--------------------------------------------------------------------------*/
 void LaTeXWriter::printMessage (std::ostream& out, const File& file,
                                 const std::string& msg) const {
-   Check3 (msg);
+   Check3 (!msg.empty ());
 
    if (strNew.size ()) {
       if (isNew (file))
@@ -497,6 +517,33 @@ void LaTeXWriter::printMessage (std::ostream& out, const File& file,
 /*--------------------------------------------------------------------------*/
 void LaTeXWriter::printEnd (std::ostream& out) const {
    out << "\\end{tabular}\n";
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Changes the LaTeX special characters quote ("), ampersand (&),
+//            apostrophe ('), less (<) and greater (>) to HTML-values
+//Parameters: value: String to change
+//Returns   : Changed string
+/*--------------------------------------------------------------------------*/
+std::string LaTeXWriter::changeSpecialChars (const std::string& value) const {
+   std::string chg (value);
+   static const char toChange[] = { '#', '$', '%', '&', '~', '_', '^', '\\',
+                                    '{', '}' };
+   static const char* changeTo[] = { "\\#", "\\$", "\\%", "\\&", "\\~", "\\_",
+                                    "\\^", "$\\backslash$", "\\{", "\\}" };
+   Check3 (sizeof (toChange) == (sizeof (changeTo) / sizeof (changeTo[0])));
+
+   for (unsigned int i (0); i < chg.size (); ++i)
+      for (unsigned int j (0); j < sizeof (toChange); ++j)
+         if (chg[i] == toChange[j]) {
+            TRACE9 ("LaTeXWriter::changeSpecialChars (const std::string&) - Changing "
+                    << chg[i] << " with " << changeTo[j]);
+            chg.replace (i, 1, changeTo[j]);
+            i += strlen (changeTo[j]);
+         }
+
+
+   return chg;
 }
 
 
@@ -537,11 +584,9 @@ void XMLWriter::printFile (std::ostream& out, const File& file,
          out << "    " << strNew;
    }
 
-   OutIterator i (format, file, prop);
-   while (i) {
-      out << "    " << *i;
-      ++i;
-   }
+   std::string value;
+   while (!((value = getNextNode (file, prop)).empty ()))
+      out << "    " << value;
    out << '\n';
 }
 
@@ -553,7 +598,7 @@ void XMLWriter::printFile (std::ostream& out, const File& file,
 /*--------------------------------------------------------------------------*/
 void XMLWriter::printMessage (std::ostream& out, const File& file,
                                const std::string& msg) const {
-   Check3 (msg);
+   Check3 (!msg.empty ());
 
    out << "<Error><File>" << file.path () << file.name () << "</File>"
        << "<Name>" << file.name () << "<Name>"
