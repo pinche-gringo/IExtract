@@ -27,6 +27,7 @@
 #include <assert.h>
 
 #include "ParseHTML.h"
+#include "Properties.h"
 
 static const unsigned LEN_TAG         = 512;
 static const unsigned LEN_TITLE       = 512;
@@ -38,7 +39,7 @@ static const unsigned LEN_COMMAND     = 1024;
 //Parameters: pClassname: Name of class containing parser-data
 /*--------------------------------------------------------------------------*/
 ParseHTML::ParseHTML ()
-   : prop (NULL) 
+   : prop (NULL)
    , startTag ("<", "Start of HTML-tag"), endTag (">", "End of HTML-tag")
    , tagTitle ("TITLE", "title-tag")
    , title ("<", "Title of document", *this, &ParseHTML::foundTitle, LEN_TITLE)
