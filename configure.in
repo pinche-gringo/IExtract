@@ -37,8 +37,8 @@ dnl Checks for programs.
 
 dnl Checks for libraries.
 AC_CHECK_LIB(stdc++, main)
-PKG_CHECK_MODULES(YMP, YMP >= 0.6.10, [],
-                  [AC_MSG_ERROR(Need libAttr to make); exit])
+PKG_CHECK_MODULES(YMP, YGP >= 0.6.10, [],
+                  [AC_MSG_ERROR(Need libYGP to make); exit])
 
 dnl Checks for header files.
 
