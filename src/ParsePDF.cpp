@@ -25,6 +25,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <strstream>
@@ -326,11 +327,19 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
          prop->*(values[actEntry]) = "";
 
          Check1 (!(len & 1));
+         ++pValue;                                  // Skip leading parenthesis
+         --len;
+         if (*(unsigned int*)pValue == 'FFEF') {      // Skip MS-header for ???
+            pValue += 4;
+            len -= 4;
+         }
          while (len) {
-            prop->*(values[actEntry]) += ((convertToInt (*pValue) << 4)
-                                          + convertToInt (pValue[1]));
+            unsigned int ch;
+            sscanf (pValue, "%2X", &ch);
+            if (ch)
+               prop->*(values[actEntry]) += (char)ch;
             pValue += 2;
-            len -= 1;
+            len -= 2;
          }
       }
       actEntry = NONE;
