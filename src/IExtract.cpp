@@ -331,7 +331,10 @@ void Application::showHelp () const {
       "  - JPEG (*.jpeg, *.jpg)\n"
       "  - MP3 (*.mp3)\n"
       "  - PDF (*.pdf)\n"
+      "  - OpenOffice (Write (*.sxw), Calc (*.sxc), Impress (*.sxi), Math (*.sxm)"
+          " & Draw (*.sxd))\n"
       "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
+      "  - RTF documents (*.rtf)\n"
       "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n");
 }
 
@@ -697,7 +700,7 @@ void Application::processFile (const YGP::File& file, HANDLER fnc) const {
       }
       catch (std::string& err) {
          LOCKOUTPUT;
-         std::cerr << PACKAGE << _("-error: ") << err.c_str () << '\n';
+         std::cerr << PACKAGE << _("-error: ") << err << '\n';
          err = ((options & SHOW_ERRORS)
                 ? std::string (_("Error while processing: ")) + err
                 : "");
