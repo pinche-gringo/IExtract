@@ -37,7 +37,7 @@
 
 /* Version number of package */
 #define RELEASE "0.5"
-#define VERSION RELEASE ".00"
+#define VERSION RELEASE ".10"
 
 
 /* Leave that blank line there!!  Autoheader needs it.
