@@ -24,10 +24,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#define PACKAGE       "Extract"
-#define VERSION       "0.1"
-#define MICRO_VERSION "00"
-
 #include <gzo-cfg.h>
 
 #include <assert.h>
@@ -50,7 +46,7 @@
 class Application : public IVIOApplication {
  public:
    Application (const int argc, const char* argv[])
-      : IVIOApplication (argc, argv, lo), verbose (false) { }
+      : IVIOApplication (argc, argv, lo), options (0), outputStyle (TEXT) { }
   ~Application () { }
 
  protected:
@@ -60,11 +56,11 @@ class Application : public IVIOApplication {
    virtual int         perform (int argc, const char* argv[]);
    virtual const char* name () const { return PACKAGE; }
    virtual const char* description () const
-      { return verbose ?
-                VERSION "." MICRO_VERSION " - Compiled on " __DATE__ " - " __TIME__
+      { return (options & VERBOSE) ?
+                PACKAGE " V" VERSION "." MICRO_VERSION " - Compiled on " __DATE__ " - " __TIME__
                 "\nAuthor: Markus Schwab; e-Mail: g17m0@lycos.com"
                 "\nDistributed under the terms of the GNU General Public License"
-              : VERSION; }
+              : PACKAGE " V" VERSION; }
 
    // Help-handling
    virtual void showHelp () const;
@@ -81,12 +77,16 @@ class Application : public IVIOApplication {
    char* processHTML (Xistream& hFile) const throw (std::string);
    char* processOffice (Xistream& hFile) const throw (std::string);
 
-   bool verbose;
+   enum opts { VERBOSE = 0x1, RECURSIVE = 0x2, SHOW_ERRORS = 0x4 };
+   unsigned int options;
 
-   typedef char* (Application::*HANDLER) (Xistream& hFile) const throw (std::string);
+   enum { TEXT, HTML } outputStyle;
+
+   typedef char* (Application::*HANDLER) (Xistream& hFile) const;
    typedef struct {
       const char* pExt;
       HANDLER     pFnc; } FILEHANDLERS;
+   HANDLER getFileTypeHandler (const char* pExt) const;
 
    static const FILEHANDLERS handlers[];
 
@@ -95,19 +95,22 @@ class Application : public IVIOApplication {
 
 
 const Application::FILEHANDLERS Application::handlers[] = {
-   { "htm", processHTML },
-   { "html", processHTML },
-   { "shtm", processHTML },
-   { "shtml", processHTML },
-   { "doc", processOffice },
-   { "xls", processOffice },
-   { "ppt", processOffice} };
+   { "htm", &Application::processHTML },
+   { "html", &Application::processHTML },
+   { "shtm", &Application::processHTML },
+   { "shtml", &Application::processHTML },
+   { "doc", &Application::processOffice },
+   { "xls", &Application::processOffice },
+   { "ppt", &Application::processOffice} };
 
 
 const IVIOApplication::longOptions Application::lo[] = {
    { "help", 'h' },
+   { "recursive", 's' },
+   { "show-errors", 'e' },
    { "verbose", 'v' },
    { "version", 'V' },
+   { "output", 'o' },
    { NULL, '\0' } };
 
 
@@ -117,8 +120,15 @@ const IVIOApplication::longOptions Application::lo[] = {
 void Application::showHelp () const {
    std::cout << "Extracts (depending on the file-type) a description out of files"
                 "\n\nUsage: "
-             << PACKAGE " <File(s)>\n\n"
-                "  File(s) ... File to analyze\n";
+             << PACKAGE " [OPTIONS] <File(s)>\n\n"
+                "  -s, --recursive ...... Recurse into subdirectories\n"
+                "  -o, --output=STYLE ... Sets the output-style (text or HTML)\n"
+                "  -e, --show-errors .... Puts error messages (additionally) into output\n"
+                "  -v, --verbose, ....... Displays the processed files (be verbose)\n"
+                "  -V, version .......... Output version information and exit\n"
+                "  -h, -?, --help ....... Displays this help and exit\n"
+                "  File(s) ... File to analyze\n\n"
+                "Currently supported documents are: HTML, WinWord, Excel & Powerpoint\n";
 }
 
 /*--------------------------------------------------------------------------*/
@@ -131,9 +141,23 @@ bool Application::handleOption (const char option) {
    assert (option != '\0');
 
    switch (option) {
-   case 'v': verbose = true; break;
+   case 'r': options |= RECURSIVE; break;
 
-   case 'V': verbose = true; std::cout << description (); exit (0);
+   case 'o': {
+      const char* pType = getOptionValue ();
+      if (!pType
+          || ((outputStyle = HTML, strcmp (pType, "HTML"))
+              && (outputStyle = TEXT, strcmp (pType, "text")))) {
+         cerr << PACKAGE "-warning: Style of output " << pType << " is not"
+                 "valid! Using text\n";
+      }
+      break; }
+
+   case 'e': options |= SHOW_ERRORS; break;
+
+   case 'v': options |= VERBOSE; break;
+
+   case 'V': options |= VERBOSE; std::cout << description () << '\n'; exit (0);
 
    default:
       std::cerr << PACKAGE "-warning: Ignoring invalid option '"
@@ -154,11 +178,18 @@ int Application::perform (int argc, const char* argv[]) {
       return -1;
    }
 
+   if (outputStyle == HTML)
+      cout << "<table>\n";
+
    for (unsigned int i (0); i < argc; ++i) {
-      if (verbose) {
+      if (options & VERBOSE) {
          std::cout << "Handling file(s) " << argv[i] << '\n'; std::cout.flush (); }
       handleFiles (argv[i]);
    }
+
+   if (outputStyle == HTML)
+      cout << "</table>\n";
+
    return 0;
 }
 
@@ -172,10 +203,12 @@ void Application::handleFiles (const char* pFile) const {
    assert (pFile);
 
    DirectorySearch ds (pFile);
-   const File* file = ds.find (IDirectorySearch::FILE_NORMAL
-                               | IDirectorySearch::FILE_DIRECTORY);
+   const File* file = ds.find ((options & RECURSIVE)
+                               ? (IDirectorySearch::FILE_NORMAL
+                                  | IDirectorySearch::FILE_DIRECTORY)
+                               : IDirectorySearch::FILE_NORMAL);
    while (file) {
-      if (verbose) {
+      if (options & VERBOSE) {
          std::cout << "Handling file " << file->name () << '\n'; std::cout.flush (); }
 
       std::string strFile (file->path ());
@@ -189,8 +222,8 @@ void Application::handleFiles (const char* pFile) const {
          }
       }
       else {
-         const char* pExt = strrchr (file->name (), '.');
-         if (pExt++) {
+         HANDLER fnc = getFileTypeHandler (strrchr (file->name (), '.'));
+         if (fnc) {
             Xifstream ifile;
             ifile.open (strFile.c_str (), ios::in | ios::binary);
             if (!ifile) {
@@ -201,29 +234,24 @@ void Application::handleFiles (const char* pFile) const {
             else {
                ifile.init ();
 
-               unsigned int i (0);
-               for (; i < (sizeof (handlers) / sizeof (handlers[0])); ++i) {
-                  char* pDescription = NULL;
-                  if (!strcmp (handlers[i].pExt, pExt)) {
-                     try {
-                        pDescription = (this->*(handlers[i].pFnc)) ((Xistream&)ifile);
-                        showFile (strFile.c_str (), pDescription);
-                     }
-                     catch (std::string& err) {
-                        std::cerr << PACKAGE "-error: " << err.c_str ();
-                        showFile (strFile.c_str (), "Error while processing");
-                     }
-                     if (pDescription) free (pDescription);
-                     break;
-                  }
+               try {
+                  char* pDescription = (this->*fnc) ((Xistream&)ifile);
+                  assert (pDescription);
+                  showFile (strFile.c_str (), pDescription);
+                  free (pDescription);
                }
-               if (i == (sizeof (handlers) / sizeof (handlers[0])))
-                  showFile (strFile.c_str (), "Unknown file-type");
-            }
-         }
+               catch (std::string& err) {
+                  std::cerr << PACKAGE "-error: " << err.c_str ();
+                  showFile (strFile.c_str (),
+                            ((options & SHOW_ERRORS)
+                             ? "Error while processing" : ""));
+               } // end-catch
+            } // end-else file could be opened
+         } // endif handler found
          else
-            showFile (strFile.c_str (), "");
-      } // end-else file
+            showFile (strFile.c_str (),
+                      (options & SHOW_ERRORS) ? "Unknown file-type" : "");
+      }
 
       file = ds.next ();
    } // end-while
@@ -238,8 +266,15 @@ void Application::handleFiles (const char* pFile) const {
 void Application::showFile (const char* pFile, const char* pDesc) const {
    assert (pFile);
 
-   std::cout << pFile << " - " << (pDesc ? pDesc : "") << '\n';
-   std::cout.flush ();
+   if (outputStyle == HTML)
+      cout << "<tr><td>&nbsp;&nbsp;<a href=" << pFile << '>';
+   std::cout << pFile;
+   if (outputStyle == HTML)
+      cout << "</td><td>";
+   cout << " - " << (pDesc ? pDesc : "");
+   if (outputStyle == HTML)
+      cout << "</td></tr>";
+   cout << '\n';
 }
 
 /*--------------------------------------------------------------------------*/
@@ -247,8 +282,8 @@ void Application::showFile (const char* pFile, const char* pDesc) const {
 //Parameters: hFile: File to processs
 //Returns   : char*: Description; NULL in case of error
 /*--------------------------------------------------------------------------*/
-char* Application::processHTML (Xistream& hFile) const {
-   if (verbose)
+char* Application::processHTML (Xistream& hFile) const throw (std::string) {
+   if (options & VERBOSE)
       std::cout << "Processing HTML-file\n";
 
    ParseHTML obj;
@@ -260,12 +295,28 @@ char* Application::processHTML (Xistream& hFile) const {
 //Parameters: hFile: File to processs
 //Returns   : char*: Description; NULL in case of error
 /*--------------------------------------------------------------------------*/
-char* Application::processOffice (Xistream& hFile) const {
-   if (verbose)
+char* Application::processOffice (Xistream& hFile) const throw (std::string) {
+   if (options & VERBOSE)
       std::cout << "Processing MS Office document";
 
    ParseWord obj;
    return strdup (obj.parse (hFile));
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Returns a handling function to a filetype
+//Parameters: pExt: Pointer to file extensions
+//Returns   : HANDLER: Method to handle this filetype; NULL in case of error
+/*--------------------------------------------------------------------------*/
+Application::HANDLER Application::getFileTypeHandler (const char* pExt) const {
+   if (pExt && *pExt++) {
+      unsigned int i (0);
+      for (; i < (sizeof (handlers) / sizeof (handlers[0])); ++i)
+         if (!strcmp (handlers[i].pExt, pExt))
+            return handlers[i].pFnc;
+   }
+
+   return NULL;
 }
 
 
