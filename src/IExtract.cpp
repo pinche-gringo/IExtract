@@ -319,23 +319,23 @@ void Application::showHelp () const {
       << _("       %U is substituted with the full path of the dir in UNIX style (with /)\n\n")
       << _("     As with FORMAT, the pipe symbol (|) separates columns.\n\n")
       << _("The format of the INI file is like this (entries can be missing):\n\n")
-      << ("   [Output]\n"
+      << "   [Output]\n"
       "   Format=<a href=\")%N\" title=\"%c\">%n</a>|%t|%a|%D\n"
       "   Title=File|Title|Author|Date\n"
       "   TextForNewFiles=<img src=../images/new.gif>\n"
       "   MaxAgeForNewFiles=15\n"
       "   DirSeparatorText=%eListing of %n%s\n"
-      "   Style=HTML\n\n")
+      "   Style=HTML\n\n"
       << _("Currently supported files are:")
-      << ("\n  - HTML (*.html, *.htm, *.shtml, *.shtm, *.sht, *.php)\n"
+      << "\n  - HTML (*.html, *.htm, *.shtml, *.shtm, *.sht, *.php)\n"
       "  - JPEG (*.jpeg, *.jpg)\n"
       "  - MP3 (*.mp3)\n"
       "  - PDF (*.pdf)\n"
       "  - OpenOffice (Write (*.sxw), Calc (*.sxc), Impress (*.sxi), Math (*.sxm)"
           " & Draw (*.sxd))\n"
       "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
-      "  - RTF documents (*.rtf)\n"
-      "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n");
+      "  - RTF (*.rtf)\n"
+      "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n";
 }
 
 //-----------------------------------------------------------------------------
