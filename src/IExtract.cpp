@@ -218,7 +218,7 @@ const Application::FILEHANDLERS Application::handlers[] = {
 const IVIOApplication::longOptions Application::lo[] = {
    { IVIOAPPL_HELP_OPTION },
    { "recursive", 'r' },
-   { "format", 'f' },
+   { "format", 'F' },
    { "title", 'T' },
 #ifdef ENABLE_THREADS
    { "threads", 't' },
@@ -229,7 +229,7 @@ const IVIOApplication::longOptions Application::lo[] = {
    { "separate", 's' },
    { "all", 'a' },
    { "new", 'n' },
-   { "ini-file", 'I' },
+   { "ini-file", 'f' },
    { "version", 'V' },
    { "output", 'o' },
    { NULL, '\0' } };
@@ -243,7 +243,7 @@ void Application::showHelp () const {
         << " " PACKAGE " " << _("[OPTIONS] <File(s)>")
         << "\n\n  -r, --recursive ....... " << _("Recurse into subdirectories")
         << "\n  -o, --output=STYLE .... " << _("Sets the output-style (text, HTML or LaTeX)")
-        << "\n  -f, --format=FORMAT ... " << _("Format of output; default: ") << DEFAULT_FORMAT
+        << "\n  -F, --format=FORMAT ... " << _("Format of output; default: ") << DEFAULT_FORMAT
         << "\n  -T, --title=TITLE ..... " << _("Title of output")
         << "\n  -s, --separate=TEXT ... " << _("Separate subdirectories with TEXT (default: empty);\n                          implies recursion into subdirectories (--recursive)")
         << "\n  -e, --show-errors ..... " << _("Puts error messages (additionally) into the output")
@@ -254,7 +254,7 @@ void Application::showHelp () const {
         << "\n  -n, --new=DAYS:TEXT ... " << _("Show TEXT for files younger than DAYS days (def: 30)")
         << "\n  -i, --include=LIST .... " << _("Files to inspect")
         << "\n  -x, --exclude=LIST .... " << _("Files not to inspect")
-        << "\n  -I, --ini-file=FILE ... " << _("Read further options from specified file")
+        << "\n  -f, --ini-file=FILE ... " << _("Read further options from specified file")
         << "\n  -V, --version ......... " << _("Output version information and exit")
         << "\n  -h, -?, --help ........ " << _("Displays this help and exit\n")
         << _("  File(s) ... Files to analyze (the last part can contain wildcards)\n\n")
@@ -262,6 +262,7 @@ void Application::showHelp () const {
         << _("LIST is a list of files; seperated with the path-separator of the operating\n")
         << _("     system (':' for UNICES, ';' for Windows). E.g. *.html:*.doc\n\n")
         << _("FORMAT specifies how to print the entries;\n")
+        << _("       The pipe symbol (|) separates columns\n")
         << _("       %a is substituted with the author\n")
         << _("       %c is substituted with the comment\n")
         << _("       %d is substituted with the modification time of the file\n")
@@ -289,6 +290,7 @@ void Application::showHelp () const {
         << _("       %P is substituted with the path to the directory in UNIX style (with /)\n")
         << _("       %s prints the start-of-output for the specified output style\n")
         << _("       %U is substituted with the full path of the dir in UNIX style (with /)\n\n")
+        << _("     As with FORMAT, the pipe symbol (|) separates columns.\n\n")
         << _("The format of the INI file is like this (entries can be missing):\n\n")
         << ("   [Output]\n"
             "   Format=<a href=\")%N\" title=\"%c\">%n</a>|%t|%a|%D\n"
@@ -359,13 +361,13 @@ bool Application::handleOption (const char option) {
 
    case 'e': options |= SHOW_ERRORS; break;
 
-   case 'f': {
+   case 'F': {
       const char* pFormat = getOptionValue ();
       if (pFormat) 
          iniOpts.format = pFormat;
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
-         error.replace (error.find ("%1"), 2, 1, 'f');
+         error.replace (error.find ("%1"), 2, 1, 'F');
          cerr << PACKAGE << error;
       }
       break; }
@@ -424,13 +426,13 @@ bool Application::handleOption (const char option) {
 
    case 'a': options |= SHOW_ALL; break;
 
-   case 'I': {
+   case 'f': {
       const char* pFile = getOptionValue ();
       if (pFile)
          readINIFile (pFile);
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
-         error.replace (error.find ("%1"), 2, 1, 'I');
+         error.replace (error.find ("%1"), 2, 1, 'f');
          cerr << PACKAGE << error;
       }
       break; }
