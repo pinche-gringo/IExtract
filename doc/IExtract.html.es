@@ -117,6 +117,9 @@
 
       <dt><b>Documentos de OpenOffice</b></dt>
       <dd><p>Busca para el contenido de la ventana "propiedades".</p>
+
+      <dt><b>Documentos en formato RTF (Rich Text Format)</b></dt>
+      <dd><p>Busca para el contenido del bloque "info".</p>
     </dl>
 
     <p>La salida puede ser en el formato HTML (una tabla), XML (XHTML por

@@ -115,6 +115,9 @@
 
       <dt><b>OpenOffice Dokumente</b></dt>
       <dd><p>Liest die Eintr&auml;ge des "Eigenschaften"-Dialogs.</p></dd>
+
+      <dt><b>RTF Dokumente</b></dt>
+      <dd><p>Liest die Eintr&auml;ge des "Info"-Blocks.</p></dd>
     </dl>
 
     <p>Die Ausgabe kann sowohl in HTML-format (table), XML (default XHTML),

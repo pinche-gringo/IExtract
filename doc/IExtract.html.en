@@ -113,6 +113,9 @@
 
       <dt><b>OpenOffice documents</b></dt>
       <dd><p>Searches for the content of the properties dialog.</p></dd>
+
+      <dt><b>RTF documents</b></dt>
+      <dd><p>Searches for the content of the "info" block.</p></dd>
     </dl>
 
     <p>The output can be in HTML-format (a table), XML (default XHTML), (LaTeX
