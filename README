@@ -2,8 +2,8 @@
                        ========
 
 
-Utility to extract a description for certain file-types
-Anti-Copyright (A) 2002 Markus Schwab <g17m0@lycos.com>
+Utility to extract the description out of certain file-types
+Copyright (C) 2002 - 2004 Markus Schwab <g17m0@lycos.com>
 -----------------------------------------------------------------------
 
 
@@ -25,16 +25,11 @@ to the extension - so don't cheat ;) ):
   - MS office documents (*.doc, *.xls, *.ppt); the comment of the properties
 	  dialog is extracted.
   - MP3 files: Extracts the contents of the ID3 tag.
+  - RTF documents: Extracts the contents of the \info section
 
 The found results can be written either in text, HTML (table), XML (defaults to
-XHTML) or LaTeX (tabular) format. Note that there is some extra formatting of
-the text (like checking for LaTeX or HTML special characters) done.
-
-
-Planed
-------
-
-  - Supporting RTF files
+XHTML) or LaTeX (tabular) format. Note that some extra formatting of the text
+is done (like checking for LaTeX or HTML special characters).
 
 
 Installation
@@ -48,7 +43,7 @@ Windows
 
 Is supported (principally), though because of missing standards not that easy
 (at least, if you have a different setup than me). See the (end of the) file
-INSTALL. Note that the General library is linked statically (and not used as
+INSTALL. Note that the libYGP library is linked statically (and not used as
 a DLL).
 
 

@@ -1,8 +1,8 @@
 Prerequisites
 -------------
 
-* General library. Should be available from the same site where you got this
-  package.
+* The libYGP library. Also available as Sourceforge project. Get it from
+  libymp.sourceforge.net (how inconsistently).
 
 
 How to build Extract (UNIX-style)
@@ -92,7 +92,7 @@ Principally you can compile the tool with:
 but might get problems because of differnt path's or the like. Change the
 approbiate makefile.
 
-- The General library should be in (beyond) a directory called "General"
+- The libYGP library should be in (beyond) a directory called "General"
   in the same directory as this utility. E.g:
 
      E:\Projects
