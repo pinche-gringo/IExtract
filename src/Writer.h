@@ -121,6 +121,26 @@ class HTMLWriter : public Writer {
 };
 
 
+// Class to write fileinfo in XML format
+class XMLWriter : public Writer {
+ public:
+   XMLWriter (const std::string& format, const std::string& strNew,
+                 unsigned long age = 0) : Writer (format, strNew, age) { }
+   virtual ~XMLWriter ();
+
+   virtual void printStart (std::ostream& out, const std::string& title) const;
+   virtual void printFile (std::ostream& out, const File& file,
+                           const Properties& prop) const;
+   virtual void printMessage (std::ostream& out, const File& file,
+                              const std::string& msg) const;
+   virtual void printEnd (std::ostream& out) const;
+
+   static XMLWriter* create (const std::string& format, const std::string& strNew,
+                              unsigned long age = 0) {
+      return new XMLWriter (format, strNew, age); }
+};
+
+
 // Class to write fileinfo in text format
 class TextWriter : public Writer {
  public:

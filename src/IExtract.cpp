@@ -86,7 +86,9 @@
 #endif
 
 
-#define DEFAULT_FORMAT "%n|-|%t|%a|%c|%d"
+static const char* const DEFAULT_FORMAT ("%n|-|%t|%a|%c|%d");
+static const char* const DEFAULT_XML_FORMAT ("<tr><td>%n</td><td>%t</td>"
+                                             "<td>%a</td><td>%c</td><td>%d</td></tr>");
 
 
 // Class to run Extract-Application
@@ -94,11 +96,11 @@ class Application : public IVIOApplication {
  public:
    Application (const int argc, const char* argv[])
       : IVIOApplication (argc, argv, lo), options (0), outputStyle (TEXT)
-      , iniOpts ()
+        , iniOpts (), chgFlag (0)
 #ifdef ENABLE_THREADS
-      , listFiles (), mxListFiles (), aThreads (0), mxThreads (), mxOutput ()
+        , listFiles (), mxListFiles (), aThreads (0), mxThreads (), mxOutput ()
 #endif
-      , writer (NULL) {
+        , writer (NULL) {
       iniOpts.format = DEFAULT_FORMAT;
       iniOpts.ageOfNewFiles = 30 * 24 * 60 * 60;
 #ifdef ENABLE_THREADS
@@ -117,7 +119,9 @@ class Application : public IVIOApplication {
    virtual const char* name () const { return PACKAGE; }
    virtual const char* description () const {
       static std::string version (PACKAGE " V" VERSION " - ");
-      version += _("Compiled on %1 at %2\n\nAuthor: Markus Schwab; email: g17m0@lycos.com\nDistributed under the terms of the GNU General Public License");
+      version += _("Compiled on %1 at %2\n\nAuthor: Markus Schwab; "
+                   "email: g17m0@lycos.com\nDistributed under the terms "
+                   "of the GNU General Public License");
       version.replace (version.find ("%1"), 2, __DATE__);
       version.replace (version.find ("%2"), 2, __TIME__);
       return version.c_str (); }
@@ -159,6 +163,7 @@ class Application : public IVIOApplication {
 
    unsigned int options;
 
+   unsigned int chgFlag;
    Options iniOpts;
 
    Writer* writer;
@@ -188,7 +193,7 @@ class Application : public IVIOApplication {
 
    std::string filelist;
 
-   enum { TEXT = 0, HTML, LATEX } outputStyle;
+   enum { TEXT = 0, HTML, LATEX, XML } outputStyle;
 
    static const longOptions lo[];
 };
@@ -240,72 +245,73 @@ const IVIOApplication::longOptions Application::lo[] = {
 /*--------------------------------------------------------------------------*/
 void Application::showHelp () const {
    std::cout << _("Extracts a description out of files (depending on the file-type)\n\nUsage:")
-        << " " PACKAGE " " << _("[OPTIONS] <File(s)>")
-        << "\n\n  -r, --recursive ....... " << _("Recurse into subdirectories")
-        << "\n  -o, --output=STYLE .... " << _("Sets the output-style (text, HTML or LaTeX)")
-        << "\n  -F, --format=FORMAT ... " << _("Format of output; default: ") << DEFAULT_FORMAT
-        << "\n  -T, --title=TITLE ..... " << _("Title of output")
-        << "\n  -s, --separate=TEXT ... " << _("Separate subdirectories with TEXT (default: empty);\n                          implies recursion into subdirectories (--recursive)")
-        << "\n  -e, --show-errors ..... " << _("Puts error messages (additionally) into the output")
-        << "\n  -a, --all ............. " << _("Show all files (including unknown types) in output")
+      << " " PACKAGE " " << _("[OPTIONS] <File(s)>")
+      << "\n\n  -r, --recursive ....... " << _("Recurse into subdirectories")
+      << "\n  -o, --output=STYLE .... " << _("Sets the output-style (text, HTML XML or LaTeX)")
+      << "\n  -F, --format=FORMAT ... " << _("Format of output; default: ") << DEFAULT_FORMAT
+   << "\n                          " << _("and for XML:") << DEFAULT_XML_FORMAT
+   << "\n  -T, --title=TITLE ..... " << _("Title of output")
+      << "\n  -s, --separate=TEXT ... " << _("Separate subdirectories with TEXT (default: empty);\n                          implies recursion into subdirectories (--recursive)")
+      << "\n  -e, --show-errors ..... " << _("Puts error messages (additionally) into the output")
+      << "\n  -a, --all ............. " << _("Show all files (including unknown types) in output")
 #ifdef ENABLE_THREADS
-        << "\n  -t, --threads=NR ...... " << _("Number of threads for examining files (default: 1)")
+      << "\n  -t, --threads=NR ...... " << _("Number of threads for examining files (default: 1)")
 #endif
-        << "\n  -n, --new=DAYS:TEXT ... " << _("Show TEXT for files younger than DAYS days (def: 30)")
-        << "\n  -i, --include=LIST .... " << _("Files to inspect")
-        << "\n  -x, --exclude=LIST .... " << _("Files not to inspect")
-        << "\n  -f, --ini-file=FILE ... " << _("Read further options from specified file")
-        << "\n  -V, --version ......... " << _("Output version information and exit")
-        << "\n  -h, -?, --help ........ " << _("Displays this help and exit\n")
-        << _("  File(s) ... Files to analyze (the last part can contain wildcards)\n\n")
-        << _("DAYS (in option -n) may be omited or may have an multiplier suffix: m for 30.\n\n")
-        << _("LIST is a list of files; seperated with the path-separator of the operating\n")
-        << _("     system (':' for UNICES, ';' for Windows). E.g. *.html:*.doc\n\n")
-        << _("FORMAT specifies how to print the entries;\n")
-        << _("       The pipe symbol (|) separates columns\n")
-        << _("       %a is substituted with the author\n")
-        << _("       %c is substituted with the comment\n")
-        << _("       %d is substituted with the modification time of the file\n")
-        << _("       %D is substituted with the modification time of the file (day only)\n")
-        << _("       %n is substituted with the name of the file\n")
-        << _("       %N is substituted with path and name of the file\n")
-        << _("       %p is substituted with the path of the file\n")
-        << _("       %P is substituted with the path of the file in UNIX style (with /)\n")
-        << _("       %s is substituted with the size of the file\n")
-        << _("       %S is substituted with the size of the file (human readable)\n")
-        << _("       %t is substituted with the title\n")
-        << _("       %U is substituted with path and name of the file in UNIX style (with /)\n")
-        << _("       %(LETTERS) is substituted with first of the above substitutions\n")
-        << _("          producing a non-empty string (e.g. %(tn) is the titel if not \n")
-        << _("          empty or else the filename.)\n\n")
-        << _("       In every other constellation the '%' is removed!\n\n")
-        << _("TITLE specifies the headers for the output; separated with (|); columns must\n")
-        << _("      contain at least one character\n\n")
-        << _("TEXT specifies the text to separate subdirectories; with the following\n")
-        << _("     conversion strings:\n")
-        << _("       %e prints the end-of-output for the specified output style\n")
-        << _("       %n is substituted with the name of the directory\n")
-        << _("       %N is substituted with the full path of the directory\n")
-        << _("       %p is substituted with the path to the directory\n")
-        << _("       %P is substituted with the path to the directory in UNIX style (with /)\n")
-        << _("       %s prints the start-of-output for the specified output style\n")
-        << _("       %U is substituted with the full path of the dir in UNIX style (with /)\n\n")
-        << _("     As with FORMAT, the pipe symbol (|) separates columns.\n\n")
-        << _("The format of the INI file is like this (entries can be missing):\n\n")
-        << ("   [Output]\n"
-            "   Format=<a href=\")%N\" title=\"%c\">%n</a>|%t|%a|%D\n"
-            "   Title=File|Title|Author|Date\n"
-            "   TextForNewFiles=<img src=../images/new.gif>\n"
-            "   MaxAgeForNewFiles=15\n"
-            "   DirSeparatorText=%eListing of %n%s\n"
-            "   Style=HTML\n\n")
-        << _("Currently supported files are:")
-        << ("\n  - HTML (*.html, *.htm, *.shtml, *.shtm, *.sht, *.php)\n"
-            "  - JPEG (*.jpeg, *.jpg)\n"
-            "  - MP3 (*.mp3)\n"
-            "  - PDF (*.pdf)\n"
-            "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
-            "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n");
+      << "\n  -n, --new=DAYS:TEXT ... " << _("Show TEXT for files younger than DAYS days (def: 30)")
+      << "\n  -i, --include=LIST .... " << _("Files to inspect")
+      << "\n  -x, --exclude=LIST .... " << _("Files not to inspect")
+      << "\n  -f, --ini-file=FILE ... " << _("Read further options from specified file")
+      << "\n  -V, --version ......... " << _("Output version information and exit")
+      << "\n  -h, -?, --help ........ " << _("Displays this help and exit\n")
+      << _("  File(s) ... Files to analyze (the last part can contain wildcards)\n\n")
+      << _("DAYS (in option -n) may be omited or may have an multiplier suffix: m for 30.\n\n")
+      << _("LIST is a list of files; seperated with the path-separator of the operating\n")
+      << _("     system (':' for UNICES, ';' for Windows). E.g. *.html:*.doc\n\n")
+      << _("FORMAT specifies how to print the entries;\n")
+      << _("       The pipe symbol (|) separates columns\n")
+      << _("       %a is substituted with the author\n")
+      << _("       %c is substituted with the comment\n")
+      << _("       %d is substituted with the modification time of the file\n")
+      << _("       %D is substituted with the modification time of the file (day only)\n")
+      << _("       %n is substituted with the name of the file\n")
+      << _("       %N is substituted with path and name of the file\n")
+      << _("       %p is substituted with the path of the file\n")
+      << _("       %P is substituted with the path of the file in UNIX style (with /)\n")
+      << _("       %s is substituted with the size of the file\n")
+      << _("       %S is substituted with the size of the file (human readable)\n")
+      << _("       %t is substituted with the title\n")
+      << _("       %U is substituted with path and name of the file in UNIX style (with /)\n")
+      << _("       %(LETTERS) is substituted with first of the above substitutions\n")
+      << _("          producing a non-empty string (e.g. %(tn) is the titel if not \n")
+      << _("          empty or else the filename.)\n\n")
+      << _("       In every other constellation the '%' is removed!\n\n")
+      << _("TITLE specifies the headers for the output; separated with (|); columns must\n")
+      << _("      contain at least one character\n\n")
+      << _("TEXT specifies the text to separate subdirectories; with the following\n")
+      << _("     conversion strings:\n")
+      << _("       %e prints the end-of-output for the specified output style\n")
+      << _("       %n is substituted with the name of the directory\n")
+      << _("       %N is substituted with the full path of the directory\n")
+      << _("       %p is substituted with the path to the directory\n")
+      << _("       %P is substituted with the path to the directory in UNIX style (with /)\n")
+      << _("       %s prints the start-of-output for the specified output style\n")
+      << _("       %U is substituted with the full path of the dir in UNIX style (with /)\n\n")
+      << _("     As with FORMAT, the pipe symbol (|) separates columns.\n\n")
+      << _("The format of the INI file is like this (entries can be missing):\n\n")
+      << ("   [Output]\n"
+      "   Format=<a href=\")%N\" title=\"%c\">%n</a>|%t|%a|%D\n"
+      "   Title=File|Title|Author|Date\n"
+      "   TextForNewFiles=<img src=../images/new.gif>\n"
+      "   MaxAgeForNewFiles=15\n"
+      "   DirSeparatorText=%eListing of %n%s\n"
+      "   Style=HTML\n\n")
+      << _("Currently supported files are:")
+      << ("\n  - HTML (*.html, *.htm, *.shtml, *.shtm, *.sht, *.php)\n"
+      "  - JPEG (*.jpeg, *.jpg)\n"
+      "  - MP3 (*.mp3)\n"
+      "  - PDF (*.pdf)\n"
+      "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
+      "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n");
 }
 
 /*--------------------------------------------------------------------------*/
@@ -336,6 +342,7 @@ bool Application::handleOption (const char option) {
       if (!pType
           || ((outputStyle = HTML, strcmp (pType, "HTML"))
               && (outputStyle = TEXT, strcmp (pType, "text"))
+              && (outputStyle = XML, strcmp (pType, "XML"))
               && (outputStyle = LATEX, strcmp (pType, "LaTeX")))) {
          outputStyle = TEXT;
          std::string error (_("-warning: Style of output `%1' is not valid! Using text\n"));
@@ -363,8 +370,10 @@ bool Application::handleOption (const char option) {
 
    case 'F': {
       const char* pFormat = getOptionValue ();
-      if (pFormat)
+      if (pFormat) {
          iniOpts.format = pFormat;
+         chgFlag |= 0x1;
+      }
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
          error.replace (error.find ("%1"), 2, 1, 'F');
@@ -460,6 +469,10 @@ int Application::perform (int argc, const char* argv[]) {
       return -1;
    }
 
+   if ((outputStyle == XML) && !(chgFlag & 1)) {
+      iniOpts.format = DEFAULT_XML_FORMAT;
+   }
+
    Check3 (iniOpts.format.size ());
 
    typedef Writer* (*CREATEWRITER) (const std::string&, const std::string&,
@@ -469,7 +482,8 @@ int Application::perform (int argc, const char* argv[]) {
       CREATEWRITER fnc;
    } t[] = { { TEXT, (CREATEWRITER)&TextWriter::create },
              { HTML, (CREATEWRITER)&HTMLWriter::create },
-             { LATEX, (CREATEWRITER)&LaTeXWriter::create } };
+             { LATEX, (CREATEWRITER)&LaTeXWriter::create },
+             { XML, (CREATEWRITER)&XMLWriter::create } };
 
    for (unsigned int i (0); i < (sizeof (t) / sizeof (t[0])); ++i)
       if (outputStyle == t[i].opt)
@@ -791,6 +805,8 @@ void Application::readINIFile (const char* pFile) {
          outputStyle = HTML;
       else if (iniOpts.style == "LaTeX")
          outputStyle = LATEX;
+      else if (iniOpts.style == "XML")
+         outputStyle = XML;
       else {
          outputStyle = TEXT;
          if (iniOpts.style != "text") {

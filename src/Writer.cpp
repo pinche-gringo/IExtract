@@ -280,7 +280,7 @@ HTMLWriter::~HTMLWriter () {
 
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Prints the start for an HTML-table
+//Purpose   : Prints the start of an HTML-table
 //Parameters: out: Stream where to put the output
 //            title: Title information
 /*--------------------------------------------------------------------------*/
@@ -319,7 +319,7 @@ void HTMLWriter::printFile (std::ostream& out, const File& file,
 
    OutIterator i (format, file, prop);
    while (i) {
-      out << "<td>" << *i << "</a></td>";
+      out << "<td>" << *i << "</td>";
       ++i;
    }
    out << "</tr>\n";
@@ -346,7 +346,7 @@ void HTMLWriter::printMessage (std::ostream& out, const File& file,
 }
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Prints the end for an HTML-table
+//Purpose   : Prints the end of an HTML-table
 //Parameters: out: Stream where to put the output
 /*--------------------------------------------------------------------------*/
 void HTMLWriter::printEnd (std::ostream& out) const {
@@ -362,7 +362,7 @@ TextWriter::~TextWriter () {
 
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Prints the start for an HTML-table
+//Purpose   : Prints the start of a text-table
 //Parameters: out: Stream where to put the output
 //            title: Title information
 /*--------------------------------------------------------------------------*/
@@ -422,7 +422,7 @@ LaTeXWriter::~LaTeXWriter () {
 
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Prints the start for a LaTeX-table (tabular)
+//Purpose   : Prints the start of a LaTeX-table (tabular)
 //Parameters: out: Stream where to put the output
 //            title: Title information
 /*--------------------------------------------------------------------------*/
@@ -492,9 +492,78 @@ void LaTeXWriter::printMessage (std::ostream& out, const File& file,
 }
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Prints the endfor an LaTeX-table
+//Purpose   : Prints the end of a LaTeX-table
 //Parameters: out: Stream where to put the output
 /*--------------------------------------------------------------------------*/
 void LaTeXWriter::printEnd (std::ostream& out) const {
    out << "\\end{tabular}\n";
+}
+
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Destructor
+/*--------------------------------------------------------------------------*/
+XMLWriter::~XMLWriter () {
+}
+
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Prints the start of an XML-table
+//Parameters: out: Stream where to put the output
+//            title: Title information
+/*--------------------------------------------------------------------------*/
+void XMLWriter::printStart (std::ostream& out, const std::string& title) const {
+   out << "<table>\n";
+
+   if (title.size ()) {
+      Tokenize titles (title);
+      std::string node;
+      while ((node = titles.getNextNode ('|')).size ())
+         out << node;
+      out << '\n';
+   }
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Prints a file entry in XML format
+//Parameters: out: Stream where to put the output
+//            file: File whose data should be printed
+//            prop: Properties of the file
+/*--------------------------------------------------------------------------*/
+void XMLWriter::printFile (std::ostream& out, const File& file,
+                            const Properties& prop) const {
+   if (strNew.size ()) {
+      if (isNew (file))
+         out << "    " << strNew;
+   }
+
+   OutIterator i (format, file, prop);
+   while (i) {
+      out << "    " << *i;
+      ++i;
+   }
+   out << '\n';
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Prints a message in XML-format (inside the table)
+//Parameters: out: Stream where to put the output
+//            file: File to which the message should be print
+//            msg: Message to print (not NULL)
+/*--------------------------------------------------------------------------*/
+void XMLWriter::printMessage (std::ostream& out, const File& file,
+                               const std::string& msg) const {
+   Check3 (msg);
+
+   out << "<Error><File>" << file.path () << file.name () << "</File>"
+       << "<Name>" << file.name () << "<Name>"
+       << "<Description>" << msg << "</Desription></Error>\n";
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Prints the end of an XML-table
+//Parameters: out: Stream where to put the output
+/*--------------------------------------------------------------------------*/
+void XMLWriter::printEnd (std::ostream& out) const {
+   out << "</table>\n";
 }
