@@ -77,7 +77,7 @@
     <dl>
       <dt><b>HTML</b></dt>
       <dd><p>Busca para el texto entre los tags <code>&lt;title&gt;</code> y
-          <code>&lt;/title&gt;</code> y the contento de los tags <code>meta</code>
+          <code>&lt;/title&gt;</code> y el contento de los tags <code>meta</code>
           (tanto en formato HTML 4.0 como "Dublin Core").</p>
 
         <p>Archivos tienen que tener la extensi&oacute;n <code>*.htm</code>, <code>*.html</code>,
@@ -103,7 +103,7 @@
       </dd>
 
       <dt><b>MP3</b></dt>
-      <dd><p>Extrae el contento of the tag ID3 (versi&oacute;n 1.x). El
+      <dd><p>Extrae el contento del tag ID3 (versi&oacute;n 1.x). El
           t&iacute;tulo del &aacute;lbum se pone en el campo comentario.</p></dd>
 
       <dt><b>PDF</b></dt>
@@ -139,7 +139,7 @@
       cualquiera letra sola y letras especificas en chorchetes ([) y
       (]), o detalladolos, especifacadolos por sus l&iacute;mites
       (separado por un gui&oacute;n) o sus clases (entre '[:' y
-      ':]'. Por invertir esa selecci&oacute;n usa la caret (^) o el
+      ':]'). Por invertir esa selecci&oacute;n usa la caret (^) o el
       signo de exclamaci&oacute;n (!) en la primera posici&oacute;). Eso
       tambi&eacute;n vale por la versi&oacute;n de Windows.</p>
 
@@ -314,7 +314,7 @@
     <address><a href="mailto:g17m0@lycos.com">Envia comentarios</a></address>
 <!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
 <!-- hhmts start -->
-Last modified: Sat Feb  1 01:15:34 PET 2003
+Last modified: Sat Feb  1 01:21:01 PET 2003
 <!-- hhmts end -->
      - $Revision$
   </body>
