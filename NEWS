@@ -1,3 +1,12 @@
+Overview of changes in version 0.2.01
+  - Added handling of StarOffice documents
+  - Code should also work on bigendian machines; hard to test on PCs though ;)
+  - Version number for Windows version increased (was still 0.1.00 before)
+  - Output in LaTeX tabular style added
+  - New ouput placeholders %D and %(...) added
+  - Also read text for new files from INI file
+  - Help text improved
+
 Overview of changes in version 0.2.00
   - Option to pass a text for new entries
   - Options to select files (in/exclude them)
