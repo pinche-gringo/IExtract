@@ -2,4 +2,5 @@
 
 bin_PROGRAMS=IExtract
 
-IExtract_SOURCES=IExtract.cpp ParseHTML.cpp ParseHTML.h ParseWord.cpp ParseWord.h
+IExtract_SOURCES=IExtract.cpp ParseHTML.cpp ParseHTML.h ParseWord.cpp \
+ 	         ParseWord.h Writer.cpp Writer.h
