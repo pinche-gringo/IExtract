@@ -293,6 +293,8 @@ void Application::showHelp () const {
       << _("       %c is substituted with the comment\n")
       << _("       %d is substituted with the modification time of the file\n")
       << _("       %D is substituted with the modification time of the file (day only)\n")
+      << _("       %e is substituted with the extension of the file\n")
+      << _("       %E is substituted with the name of the file without extension\n")
       << _("       %n is substituted with the name of the file\n")
       << _("       %N is substituted with path and name of the file\n")
       << _("       %p is substituted with the path of the file\n")
@@ -447,8 +449,8 @@ bool Application::handleOption (const char option) {
       const char* files = getOptionValue ();
       if (files) {
          std::string node;
-         YGP::PathSearch list (filelist);
-         while (!(node = list.getNextNode ()).empty ()) {
+         YGP::PathSearch list (files);
+         while ((node = list.getNextNode ()).size ()) {
             filelist += option;
             filelist += node;
             filelist += YGP::PathSearch::PATHSEPARATOR;
