@@ -51,6 +51,7 @@ CLEAN :
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\ParseHTML.obj"
 	-@erase "$(INTDIR)\ParseJPG.obj"
+	-@erase "$(INTDIR)\ParseSOffice.obj"
 	-@erase "$(INTDIR)\ParseWord.obj"
 	-@erase "$(INTDIR)\PathSrch.obj"
 	-@erase "$(INTDIR)\StackTrc.obj"
@@ -66,7 +67,7 @@ CLEAN :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 CPP=cl.exe
-CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "..\..\General\Common" /I "..\..\General\Windows" /D "NDEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.1" /D MICRO_VERSION="00" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.1\" /D MICRO_VERSION=\"00\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "..\..\General\Common" /I "..\..\General\Windows" /D "NDEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.2" /D MICRO_VERSION="01" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.2\" /D MICRO_VERSION=\"01\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -115,6 +116,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\FileRExp.obj" \
 	"$(INTDIR)\IDirSrch.obj" \
 	"$(INTDIR)\IExtract.obj" \
+	"$(INTDIR)\INIFile.obj" \
 	"$(INTDIR)\IVIOAppl.obj" \
 	"$(INTDIR)\Parse.obj" \
 	"$(INTDIR)\ParseHTML.obj" \
@@ -127,7 +129,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Writer.obj" \
 	"$(INTDIR)\XDirSrch.obj" \
 	"$(INTDIR)\XStrBuf.obj" \
-	"$(INTDIR)\INIFile.obj"
+	"$(INTDIR)\ParseSOffice.obj"
 
 "$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -160,6 +162,7 @@ CLEAN :
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\ParseHTML.obj"
 	-@erase "$(INTDIR)\ParseJPG.obj"
+	-@erase "$(INTDIR)\ParseSOffice.obj"
 	-@erase "$(INTDIR)\ParseWord.obj"
 	-@erase "$(INTDIR)\PathSrch.obj"
 	-@erase "$(INTDIR)\StackTrc.obj"
@@ -178,7 +181,7 @@ CLEAN :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 CPP=cl.exe
-CPP_PROJ=/nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\General\Common" /I "..\..\General\Windows" /D "_DEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.1" /D MICRO_VERSION="00" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.1\" /D MICRO_VERSION=\"00\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
+CPP_PROJ=/nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\General\Common" /I "..\..\General\Windows" /D "_DEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.2" /D MICRO_VERSION="01" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.2\" /D MICRO_VERSION=\"01\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -227,6 +230,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\FileRExp.obj" \
 	"$(INTDIR)\IDirSrch.obj" \
 	"$(INTDIR)\IExtract.obj" \
+	"$(INTDIR)\INIFile.obj" \
 	"$(INTDIR)\IVIOAppl.obj" \
 	"$(INTDIR)\Parse.obj" \
 	"$(INTDIR)\ParseHTML.obj" \
@@ -239,7 +243,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Writer.obj" \
 	"$(INTDIR)\XDirSrch.obj" \
 	"$(INTDIR)\XStrBuf.obj" \
-	"$(INTDIR)\INIFile.obj"
+	"$(INTDIR)\ParseSOffice.obj"
 
 "$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -340,6 +344,12 @@ SOURCE=..\src\ParseHTML.cpp
 SOURCE=..\src\ParseJPG.cpp
 
 "$(INTDIR)\ParseJPG.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\src\ParseSOffice.cpp
+
+"$(INTDIR)\ParseSOffice.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
