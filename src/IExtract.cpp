@@ -559,8 +559,8 @@ void Application::handleFiles (const char* pFile) const {
          if (aThreads.size () < aThreads.capacity ())
             try {
                ((Application*)this)->aThreads.push_back (
-                  OThread<Application>::create2 ((Application*)this,
-                                                 &Application::processThread, NULL));
+                  YGP::OThread<Application>::create2 ((Application*)this,
+                                                      &Application::processThread, NULL));
             }
             catch (std::string& err) {
                std::cerr << PACKAGE << _("-error: ") << err << '\n';
@@ -592,7 +592,7 @@ void Application::handleFiles (const char* pFile) const {
               << aThreads[0]->getID ());
       unsigned long id (aThreads[0]->getID ());
       UNLOCKTHREADS
-      Thread::waitForThread (id);
+      YGP::Thread::waitForThread (id);
    }
 #endif
 
@@ -646,7 +646,7 @@ void* Application::processThread (void* pThread) {
    YGP::ParseObject::freeBuffer ();
 
    LOCKTHREADS
-   Check3 (find (aThreads.begin (), aThreads.end (), pThread));
+   Check3 (find (aThreads.begin (), aThreads.end (), pThread) != aThreads.end ());
    aThreads.erase (find (aThreads.begin (), aThreads.end (), pThread));
    UNLOCKTHREADS
    return NULL;
