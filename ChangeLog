@@ -1,3 +1,35 @@
+2003-12-28  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.5.00 commented
+
+	* configure.in: Version to 0.5.00
+
+	* src/IExtract.cpp:
+	  Changed help-text (so that supported formats don't need to be translated)
+
+	* Windows/IExtract-cfg.h: Version to 0.5.00
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Added handling of RTF documents
+
+	* po/de.po, po/en.po, po/es.po: Messages from ParseRTF added
+
+	* po/POTFILES.in: Added ParseRTF.cpp
+
+2003-12-27  Markus Schwab  <g17m0@lycos.com>
+
+	* src/IExtract.cpp:
+	  Added handling of OpenOpffice and RTF documents to help
+
+	* src/ParseRTF.cpp, src/ParseRTF.h: Blocks can have a following value
+
+	* src/IExtract.cpp:
+	  Handling RTF documents; optimized building of map defining files to handle
+
+	* src/Makefile.am: ParseRTF added
+
+	* src/ParseRTF.cpp, src/ParseRTF.h: New file.
+
 2003-12-12  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Commented changes in V0.4.02
