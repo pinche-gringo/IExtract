@@ -36,8 +36,10 @@
 #include <IVIOAppl.h>
 
 #include "Writer.h"
+#include "ParseJPG.h"
 #include "ParseHTML.h"
 #include "ParseWord.h"
+#include "Properties.h"
 
 #if SYSTEM == WINDOWS
 #  define strcmp stricmp
@@ -76,8 +78,10 @@ class Application : public IVIOApplication {
 
    void handleFiles (Writer& writer, const char* pFile) const;
 
-   std::string processHTML (Xistream& hFile) const throw (std::string);
-   std::string processOffice (Xistream& hFile) const throw (std::string);
+   void processJPG (Xistream& hFile, Properties& result) const throw (std::string);
+   void processHTML (Xistream& hFile, Properties& result) const throw (std::string);
+   void processOffice (Xistream& hFile, Properties& result) const
+      throw (std::string);
 
    enum { RECURSIVE = 0x1, VERBOSE = 0x2, SHOW_ALL = 0x4, SHOW_ERRORS = 0x8 };
    unsigned int showOptions;
@@ -85,7 +89,7 @@ class Application : public IVIOApplication {
 
    enum { TEXT = 0, HTML } outputStyle;
 
-   typedef std::string (Application::*HANDLER) (Xistream& hFile) const;
+   typedef void (Application::*HANDLER) (Xistream& hFile, Properties& result) const;
    typedef struct {
       const char* pExt;
       HANDLER     pFnc; } FILEHANDLERS;
@@ -98,13 +102,15 @@ class Application : public IVIOApplication {
 
 
 const Application::FILEHANDLERS Application::handlers[] = {
+   { "jpg", &Application::processJPG },
+   { "jpeg", &Application::processJPG },
    { "htm", &Application::processHTML },
    { "html", &Application::processHTML },
    { "shtm", &Application::processHTML },
    { "shtml", &Application::processHTML },
    { "doc", &Application::processOffice },
    { "xls", &Application::processOffice },
-   { "ppt", &Application::processOffice} };
+   { "ppt", &Application::processOffice } };
 
 
 const IVIOApplication::longOptions Application::lo[] = {
@@ -252,21 +258,23 @@ void Application::handleFiles (Writer& writer, const char* pFile) const {
             ifile.init ();
 
             try {
-               writer.printFile (cout, *file, (this->*fnc) ((Xistream&)ifile));
+               Properties prop;
+               (this->*fnc) ((Xistream&)ifile, prop);
+               writer.printFile (cout, *file, prop);
             }
             catch (std::string& err) {
                std::cerr << PACKAGE "-error: " << err.c_str ();
-               writer.printFile (cout, *file,
-                                 ((options & SHOW_ERRORS)
-                                  ? "Error while processing" : NULL));
+               Properties errorProp =
+                  { (options & SHOW_ERRORS) ? "Error while processing" : ""};
+               writer.printFile (cout, *file, errorProp);
             } // end-catch
          } // end-else file could be opened
       } // endif handler found
       else
-         if (options & SHOW_ALL)
-            writer.printFile (cout, *file,
-                              ((options & SHOW_ERRORS)
-                               ? "Unknown file-type" : NULL));
+         if (options & SHOW_ALL) {
+            Properties errorProp = { "Unknown file-type" };
+            writer.printFile (cout, *file, errorProp);
+         }
       file = ds.next ();
    } // end-while
 
@@ -290,29 +298,45 @@ void Application::handleFiles (Writer& writer, const char* pFile) const {
 }
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Tries to extract to title of a HTML-document
+//Purpose   : Tries to extract the properties of a HTML-document
 //Parameters: hFile: File to processs
-//Returns   : std::string: Description
+//            result: Result of parsing
 /*--------------------------------------------------------------------------*/
-std::string Application::processHTML (Xistream& hFile) const throw (std::string) {
+void Application::processHTML (Xistream& hFile, Properties& result) const
+   throw (std::string) {
    if (options & VERBOSE)
       std::cout << "Processing HTML-file\n";
 
    ParseHTML obj;
-   return obj.parse (hFile);
+   obj.parse (hFile, result);
 }
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Tries to extract to title of a MS-office document
+//Purpose   : Tries to extract the properties of a MS-office document
 //Parameters: hFile: File to processs
-//Returns   : std::string: Description
+//            result: Result of parsing
 /*--------------------------------------------------------------------------*/
-std::string Application::processOffice (Xistream& hFile) const throw (std::string) {
+void Application::processOffice (Xistream& hFile, Properties& result) const
+   throw (std::string) {
    if (options & VERBOSE)
       std::cout << "Processing MS Office document\n";
 
    ParseWord obj;
-   return obj.parse (hFile);
+   obj.parse (hFile, result);
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Tries to extract the properties of a JPEG image
+//Parameters: hFile: File to processs
+//            result: Result of parsing
+/*--------------------------------------------------------------------------*/
+void Application::processJPG (Xistream& hFile, Properties& result) const
+   throw (std::string) {
+   if (options & VERBOSE)
+      std::cout << "Processing JPEG image\n";
+
+   ParseJPEG obj;
+   obj.parse (hFile, result);
 }
 
 /*--------------------------------------------------------------------------*/
