@@ -1,4 +1,10 @@
+Overview of changes in version 0.2.02
+
+  - Added support for PDF files
+  - Option "-e" reports also the error of the parser in the output
+
 Overview of changes in version 0.2.01
+
   - Added handling of StarOffice documents
   - Code should also work on bigendian machines; hard to test on PCs though ;)
   - Version number for Windows version increased (was still 0.1.00 before)
@@ -8,6 +14,7 @@ Overview of changes in version 0.2.01
   - Help text improved
 
 Overview of changes in version 0.2.00
+
   - Option to pass a text for new entries
   - Options to select files (in/exclude them)
   - Using threads
@@ -19,4 +26,5 @@ Overview of changes in version 0.2.00
 
 
 Overview of changes in version 0.1.00
+
   - Handling JPG, HTML & M$ office documents
