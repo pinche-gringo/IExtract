@@ -69,6 +69,7 @@ static int x = (mtrace (), 0);
 
 #include "Writer.h"
 #include "Options.h"
+#include "ParsePDF.h"
 #include "ParseJPG.h"
 #include "ParseHTML.h"
 #include "ParseWord.h"
@@ -144,6 +145,7 @@ class Application : public IVIOApplication {
    void* processThread (void*);
 #endif
 
+   void processPDF (Xistream& hFile, Properties& result) const throw (std::string);
    void processJPG (Xistream& hFile, Properties& result) const throw (std::string);
    void processHTML (Xistream& hFile, Properties& result) const throw (std::string);
    void processOffice (Xistream& hFile, Properties& result) const
@@ -193,19 +195,20 @@ class Application : public IVIOApplication {
 
 // TODO: If this table gets bigger change it to std::map!
 const Application::FILEHANDLERS Application::handlers[] = {
+   { "doc", &Application::processOffice },
    { "htm", &Application::processHTML },
    { "html", &Application::processHTML },
+   { "jpeg", &Application::processJPG },
+   { "jpg", &Application::processJPG },
+   { "pdf", &Application::processPDF },
+   { "ppt", &Application::processOffice },
+   { "sda", &Application::processStarOffice },
+   { "sdc", &Application::processStarOffice }, 
+   { "sdd", &Application::processStarOffice },
+   { "sdw", &Application::processStarOffice },
    { "shtm", &Application::processHTML },
    { "shtml", &Application::processHTML },
-   { "sdw", &Application::processStarOffice },
-   { "sdc", &Application::processStarOffice },
-   { "sdd", &Application::processStarOffice },
-   { "sda", &Application::processStarOffice },
-   { "jpg", &Application::processJPG },
-   { "jpeg", &Application::processJPG },
-   { "doc", &Application::processOffice },
-   { "xls", &Application::processOffice },
-   { "ppt", &Application::processOffice } };
+   { "xls", &Application::processOffice } };
 
 
 const IVIOApplication::longOptions Application::lo[] = {
@@ -274,6 +277,7 @@ void Application::showHelp () const {
                 "Currently supported files are:\n"
                 "  - HTML (*.html, *.htm, *.shtml, *.shtm)\n"
                 "  - JPEG (*.jpeg, *.jpg)\n"
+                "  - PDF (*.pdf)\n"
                 "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
                 "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n";
 }
@@ -576,8 +580,10 @@ void Application::processFile (const File& file, HANDLER fnc) const {
       catch (std::string& err) {
          LOCKOUTPUT
          std::cerr << PACKAGE "-error: " << err.c_str () << '\n';
-         writer->printMessage (cout, file,
-                              (options & SHOW_ERRORS) ? "Error while processing" : "");
+         err = ((options & SHOW_ERRORS)
+                ? std::string ("Error while processing: ") + err
+                : "");
+         writer->printMessage (cout, file, err.c_str ());
          UNLOCKOUTPUT
       } // end-catch
    } // end-else file could be opened
@@ -592,6 +598,16 @@ void Application::processHTML (Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseHTML obj;
    obj.parse (hFile, result);
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Tries to extract the properties of a HTML-document
+//Parameters: hFile: File to processs
+//            result: Result of parsing
+/*--------------------------------------------------------------------------*/
+void Application::processPDF (Xistream& hFile, Properties& result) const
+   throw (std::string) {
+   ParsePDF::parse (hFile, result);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -678,8 +694,7 @@ void Application::readINIFile (const char* pFile) {
       unsigned int rc (INIFILE_READ ());
    }
    catch (std::string& error) {
-      std::cerr << PACKAGE "-error: Can't read INI-file '" << pFile
-                << "'\nReason: " << error << '\n';
+      TRACE1 (error);
    }
 
    if (iniOpts.style.size ()) {
