@@ -58,9 +58,8 @@ inline unsigned short get2BytesLSB (const char* pAddr) {
 /*--------------------------------------------------------------------------*/
 ParseStarOffice::ParseStarOffice ()
    : prop (NULL), actEntry (NONE)
-     , idSOffice (ID, "StarOffice ID", false)
-     , skip ("\\*", "Unused contents", 7, false, false)
-     , skip2 (ID1, "Unused contents 2", 0x900, false, false)
+     , idSOffice (ID, "StarOffice ID", false), skip (7)
+     , skip2 (ID1, "Unused contents 2", 0x900, 1, false, false)
      , skipIDStart (ID1, "Start of StarOffice IDs", 256, 1, false)
      , length ("\\*", "Length of data-entry", *this, &ParseStarOffice::foundLength, 2, 2, false)
      , value ("\\*", "Property-entry", *this, &ParseStarOffice::foundValue, 1, 0, false)
@@ -110,7 +109,7 @@ int ParseStarOffice::foundValue (const char* pTitle, unsigned int len) {
       (prop->*(entries[actEntry].value)).assign (pTitle, len);
    }
 
-   skip.setMaxCard (entries[actEntry].offset - len);
+   skip.setOffset (entries[actEntry].offset - len);
    return ParseObject::PARSE_OK;
 }
 

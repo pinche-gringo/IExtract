@@ -41,6 +41,7 @@
 #ifdef WORDS_BIGENDIAN
 #  define TYPE_TITLE     0x9b9c0100
 #  define TYPE_COMMENT   0x9c9c0100
+#  define TYPE_AUTHOR    0x9d9c0100
 
 #  define TYPE_TITLE2    0x1c026900
 #  define TYPE_COMMENT2  0x1c027800
@@ -65,6 +66,7 @@ inline unsigned int get4BytesLSB (const char* pAddr) {
 #else
 #  define TYPE_TITLE     0x019c9b
 #  define TYPE_COMMENT   0x019c9c
+#  define TYPE_AUTHOR    0x019c9d
 
 #  define TYPE_TITLE2    0x69021c
 #  define TYPE_COMMENT2  0x78021c
@@ -104,8 +106,7 @@ ParseJPEG::ParseJPEG ()
    , length1 ("\\*", "Length (MSB first)", *this, &ParseJPEG::foundLength, 2, 2, false)
    , length2 ("\\*", "Length (LSB first)", *this, &ParseJPEG::foundLength2, 2, 2, false)
    , offset ("\\*", "Offset", *this, &ParseJPEG::foundOffset, 4, 4, false)
-   , skip ("\\*", "Skipping chars", 16, false, false)
-   , ignore ("\xff", "Ignore til special", 512, true, false)
+   , skip (16)
    , selFormat (_selFormat, "Possible comments", 1, 0, false)
    , seqFormat1 (_seqFormat1, "Format style 1", 1, 1, false)
    , selProperties (_selProperties, "Properties", 1, 0, false)
@@ -179,9 +180,10 @@ int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
           << string (pTitle, len) << " -> " << len << " chars");
 
    static string Properties::* values[] = { &Properties::strTitle,
-                                            &Properties::strComment };
+                                            &Properties::strComment,
+                                            &Properties::strAuthor };
    for (unsigned int i (0);
-        i < (sizeof (lengths) / sizeof (lengths[0])); ++i)
+        i < (sizeof (values) / sizeof (values[0])); ++i)
       if (lengths[i]) {
          TRACE8 ("ParseJPEG::foundTitle (const char*, unsigned int) - " << i
                  << ": Assigning from " << (offsets[i] - cRead) << ' '
@@ -267,7 +269,7 @@ int ParseJPEG::foundLength (const char* length, unsigned int) {
       title3.setMaxCard (lengths[1]);
    }
 
-   skip.setMaxCard (14);
+   skip.setOffset (14);
    return ParseObject::PARSE_OK;
 }
 
@@ -279,12 +281,12 @@ int ParseJPEG::foundLength (const char* length, unsigned int) {
 int ParseJPEG::foundLength2 (const char* length, unsigned int) {
    assert (length);
 
-   static unsigned int aSupportedTypes[] = { TYPE_TITLE, TYPE_COMMENT };
+   static unsigned int aSupportedTypes[] = { TYPE_TITLE, TYPE_COMMENT, TYPE_AUTHOR };
    for (unsigned int i (0);
-        i < (sizeof (lengths) / sizeof (lengths[0])); ++i)
+        i < (sizeof (aSupportedTypes) / sizeof (aSupportedTypes[0])); ++i)
       if (actEntry == aSupportedTypes[i]) {
          lengths[i] = get2BytesLSB (length);
-         TRACE9 ("ParseJPEG::foundLength2 (const char*) - " << lengths[i]
+         TRACE8 ("ParseJPEG::foundLength2 (const char*) - " << lengths[i]
                  << " (0x" << hex << lengths[i] << dec << ')');
          actEntry = i;
          return ParseObject::PARSE_OK;
@@ -317,7 +319,7 @@ int ParseJPEG::foundNumber (const char* nr, unsigned int) {
 int ParseJPEG::foundType (const char* pType, unsigned int) {
    assert (pType);
    actEntry = *(unsigned int*)pType;
-   TRACE9 ("ParseJPEG::foundType (const char*) - " << hex << actEntry << dec);
+   TRACE8 ("ParseJPEG::foundType (const char*) - " << hex << actEntry << dec);
    cRead += 12;
    return ParseObject::PARSE_OK;
 }
@@ -332,7 +334,7 @@ int ParseJPEG::foundOffset (const char* pOffset, unsigned int len) {
    assert (pOffset);
    if (actEntry != -1U) {
       offsets[actEntry] = get4BytesLSB (pOffset);
-      TRACE9 ("ParseJPEG::foundOffset (const char*) - " << offsets[actEntry]
+      TRACE8 ("ParseJPEG::foundOffset (const char*) - " << offsets[actEntry]
               << " (0x" << hex << offsets[actEntry] << dec << ')');
    }
    return ParseObject::PARSE_OK;
@@ -346,8 +348,7 @@ int ParseJPEG::foundPropertiesHeader (const char*, unsigned int) {
    TRACE1 ("ParseJPEG::foundPropertiesHeader (const char*) - Bytes read: "
            << cRead << " (0x" << hex << cRead << dec << ')');
 
-   skip.setMinCard (4);
-   skip.setMaxCard (4);
+   skip.setOffset (4);
    cRead += 14;
 
    TRACE8 ("ParseJPEG::foundPropertiesHeader (const char*) - Title length: "

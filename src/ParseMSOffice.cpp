@@ -37,7 +37,6 @@
 
 #include <Trace_.h>
 
-
 #include "ParseWord.h"
 #include "Properties.h"
 
@@ -76,15 +75,14 @@ static const unsigned int aTypes[] = { TYPE_TITLE, TYPE_AUTHOR, TYPE_COMMENT };
 /*--------------------------------------------------------------------------*/
 ParseWord::ParseWord()
    : len (0), cEntries (0), actEntry (-1U), cRead (0), prop (NULL)
-   , id (ID, "ID for title", 16, 16, false)
-   , skip ("\\*", "Unused information", 4, 1, false)
+   , id (ID, "ID for title", 16, 16, false), skip (4)
    , nrEntries ("\\*", "Number of entries", *this, &ParseWord::foundNrEntries, 4, 4, false)
    , type ("\\*", "Type of entry", *this, &ParseWord::foundType, 4, 4, false)
    , offset ("\\*", "Offset of Comment", *this, &ParseWord::foundOffset, 4, 4, false)
    , length ("\\*", "Length of title", *this, &ParseWord::foundLength, 4, 4, false)
    , title ("\0", "Title of document", *this, &ParseWord::foundTitle, 1, 1, false)
    , skipIDStart (ID1, "Other command", 16, 1)
-   , ignore (ID1, "Content", LEN_CONTENT, false, false)
+   , ignore (ID1, "Content", LEN_CONTENT, 1, false, false)
    , seqTitle (_seqTitle, "Title entry", 1, 1, false)
    , seqEntries (_seqEntries, "Entry description", *this,
                  &ParseWord::foundPropertiesHeader, 1, 1, false)
@@ -203,7 +201,7 @@ int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
    if (aOffsets.size () > 0) {
       actEntry = aOffsets.begin ()->first;
       off = aOffsets.begin ()->first - off - len - 4;
-      skip.setMaxCard (off);
+      skip.setOffset (off);
       TRACE7 ("ParseWord::foundTitle (const char*) - Skipping " << off
               << " bytes for next entry");
    }
@@ -223,7 +221,7 @@ int ParseWord::foundPropertiesHeader (const char*, unsigned int) {
    if (aOffsets.begin () != aOffsets.end ()) {
       TRACE7 ("ParseWord::foundPropertiesHeader (const char*) - Skipping "
               << (aOffsets.begin ()->first - cRead - 4) << " bytes for 1st entry");
-      skip.setMaxCard (aOffsets.begin ()->first - cRead - 4);
+      skip.setOffset (aOffsets.begin ()->first - cRead - 4);
       actEntry = aOffsets.begin ()->first;
       seqTitle.setMaxCard (aOffsets.size ());
    }

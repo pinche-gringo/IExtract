@@ -18,6 +18,10 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
+#ifdef _MSC_VER
+#pragma warning(disable:4786) // disable warning about truncating debug info
+#endif
+
 #include <map>
 #include <string>
 
@@ -60,7 +64,7 @@ class ParsePDF {
    ParseExact      startXRef;
    OMParseAttomic  offXRef;
    ParseExact      skipS;
-   ParseTextIgnore skip;
+   ParseText       skip;
 
    ParseExact      idXRef;
    OMParseAttomic  nrStart;

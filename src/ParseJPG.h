@@ -62,8 +62,7 @@ class ParseJPEG  {
    OMParseAttomic  length1;
    OMParseAttomic  length2;
    OMParseAttomic  offset;
-   ParseIgnore     skip;
-   ParseTextIgnore ignore;
+   ParseSkip       skip;
 
    ParseSelection  selFormat;
    ParseSequence   seqFormat1;
@@ -84,8 +83,8 @@ class ParseJPEG  {
    ParseObject*   _seqPropXXL[4];
    ParseObject*   _seqEntries[4];
 
-   unsigned int offsets[2];
-   unsigned int lengths[2];
+   unsigned int offsets[3];
+   unsigned int lengths[3];
 
    unsigned int cRead;
    unsigned int actEntry;

@@ -32,6 +32,7 @@ class ParseStarOffice  {
 
    void parse (Xistream& stream, Properties& result) throw (std::string) {
       prop = &result;
+      stream.seekg (0x800);
       selDocument.parse (stream); }
 
  private:
@@ -45,8 +46,8 @@ class ParseStarOffice  {
 
    ParseExact        idSOffice;
    ParseExact        skipIDStart;
-   ParseIgnore       skip;
-   ParseTextIgnore   skip2;
+   ParseSkip         skip;
+   ParseText         skip2;
    OMParseAttomic    length;
    OMParseAttomic    value;
 

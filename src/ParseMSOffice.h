@@ -57,14 +57,14 @@ class ParseWord  {
    typedef OFParseSequence<ParseWord> OMParseSequence;
 
    ParseExact      id;
-   ParseAttomic    skip;
+   ParseSkip       skip;
    OMParseAttomic  nrEntries;
    OMParseAttomic  type;
    OMParseAttomic  offset;
    OMParseAttomic  length;
    OMParseText     title;
    ParseAttomic    skipIDStart;
-   ParseTextIgnore ignore;
+   ParseText       ignore;
 
    ParseSequence   seqTitle;
    OMParseSequence seqEntries;

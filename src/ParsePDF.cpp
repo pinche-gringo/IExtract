@@ -25,6 +25,11 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
+#ifdef _MSC_VER
+#pragma warning(disable:4355) // disable warning about this in initlist
+#pragma warning(disable:4786) // disable warning about truncating debug info
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -44,12 +49,12 @@
 /*--------------------------------------------------------------------------*/
 //Purpose   : (Default-)Constructor
 /*--------------------------------------------------------------------------*/
-ParsePDF::ParsePDF () 
+ParsePDF::ParsePDF ()
    :  infoObject (-1U), actEntry (NONE), actObject (0), offPrev (0)
      , startXRef (ID, "Tag for offset of cross reference table")
      , offXRef ("\\9", "Offset of cross reference table", *this, &ParsePDF::foundOffset, 10, 1)
      , skipS (ID1, "Start of startxref-tag", 20)
-     , skip (ID1, "Unused data", 256)
+     , skip (ID1, "Unused data", 256, 1, true, false)
      , idXRef ("xref", "Tag for cross reference table")
      , nrStart ("\\9", "Number of cross reference entries", *this, &ParsePDF::foundStartNumber, 10)
      , count ("\\9", "Number of cross reference entries", *this, &ParsePDF::foundNumber, 10)
