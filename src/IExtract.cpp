@@ -168,7 +168,7 @@ bool Application::handleOption (const char option) {
       if (!pType
           || ((outputStyle = HTML, strcmp (pType, "HTML"))
               && (outputStyle = TEXT, strcmp (pType, "text"))))
-         cerr << PACKAGE "-warning: Style of output " << pType << " is not"
+         cerr << PACKAGE "-warning: Style of output " << pType << " is not "
                  "valid! Using text\n";
       break; }
 
@@ -184,14 +184,14 @@ bool Application::handleOption (const char option) {
           || ((time = strtoul (pNew, &pEnd, 10)),
               (!pEnd || ((*pEnd != ':') && (*pEnd != 'm')))))
          cerr << PACKAGE "-warning: Argument for new files " << pNew << " is not"
-                 "valid! Ignoring option\n";
+                 " valid! Ignoring option\n";
       else {
          if (*pEnd == 'm') {
             ++pEnd;
             time *= 30;
          }
-         time *= 24 * 60 * 60;
-         ageOfNewFiles = time;
+         if (time)
+            ageOfNewFiles = time * 24 * 60 * 60;
          pTextForNewFiles = pEnd + 1;
       }
                                           
