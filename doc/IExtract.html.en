@@ -102,6 +102,10 @@
       <dd><p>Extracts the content of the ID3 tag (version 1.x). The title of
           the album is returned in the comment field.</p></dd>
 
+      <dt><b>OGG</b></dt>
+      <dd><p>Extracts the content of the comment header. The title of
+          the album is returned in the comment field.</p></dd>
+
       <dt><b>PDF</b></dt>
       <dd><p>PDF documents contain a so called <i>Document Information
             directory</i> with various keys. The content of this directory is

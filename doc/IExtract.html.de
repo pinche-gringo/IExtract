@@ -103,6 +103,10 @@
       <dd><p>Sucht nach dem ID3 tag (version 1.x) am Ende der Datei. Der Titel des
           Albums wird im Kommentar-Feld zur&uuml;ckgeliefert.</p></dd>
 
+      <dt><b>OGG</b></dt>
+      <dd><p>Sucht nach dem "Comment header" am Anfang der Datei. Der Titel des
+          Albums wird im Kommentar-Feld zur&uuml;ckgeliefert.</p></dd>
+
       <dt><b>PDF</b></dt>
       <dd><p>PDF-Dokumente beinhalten ein sogenanntes <i>Document Information
             directory</i> mit verschiedenen Eintr&auml;gen. Der Inhalt dieses

@@ -105,6 +105,10 @@
       <dd><p>Extrae el contenido del tag ID3 (versi&oacute;n 1.x). El
           t&iacute;tulo del &aacute;lbum se pone en el campo comentario.</p></dd>
 
+      <dt><b>OGG</b></dt>
+      <dd><p>Extrae el contenido del "comment header" (cabeza de comentario).
+          El t&iacute;tulo del &aacute;lbum se pone en el campo comentario.</p></dd>
+
       <dt><b>PDF</b></dt>
       <dd><p>Documentos de PDF contienen un llamado <i>Document Information
             directory</i> (Directorio de informaciones del documento) con varias
