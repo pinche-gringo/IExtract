@@ -35,6 +35,9 @@
 #define TYPE_TITLE    0x019b9c
 #define TYPE_COMMENT  0x019c9c
 
+unsigned int ParseJPEG::aSupportedTypes[] = { TYPE_TITLE, TYPE_COMMENT };
+
+
 /*--------------------------------------------------------------------------*/
 //Purpose   : (Default-)Constructor
 //Parameters: pClassname: Name of class containing parser-data
@@ -48,13 +51,14 @@ ParseJPEG::ParseJPEG ()
    , length1 ("\\*", "Length", *this, &ParseJPEG::foundLength, 2, 2, false)
    , length2 ("\\*", "Length", *this, &ParseJPEG::foundLength2, 2, 2, false)
    , type ("\\*", "Type of entry", *this, &ParseJPEG::foundType, 4, 4, false)
-   , title ("\0", "Comment", *this, &ParseJPEG::foundTitle, 1, 1, false)
+   , title ("\\*", "Comment", *this, &ParseJPEG::foundTitle, 1, 1, false)
    , offset("\\*", "Offset", *this, &ParseJPEG::foundOffset, 4, 4, false)
    , ignore ("\\*", "Unused information", 8, 8, false)
    , selComment (_selComment, "Possible comments", 1, 0, false)
    , seqComment1 (_seqComment1, "Comment style 1", 1, 1, false)
    , seqComment2 (_seqComment2, "Comment style 2", 1, 1, false)
-   , seqEntries (_seqEntries, "List of property entries", 1, 1, false)
+   , seqEntries (_seqEntries, "List of property entries", *this,
+                 &ParseJPEG::foundPropertiesHeader, 1, 1, false)
    , jpegImage (_jpegImage, "JPEG image", 1, 1)
    , cRead (0), actEntry (TYPE_TITLE), cEntries (0) {
 
@@ -77,8 +81,10 @@ ParseJPEG::ParseJPEG ()
    _seqComment2[2] = &idComment2;
    _seqComment2[3] = &ignore;
    _seqComment2[4] = &number;
-    _seqComment2[5] = &seqEntries;
-   _seqComment2[6] = NULL;
+   _seqComment2[5] = &seqEntries;
+   _seqComment2[6] = &ignore;
+   _seqComment2[7] = &title;
+   _seqComment2[8] = NULL;
 
    _seqEntries[0] = &type;
    _seqEntries[1] = &length2;
@@ -121,10 +127,12 @@ int ParseJPEG::foundLength (const char* length, unsigned int) {
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundLength2 (const char* length, unsigned int) {
    assert (length);
-   unsigned int len (*(unsigned int*)length);
-   if (len)
-      title.setMaxCard (len);
-   TRACE8 ("ParseJPEG::foundLength (const char*, unsigned int): " << len);
+   unsigned int offset (getTypeIndex (actEntry));
+   if (offset != -1) {
+      lengths[offset] = *(unsigned int*)length;
+      TRACE9 ("ParseWord::foundLength2 (const char*) - " << lengths[offset]
+              << " (0x" << hex << lengths[offset] << dec << ')');
+   }
    return ParseObject::PARSE_OK;
 }
 
@@ -163,12 +171,43 @@ int ParseJPEG::foundType (const char* pType, unsigned int) {
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundOffset (const char* pOffset, unsigned int len) {
    assert (pOffset);
-   if ((actEntry == TYPE_TITLE) || (actEntry == TYPE_COMMENT)) {
-      ((actEntry == TYPE_TITLE) ? offTitle : offComment)
-         = *(unsigned int*)pOffset;
-      TRACE9 ("ParseWord::foundOffset (const char*) - "
-              << *(unsigned int*)pOffset << " (0x"
-              << hex << *(unsigned int*)pOffset << dec << ')');
+   unsigned int offset (getTypeIndex (actEntry));
+   if (offset != -1) {
+      offsets[offset] = *(unsigned int*)pOffset;
+      TRACE9 ("ParseWord::foundOffset (const char*) - " << offsets[offset]
+              << " (0x" << hex << offsets[offset] << dec << ')');
    }
    return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after the header of the properthies has been read
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseJPEG::foundPropertiesHeader (const char*, unsigned int) {
+   TRACE1 ("ParseJPEG::foundPropertiesHeader (const char*) - Bytes read: "
+           << cRead << " (0x" << hex << cRead << dec << ')');
+
+   ignore.setMinCard (4);
+   ignore.setMaxCard (4);
+
+   TRACE8 ("ParseJPEG::foundPropertiesHeader (const char*) - Setting title length to "
+           << title.getMaxCard () - cRead - 32);
+   assert (title.getMaxCard () > cRead);
+   title.setMaxCard (title.getMaxCard () - cRead - 32);
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Retrieves the index of the passed type
+//Parameters: type: Type to inspect
+//Returns   : unsigned int: Offset; -1 if type is not valid
+/*--------------------------------------------------------------------------*/
+int ParseJPEG::getTypeIndex (unsigned int type) {
+   for (unsigned int i (0);
+        i < (sizeof (aSupportedTypes) / sizeof (aSupportedTypes[0])); ++i)
+      if (type == aSupportedTypes[i])
+         return i;
+
+   return -1;
 }

@@ -42,16 +42,18 @@ class ParseJPEG  {
    int foundLength (const char*, unsigned int);
    int foundLength2 (const char*, unsigned int);
    int foundOffset (const char*, unsigned int);
+   int foundPropertiesHeader (const char*, unsigned int);
 
-   typedef OFParseText<ParseJPEG>    OMParseText;
-   typedef OFParseExact<ParseJPEG>   OMParseExact;
-   typedef OFParseAttomic<ParseJPEG> OMParseAttomic;
+   typedef OFParseText<ParseJPEG>     OMParseText;
+   typedef OFParseExact<ParseJPEG>    OMParseExact;
+   typedef OFParseAttomic<ParseJPEG>  OMParseAttomic;
+   typedef OFParseSequence<ParseJPEG> OMParseSequence;
 
    ParseExact     idJPEG;
    ParseExact     idComment2;
    ParseExact     tagComment1;
    ParseExact     tagComment2;
-   OMParseText    title;
+   OMParseAttomic title;
    OMParseAttomic type;
    OMParseAttomic number;
    OMParseAttomic length1;
@@ -59,20 +61,23 @@ class ParseJPEG  {
    OMParseAttomic offset;
    ParseAttomic   ignore;
 
-   ParseSelection selComment;
-   ParseSequence  seqComment1;
-   ParseSequence  seqComment2;
-   ParseSequence  seqEntries;
-   ParseSequence  jpegImage;                                  // Startsequence
+   ParseSelection  selComment;
+   ParseSequence   seqComment1;
+   ParseSequence   seqComment2;
+   OMParseSequence seqEntries;
+   ParseSequence   jpegImage;                                 // Startsequence
 
    ParseObject*   _selComment[3];
    ParseObject*   _seqEntries[4];
    ParseObject*   _seqComment1[4];
-   ParseObject*   _seqComment2[7];
+   ParseObject*   _seqComment2[9];
    ParseObject*   _jpegImage[4];
 
-   unsigned int offTitle;
-   unsigned int offComment;
+   static int getTypeIndex (unsigned int type);
+
+   static unsigned int aSupportedTypes[];
+   unsigned int offsets[2];
+   unsigned int lengths[2];
 
    unsigned int cRead;
    unsigned int actEntry;
