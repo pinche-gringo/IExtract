@@ -50,7 +50,7 @@ class ParseHTML  {
    ParseUpperExact   tagMeta;
    OMParseUpperExact tagTitle;
    ParseUpperExact   tagEndTitle;
-   ParseUpperExact   tagEndHead;
+   OMParseUpperExact tagEndHead;
    OMParseText       title;
    OMParseText       value;
    ParseText         otherTag;
