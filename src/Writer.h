@@ -135,4 +135,25 @@ class TextWriter : public Writer {
 };
 
 
+
+// Class to write fileinfo in LaTeX format
+class LaTeXWriter : public Writer {
+ public:
+   LaTeXWriter (const char* format, unsigned long age = 0, const char* pNew = NULL)
+      : Writer (format, age, pNew) { }
+   virtual ~LaTeXWriter ();
+
+   virtual void printStart (std::ostream& out, const char* title = NULL) const;
+   virtual void printFile (std::ostream& out, const File& file,
+                           const Properties& prop) const;
+   virtual void printMessage (std::ostream& out, const File& file,
+                              const char* msg) const;
+   virtual void printEnd (std::ostream& out) const;
+
+   static LaTeXWriter* create (const char* format, unsigned long age = 0,
+                              const char* pNew = NULL) {
+      return new LaTeXWriter (format, age, pNew); }
+};
+
+
 #endif

@@ -181,7 +181,7 @@ class Application : public IVIOApplication {
 
    string filelist;
 
-   enum { TEXT = 0, HTML } outputStyle;
+   enum { TEXT = 0, HTML, LATEX } outputStyle;
 
    static const longOptions lo[];
 };
@@ -227,7 +227,7 @@ void Application::showHelp () const {
                 "\n\nUsage: "
              << PACKAGE " [OPTIONS] <File(s)>\n\n"
                 "  -r, --recursive ....... Recurse into subdirectories\n"
-                "  -o, --output=STYLE .... Sets the output-style (text or HTML)\n"
+                "  -o, --output=STYLE .... Sets the output-style (text, HTML or LaTeX)\n"
                 "  -f, --format=FORMAT ... Format of output (default: " DEFAULT_FORMAT "\n"
                 "  -T, --title=TITLE ..... Title of output\n"
                 "  -e, --show-errors ..... Puts error messages (additionally) into output\n"
@@ -274,9 +274,12 @@ bool Application::handleOption (const char option) {
       const char* pType = getOptionValue ();
       if (!pType
           || ((outputStyle = HTML, strcmp (pType, "HTML"))
-              && (outputStyle = TEXT, strcmp (pType, "text"))))
+              && (outputStyle = TEXT, strcmp (pType, "text"))
+              && (outputStyle = LATEX, strcmp (pType, "LaTeX")))) {
+         outputStyle = TEXT;
          cerr << PACKAGE "-warning: Style of output " << pType << " is not "
                  "valid! Using text\n";
+      }
       break; }
 
 #ifdef ENABLE_THREADS
@@ -367,7 +370,8 @@ int Application::perform (int argc, const char* argv[]) {
       unsigned int opt;
       CREATEWRITER fnc;
    } t[] = { { TEXT, (CREATEWRITER)&TextWriter::create },
-             { HTML, (CREATEWRITER)&HTMLWriter::create } };
+             { HTML, (CREATEWRITER)&HTMLWriter::create },
+             { LATEX, (CREATEWRITER)&LaTeXWriter::create } };
 
    for (unsigned int i (0); i < (sizeof (t) / sizeof (t[0])); ++i)
       if (outputStyle == t[i].opt) {
@@ -665,6 +669,8 @@ void Application::readINIFile (const char* pFile) {
          outputStyle = HTML;
       else if (Style == "text")
          outputStyle = TEXT;
+      else if (Style == "LaTeX")
+         outputStyle = LATEX;
       else
          cerr << PACKAGE "-warning: The INI-file '" << pFile << "' contains an "
             "invalid entry for the output style ('" << Style << "')! Using text\n";

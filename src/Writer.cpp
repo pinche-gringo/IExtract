@@ -298,3 +298,104 @@ void TextWriter::printMessage (std::ostream& out, const File& file,
       out << pStrNew << ": ";
    out << file.name () << " - " << msg << '\n';
 }
+
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Destructor
+/*--------------------------------------------------------------------------*/
+LaTeXWriter::~LaTeXWriter () {
+}
+
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Prints the start for a LaTeX-table (tabular)
+//Parameters: out: Stream where to put the output
+//            title: Title information
+/*--------------------------------------------------------------------------*/
+void LaTeXWriter::printStart (std::ostream& out, const char* title) const {
+   out << "\\begin{tabular}{";
+   for (unsigned int i (0); i < columns (); ++i)
+      cout << 'l';
+   out << "}\n";
+
+   if (title) {
+      if (pStrNew)
+         out << "&";
+
+      Tokenize titles (title);
+      std::string node;
+      node = titles.getNextNode ('|');
+      out << "{\\textbf " << node << '}';
+      while ((node = titles.getNextNode ('|')).size ())
+         out << "&{\\textbf " << node << "}" << node;
+
+      out << "\\\\\n";
+   }
+ }
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Prints a file entry in LaTeX format
+//Parameters: out: Stream where to put the output
+//            file: File whose data should be printed
+//            prop: Properties of the file
+/*--------------------------------------------------------------------------*/
+void LaTeXWriter::printFile (std::ostream& out, const File& file,
+                             const Properties& prop) const {
+   if (pStrNew) {
+      if (isNew (file))
+         out << pStrNew;
+      out << '&';
+   }
+
+   OutIterator i (pFormat, file, prop);
+   while (i) {
+      out << *i;
+      ++i;
+      if (i)
+         out << '&';
+   }
+   out << "\\\\\n";
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Prints a message in LaTeX-format (inside the table)
+//Parameters: out: Stream where to put the output
+//            file: File to which the message should be print
+//            msg: Message to print (not NULL)
+/*--------------------------------------------------------------------------*/
+void LaTeXWriter::printMessage (std::ostream& out, const File& file,
+                                const char* msg) const {
+   assert (msg);
+
+   if (pStrNew) {
+      if (isNew (file))
+         out << pStrNew;
+      out << '&';
+   }
+
+   unsigned int cols (columns ());
+   TRACE9 ("LaTeXWriter::printMessage (ostream&, const File&, const char*) - "
+           << cols << " Columns");
+   OutIterator i (pFormat, file);
+   while (i) {
+      if (i.isAtName ())
+         out << *i;
+      out << '&';
+      --cols;
+      if (i.isAtName ())
+         break;
+      ++i;
+   }
+
+   TRACE5 ("LaTeXWriter::printMessage (ostream&, const File&, const char*) - "
+           << msg << " for " << cols << " Columns");
+   out << "{\\multicolumn{" << cols << "}l{" << msg << "}\\\\\n";
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Prints the endfor an LaTeX-table
+//Parameters: out: Stream where to put the output
+/*--------------------------------------------------------------------------*/
+void LaTeXWriter::printEnd (std::ostream& out) const {
+   out << "\\end{tabular}\n";
+}
