@@ -17,6 +17,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+#include <string>
+
 #include <Parse.h>
 
 
@@ -24,25 +26,25 @@
 class ParseHTML  {
  public:
    ParseHTML ();
-   ~ParseHTML () { if (pTitle) free (pTitle); }
+   ~ParseHTML () { }
 
-   const char* parse (Xistream& stream) throw (std::string) {
+   std::string parse (Xistream& stream) throw (std::string) {
       htmlDoc.parse (stream);
-      return pTitle; }
+      return strTitle; }
 
  private:
    // Callback-methods for type of parsed elementes
-   int foundTitle (const char*);
+   int foundTitle (const char*, unsigned int);
 
    typedef OFParseText<ParseHTML> OMParseText;
 
-   ParseExact  startTag;
-   ParseExact  endTag;
-   ParseExact  tagTitle;
-   ParseExact  tagEndTitle;
-   OMParseText title;
-   ParseText   otherTag;
-   ParseText   ignore;
+   ParseExact      startTag;
+   ParseExact      endTag;
+   ParseUpperExact tagTitle;
+   ParseUpperExact tagEndTitle;
+   OMParseText     title;
+   ParseText       otherTag;
+   ParseText       ignore;
 
    ParseSequence  seqTag;
    ParseSequence  seqTitle;
@@ -54,7 +56,7 @@ class ParseHTML  {
    ParseObject* _seqTag[4];
    ParseObject* _htmlDoc[3];
 
-   char* pTitle;
+   std::string strTitle;
 };
 
 #endif
