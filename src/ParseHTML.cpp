@@ -46,9 +46,9 @@ static const unsigned LEN_COMMAND     = 1024;
 ParseHTML::ParseHTML ()
    : prop (NULL), actEntry (NONE)
      , startTag ("<", "Start of HTML-tag"), endTag (">", "End of HTML-tag")
-     , tagMeta ("META", "meta-tag")
-     , tagTitle ("TITLE", "title-tag", *this, &ParseHTML::foundTitle)
-     , tagEndTitle ("/TITLE", "title-tag")
+     , tagMeta ("META", "Meta tag")
+     , tagTitle ("TITLE", "Title-tag", *this, &ParseHTML::foundTitle)
+     , tagEndTitle ("/TITLE", "Title-tag")
      , tagEndHead ("/HEAD", "End of header")
      , title ("<", "Title of document", *this, &ParseHTML::foundValue, LEN_TITLE)
      , value ("\">", "Value of entry", *this, &ParseHTML::foundValue, LEN_TITLE)
@@ -63,25 +63,34 @@ ParseHTML::ParseHTML ()
      , DCdescription  ("DC.DESCRIPTION", "Description in Dublin Core", *this, &ParseHTML::foundComment)
      , DCauthor ("DC.CREATOR", "Author in Dublin Core", *this, &ParseHTML::foundAuthor)
      , DCtitle ("DC.TITLE", "Title in Dublin Core", *this, &ParseHTML::foundTitle)
-     , seqMetaCmd (_seqMetaCmd, "Meta tag")
+     , seqMetaCmd (_seqMetaCmd, "Meta entry")
+     , seqMetaName (_seqMetaName, "Name entry for meta tag")
      , seqTitle (_seqTitle, "Title entry")
      , selMetaTags (_selMetaTags, "Recogniced meta tags", 1, 0)
+     , selMetaCmds (_selMetaCmds, "Meta entries")
      , selCmd (_selCmd, "Valid HTML command")
      , seqTag (_seqTag, "Valid HTML tag")
      , htmlDoc (_htmlDoc, "HTML document", -1, 1) {
 
    _seqMetaCmd[0] = &tagMeta;
-   _seqMetaCmd[1] = &name;
-   _seqMetaCmd[2] = &equal;
-   _seqMetaCmd[3] = &quote;
-   _seqMetaCmd[4] = &selMetaTags;
-   _seqMetaCmd[5] = &quote;
-   _seqMetaCmd[6] = &content;
-   _seqMetaCmd[7] = &equal;
-   _seqMetaCmd[8] = &quote;
-   _seqMetaCmd[9] = &value;
-   _seqMetaCmd[10] = &quote;
-   _seqMetaCmd[11] = NULL;
+   _seqMetaCmd[1] = &selMetaCmds;
+   _seqMetaCmd[2] = NULL;
+
+   _selMetaCmds[0] = &seqMetaName;
+   _selMetaCmds[1] = &otherTag;
+   _selMetaCmds[2] = NULL;
+
+   _seqMetaName[0] = &name;
+   _seqMetaName[1] = &equal;
+   _seqMetaName[2] = &quote;
+   _seqMetaName[3] = &selMetaTags;
+   _seqMetaName[4] = &quote;
+   _seqMetaName[5] = &content;
+   _seqMetaName[6] = &equal;
+   _seqMetaName[7] = &quote;
+   _seqMetaName[8] = &value;
+   _seqMetaName[9] = &quote;
+   _seqMetaName[10] = NULL;
 
    _selMetaTags[0] = &description;
    _selMetaTags[1] = &author;
@@ -126,8 +135,8 @@ int ParseHTML::foundValue (const char* pTitle, unsigned int len) {
 
       assert (prop);
       (prop->*(values[actEntry])).assign (pTitle, len);
-      actEntry = NONE;
    }
+   actEntry = NONE;
    return ParseObject::PARSE_OK;
 }
 

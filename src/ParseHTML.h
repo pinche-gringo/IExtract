@@ -72,11 +72,15 @@ class ParseHTML  {
    ParseSequence  seqTag;
    ParseSequence  seqTitle;
    ParseSequence  seqMetaCmd;
+   ParseSequence  seqMetaName;
+   ParseSelection selMetaCmds;
    ParseSelection selMetaTags;
    ParseSelection selCmd;
    ParseSelection htmlDoc;                                    // Startsequence
 
-   ParseObject* _seqMetaCmd[12];
+   ParseObject* _seqMetaName[11];
+   ParseObject* _seqMetaCmd[3];
+   ParseObject* _selMetaCmds[3];
    ParseObject* _seqTitle[6];
    ParseObject* _selCmd[5];
    ParseObject* _selMetaTags[6];
