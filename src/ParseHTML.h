@@ -36,15 +36,17 @@ class ParseHTML  {
 
  private:
    // Callback-methods for type of parsed elementes
-   int foundValue (const char*, unsigned int);
+   int foundValue (const char* pValue, unsigned int len);
    int foundTitle (const char*, unsigned int);
    int foundAuthor (const char*, unsigned int);
    int foundComment (const char*, unsigned int);
    int foundEndOfHead (const char*, unsigned int);
    int foundEndScript (const char*, unsigned int);
    int foundScript (const char*, unsigned int);
+   int foundQuote (const char* pValue, unsigned int len);
 
    typedef YGP::OFParseText<ParseHTML> OMParseText;
+   typedef YGP::OFParseExact<ParseHTML> OMParseExact;
    typedef YGP::OFParseSequence<ParseHTML> OMParseSequence;
    typedef YGP::OFParseUpperExact<ParseHTML> OMParseUpperExact;
 
@@ -62,7 +64,7 @@ class ParseHTML  {
    YGP::ParseText       ignore;
 
    // Elements to parse meta contents
-   YGP::ParseExact      quote;
+   OMParseExact         quote;
    YGP::ParseExact      equal;
    YGP::ParseUpperExact name;
    YGP::ParseUpperExact content;

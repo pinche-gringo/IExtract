@@ -57,7 +57,7 @@ ParseHTML::ParseHTML ()
      , scriptType (">", _("Type of script"), LEN_TAG, 0)
      , otherMetaEntry (" \"", _("Other META entry"), LEN_TAG)
      , ignore ("<", _("Unused information"), LEN_COMMAND, 1, true, false)
-     , quote ("\"", _("Quote"), 1, 0, true)
+     , quote ("\"", _("Quote"), *this, &ParseHTML::foundQuote, 1, 0, true)
      , equal ("=", _("Equal sign"), 1, 0, true)
      , name ("NAME", _("Name of meta tag"))
      , content ("CONTENT", _("Content specifier"))
@@ -210,5 +210,19 @@ int ParseHTML::foundEndScript (const char*, unsigned int) {
 //-----------------------------------------------------------------------------
 int ParseHTML::foundScript (const char*, unsigned int) {
    selScriptContent.setMaxCard (-1U);
+   return YGP::ParseObject::PARSE_OK;
+}
+
+//-----------------------------------------------------------------------------
+/// Callback after a quote was found
+/// \param pValue: Found quote character
+/// \param len: Length of value
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+int ParseHTML::foundQuote (const char* pValue, unsigned int len) {
+   Check3 (pValue);
+   Check3 (len ? (*pValue == '"') : !*pValue);
+
+   otherMetaEntry.setValue (len ? "\"" : " ");
    return YGP::ParseObject::PARSE_OK;
 }
