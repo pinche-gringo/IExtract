@@ -193,6 +193,8 @@
               ersetzt</li>
             <li><b>%D</b> wird durch den Tag der letzten &Auml;nderung der Datei
               ersetzt</li>
+            <li><b>%e</b> wird durch die Dateiextension ersetzt</li>
+            <li><b>%E</b> wird durch den Dateinamen ohne Extension ersetzt</li>
               <li><b>%n</b> wird durch den Dateinamen ersetzt</li>
             <li><b>%N</b> wird durch den Dateinamen inklusive Pfad ersetzt</li>
             <li><b>%p</b> wird durch den Pfad der Datei ersetzt</li>

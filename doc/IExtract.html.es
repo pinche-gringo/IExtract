@@ -193,6 +193,8 @@
               cambio del archivo</li>
             <li><b>%D</b> est&aacute; cambiado por la fecha del &uacute;ltimo
               cambio del archivo</li>
+            <li><b>%e</b> est&aacute; cambiado por la extensi&oacute;n del archivo</li>
+            <li><b>%N</b> est&aacute; cambiado por el nombre del archivo sin extensi&oacute;n</li>
             <li><b>%n</b> est&aacute; cambiado por el nombre del archivo</li>
             <li><b>%N</b> est&aacute; cambiado por el nombre y el camino del archivo</li>
             <li><b>%p</b> est&aacute; cambiado por el camino del archivo</li>

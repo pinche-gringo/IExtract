@@ -184,6 +184,8 @@
               <li><b>%c</b> is substituted with the comment</li>
               <li><b>%d</b> is substituted with the modification time of the file</li>
               <li><b>%D</b> is substituted with the modification time of the file (day only)</li>
+              <li><b>%e</b> is substituted with the extension of the file</li>
+              <li><b>%E</b> is substituted with the name of the file without extension</li>
               <li><b>%n</b> is substituted with the name of the file</li>
               <li><b>%N</b> is substituted with path and name of the file</li>
               <li><b>%p</b> is substituted with the path of the file</li>
