@@ -17,7 +17,8 @@ to the extension - so don't cheat ;) ):
 	  the meta tags (supported are the tags according HTML 4.0 and
 	  Dublin Core) is extracted.
   - PDF: The content of the "document information dictionary" is extracted
-         Note that the content of the "Subject" key is returned as comment!
+          (the content of the "Subject" key is returned as comment).
+          Note that encrypted information is not decrypted!
   - OpenOffice documents (*.sxw, *.sxc, *.sxd, *.sdi, *.sxm); the comments of
           the properties dialog is extracted
   - StarOffice documents (*.sdw, *.sdc, *.sdd, *.sda); the comments of the
