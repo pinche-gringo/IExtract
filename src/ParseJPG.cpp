@@ -24,11 +24,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#include <assert.h>
-
 
 // Note TRACELEVEL 9 is not recomended as the title very likely contains
 // special characters!
+#include <Check.h>
 #include <Trace_.h>
 
 #include "ParseJPG.h"
@@ -160,7 +159,7 @@ ParseJPEG::ParseJPEG ()
    _seqEntries[2] = &offset;
    _seqEntries[3] = NULL;
 
-   assert ((sizeof (offsets) / sizeof (offsets[0]))
+   Check3 ((sizeof (offsets) / sizeof (offsets[0]))
            == (sizeof (lengths) / sizeof (lengths[0])));
    for (unsigned int i (0);
         i < (sizeof (offsets) / sizeof (offsets[0])); ++i)
@@ -175,7 +174,7 @@ ParseJPEG::ParseJPEG ()
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
-   assert (prop); assert (pTitle);
+   Check3 (prop); Check3 (pTitle);
    TRACE9 ("ParseJPEG::foundTitle (const char*, unsigned int) - Title: "
           << string (pTitle, len) << " -> " << len << " chars");
 
@@ -202,7 +201,7 @@ int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
-   assert (prop); assert (pTitle);
+   Check3 (prop); Check3 (pTitle);
    TRACE9 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Title: "
            << string (pTitle, len) << " -> " << len << " chars");
 
@@ -261,7 +260,7 @@ int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundLength (const char* length, unsigned int) {
-   assert (length);
+   Check3 (length);
    lengths[1] = get2BytesMSB (length);
    TRACE8 ("ParseJPEG::foundLength (const char*, unsigned int): " << lengths[1]);
    if (lengths[1]) {
@@ -279,7 +278,7 @@ int ParseJPEG::foundLength (const char* length, unsigned int) {
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundLength2 (const char* length, unsigned int) {
-   assert (length);
+   Check3 (length);
 
    static unsigned int aSupportedTypes[] = { TYPE_TITLE, TYPE_COMMENT, TYPE_AUTHOR };
    for (unsigned int i (0);
@@ -302,7 +301,7 @@ int ParseJPEG::foundLength2 (const char* length, unsigned int) {
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundNumber (const char* nr, unsigned int) {
-   assert (nr);
+   Check3 (nr);
    seqEntries.setMaxCard (cEntries = (get2BytesLSB (nr)));
    seqEntries.setMinCard (cEntries);
    length2.setMaxCard (4);
@@ -317,7 +316,7 @@ int ParseJPEG::foundNumber (const char* nr, unsigned int) {
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundType (const char* pType, unsigned int) {
-   assert (pType);
+   Check3 (pType);
    actEntry = *(unsigned int*)pType;
    TRACE8 ("ParseJPEG::foundType (const char*) - " << hex << actEntry << dec);
    cRead += 12;
@@ -331,7 +330,7 @@ int ParseJPEG::foundType (const char* pType, unsigned int) {
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundOffset (const char* pOffset, unsigned int len) {
-   assert (pOffset);
+   Check3 (pOffset);
    if (actEntry != -1U) {
       offsets[actEntry] = get4BytesLSB (pOffset);
       TRACE8 ("ParseJPEG::foundOffset (const char*) - " << offsets[actEntry]
@@ -356,7 +355,7 @@ int ParseJPEG::foundPropertiesHeader (const char*, unsigned int) {
    if (title.getMaxCard () <= (cRead + 8))
       _seqPropLong[6] = NULL;
    else {
-      assert (title.getMaxCard () > (cRead + 8));
+      Check3 (title.getMaxCard () > (cRead + 8));
       title.setMaxCard (title.getMaxCard () - cRead - 8);
    }
    return ParseObject::PARSE_OK;

@@ -68,7 +68,9 @@ ParsePDF::ParsePDF ()
      , idObj ("1", "ID of object (repeated)")
      , number ("\\9", "Generation", 10)
      , tagObj ("obj", "Tag for an object")
-     , endOfValue (")>", "End of value")
+     , startOfValue1 ("(", "Start of value ('(')", *this, &ParsePDF::foundParenthesis)
+     , startOfValue2 ("<", "Start of value ('<')", *this, &ParsePDF::foundBracket)
+     , endOfValue (")", "End of value")
      , endObj (">>", "End of object", *this, &ParsePDF::foundEndObj)
      , tagTitle ("/Title", "Tag for title", *this, &ParsePDF::foundTitle)
      , tagAuthor ("/Author", "Tag for author", *this, &ParsePDF::foundAuthor)
@@ -84,6 +86,7 @@ ParsePDF::ParsePDF ()
      , seqPrev (_seqPrev, "Prev entry")
      , seqInfoObj (_seqInfoObj, "Info object")
      , seqInfoValue (_seqInfoValue, "Info values", -1, 0)
+     , selStartOfValue (_selStartOfValue, "Start of values")
      , selType (_selType, "Valid type") {
    _selXRef[0] = &seqXRef;
    _selXRef[1] = &skipS;
@@ -134,9 +137,10 @@ ParsePDF::ParsePDF ()
    _seqInfoObj[5] = NULL;
 
    _seqInfoValue[0] = &selType;
-   _seqInfoValue[1] = &value;
-   _seqInfoValue[2] = &endOfValue;
-   _seqInfoValue[3] = NULL;
+   _seqInfoValue[1] = &selStartOfValue;
+   _seqInfoValue[2] = &value;
+   _seqInfoValue[3] = &endOfValue;
+   _seqInfoValue[4] = NULL;
 
    _selType[0] = &tagTitle;
    _selType[1] = &tagAuthor;
@@ -144,6 +148,10 @@ ParsePDF::ParsePDF ()
    _selType[3] = &endObj;
    _selType[4] = &skip;
    _selType[5] = NULL;
+
+   _selStartOfValue[0] = &startOfValue1;
+   _selStartOfValue[1] = &startOfValue2;
+   _selStartOfValue[2] = NULL;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -307,6 +315,28 @@ int ParsePDF::foundComment (const char*, unsigned int) {
 }
 
 /*--------------------------------------------------------------------------*/
+//Purpose   : Callback after the start of a hex-value was read
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParsePDF::foundBracket (const char*, unsigned int) {
+   TRACE5 ("ParsePDF::foundBracket (const char*, unsigned int)");
+   endOfValue.setValue (">");
+   value.setValue (">");
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after the start of a string value was read
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParsePDF::foundParenthesis (const char*, unsigned int) {
+   TRACE5 ("ParsePDF::foundParenthesis (const char*, unsigned int)");
+   endOfValue.setValue (")");
+   value.setValue (")");
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the value for an entry was read
 //Parameters: pLength: Pointer to value
 //Returns   : int: Status: ParseObject::PARSE_OK
@@ -324,16 +354,14 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
 
       Check3 (prop);
       Check3 ((sizeof (values) / sizeof (values[0])) > actEntry);
-      Check1 ((*pValue == '(') || (*pValue == ')'));
+      Check1 ((*value.getValue () == ')') || (*value.getValue () == '>'));
 
-      if (*pValue == '(')
-         (prop->*(values[actEntry])).assign (pValue + 1, len - 1);
+      if (*value.getValue () == ')')
+         (prop->*(values[actEntry])).assign (pValue, len);
       else {
          prop->*(values[actEntry]) = "";
 
          Check1 (!(len & 1));
-         ++pValue;                                  // Skip leading parenthesis
-         --len;
          if (*(unsigned int*)pValue == 'FFEF') {      // Skip MS-header for ???
             pValue += 4;
             len -= 4;

@@ -24,8 +24,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#include <assert.h>
-
+#include <Check.h>
 #include <Trace_.h>
 
 #include "Properties.h"
@@ -93,7 +92,7 @@ int ParseStarOffice::foundValue (const char* pTitle, unsigned int len) {
    TRACE1 ("ParseStarOffice::foundValue (const char*, unsigned int) - "
            << len << " byte = " << pTitle);
 
-   assert (actEntry != NONE);
+   Check3 (actEntry != NONE);
 
    static struct {
       string Properties::* value;
@@ -102,10 +101,10 @@ int ParseStarOffice::foundValue (const char* pTitle, unsigned int len) {
                    { &Properties::strAuthor, 80 },
                    { &Properties::strTitle,  128 },
                    { &Properties::strComment,  0 } };
-   assert (actEntry <= (sizeof (entries) / sizeof (entries[0])));
+   Check3 (actEntry <= (sizeof (entries) / sizeof (entries[0])));
 
    if (len) {
-      assert (prop);
+      Check3 (prop);
       (prop->*(entries[actEntry].value)).assign (pTitle, len);
    }
 
@@ -121,7 +120,7 @@ int ParseStarOffice::foundValue (const char* pTitle, unsigned int len) {
 int ParseStarOffice::foundLength (const char* pLength, unsigned int) {
    TRACE5 ("ParseStarOffice::foundLength (const char*, unsigned int) - "
            << get2BytesLSB (pLength));
-   assert (pLength);
+   Check3 (pLength);
    actEntry = (enum types)((int)actEntry + 1);
    value.setMaxCard (get2BytesLSB (pLength));
    return ParseObject::PARSE_OK;

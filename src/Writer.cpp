@@ -24,11 +24,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#include <assert.h>
 #include <time.h>
 
 #include <iostream>
 
+#include <Check.h>
 #include <Trace_.h>
 
 #include <File.h>
@@ -47,8 +47,8 @@
 /*--------------------------------------------------------------------------*/
 Writer::Writer (const char* format, unsigned long age, const char* pNew)
    : pStrNew (pNew), pFormat (format) {
-   assert (pNew ? age : 1);
-   assert (pFormat);
+   Check3 (pNew ? age : 1);
+   Check3 (pFormat);
 
    limit = time (NULL) - age;
 }
@@ -117,19 +117,19 @@ void Writer::OutIterator::getSubstitute (const char ctrl, std::string& subst) co
 
    case 'D':
    case 'd': {
-      assert (file);
+      Check3 (file);
       ATimestamp stamp (file->time ());
       subst = (ctrl == 'D') ? stamp.ADate::toString () : stamp.toString (); break; }
 
-   case 'n': assert (file); subst = file->name (); break;
+   case 'n': Check3 (file); subst = file->name (); break;
 
    case 'N':
-      assert (file);
+      Check3 (file);
       subst = file->path ();
       subst += file->name ();
       break;
 
-   case 'p': assert (file); subst = file->path (); break;
+   case 'p': Check3 (file); subst = file->path (); break;
 
    case 't': subst = p->strTitle; break;
 
@@ -142,7 +142,7 @@ void Writer::OutIterator::getSubstitute (const char ctrl, std::string& subst) co
 //Returns   : std::string: Next (expanded) token
 /*--------------------------------------------------------------------------*/
 std::string Writer::OutIterator::operator* () const {
-   assert (file);
+   Check3 (file);
 
    int pos (0);
    std::string token (columns_.getActNode ());
@@ -236,7 +236,7 @@ void HTMLWriter::printFile (std::ostream& out, const File& file,
 /*--------------------------------------------------------------------------*/
 void HTMLWriter::printMessage (std::ostream& out, const File& file,
                                const char* msg) const {
-   assert (msg);
+   Check3 (msg);
 
    out << "<tr valign=top>";
    if (pStrNew) {
@@ -329,7 +329,7 @@ void TextWriter::printFile (std::ostream& out, const File& file,
 /*--------------------------------------------------------------------------*/
 void TextWriter::printMessage (std::ostream& out, const File& file,
                                const char* msg) const {
-   assert (msg);
+   Check3 (msg);
    if (pStrNew && isNew (file))
       out << pStrNew << ": ";
    out << file.name () << " - " << msg << '\n';
@@ -401,7 +401,7 @@ void LaTeXWriter::printFile (std::ostream& out, const File& file,
 /*--------------------------------------------------------------------------*/
 void LaTeXWriter::printMessage (std::ostream& out, const File& file,
                                 const char* msg) const {
-   assert (msg);
+   Check3 (msg);
 
    if (pStrNew) {
       if (isNew (file))

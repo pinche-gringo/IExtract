@@ -27,12 +27,8 @@
 #include <gzo-cfg.h>
 
 #include <ctype.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <mcheck.h>
-static int x = (mtrace (), 0);
 
 #include <string>
 
@@ -59,6 +55,7 @@ static int x = (mtrace (), 0);
 #endif
 
 
+#include <Check.h>
 #include <Trace_.h>
 #include <XStream.h>
 #include <DirSrch.h>
@@ -289,7 +286,7 @@ void Application::showHelp () const {
 //Require   : option not '\0´'
 /*--------------------------------------------------------------------------*/
 bool Application::handleOption (const char option) {
-   assert (option != '\0');
+   Check3 (option != '\0');
 
    switch (option) {
    case 'r': options |= RECURSIVE; break;
@@ -387,7 +384,7 @@ int Application::perform (int argc, const char* argv[]) {
       return -1;
    }
 
-   assert (iniOpts.format.size ());
+   Check3 (iniOpts.format.size ());
 
    typedef Writer* (*CREATEWRITER) (const char*, unsigned long, const char*);
    static struct {
@@ -402,7 +399,7 @@ int Application::perform (int argc, const char* argv[]) {
          writer = t[i].fnc (iniOpts.format.c_str (), ageOfNewFiles,
                             iniOpts.newText.size () ? iniOpts.newText.c_str () : NULL);
       }
-   assert (writer);
+   Check3 (writer);
 
    writer->printStart (cout, iniOpts.title.size () ? iniOpts.title.c_str () : NULL);
 
@@ -426,7 +423,7 @@ int Application::perform (int argc, const char* argv[]) {
 //Requires  : pFile not NULL
 /*--------------------------------------------------------------------------*/
 void Application::handleFiles (const char* pFile) const {
-   assert (pFile);
+   Check3 (pFile);
    TRACE5 ("Application::handleFiles (const char*) const - " << pFile);
 
    XDirSrch ds (pFile);
@@ -517,7 +514,7 @@ void Application::handleFiles (const char* pFile) const {
 //Purpose   : Threadfunction to process files (as long as the filelist is full)
 /*--------------------------------------------------------------------------*/
 void* Application::processThread (void* pThread) {
-   assert (pThread);
+   Check3 (pThread);
    FILEFNC file;
 
    while (true) {
@@ -528,8 +525,8 @@ void* Application::processThread (void* pThread) {
          UNLOCKFILES
          TRACE1 ("Application::processThread (void*) - File " << file.name ()
                   << "; Remaining: " << listFiles.size ());
-         assert (file.fnc);
-         assert (file.fnc == getFileTypeHandler (strrchr (file.name (), '.')));
+         Check3 (file.fnc);
+         Check3 (file.fnc == getFileTypeHandler (strrchr (file.name (), '.')));
          processFile (file, file.fnc);
       }
       else {
@@ -539,7 +536,7 @@ void* Application::processThread (void* pThread) {
    } // end-while
 
    LOCKTHREADS
-   assert (find (aThreads.begin (), aThreads.end (), pThread));
+   Check3 (find (aThreads.begin (), aThreads.end (), pThread));
    aThreads.erase (find (aThreads.begin (), aThreads.end (), pThread));
    UNLOCKTHREADS
    return NULL;
@@ -684,7 +681,7 @@ void Application::convertFromUnicode (Properties& prop) {
 /*--------------------------------------------------------------------------*/
 void Application::readINIFile (const char* pFile) {
    TRACE5 ("Application::readINIFile (const char*) - " << pFile);
-   assert (pFile);
+   Check3 (pFile);
 
    std::string Style;
    try {

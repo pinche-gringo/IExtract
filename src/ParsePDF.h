@@ -54,6 +54,8 @@ class ParsePDF {
    int foundObjOffset (const char*, unsigned int);
    int foundObjectID (const char*, unsigned int);
    int foundEndObj (const char*, unsigned int);
+   int foundParenthesis (const char*, unsigned int);
+   int foundBracket (const char*, unsigned int);
 
    void parseInfoObject ();
 
@@ -80,13 +82,16 @@ class ParsePDF {
    ParseExact      idObj;
    ParseAttomic    number;
    ParseExact      tagObj;
-   ParseAttomic    endOfValue;
    OMParseExact    endObj;
 
    OMParseExact    tagTitle;
    OMParseExact    tagAuthor;
    OMParseExact    tagComment;
    OMParseTextEsc  value;
+
+   OMParseExact    startOfValue1;
+   OMParseExact    startOfValue2;
+   ParseExact      endOfValue;
 
    ParseSelection selXRef;
    ParseSequence  seqXRef;
@@ -99,6 +104,7 @@ class ParsePDF {
    ParseSequence  seqInfoObj;
    ParseSequence  seqInfoValue;
    ParseSelection selType;
+   ParseSelection selStartOfValue;
 
    ParseObject* _selXRef[4];
    ParseObject* _seqXRef[4];
@@ -109,8 +115,9 @@ class ParsePDF {
    ParseObject* _seqInfo[4];
    ParseObject* _seqPrev[3];
    ParseObject* _seqInfoObj[6];
-   ParseObject* _seqInfoValue[4];
+   ParseObject* _seqInfoValue[5];
    ParseObject* _selType[6];
+   ParseObject* _selStartOfValue[3];
 
    Properties* prop;
 
