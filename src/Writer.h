@@ -82,6 +82,8 @@ class Writer {
       OutIterator (const char* format) : columns_ (format), p (NULL), file (NULL) {
          columns_.getNextNode ('|'); }
 
+      void getSubstitute (const char ctrl, std::string& substitute) const;
+
       Tokenize columns_;
 
       const File* file;

@@ -93,6 +93,51 @@ bool Writer::OutIterator::isAtName () const {
 
 
 /*--------------------------------------------------------------------------*/
+//Purpose   : Returns the substitute for a control character
+//            Substitutes:
+//              'a': With the author (of the properties)
+//              'c': With the comment (of the properties)
+//              'd': With the timestamp of the file
+//              'd': With the date of the file
+//              'n': With the name of the file
+//              'N': With path and name of the file
+//              'p': With the paht of the file
+//              't': With the title (of the properties)
+//              '%': With a '%'
+//Parameters: ctrl: Control character
+//            subst: String with which to replace the character
+/*--------------------------------------------------------------------------*/
+void Writer::OutIterator::getSubstitute (const char ctrl, std::string& subst) const {
+   subst = "";
+
+   switch (ctrl) {
+   case 'a': if (p) subst = p->strAuthor; break;
+
+   case 'c': if (p) subst = p->strComment; break;
+
+   case 'D':
+   case 'd': {
+      assert (file);
+      ATimestamp stamp (file->time ());
+      subst = (ctrl == 'D') ? stamp.ADate::toString () : stamp.toString (); break; }
+
+   case 'n': assert (file); subst = file->name (); break;
+
+   case 'N':
+      assert (file);
+      subst = file->path ();
+      subst += file->name ();
+      break;
+
+   case 'p': assert (file); subst = file->path (); break;
+
+   case 't': subst = p->strTitle; break;
+
+   case '%': subst = '%'; break;
+   }
+}
+
+/*--------------------------------------------------------------------------*/
 //Purpose   : Returns the next token; special characters are expanded
 //Returns   : std::string: Next (expanded) token
 /*--------------------------------------------------------------------------*/
@@ -104,31 +149,28 @@ std::string Writer::OutIterator::operator* () const {
 
    TRACE2 ("Writer::OutIterator::operator* () - Node = '" << token << '\'');
 
-   while (((pos = token.find ('%', pos)) != std::string::npos)
-          && (pos < token.size ()))
-      switch (token[pos + 1]) {
-      case 'a': if (p) token.replace (pos, 2, p->strAuthor); break;
+   std::string substitute;
+   unsigned int nPos (0);
+   while (((pos = token.find ('%', nPos)) != std::string::npos)
+          && (pos < token.size ())) {
+      if (token[pos + 1] != '(')
+         getSubstitute (token[nPos = pos + 1], substitute);
+      else {
+         nPos = pos + 1;
+         do {
+            getSubstitute (token[nPos], substitute);
+         } while (substitute.empty () && (token[++nPos] != ')') && token[nPos]);
 
-      case 'c': if (p) token.replace (pos, 2, p->strComment); break;
+         // Now skip to next closing bracket
+         if (token[nPos])
+            if ((nPos = token.find (')', nPos)) != std::string::npos)
+               ++nPos;
+            else
+               nPos = token.size ();
+      } // end-else '(' found
 
-      case 'd': {
-         ATimestamp stamp (file->time ());
-         token.replace (pos, 2, stamp.toString ()); break; }
-
-      case 'n': token.replace (pos, 2, file->name ()); break;
-
-      case 'N': {
-         std::string name (file->path ());
-         name += file->name ();
-         token.replace (pos, 2, name);
-         break; }
-
-      case 'p': token.replace (pos, 2, file->path ()); break;
-
-      case 't': if (p) token.replace (pos, 2, p->strTitle); break;
-
-      case '%': token.replace (pos, 1, 0, '\0'); break;
-      }
+      token.replace (pos, nPos - pos + 1, substitute);
+   }
    return token;
 }
 
@@ -180,13 +222,7 @@ void HTMLWriter::printFile (std::ostream& out, const File& file,
 
    OutIterator i (pFormat, file, prop);
    while (i) {
-      out << "<td>";
-      if (i.isAtName ())
-         out << "<a href=\"" << file.path () << file.name () << "\">";
-      out << *i;
-      if (i.isAtName ())
-         out << "</a>";
-      out << "</td>";
+      out << "<td>" << *i << "</a></td>";
       ++i;
    }
    out << "</tr>\n";
@@ -315,7 +351,7 @@ LaTeXWriter::~LaTeXWriter () {
 void LaTeXWriter::printStart (std::ostream& out, const char* title) const {
    out << "\\begin{tabular}{";
    for (unsigned int i (0); i < columns (); ++i)
-      cout << 'l';
+      out << 'l';
    out << "}\n";
 
    if (title) {
