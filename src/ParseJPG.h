@@ -39,6 +39,7 @@ class ParseJPEG  {
    int foundType (const char*, unsigned int);
    int foundNumber (const char*, unsigned int);
    int foundTitle (const char*, unsigned int);
+   int foundTitle3 (const char*, unsigned int);
    int foundLength (const char*, unsigned int);
    int foundLength2 (const char*, unsigned int);
    int foundOffset (const char*, unsigned int);
@@ -53,7 +54,9 @@ class ParseJPEG  {
    ParseExact      idFormat1;
    ParseExact      idComment1;
    ParseExact      idComment2;
+   ParseExact      idComment3;
    OMParseAttomic  title;
+   OMParseAttomic  title3;
    OMParseAttomic  type;
    OMParseAttomic  number;
    OMParseAttomic  length1;
@@ -64,10 +67,10 @@ class ParseJPEG  {
 
    ParseSelection  selFormat;
    ParseSequence   seqFormat1;
-   ParseSequence   seqFormat2;
    ParseSelection  selProperties;
    ParseSequence   seqPropShort;
    ParseSequence   seqPropLong;
+   ParseSequence   seqPropXXL;
 
    OMParseSequence seqEntries;
    ParseSequence   jpegImage;                                 // Startsequence
@@ -75,15 +78,12 @@ class ParseJPEG  {
    ParseObject*   _jpegImage[3];
    ParseObject*   _selFormat[3];
    ParseObject*   _seqFormat1[4];
-   ParseObject*   _seqFormat2[2];
-   ParseObject*   _selProperties[3];
+   ParseObject*   _selProperties[4];
    ParseObject*   _seqPropShort[4];
    ParseObject*   _seqPropLong[8];
+   ParseObject*   _seqPropXXL[4];
    ParseObject*   _seqEntries[4];
 
-   static int getTypeIndex (unsigned int type);
-
-   static unsigned int aSupportedTypes[];
    unsigned int offsets[2];
    unsigned int lengths[2];
 

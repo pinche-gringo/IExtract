@@ -36,10 +36,12 @@
 #endif
 
 
-#define TYPE_TITLE    0x019c9b
-#define TYPE_COMMENT  0x019c9c
+#define TYPE_TITLE     0x019c9b
+#define TYPE_COMMENT   0x019c9c
 
-unsigned int ParseJPEG::aSupportedTypes[] = { TYPE_TITLE, TYPE_COMMENT };
+#define TYPE_TITLE2    0x69021c
+#define TYPE_COMMENT2  0x78021c
+#define TYPE_AUTHOR2   0x6e021c
 
 
 /*--------------------------------------------------------------------------*/
@@ -51,7 +53,9 @@ ParseJPEG::ParseJPEG ()
    , idFormat1 ("\xff\xe0", "ID of format 1", 2, 2, false)
    , idComment1 ("\xff\xfe", "ID of short comments", false)
    , idComment2 ("\xff\xe1", "ID of long comments", false)
+   , idComment3 ("\xff\xed", "ID of XXL comments", false)
    , title ("\\*", "Comment", *this, &ParseJPEG::foundTitle, 1, 1, false)
+   , title3 ("\\*", "Comment values", *this, &ParseJPEG::foundTitle3, 1, 1, false)
    , type ("\\*", "Type of entry", *this, &ParseJPEG::foundType, 4, 4, false)
    , number ("\\*", "Number of records", *this, &ParseJPEG::foundNumber, 2, 2, false)
    , length1 ("\\*", "Length (MSB first)", *this, &ParseJPEG::foundLength, 2, 2, false)
@@ -61,10 +65,10 @@ ParseJPEG::ParseJPEG ()
    , ignore ("\xff", "Ignore til special", 512, true, false)
    , selFormat (_selFormat, "Possible comments", 1, 0, false)
    , seqFormat1 (_seqFormat1, "Format style 1", 1, 1, false)
-   , seqFormat2 (_seqFormat2, "Format style 2", 1, 1, false)
    , selProperties (_selProperties, "Properties", 1, 0, false)
    , seqPropShort (_seqPropShort, "Short properties", 1, 1, false)
    , seqPropLong (_seqPropLong, "Long properties", 1, 1, false)
+   , seqPropXXL (_seqPropXXL, "XXL properties", 1, 1, false)
    , seqEntries (_seqEntries, "List of property entries", *this,
                  &ParseJPEG::foundPropertiesHeader, 1, 1, false)
    , jpegImage (_jpegImage, "JPEG image", 1, 1)
@@ -75,7 +79,7 @@ ParseJPEG::ParseJPEG ()
    _jpegImage[2] = NULL;
 
    _selFormat[0] = &seqFormat1;
-   _selFormat[1] = &seqFormat2;
+   _selFormat[1] = &seqPropLong;
    _selFormat[2] = NULL;
 
    _seqFormat1[0] = &idFormat1;
@@ -83,12 +87,10 @@ ParseJPEG::ParseJPEG ()
    _seqFormat1[2] = &selProperties;
    _seqFormat1[3] = NULL;
 
-   _seqFormat2[0] = &seqPropLong;
-   _seqFormat2[1] = NULL;
-
    _selProperties[0] = &seqPropShort;
    _selProperties[1] = &seqPropLong;
-   _selProperties[2] = NULL;
+   _selProperties[2] = &seqPropXXL;
+   _selProperties[3] = NULL;
 
    _seqPropShort[0] = &idComment1;
    _seqPropShort[1] = &length1;
@@ -104,13 +106,20 @@ ParseJPEG::ParseJPEG ()
    _seqPropLong[6] = &title;
    _seqPropLong[7] = NULL;
 
+   _seqPropXXL[0] = &idComment3;
+   _seqPropXXL[1] = &length1;
+   _seqPropXXL[2] = &title3;
+   _seqPropXXL[3] = NULL;
+
    _seqEntries[0] = &type;
    _seqEntries[1] = &length2;
    _seqEntries[2] = &offset;
    _seqEntries[3] = NULL;
 
+   assert ((sizeof (offsets) / sizeof (offsets[0]))
+           == (sizeof (lengths) / sizeof (lengths[0])));
    for (unsigned int i (0);
-        i < (sizeof (aSupportedTypes) / sizeof (aSupportedTypes[0])); ++i)
+        i < (sizeof (offsets) / sizeof (offsets[0])); ++i)
       offsets[i] = lengths[i] = 0;
 }
 
@@ -129,13 +138,74 @@ int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
    static string Properties::* values[] = { &Properties::strTitle,
                                             &Properties::strComment };
    for (unsigned int i (0);
-        i < (sizeof (aSupportedTypes) / sizeof (aSupportedTypes[0])); ++i)
+        i < (sizeof (lengths) / sizeof (lengths[0])); ++i)
       if (lengths[i]) {
          TRACE8 ("ParseJPEG::foundTitle (const char*, unsigned int) - " << i
                  << ": Assigning from " << (offsets[i] - cRead) << ' '
                  << lengths[i] << " chars");
          (prop->*(values[i])).assign (pTitle + offsets[i] - cRead, lengths[i] - 2);
       }
+
+   TRACE9 ("ParseJPEG::foundTitle (const char*, unsigned int) - Out");
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after a comment entry (Photoshop stlye) was read
+//Parameters: pTitle: Pointer to title
+//            len: Length of title
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
+   assert (prop); assert (pTitle);
+   TRACE9 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Title: "
+           << string (pTitle, len) << " -> " << len << " chars");
+
+   const char* pAct = pTitle + strlen (pTitle) + 1;    // Skip leading comment
+   pTitle += len;
+
+   TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Header: *"
+           << hex << (unsigned int)pAct << " = " << (*(unsigned int*)pAct) << dec);
+
+   if (*(unsigned int*)pAct == 0x4d494238) {
+      pAct += 6;
+      pAct += (unsigned int)*pAct;
+
+      TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Entry: *"
+              << hex << (unsigned int)pAct << " = " << (*(unsigned int*)pAct) << dec);
+
+      if (*(unsigned int*)pAct == 0x6e) {
+         pAct += 4;
+         pTitle = pAct + (unsigned int)*pAct++;
+         do {
+            TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Type: *"
+                    << hex << (unsigned int)pAct << " = " << (*(unsigned int*)pAct) << dec);
+
+            static string Properties::* values[] = { &Properties::strTitle,
+                                                     &Properties::strComment,
+                                                     &Properties::strAuthor };
+            static unsigned int aSupportedTypes[] = { TYPE_TITLE2, TYPE_COMMENT2,
+                                                      TYPE_AUTHOR2 };
+
+            for (unsigned int i (0);
+                 i < (sizeof (aSupportedTypes) / sizeof (aSupportedTypes[0])); ++i) {
+               if (*(unsigned int*)pAct == aSupportedTypes[i]) {
+                  pAct += 4;
+                  TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - " << i
+                          << ": Assigning " << (unsigned int)(*pAct) << " chars");
+                  (prop->*(values[i])).assign (pAct + 1, (unsigned int)*pAct);
+                  pAct -= 4;
+                  break;
+               }
+            } // end-for
+
+            pAct += 4;
+            TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Skipping "
+                    << ((unsigned int)*pAct) << " bytes");
+            pAct += (unsigned int)*pAct + 1;
+         } while (pAct < pTitle);
+      } // end-if comment part found
+   } // end-if header
    return ParseObject::PARSE_OK;
 }
 
@@ -145,12 +215,14 @@ int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundLength (const char* length, unsigned int) {
-   assert (length); lengths[1] = ((unsigned char)(*length) << 8) + (unsigned char)length[1];
+   assert (length);
+   lengths[1] = ((unsigned char)(*length) << 8) + (unsigned char)length[1];
    TRACE8 ("ParseJPEG::foundLength (const char*, unsigned int): " << lengths[1]);
-   if (lengths[1])
+   if (lengths[1]) {
       title.setMaxCard (lengths[1]);
+      title3.setMaxCard (lengths[1]);
+   }
 
-   skip.setMinCard (14);
    skip.setMaxCard (14);
    return ParseObject::PARSE_OK;
 }
@@ -162,12 +234,19 @@ int ParseJPEG::foundLength (const char* length, unsigned int) {
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundLength2 (const char* length, unsigned int) {
    assert (length);
-   int offset (getTypeIndex (actEntry));
-   if (offset != -1) {
-      lengths[offset] = *(unsigned short*)length;
-      TRACE9 ("ParseWord::foundLength2 (const char*) - " << lengths[offset]
-              << " (0x" << hex << lengths[offset] << dec << ')');
-   }
+
+   static unsigned int aSupportedTypes[] = { TYPE_TITLE, TYPE_COMMENT };
+   for (unsigned int i (0);
+        i < (sizeof (lengths) / sizeof (lengths[0])); ++i)
+      if (actEntry == aSupportedTypes[i]) {
+         lengths[i] = *(unsigned short*)length;
+         TRACE9 ("ParseWord::foundLength2 (const char*) - " << lengths[i]
+                 << " (0x" << hex << lengths[i] << dec << ')');
+         actEntry = i;
+         return ParseObject::PARSE_OK;
+      }
+
+   actEntry = -1U;
    return ParseObject::PARSE_OK;
 }
 
@@ -199,7 +278,6 @@ int ParseJPEG::foundType (const char* pType, unsigned int) {
    return ParseObject::PARSE_OK;
 }
 
-
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the offset of an entry has been parsed
 //Parameters: pOffset: Pointer to found offset
@@ -208,11 +286,10 @@ int ParseJPEG::foundType (const char* pType, unsigned int) {
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundOffset (const char* pOffset, unsigned int len) {
    assert (pOffset);
-   int offset (getTypeIndex (actEntry));
-   if (offset != -1) {
-      offsets[offset] = *(unsigned int*)pOffset;
-      TRACE9 ("ParseWord::foundOffset (const char*) - " << offsets[offset]
-              << " (0x" << hex << offsets[offset] << dec << ')');
+   if (actEntry != -1U) {
+      offsets[actEntry] = *(unsigned int*)pOffset;
+      TRACE9 ("ParseWord::foundOffset (const char*) - " << offsets[actEntry]
+              << " (0x" << hex << offsets[actEntry] << dec << ')');
    }
    return ParseObject::PARSE_OK;
 }
@@ -238,18 +315,4 @@ int ParseJPEG::foundPropertiesHeader (const char*, unsigned int) {
       title.setMaxCard (title.getMaxCard () - cRead - 8);
    }
    return ParseObject::PARSE_OK;
-}
-
-/*--------------------------------------------------------------------------*/
-//Purpose   : Retrieves the index of the passed type
-//Parameters: type: Type to inspect
-//Returns   : unsigned int: Offset; -1 if type is not valid
-/*--------------------------------------------------------------------------*/
-int ParseJPEG::getTypeIndex (unsigned int type) {
-   for (unsigned int i (0);
-        i < (sizeof (aSupportedTypes) / sizeof (aSupportedTypes[0])); ++i)
-      if (type == aSupportedTypes[i])
-         return i;
-
-   return -1;
 }
