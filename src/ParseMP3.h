@@ -36,7 +36,7 @@ class ParseMP3 {
  private:
    ParseMP3 ();
    ParseMP3 (const ParseMP3& other);
-   virtual ~ParseMP3 ();
+   ~ParseMP3 ();
    const ParseMP3& operator= (const ParseMP3& other);
 
    static std::string strip (std::string& value, unsigned int pos, unsigned int len);

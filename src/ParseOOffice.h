@@ -29,7 +29,7 @@ struct Properties;
 class ParseOpenOffice {
  public:
    ParseOpenOffice ();
-   virtual ~ParseOpenOffice ();
+   ~ParseOpenOffice ();
 
    void parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
       prop = &result;

@@ -28,7 +28,7 @@ class Options : public YGP::Entity {
 
  public:
    Options ();
-   virtual ~Options ();
+   ~Options ();
 
  private:
    Options (const Options& other);

@@ -34,7 +34,7 @@ struct Properties;
 class ParsePDF {
  public:
    ParsePDF ();
-   virtual ~ParsePDF ();
+   ~ParsePDF ();
 
    static void parse (YGP::Xistream& stream, Properties& result) throw (std::string);
 
