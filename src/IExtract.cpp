@@ -281,6 +281,7 @@ void Application::showHelp () const {
       << _("       %(LETTERS) is substituted with first of the above substitutions\n")
       << _("          producing a non-empty string (e.g. %(tn) is the titel if not \n")
       << _("          empty or else the filename.)\n\n")
+       // xgettext:no-c-format
       << _("       In every other constellation the '%' is removed!\n\n")
       << _("TITLE specifies the headers for the output; separated with (|); columns must\n")
       << _("      contain at least one character\n\n")
