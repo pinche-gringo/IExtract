@@ -269,8 +269,8 @@ void Application::showHelp () const {
       << "\n\n  -r, --recursive ....... " << _("Recurse into subdirectories")
       << "\n  -o, --output=STYLE .... " << _("Sets the output-style (text, HTML XML or LaTeX)")
       << "\n  -F, --format=FORMAT ... " << _("Format of output; default: ") << DEFAULT_FORMAT
-   << "\n                          " << _("and for XML:") << DEFAULT_XML_FORMAT
-   << "\n  -T, --title=TITLE ..... " << _("Title of output")
+      << "\n                          " << _("and for XML:") << DEFAULT_XML_FORMAT
+      << "\n  -T, --title=TITLE ..... " << _("Title of output")
       << "\n  -s, --separate=TEXT ... " << _("Separate subdirectories with TEXT (default: empty);\n                          implies recursion into subdirectories (--recursive)")
       << "\n  -e, --show-errors ..... " << _("Puts error messages (additionally) into the output")
       << "\n  -a, --all ............. " << _("Show all files (including unknown types) in output")
@@ -303,9 +303,11 @@ void Application::showHelp () const {
       << _("       %S is substituted with the size of the file (human readable)\n")
       << _("       %t is substituted with the title\n")
       << _("       %U is substituted with path and name of the file in UNIX style (with /)\n")
-      << _("       %(LETTERS) is substituted with first of the above substitutions\n")
-      << _("          producing a non-empty string (e.g. %(tn) is the titel if not \n")
-      << _("          empty or else the filename.)\n\n")
+      << _("       %(LETTERS) is substituted with first of the above substitutions\n"
+           "          producing a non-empty string (e.g. %(tn) is the titel if not \n"
+           "          empty or else the filename.)\n")
+      << _("       %*LETTER changes the substitution slightly. For file names it causes a\n"
+           "          conversion of special characters; for the others it suppresses them\n\n")
        // xgettext:no-c-format
       << _("       In every other constellation the '%' is removed!\n\n")
       << _("TITLE specifies the headers for the output; separated with (|); columns must\n")
