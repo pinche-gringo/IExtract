@@ -34,11 +34,12 @@ class Options : public Entity {
    Options (const Options& other);
    const Options& operator= (const Options& other);
 
-   std::string format;     // %attrib%; Format
-   std::string title;      // %attrib%; Title
-   std::string newText;    // %attrib%; TextForNewFiles
-   std::string style;      // %attrib%; Style
-   std::string separate;   // %attrib%; DirSeparator
+   std::string  format;        // %attrib%; Format
+   std::string  title;         // %attrib%; Title
+   std::string  newText;       // %attrib%; TextForNewFiles
+   unsigned int ageOfNewFiles; // %attrib%; MaxAgeForNewFiles
+   std::string  style;         // %attrib%; Style
+   std::string  separate;      // %attrib%; DirSeparatorText
 };
 
 
