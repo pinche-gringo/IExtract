@@ -2,7 +2,7 @@
 
 bin_PROGRAMS=IExtract
 
-IExtract_LDADD=@YMP_LIBS@
+IExtract_LDADD=@YMP_LIBS@ @LTLIBINTL@
 IExtract_SOURCES=IExtract.cpp ParseHTML.cpp ParseHTML.h ParseWord.cpp \
 	         ParseWord.h Writer.cpp Writer.h ParseJPG.cpp ParseJPG.h\
 		 Properties.h ParseSOffice.cpp ParseSOffice.h Options.h\
