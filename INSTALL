@@ -89,14 +89,12 @@ Principally you can compile the tool with:
 
    make [GCC | MSC]
 
-but might get problems because of differnt path's or the like. Change the
-approbiate makefile.
+The Makefile tries to link with the static version of the libYGP library. To
+make this work, the environment variables LIB and INCLUDE must be set to the
+approbiate paths. E.g.:
 
-- The libYGP library should be in (beyond) a directory called "General"
-  in the same directory as this utility. E.g:
+  set LIB=%LIB%;E:\LIB
+  set INCLUDE=%INCLUDE%;E:\Include
 
-     E:\Projects
-          - General
-          - Extract
-
-- Make does *not* set the environment for the compiler!
+Make does *not* set the environment for the compiler, so you might need to run
+VCVars32.bat before compiling!
