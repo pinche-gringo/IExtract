@@ -121,7 +121,15 @@ SOURCE=..\src\ParseHTML.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\ParseJPG.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\ParseWord.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\General\Common\PathSrch.cpp
 # End Source File
 # Begin Source File
 
@@ -129,7 +137,15 @@ SOURCE=..\..\General\Common\StackTrc.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\General\Common\Tokenize.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\Writer.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\General\Common\XDirSrch.cpp
 # End Source File
 # Begin Source File
 
@@ -177,11 +193,27 @@ SOURCE=..\src\ParseHTML.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\ParseJPG.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\ParseWord.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\General\Common\PathSrch.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\General\Common\Tokenize.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\Writer.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\General\Common\XDirSrch.h
 # End Source File
 # Begin Source File
 

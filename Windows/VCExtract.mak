@@ -46,10 +46,14 @@ CLEAN :
 	-@erase "$(INTDIR)\IVIOAppl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\ParseHTML.obj"
+	-@erase "$(INTDIR)\ParseJPG.obj"
 	-@erase "$(INTDIR)\ParseWord.obj"
+	-@erase "$(INTDIR)\PathSrch.obj"
 	-@erase "$(INTDIR)\StackTrc.obj"
+	-@erase "$(INTDIR)\Tokenize.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\Writer.obj"
+	-@erase "$(INTDIR)\XDirSrch.obj"
 	-@erase "$(INTDIR)\XStrBuf.obj"
 	-@erase "$(OUTDIR)\IExtract.exe"
 
@@ -109,7 +113,11 @@ LINK32_OBJS= \
 	"$(INTDIR)\ParseWord.obj" \
 	"$(INTDIR)\StackTrc.obj" \
 	"$(INTDIR)\Writer.obj" \
-	"$(INTDIR)\XStrBuf.obj"
+	"$(INTDIR)\XStrBuf.obj" \
+	"$(INTDIR)\Tokenize.obj" \
+	"$(INTDIR)\PathSrch.obj" \
+	"$(INTDIR)\XDirSrch.obj" \
+	"$(INTDIR)\ParseJPG.obj"
 
 "$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -137,11 +145,15 @@ CLEAN :
 	-@erase "$(INTDIR)\IVIOAppl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\ParseHTML.obj"
+	-@erase "$(INTDIR)\ParseJPG.obj"
 	-@erase "$(INTDIR)\ParseWord.obj"
+	-@erase "$(INTDIR)\PathSrch.obj"
 	-@erase "$(INTDIR)\StackTrc.obj"
+	-@erase "$(INTDIR)\Tokenize.obj"
 	-@erase "$(INTDIR)\vc60.idb"
 	-@erase "$(INTDIR)\vc60.pdb"
 	-@erase "$(INTDIR)\Writer.obj"
+	-@erase "$(INTDIR)\XDirSrch.obj"
 	-@erase "$(INTDIR)\XStrBuf.obj"
 	-@erase "$(OUTDIR)\IExtract.exe"
 	-@erase "$(OUTDIR)\IExtract.ilk"
@@ -203,7 +215,11 @@ LINK32_OBJS= \
 	"$(INTDIR)\ParseWord.obj" \
 	"$(INTDIR)\StackTrc.obj" \
 	"$(INTDIR)\Writer.obj" \
-	"$(INTDIR)\XStrBuf.obj"
+	"$(INTDIR)\XStrBuf.obj" \
+	"$(INTDIR)\Tokenize.obj" \
+	"$(INTDIR)\PathSrch.obj" \
+	"$(INTDIR)\XDirSrch.obj" \
+	"$(INTDIR)\ParseJPG.obj"
 
 "$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -277,9 +293,21 @@ SOURCE=..\src\ParseHTML.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\src\ParseJPG.cpp
+
+"$(INTDIR)\ParseJPG.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\src\ParseWord.cpp
 
 "$(INTDIR)\ParseWord.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\General\Common\PathSrch.cpp
+
+"$(INTDIR)\PathSrch.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -289,9 +317,21 @@ SOURCE=..\..\General\Common\StackTrc.cpp
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+SOURCE=..\..\General\Common\Tokenize.cpp
+
+"$(INTDIR)\Tokenize.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
 SOURCE=..\src\Writer.cpp
 
 "$(INTDIR)\Writer.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\General\Common\XDirSrch.cpp
+
+"$(INTDIR)\XDirSrch.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
