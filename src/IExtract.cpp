@@ -25,7 +25,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #undef  ENABLE_THREADS
-#define ENABLE_THREADS
+//#define ENABLE_THREADS
 
 #include <gzo-cfg.h>
 
@@ -56,6 +56,7 @@
 #  define LOCKOUTPUT
 #  define UNLOCKOUTPUT
 #endif
+
 
 #include <Trace_.h>
 #include <XStream.h>
@@ -334,20 +335,6 @@ int Application::perform (int argc, const char* argv[]) {
       handleFiles (file.c_str ());
    }
 
-   // Wait for threads to terminte
-   while (true) {
-      LOCKTHREADS
-      if (aThreads.empty ()) {
-         UNLOCKTHREADS
-         break;
-      }
-      if(aThreads[0])
-         Thread::waitForThread (*aThreads[0]);
-      else
-         aThreads.erase (aThreads.begin ());
-      UNLOCKTHREADS
-   }
-
    writer->printEnd (cout);
    return 0;
 }
@@ -381,18 +368,37 @@ void Application::handleFiles (const char* pFile) const {
       }
       ((Application*)this)->listFiles.push (*file);
       UNLOCKFILES
+
       LOCKTHREADS
-      bool newThread (aThreads.size () < aThreads.capacity ());
-      if (newThread)
-         ((Application*)this)->aThreads.push_back (
-            OThread<Application>::create2 ((Application*)this,
-                                             &Application::processThread, NULL));
+      if (aThreads.size () < aThreads.capacity ())
+         try {
+            ((Application*)this)->aThreads.push_back (
+               OThread<Application>::create2 ((Application*)this,
+                                              &Application::processThread, NULL));
+         }
+         catch (std::string& err) {
+            cerr << PACKAGE "-error: " << err << '\n';
+         }
       UNLOCKTHREADS
 #else
       processFile (*file);
 #endif
       file = ds.next ();
    } // end-while
+
+#ifdef ENABLE_THREADS
+   // Wait for threads to terminte
+   TRACE9 ("Wait for threads");
+   while (true) {
+      LOCKTHREADS
+      if (aThreads.empty ()) {
+         UNLOCKTHREADS
+         break;
+      }
+      UNLOCKTHREADS
+      Thread::waitForThread (*aThreads[0]);
+   }
+#endif
 
    // Now handle subdirectories (if specified)
    if (options & RECURSIVE) {
@@ -418,17 +424,16 @@ void Application::handleFiles (const char* pFile) const {
 /*--------------------------------------------------------------------------*/
 void* Application::processThread (void* pThread) {
    assert (pThread);
-   TRACE1 ("Application::processThread (void*) - " << ((Thread*)pThread)->getID ());
    File file;
 
    while (true) {
       LOCKFILES
       if (listFiles.size ()) {
          file = listFiles.front ();
-         TRACE1 ("Application::processThread (void*) - File " << file.name ()
-                  << "; Remaining: " << listFiles.size ());
          listFiles.pop ();
          UNLOCKFILES
+         TRACE1 ("Application::processThread (void*) - File " << file.name ()
+                  << "; Remaining: " << listFiles.size ());
          processFile (file);
       }
       else {
@@ -437,7 +442,6 @@ void* Application::processThread (void* pThread) {
       }
    } // end-while
 
-   TRACE9 ("Thread ends!");
    LOCKTHREADS
    assert (find (aThreads.begin (), aThreads.end (), pThread));
    aThreads.erase (find (aThreads.begin (), aThreads.end (), pThread));
