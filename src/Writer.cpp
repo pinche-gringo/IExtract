@@ -31,6 +31,7 @@
 #include <File.h>
 
 #include "Writer.h"
+#include "Properties.h"
 
 
 /*--------------------------------------------------------------------------*/
@@ -59,16 +60,17 @@ void HTMLWriter::printStart (std::ostream& out) const {
 //Purpose   : Prints the start for an HTML-table
 //Parameters: out: Stream where to put the output
 //            file: File whose data should be printed
-//            description: Description to the file
+//            prop: Properties of the file
 /*--------------------------------------------------------------------------*/
 void HTMLWriter::printFile (std::ostream& out, const File& file,
-                            const std::string& description) const {
+                            const Properties& prop) const {
    out << "<tr valign=top><td>&nbsp;&nbsp;<a href=\"" << file.path ()
        << file.name () << "\">";
    if (options & SHOW_PATH)
       out << file.path ();
    out << file.name () << "</td><td valign=top>-</td><td valign=top>"
-       << description << "</td></tr>\n";
+       << (prop.strComment.empty () ? prop.strTitle : prop.strComment)
+       << "</td></tr>\n";
 }
 
 /*--------------------------------------------------------------------------*/
@@ -91,11 +93,12 @@ TextWriter::~TextWriter () {
 //Purpose   : Prints the start for an Text-table
 //Parameters: out: Stream where to put the output
 //            file: File whose data should be printed
-//            description: Description to the file
+//            prop: Properties of the file
 /*--------------------------------------------------------------------------*/
 void TextWriter::printFile (std::ostream& out, const File& file,
-                            const std::string& description) const {
+                            const Properties& prop) const {
    if (options & SHOW_PATH)
       out << file.path ();
-   out << file.name () << " - " << description << '\n';
+   out << file.name () << " - "
+       << (prop.strComment.empty () ? prop.strTitle : prop.strComment) << '\n';
 }

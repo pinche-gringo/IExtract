@@ -19,9 +19,8 @@
 
 #include <iosfwd>
 
-#include <string>
-
 struct File;
+struct Properties;
 
 
 // Baseclass of output classes
@@ -32,7 +31,7 @@ class Writer {
 
    virtual void printStart (std::ostream& out) const { };
    virtual void printFile (std::ostream& out, const File& file,
-                           const std::string& description) const = 0;
+                           const Properties& prop) const = 0;
    virtual void printEnd (std::ostream& out) const { };
 
    typedef enum { SHOW_PATH = 0x1 } showOptions;
@@ -50,7 +49,7 @@ class HTMLWriter : public Writer {
 
    virtual void printStart (std::ostream& out) const;
    virtual void printFile (std::ostream& out, const File& file,
-                           const std::string& description) const;
+                           const Properties& prop) const;
    virtual void printEnd (std::ostream& out) const;
 
    static HTMLWriter* create (unsigned int options) {
@@ -65,7 +64,7 @@ class TextWriter : public Writer {
    virtual ~TextWriter ();
 
    virtual void printFile (std::ostream& out, const File& file,
-                           const std::string& description) const;
+                           const Properties& prop) const;
 
    static TextWriter* create (unsigned int options) {
       return new TextWriter (options); }
