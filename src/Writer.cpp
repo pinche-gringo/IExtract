@@ -29,13 +29,13 @@
 
 #include <iostream>
 
-#include <Check.h>
-#include <Trace_.h>
+#include <YGP/Check.h>
+#include <YGP/Trace_.h>
 
-#include <File.h>
-#include <ATStamp.h>
-#include <ANumeric.h>
-#include <Tokenize.h>
+#include <YGP/File.h>
+#include <YGP/ATStamp.h>
+#include <YGP/ANumeric.h>
+#include <YGP/Tokenize.h>
 
 #include "Writer.h"
 #include "Properties.h"
@@ -68,7 +68,7 @@ Writer::~Writer () {
 /*--------------------------------------------------------------------------*/
 unsigned int Writer::columns () const {
    unsigned int cols (1);
-   Tokenize t (columns_);
+   YGP::Tokenize t (columns_);
    while (!t.getNextNode ('|').empty ())
       ++cols;
    return cols;
@@ -89,13 +89,13 @@ unsigned int Writer::columns () const {
 //            data: Text to print for separation
 //            title: Text to print as header for every new dir
 /*--------------------------------------------------------------------------*/
-void Writer::printSeparator (std::ostream& out, const File& file,
+void Writer::printSeparator (std::ostream& out, const YGP::File& file,
                              const std::string& data, const std::string& title) const {
    unsigned int pos (0);
    unsigned int oldPos (0);
    while ((pos < data.size ())
           && ((pos = data.find ('%', oldPos)) != std::string::npos)) {
-      TRACE9 ("printSeparator (ostream&, const File, const string&) - Inspecting "
+      TRACE9 ("printSeparator (ostream&, const YGP::File, const string&) - Inspecting "
              << data[pos + 1]);
       out << data.substr (oldPos, pos - oldPos );
 
@@ -115,7 +115,7 @@ void Writer::printSeparator (std::ostream& out, const File& file,
          std::string path (file.path ());
 #if SYSTEM != UNIX
          unsigned int pos (0);
-         while ((pos = path.find (File::DIRSEPARATOR, pos)) != std::string::npos)
+         while ((pos = path.find (YGP::File::DIRSEPARATOR, pos)) != std::string::npos)
             path.replace (pos, 1, 1, '/');
 #endif
 
@@ -149,7 +149,7 @@ void Writer::printSeparator (std::ostream& out, const File& file,
 //            file: File subsituting various placeholders
 //            prop: Properties subsituting various placeholders
 /*--------------------------------------------------------------------------*/
-void Writer::getSubstitute (const char ctrl, std::string& subst, const File& file,
+void Writer::getSubstitute (const char ctrl, std::string& subst, const YGP::File& file,
                             const Properties& prop) const {
    switch (ctrl) {
    case 'a': subst = changeSpecialChars (prop.strAuthor); break;
@@ -158,7 +158,7 @@ void Writer::getSubstitute (const char ctrl, std::string& subst, const File& fil
 
    case 'D':
    case 'd': {
-      ATimestamp stamp (file.time ());
+      YGP::ATimestamp stamp (file.time ());
       subst = (ctrl == 'D') ? stamp.ADate::toString () : stamp.toString (); break; }
 
    case 'n': subst = changeSpecialChars (file.name ()); break;
@@ -177,7 +177,7 @@ void Writer::getSubstitute (const char ctrl, std::string& subst, const File& fil
       subst = changeSpecialChars (file.path ());
 #if SYSTEM != UNIX
       unsigned int pos (0);
-      while ((pos = subst.find (File::DIRSEPARATOR, pos)) != std::string::npos)
+      while ((pos = subst.find (YGP::File::DIRSEPARATOR, pos)) != std::string::npos)
          subst.replace (pos, 1, 1, '/');
 #endif
 
@@ -187,10 +187,10 @@ void Writer::getSubstitute (const char ctrl, std::string& subst, const File& fil
 
    case 's':
    case 'S': {
-      ANumeric size (file.size ());
+      YGP::ANumeric size (file.size ());
       subst = "";
       subst = ((ctrl == 'S') ? convertToHumanString (file.size ())
-               : ANumeric::toString (file.size ()));
+               : YGP::ANumeric::toString (file.size ()));
       break; }
 
    default:
@@ -207,7 +207,7 @@ void Writer::getSubstitute (const char ctrl, std::string& subst, const File& fil
 /*--------------------------------------------------------------------------*/
 std::string Writer::convertToHumanString (unsigned long value) {
    if (value < 1000)
-      return ANumeric::toString (value);
+      return YGP::ANumeric::toString (value);
 
    std::string tString (1, 'k');
 
@@ -227,7 +227,7 @@ std::string Writer::convertToHumanString (unsigned long value) {
    }
    else
       value >>= 10;
-   return ANumeric::toString (value) + tString;
+   return YGP::ANumeric::toString (value) + tString;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -236,7 +236,7 @@ std::string Writer::convertToHumanString (unsigned long value) {
 //            prop: Properties subsituting various placeholders
 //Returns   : std::string: Next (expanded) token
 /*--------------------------------------------------------------------------*/
-std::string Writer::getNextNode (const File& file, const Properties& prop) const {
+std::string Writer::getNextNode (const YGP::File& file, const Properties& prop) const {
    unsigned int pos (0);
    std::string token (const_cast<Writer*> (this)->columns_.getNextNode ('|'));
    if (token.empty ()) {
@@ -244,7 +244,7 @@ std::string Writer::getNextNode (const File& file, const Properties& prop) const
       return token;
    }
 
-   TRACE2 ("Writer::getNextNode (const File&, const Properties&) - Node = '"
+   TRACE2 ("Writer::getNextNode (const YGP::File&, const Properties&) - Node = '"
            << token << '\'');
 
    std::string substitute;
@@ -294,7 +294,7 @@ void HTMLWriter::printStart (std::ostream& out, const std::string& title) const 
       if (strNew.size ())
          out << "<td></td>";
 
-      Tokenize titles (title);
+      YGP::Tokenize titles (title);
       std::string node;
       while ((node = titles.getNextNode ('|')).size ())
          out << "<td>" << node << "</td>";
@@ -309,7 +309,7 @@ void HTMLWriter::printStart (std::ostream& out, const std::string& title) const 
 //            file: File whose data should be printed
 //            prop: Properties of the file
 /*--------------------------------------------------------------------------*/
-void HTMLWriter::printFile (std::ostream& out, const File& file,
+void HTMLWriter::printFile (std::ostream& out, const YGP::File& file,
                             const Properties& prop) const {
    out << "<tr valign=top>";
    if (strNew.size ()) {
@@ -356,7 +356,7 @@ std::string HTMLWriter::changeSpecialChars (const std::string& value) const {
 //            file: File to which the message should be print
 //            msg: Message to print (not NULL)
 /*--------------------------------------------------------------------------*/
-void HTMLWriter::printMessage (std::ostream& out, const File& file,
+void HTMLWriter::printMessage (std::ostream& out, const YGP::File& file,
                                const std::string& msg) const {
    Check3 (!msg.empty ());
 
@@ -393,7 +393,7 @@ TextWriter::~TextWriter () {
 /*--------------------------------------------------------------------------*/
 void TextWriter::printStart (std::ostream& out, const std::string& title) const {
    if (title.size ()) {
-      Tokenize titles (title);
+      YGP::Tokenize titles (title);
       std::string node;
       while ((node = titles.getNextNode ('|')).size ())
          out << node << " ";
@@ -407,7 +407,7 @@ void TextWriter::printStart (std::ostream& out, const std::string& title) const 
 //            file: File whose data should be printed
 //            prop: Properties of the file
 /*--------------------------------------------------------------------------*/
-void TextWriter::printFile (std::ostream& out, const File& file,
+void TextWriter::printFile (std::ostream& out, const YGP::File& file,
                             const Properties& prop) const {
    if (strNew.size () && isNew (file))
       out << strNew << ": ";
@@ -427,7 +427,7 @@ void TextWriter::printFile (std::ostream& out, const File& file,
 //            file: File to which the message should be print
 //            msg: Message to print (not NULL)
 /*--------------------------------------------------------------------------*/
-void TextWriter::printMessage (std::ostream& out, const File& file,
+void TextWriter::printMessage (std::ostream& out, const YGP::File& file,
                                const std::string& msg) const {
    Check3 (!msg.empty ());
    if (strNew.size () && isNew (file))
@@ -458,7 +458,7 @@ void LaTeXWriter::printStart (std::ostream& out, const std::string& title) const
       if (strNew.size ())
          out << "&";
 
-      Tokenize titles (title);
+      YGP::Tokenize titles (title);
       std::string node;
       node = titles.getNextNode ('|');
       out << "{\\textbf " << node << '}';
@@ -475,7 +475,7 @@ void LaTeXWriter::printStart (std::ostream& out, const std::string& title) const
 //            file: File whose data should be printed
 //            prop: Properties of the file
 /*--------------------------------------------------------------------------*/
-void LaTeXWriter::printFile (std::ostream& out, const File& file,
+void LaTeXWriter::printFile (std::ostream& out, const YGP::File& file,
                              const Properties& prop) const {
    if (strNew.size ()) {
       if (isNew (file))
@@ -497,7 +497,7 @@ void LaTeXWriter::printFile (std::ostream& out, const File& file,
 //            file: File to which the message should be print
 //            msg: Message to print (not NULL)
 /*--------------------------------------------------------------------------*/
-void LaTeXWriter::printMessage (std::ostream& out, const File& file,
+void LaTeXWriter::printMessage (std::ostream& out, const YGP::File& file,
                                 const std::string& msg) const {
    Check3 (!msg.empty ());
 
@@ -563,7 +563,7 @@ void XMLWriter::printStart (std::ostream& out, const std::string& title) const {
    out << "<table>\n";
 
    if (title.size ()) {
-      Tokenize titles (title);
+      YGP::Tokenize titles (title);
       std::string node;
       while ((node = titles.getNextNode ('|')).size ())
          out << node;
@@ -577,7 +577,7 @@ void XMLWriter::printStart (std::ostream& out, const std::string& title) const {
 //            file: File whose data should be printed
 //            prop: Properties of the file
 /*--------------------------------------------------------------------------*/
-void XMLWriter::printFile (std::ostream& out, const File& file,
+void XMLWriter::printFile (std::ostream& out, const YGP::File& file,
                             const Properties& prop) const {
    if (strNew.size ()) {
       if (isNew (file))
@@ -596,7 +596,7 @@ void XMLWriter::printFile (std::ostream& out, const File& file,
 //            file: File to which the message should be print
 //            msg: Message to print (not NULL)
 /*--------------------------------------------------------------------------*/
-void XMLWriter::printMessage (std::ostream& out, const File& file,
+void XMLWriter::printMessage (std::ostream& out, const YGP::File& file,
                                const std::string& msg) const {
    Check3 (!msg.empty ());
 

@@ -27,8 +27,8 @@
 
 #include <IExtract-cfg.h>
 
-#include <Check.h>
-#include <Trace_.h>
+#include <YGP/Check.h>
+#include <YGP/Trace_.h>
 
 #include "Properties.h"
 #include "ParseSOffice.h"
@@ -90,7 +90,7 @@ ParseStarOffice::ParseStarOffice ()
 //Purpose   : Callback after a value was read
 //Parameters: pLength: Pointer to value
 //            len: Length of data
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseStarOffice::foundValue (const char* pTitle, unsigned int len) {
    TRACE1 ("ParseStarOffice::foundValue (const char*, unsigned int) - "
@@ -113,13 +113,13 @@ int ParseStarOffice::foundValue (const char* pTitle, unsigned int len) {
    }
 
    skip.setOffset (entries[actEntry].offset - len);
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the length of the next value was read
 //Parameters: pLength: Pointer to length
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseStarOffice::foundLength (const char* pLength, unsigned int) {
    TRACE5 ("ParseStarOffice::foundLength (const char*, unsigned int) - "
@@ -127,16 +127,16 @@ int ParseStarOffice::foundLength (const char* pLength, unsigned int) {
    Check3 (pLength);
    actEntry = (enum types)((int)actEntry + 1);
    value.setMaxCard (get2BytesLSB (pLength));
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the property-entries have been parsed
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseStarOffice::foundProps (const char*, unsigned int) {
    TRACE9 ("ParseStarOffice::foundProps (const char*, unsigned int)");
 
    selDocument.setMaxCard (1);
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }

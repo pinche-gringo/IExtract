@@ -27,8 +27,8 @@
 
 #include <iostream>
 
-#include <Check.h>
-#include <Trace_.h>
+#include <YGP/Check.h>
+#include <YGP/Trace_.h>
 
 #include <IExtract-cfg.h>
 
@@ -86,7 +86,7 @@ ParseOpenOffice::~ParseOpenOffice () {
 /// Callback after finding an XML tag in the document
 /// \param pTag: Pointer to text holding the found tag
 /// \param len: Length of text
-/// \returns \c ParseObject::ParseOK
+/// \returns \c YGP::ParseObject::ParseOK
 //----------------------------------------------------------------------------
 int ParseOpenOffice::foundTag (const char* pTag, unsigned int len) {
    TRACE1 ("ParseOpenOffice::foundTag (const char*, unsigned int) - Tag: "
@@ -112,14 +112,14 @@ int ParseOpenOffice::foundTag (const char* pTag, unsigned int len) {
    else
       pEntry = &Properties::strTitle;
 
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 //----------------------------------------------------------------------------
 /// Callback after finding a value of an XML tag in the document.
 /// \param pTag: Pointer to text holding the found value
 /// \param len: Length of text
-/// \returns \c ParseObject::ParseOK
+/// \returns \c YGP::ParseObject::ParseOK
 //----------------------------------------------------------------------------
 int ParseOpenOffice::foundValue (const char* pValue, unsigned int len) {
    TRACE1 ("ParseOpenOffice::foundValue (const char*, unsigned int) - Value: "
@@ -131,5 +131,5 @@ int ParseOpenOffice::foundValue (const char* pValue, unsigned int len) {
       (prop->*pEntry).assign (pValue, len);
       pEntry = NULL;
    }
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }

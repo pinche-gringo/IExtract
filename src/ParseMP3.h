@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include <XStream.h>
+#include <YGP/XStream.h>
 
 struct Properties;
 
@@ -31,7 +31,7 @@ struct Properties;
 //  - The album is returned in strComment
 class ParseMP3 {
  public:
-   static void parse (Xistream& stream, Properties& result) throw (std::string);
+   static void parse (YGP::Xistream& stream, Properties& result) throw (std::string);
 
  private:
    ParseMP3 ();

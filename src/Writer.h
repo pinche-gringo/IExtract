@@ -24,8 +24,13 @@
 
 #include <iosfwd>
 
-struct File;
+namespace YGP {
+   struct File;
+}
 struct Properties;
+
+
+#include <YGP/Tokenize.h>
 
 
 // Baseclass of output classes
@@ -35,19 +40,19 @@ class Writer {
    virtual ~Writer ();
 
    virtual void printStart (std::ostream& out, const std::string& title) const { };
-   virtual void printFile (std::ostream& out, const File& file,
+   virtual void printFile (std::ostream& out, const YGP::File& file,
                            const Properties& prop) const = 0;
-   virtual void printMessage (std::ostream& out, const File& file,
+   virtual void printMessage (std::ostream& out, const YGP::File& file,
                               const std::string& msg) const = 0;
    virtual void printEnd (std::ostream& out) const { };
 
-   void printSeparator (std::ostream& out, const File& file,
+   void printSeparator (std::ostream& out, const YGP::File& file,
                         const std::string& sep, const std::string& title = "") const;
 
  protected:
    virtual std::string changeSpecialChars (const std::string& val) const { return val; }
 
-   bool isNew (const File& file) const {
+   bool isNew (const YGP::File& file) const {
       return file.time () > limit; }
 
    unsigned int columns () const;
@@ -55,15 +60,15 @@ class Writer {
    unsigned int      options;
    const std::string strNew;
 
-   std::string getNextNode (const File& file, const Properties& prop) const;
-   void getSubstitute (const char ctrl, std::string& substitute, const File& file,
+   std::string getNextNode (const YGP::File& file, const Properties& prop) const;
+   void getSubstitute (const char ctrl, std::string& substitute, const YGP::File& file,
                        const Properties& prop) const;
 
    static std::string convertToHumanString (unsigned long value);
 
  private:
    long limit;
-   Tokenize columns_;
+   YGP::Tokenize columns_;
 };
 
 
@@ -75,9 +80,9 @@ class HTMLWriter : public Writer {
    virtual ~HTMLWriter ();
 
    virtual void printStart (std::ostream& out, const std::string& title) const;
-   virtual void printFile (std::ostream& out, const File& file,
+   virtual void printFile (std::ostream& out, const YGP::File& file,
                            const Properties& prop) const;
-   virtual void printMessage (std::ostream& out, const File& file,
+   virtual void printMessage (std::ostream& out, const YGP::File& file,
                               const std::string& msg) const;
    virtual void printEnd (std::ostream& out) const;
 
@@ -97,9 +102,9 @@ class XMLWriter : public HTMLWriter {
    virtual ~XMLWriter ();
 
    virtual void printStart (std::ostream& out, const std::string& title) const;
-   virtual void printFile (std::ostream& out, const File& file,
+   virtual void printFile (std::ostream& out, const YGP::File& file,
                            const Properties& prop) const;
-   virtual void printMessage (std::ostream& out, const File& file,
+   virtual void printMessage (std::ostream& out, const YGP::File& file,
                               const std::string& msg) const;
    virtual void printEnd (std::ostream& out) const;
 
@@ -117,9 +122,9 @@ class TextWriter : public Writer {
    virtual ~TextWriter ();
 
    virtual void printStart (std::ostream& out, const std::string& title) const;
-   virtual void printFile (std::ostream& out, const File& file,
+   virtual void printFile (std::ostream& out, const YGP::File& file,
                            const Properties& prop) const;
-   virtual void printMessage (std::ostream& out, const File& file,
+   virtual void printMessage (std::ostream& out, const YGP::File& file,
                               const std::string& msg) const;
 
    static TextWriter* create (const std::string& format, const std::string& strNew,
@@ -137,9 +142,9 @@ class LaTeXWriter : public Writer {
    virtual ~LaTeXWriter ();
 
    virtual void printStart (std::ostream& out, const std::string& title) const;
-   virtual void printFile (std::ostream& out, const File& file,
+   virtual void printFile (std::ostream& out, const YGP::File& file,
                            const Properties& prop) const;
-   virtual void printMessage (std::ostream& out, const File& file,
+   virtual void printMessage (std::ostream& out, const YGP::File& file,
                               const std::string& msg) const;
    virtual void printEnd (std::ostream& out) const;
 

@@ -29,8 +29,8 @@
 
 // Note TRACELEVEL 9 is not recomended as the title very likely contains
 // special characters!
-#include <Check.h>
-#include <Trace_.h>
+#include <YGP/Check.h>
+#include <YGP/Trace_.h>
 
 #include "ParseJPG.h"
 #include "Properties.h"
@@ -173,7 +173,7 @@ ParseJPEG::ParseJPEG ()
 //Purpose   : Callback after a title was read
 //Parameters: pTitle: Pointer to title
 //            len: Length of title
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
    Check3 (prop); Check3 (pTitle);
@@ -193,14 +193,14 @@ int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
       }
 
    TRACE9 ("ParseJPEG::foundTitle (const char*, unsigned int) - Out");
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after a comment entry (Photoshop stlye) was read
 //Parameters: pTitle: Pointer to title
 //            len: Length of title
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
    Check3 (prop); Check3 (pTitle);
@@ -253,13 +253,13 @@ int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
          } while (pAct < pTitle);
       } // end-if comment part found
    } // end-if header
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the length of the title was read
 //Parameters: length: Pointer to length
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundLength (const char* length, unsigned int) {
    Check3 (length);
@@ -271,13 +271,13 @@ int ParseJPEG::foundLength (const char* length, unsigned int) {
    }
 
    skip.setOffset (14);
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the length of the title was read
 //Parameters: length: Pointer to length
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundLength2 (const char* length, unsigned int) {
    Check3 (length);
@@ -290,17 +290,17 @@ int ParseJPEG::foundLength2 (const char* length, unsigned int) {
          TRACE8 ("ParseJPEG::foundLength2 (const char*) - " << lengths[i]
                  << " (0x" << hex << lengths[i] << dec << ')');
          actEntry = i;
-         return ParseObject::PARSE_OK;
+         return YGP::ParseObject::PARSE_OK;
       }
 
    actEntry = -1U;
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the number of entries has been read
 //Parameters: nr: Pointer to number of entries
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundNumber (const char* nr, unsigned int) {
    Check3 (nr);
@@ -309,27 +309,27 @@ int ParseJPEG::foundNumber (const char* nr, unsigned int) {
    length2.setMaxCard (4);
    TRACE8 ("ParseJPEG::foundNumber (const char*, unsigned int): " << cEntries);
    lengths[1] = 0;
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the type of an entry has been parsed
 //Parameters: pType: Pointer to found type
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundType (const char* pType, unsigned int) {
    Check3 (pType);
    actEntry = *(unsigned int*)pType;
    TRACE8 ("ParseJPEG::foundType (const char*) - " << hex << actEntry << dec);
    cRead += 12;
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the offset of an entry has been parsed
 //Parameters: pOffset: Pointer to found offset
 //            len: Length of data
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundOffset (const char* pOffset, unsigned int len) {
    Check3 (pOffset);
@@ -338,12 +338,12 @@ int ParseJPEG::foundOffset (const char* pOffset, unsigned int len) {
       TRACE8 ("ParseJPEG::foundOffset (const char*) - " << offsets[actEntry]
               << " (0x" << hex << offsets[actEntry] << dec << ')');
    }
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the header of the properthies has been read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundPropertiesHeader (const char*, unsigned int) {
    TRACE1 ("ParseJPEG::foundPropertiesHeader (const char*) - Bytes read: "
@@ -360,5 +360,5 @@ int ParseJPEG::foundPropertiesHeader (const char*, unsigned int) {
       Check3 (title.getMaxCard () > (cRead + 8));
       title.setMaxCard (title.getMaxCard () - cRead - 8);
    }
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }

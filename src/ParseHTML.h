@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include <Parse.h>
+#include <YGP/Parse.h>
 
 struct Properties;
 
@@ -30,7 +30,7 @@ class ParseHTML  {
    ParseHTML ();
    ~ParseHTML () { }
 
-   void parse (Xistream& stream, Properties& result) throw (std::string) {
+   void parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
       prop = &result;
       htmlDoc.parse (stream); }
 
@@ -42,25 +42,25 @@ class ParseHTML  {
    int foundComment (const char*, unsigned int);
    int foundEndOfHead (const char*, unsigned int);
 
-   typedef OFParseText<ParseHTML> OMParseText;
-   typedef OFParseUpperExact<ParseHTML> OMParseUpperExact;
+   typedef YGP::OFParseText<ParseHTML> OMParseText;
+   typedef YGP::OFParseUpperExact<ParseHTML> OMParseUpperExact;
 
-   ParseExact        startTag;
-   ParseExact        endTag;
-   ParseUpperExact   tagMeta;
-   OMParseUpperExact tagTitle;
-   ParseUpperExact   tagEndTitle;
-   OMParseUpperExact tagEndHead;
-   OMParseText       title;
-   OMParseText       value;
-   ParseText         otherTag;
-   ParseText         ignore;
+   YGP::ParseExact      startTag;
+   YGP::ParseExact      endTag;
+   YGP::ParseUpperExact tagMeta;
+   OMParseUpperExact    tagTitle;
+   YGP::ParseUpperExact tagEndTitle;
+   OMParseUpperExact    tagEndHead;
+   OMParseText          title;
+   OMParseText          value;
+   YGP::ParseText       otherTag;
+   YGP::ParseText       ignore;
 
    // Elements to parse meta contents
-   ParseExact      quote;
-   ParseExact      equal;
-   ParseUpperExact name;
-   ParseUpperExact content;
+   YGP::ParseExact      quote;
+   YGP::ParseExact      equal;
+   YGP::ParseUpperExact name;
+   YGP::ParseUpperExact content;
 
    // Supported meta-content
    OMParseUpperExact description;
@@ -69,23 +69,23 @@ class ParseHTML  {
    OMParseUpperExact DCauthor;
    OMParseUpperExact DCtitle;
 
-   ParseSequence  seqTag;
-   ParseSequence  seqTitle;
-   ParseSequence  seqMetaCmd;
-   ParseSequence  seqMetaName;
-   ParseSelection selMetaCmds;
-   ParseSelection selMetaTags;
-   ParseSelection selCmd;
-   ParseSelection htmlDoc;                                    // Startsequence
+   YGP::ParseSequence  seqTag;
+   YGP::ParseSequence  seqTitle;
+   YGP::ParseSequence  seqMetaCmd;
+   YGP::ParseSequence  seqMetaName;
+   YGP::ParseSelection selMetaCmds;
+   YGP::ParseSelection selMetaTags;
+   YGP::ParseSelection selCmd;
+   YGP::ParseSelection htmlDoc;                                    // Startsequence
 
-   ParseObject* _seqMetaName[11];
-   ParseObject* _seqMetaCmd[3];
-   ParseObject* _selMetaCmds[3];
-   ParseObject* _seqTitle[6];
-   ParseObject* _selCmd[5];
-   ParseObject* _selMetaTags[6];
-   ParseObject* _seqTag[4];
-   ParseObject* _htmlDoc[3];
+   YGP::ParseObject* _seqMetaName[11];
+   YGP::ParseObject* _seqMetaCmd[3];
+   YGP::ParseObject* _selMetaCmds[3];
+   YGP::ParseObject* _seqTitle[6];
+   YGP::ParseObject* _selCmd[5];
+   YGP::ParseObject* _selMetaTags[6];
+   YGP::ParseObject* _seqTag[4];
+   YGP::ParseObject* _htmlDoc[3];
 
    Properties*  prop;
    enum { NONE = -1, TITLE = 0, AUTHOR, COMMENT } actEntry;

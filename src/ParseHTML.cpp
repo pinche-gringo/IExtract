@@ -27,7 +27,7 @@
 
 #include <IExtract-cfg.h>
 
-#include <Check.h>
+#include <YGP/Check.h>
 #include "ParseHTML.h"
 #include "Properties.h"
 
@@ -126,7 +126,7 @@ ParseHTML::ParseHTML ()
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after a title was read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseHTML::foundValue (const char* pTitle, unsigned int len) {
    if (actEntry != NONE) {
@@ -137,41 +137,41 @@ int ParseHTML::foundValue (const char* pTitle, unsigned int len) {
       (prop->*(values[actEntry])).assign (pTitle, len);
    }
    actEntry = NONE;
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after a title tag was read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseHTML::foundTitle (const char*, unsigned int) {
    actEntry = TITLE;
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after an author-tag was read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseHTML::foundAuthor (const char*, unsigned int) {
    actEntry = AUTHOR;
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after a comment tag was read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseHTML::foundComment (const char*, unsigned int) {
    actEntry = COMMENT;
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after a title tag was read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseHTML::foundEndOfHead (const char*, unsigned int) {
    htmlDoc.setMaxCard (1);
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }

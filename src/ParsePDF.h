@@ -25,7 +25,7 @@
 #include <map>
 #include <string>
 
-#include <Parse.h>
+#include <YGP/Parse.h>
 
 struct Properties;
 
@@ -36,7 +36,7 @@ class ParsePDF {
    ParsePDF ();
    virtual ~ParsePDF ();
 
-   static void parse (Xistream& stream, Properties& result) throw (std::string);
+   static void parse (YGP::Xistream& stream, Properties& result) throw (std::string);
 
  private:
    ParsePDF (const ParsePDF& other);
@@ -59,30 +59,30 @@ class ParsePDF {
 
    void parseInfoObject ();
 
-   typedef OFParseExact<ParsePDF>   OMParseExact;
-   typedef OFParseTextEsc<ParsePDF> OMParseTextEsc;
-   typedef OFParseAttomic<ParsePDF> OMParseAttomic;
+   typedef YGP::OFParseExact<ParsePDF>   OMParseExact;
+   typedef YGP::OFParseTextEsc<ParsePDF> OMParseTextEsc;
+   typedef YGP::OFParseAttomic<ParsePDF> OMParseAttomic;
 
-   ParseExact      startXRef;
+   YGP::ParseExact startXRef;
    OMParseAttomic  offXRef;
-   ParseExact      skipS;
-   ParseText       skip;
+   YGP::ParseExact skipS;
+   YGP::ParseText  skip;
 
-   ParseExact      idXRef;
+   YGP::ParseExact idXRef;
    OMParseAttomic  nrStart;
    OMParseAttomic  count;
    OMParseAttomic  offObject;
 
-   ParseExact      tagTrailer;
-   ParseExact      startObj;
-   ParseExact      objInfo;
-   ParseExact      objPrev;
-   OMParseAttomic  objOffPrev;
-   OMParseAttomic  idObject;
-   ParseExact      idObj;
-   ParseAttomic    number;
-   ParseExact      tagObj;
-   OMParseExact    endObj;
+   YGP::ParseExact   tagTrailer;
+   YGP::ParseExact   startObj;
+   YGP::ParseExact   objInfo;
+   YGP::ParseExact   objPrev;
+   OMParseAttomic    objOffPrev;
+   OMParseAttomic    idObject;
+   YGP::ParseExact   idObj;
+   YGP::ParseAttomic number;
+   YGP::ParseExact   tagObj;
+   OMParseExact      endObj;
 
    OMParseExact    tagTitle;
    OMParseExact    tagAuthor;
@@ -91,38 +91,38 @@ class ParsePDF {
 
    OMParseExact    startOfValue1;
    OMParseExact    startOfValue2;
-   ParseExact      endOfValue;
+   YGP::ParseExact endOfValue;
 
-   ParseSelection selXRef;
-   ParseSequence  seqXRef;
-   ParseSequence  seqXRefTable;
-   ParseSequence  seqXRefTableEntries;
-   ParseSequence  seqTrailer;
-   ParseSelection selValues;
-   ParseSequence  seqInfo;
-   ParseSequence  seqPrev;
-   ParseSequence  seqInfoObj;
-   ParseSequence  seqInfoValue;
-   ParseSelection selType;
-   ParseSelection selStartOfValue;
+   YGP::ParseSelection selXRef;
+   YGP::ParseSequence  seqXRef;
+   YGP::ParseSequence  seqXRefTable;
+   YGP::ParseSequence  seqXRefTableEntries;
+   YGP::ParseSequence  seqTrailer;
+   YGP::ParseSelection selValues;
+   YGP::ParseSequence  seqInfo;
+   YGP::ParseSequence  seqPrev;
+   YGP::ParseSequence  seqInfoObj;
+   YGP::ParseSequence  seqInfoValue;
+   YGP::ParseSelection selType;
+   YGP::ParseSelection selStartOfValue;
 
-   ParseObject* _selXRef[4];
-   ParseObject* _seqXRef[4];
-   ParseObject* _seqXRefTable[6];
-   ParseObject* _seqXRefTableEntries[3];
-   ParseObject* _seqTrailer[4];
-   ParseObject* _selValues[5];
-   ParseObject* _seqInfo[4];
-   ParseObject* _seqPrev[3];
-   ParseObject* _seqInfoObj[6];
-   ParseObject* _seqInfoValue[5];
-   ParseObject* _selType[6];
-   ParseObject* _selStartOfValue[3];
+   YGP::ParseObject* _selXRef[4];
+   YGP::ParseObject* _seqXRef[4];
+   YGP::ParseObject* _seqXRefTable[6];
+   YGP::ParseObject* _seqXRefTableEntries[3];
+   YGP::ParseObject* _seqTrailer[4];
+   YGP::ParseObject* _selValues[5];
+   YGP::ParseObject* _seqInfo[4];
+   YGP::ParseObject* _seqPrev[3];
+   YGP::ParseObject* _seqInfoObj[6];
+   YGP::ParseObject* _seqInfoValue[5];
+   YGP::ParseObject* _selType[6];
+   YGP::ParseObject* _selStartOfValue[3];
 
    Properties* prop;
 
    enum { NONE = -1, TITLE = 0, AUTHOR, COMMENT } actEntry;
-   Xistream* file;
+   YGP::Xistream* file;
    unsigned int offPrev;
    unsigned int actObject;
    unsigned int infoObject;

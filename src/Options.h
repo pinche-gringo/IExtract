@@ -20,10 +20,10 @@
 
 #include <string>
 
-#include <Entity.h>
+#include <YGP/Entity.h>
 
 
-class Options : public Entity {
+class Options : public YGP::Entity {
    friend class Application;
 
  public:

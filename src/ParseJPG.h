@@ -18,7 +18,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
-#include <Parse.h>
+#include <YGP/Parse.h>
 
 
 struct Properties;
@@ -30,7 +30,7 @@ class ParseJPEG  {
    ParseJPEG ();
    ~ParseJPEG () { }
 
-   void parse (Xistream& stream, Properties& result) throw (std::string) {
+   void parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
       prop = &result;
       jpegImage.parse (stream); }
 
@@ -45,16 +45,16 @@ class ParseJPEG  {
    int foundOffset (const char*, unsigned int);
    int foundPropertiesHeader (const char*, unsigned int);
 
-   typedef OFParseText<ParseJPEG>     OMParseText;
-   typedef OFParseExact<ParseJPEG>    OMParseExact;
-   typedef OFParseAttomic<ParseJPEG>  OMParseAttomic;
-   typedef OFParseSequence<ParseJPEG> OMParseSequence;
+   typedef YGP::OFParseText<ParseJPEG>     OMParseText;
+   typedef YGP::OFParseExact<ParseJPEG>    OMParseExact;
+   typedef YGP::OFParseAttomic<ParseJPEG>  OMParseAttomic;
+   typedef YGP::OFParseSequence<ParseJPEG> OMParseSequence;
 
-   ParseExact      idJPEG;
-   ParseExact      idFormat1;
-   ParseExact      idComment1;
-   ParseExact      idComment2;
-   ParseExact      idComment3;
+   YGP::ParseExact idJPEG;
+   YGP::ParseExact idFormat1;
+   YGP::ParseExact idComment1;
+   YGP::ParseExact idComment2;
+   YGP::ParseExact idComment3;
    OMParseAttomic  title;
    OMParseAttomic  title3;
    OMParseAttomic  type;
@@ -62,26 +62,26 @@ class ParseJPEG  {
    OMParseAttomic  length1;
    OMParseAttomic  length2;
    OMParseAttomic  offset;
-   ParseSkip       skip;
+   YGP::ParseSkip  skip;
 
-   ParseSelection  selFormat;
-   ParseSequence   seqFormat1;
-   ParseSelection  selProperties;
-   ParseSequence   seqPropShort;
-   ParseSequence   seqPropLong;
-   ParseSequence   seqPropXXL;
+   YGP::ParseSelection  selFormat;
+   YGP::ParseSequence   seqFormat1;
+   YGP::ParseSelection  selProperties;
+   YGP::ParseSequence   seqPropShort;
+   YGP::ParseSequence   seqPropLong;
+   YGP::ParseSequence   seqPropXXL;
 
-   OMParseSequence seqEntries;
-   ParseSequence   jpegImage;                                 // Startsequence
+   OMParseSequence    seqEntries;
+   YGP::ParseSequence jpegImage;                              // Startsequence
 
-   ParseObject*   _jpegImage[3];
-   ParseObject*   _selFormat[3];
-   ParseObject*   _seqFormat1[4];
-   ParseObject*   _selProperties[4];
-   ParseObject*   _seqPropShort[4];
-   ParseObject*   _seqPropLong[8];
-   ParseObject*   _seqPropXXL[4];
-   ParseObject*   _seqEntries[4];
+   YGP::ParseObject*   _jpegImage[3];
+   YGP::ParseObject*   _selFormat[3];
+   YGP::ParseObject*   _seqFormat1[4];
+   YGP::ParseObject*   _selProperties[4];
+   YGP::ParseObject*   _seqPropShort[4];
+   YGP::ParseObject*   _seqPropLong[8];
+   YGP::ParseObject*   _seqPropXXL[4];
+   YGP::ParseObject*   _seqEntries[4];
 
    unsigned int offsets[3];
    unsigned int lengths[3];

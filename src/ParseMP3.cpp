@@ -25,7 +25,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
-#include <Trace_.h>
+#include <YGP/Trace_.h>
 
 #include "Properties.h"
 
@@ -51,7 +51,7 @@ ParseMP3::~ParseMP3 () {
 //Parameters: stream: MP3-file to analyze
 //            result: Out: Found information
 /*--------------------------------------------------------------------------*/
-void ParseMP3::parse (Xistream& stream, Properties& result) throw (std::string) {
+void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
    stream.seekg (-0x80, std::ios::end);
    std::string value;
 

@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include <Parse.h>
+#include <YGP/Parse.h>
 
 
 struct Properties;
@@ -31,7 +31,7 @@ class ParseOpenOffice {
    ParseOpenOffice ();
    virtual ~ParseOpenOffice ();
 
-   void parse (Xistream& stream, Properties& result) throw (std::string) {
+   void parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
       prop = &result;
       selDocument.parse (stream);
    }
@@ -45,26 +45,26 @@ class ParseOpenOffice {
    int foundTag (const char*, unsigned int);
    int foundValue (const char*, unsigned int);
 
-   typedef OFParseText<ParseOpenOffice>    OMParseText;
-   typedef OFParseQuoted<ParseOpenOffice>  OMParseQuoted;
+   typedef YGP::OFParseText<ParseOpenOffice>    OMParseText;
+   typedef YGP::OFParseQuoted<ParseOpenOffice>  OMParseQuoted;
 
    Properties*  prop;
 
-   ParseExact        idMetadata;
-   ParseExact        skipIDStart;
-   ParseText         skipUnused;
-   ParseText         skipLine;
+   YGP::ParseExact   idMetadata;
+   YGP::ParseExact   skipIDStart;
+   YGP::ParseText    skipUnused;
+   YGP::ParseText    skipLine;
    OMParseQuoted     tag;
    OMParseText       value;
 
-   ParseSequence    seqMetadata;
-   ParseSequence    seqEntry;
+   YGP::ParseSequence    seqMetadata;
+   YGP::ParseSequence    seqEntry;
 
-   ParseSelection   selDocument;                              // Startsequence
+   YGP::ParseSelection   selDocument;                         // Startsequence
 
-   ParseObject* _selDocument[4];
-   ParseObject* _seqMetadata[4];
-   ParseObject* _seqEntry[3];
+   YGP::ParseObject* _selDocument[4];
+   YGP::ParseObject* _seqMetadata[4];
+   YGP::ParseObject* _seqEntry[3];
 
    std::string Properties::* pEntry;
 };

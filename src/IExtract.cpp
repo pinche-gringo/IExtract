@@ -26,7 +26,7 @@
 
 
 #include <IExtract-cfg.h>
-#include <gzo-cfg.h>
+#include <ygp-cfg.h>
 
 #include <cctype>
 #include <cstdlib>
@@ -40,8 +40,8 @@
 #  include <vector>
 #  include <algorithm>
 
-#  include <Mutex.h>
-#  include <Thread.h>
+#  include <YGP/Mutex.h>
+#  include <YGP/Thread.h>
 #  define LOCKFILES     { ((Application*)this)->mxListFiles.lock (); }
 #  define UNLOCKFILES   { ((Application*)this)->mxListFiles.unlock (); }
 #  define LOCKTHREADS   { ((Application*)this)->mxThreads.lock (); }
@@ -57,14 +57,14 @@
 #  define UNLOCKOUTPUT
 #endif
 
-#include <Check.h>
-#include <Trace_.h>
-#include <XStream.h>
-#include <DirSrch.h>
-#include <XDirSrch.h>
-#include <PathSrch.h>
-#include <IVIOAppl.h>
-#include <INIFile.h>
+#include <YGP/Check.h>
+#include <YGP/Trace_.h>
+#include <YGP/XStream.h>
+#include <YGP/DirSrch.h>
+#include <YGP/XDirSrch.h>
+#include <YGP/PathSrch.h>
+#include <YGP/IVIOAppl.h>
+#include <YGP/INIFile.h>
 
 #include "Writer.h"
 #include "Options.h"
@@ -94,7 +94,7 @@ static const char* const DEFAULT_XML_FORMAT = "<tr><td>%n</td><td>%t</td>"
 
 
 // Class to run Extract-Application
-class Application : public IVIOApplication {
+class Application : public YGP::IVIOApplication {
  public:
    Application (const int argc, const char* argv[]);
    ~Application ();
@@ -123,27 +123,27 @@ class Application : public IVIOApplication {
    Application (const Application&);
    const Application& operator= (const Application&);
 
-   typedef void (Application::*HANDLER) (Xistream& hFile, Properties& result) const;
+   typedef void (Application::*HANDLER) (YGP::Xistream& hFile, Properties& result) const;
    HANDLER getFileTypeHandler (const char* pExt) const;
    std::map<const std::string, HANDLER> handlers;
 
    static void convertFromWideChar (Properties& prop);
 
    void handleFiles (const char* pFile) const;
-   void processFile (const File& file, HANDLER fnc) const;
+   void processFile (const YGP::File& file, HANDLER fnc) const;
 #ifdef ENABLE_THREADS
    void* processThread (void*);
 #endif
 
-   void processMP3 (Xistream& hFile, Properties& result) const throw (std::string);
-   void processPDF (Xistream& hFile, Properties& result) const throw (std::string);
-   void processJPG (Xistream& hFile, Properties& result) const throw (std::string);
-   void processHTML (Xistream& hFile, Properties& result) const throw (std::string);
-   void processOffice (Xistream& hFile, Properties& result) const
+   void processMP3 (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processPDF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processJPG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processHTML (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processOffice (YGP::Xistream& hFile, Properties& result) const
       throw (std::string);
-   void processOpenOffice (Xistream& hFile, Properties& result) const
+   void processOpenOffice (YGP::Xistream& hFile, Properties& result) const
       throw (std::string);
-   void processStarOffice (Xistream& hFile, Properties& result) const
+   void processStarOffice (YGP::Xistream& hFile, Properties& result) const
       throw (std::string);
 
    enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4 };
@@ -161,30 +161,30 @@ class Application : public IVIOApplication {
    static const longOptions lo[];
 
 #ifdef ENABLE_THREADS
-   std::vector<Thread*> aThreads;
-   Mutex                mxThreads;
-   Mutex                mxOutput;
+   std::vector<YGP::Thread*> aThreads;
+   YGP::Mutex                mxThreads;
+   YGP::Mutex                mxOutput;
 
-   typedef struct FileFunction : public File {
+   typedef struct FileFunction : public YGP::File {
       HANDLER fnc;
-      FileFunction () : File (), fnc (NULL) { }
-      FileFunction (const struct File& file) : File (file) { }
-      FileFunction (const struct FileFunction& ffnc) : File (ffnc)
+      FileFunction () : YGP::File (), fnc (NULL) { }
+      FileFunction (const YGP::File& file) : YGP::File (file) { }
+      FileFunction (const struct FileFunction& ffnc) : YGP::File (ffnc)
          , fnc (ffnc.fnc) { }
 
       const struct FileFunction& operator= (const struct FileFunction& ffnc) {
          if (this != &ffnc) {
-            File::operator= (ffnc);
+            YGP::File::operator= (ffnc);
             fnc = ffnc.fnc;
          }
          return *this; }
    } FILEFNC;
-   Mutex                mxListFiles;
+   YGP::Mutex           mxListFiles;
    std::queue<FILEFNC>  listFiles;
 #endif
 };
 
-const IVIOApplication::longOptions Application::lo[] = {
+const YGP::IVIOApplication::longOptions Application::lo[] = {
    { IVIOAPPL_HELP_OPTION },
    { "recursive", 'r' },
    { "format", 'F' },
@@ -211,7 +211,7 @@ const IVIOApplication::longOptions Application::lo[] = {
 /// \param argv: Array holding (pointer to) arguments
 //----------------------------------------------------------------------------
 Application::Application (const int argc, const char* argv[]) 
-    : IVIOApplication (argc, argv, lo), options (0), chgFlag (0), iniOpts ()
+    : YGP::IVIOApplication (argc, argv, lo), options (0), chgFlag (0), iniOpts ()
     , writer (NULL), outputStyle (TEXT)
 #ifdef ENABLE_THREADS
     , aThreads (0)
@@ -439,7 +439,7 @@ bool Application::handleOption (const char option) {
       if (files) {
          filelist += option;
          filelist += files;
-         filelist += PathSearch::PATHSEPARATOR;
+         filelist += YGP::PathSearch::PATHSEPARATOR;
       }
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
@@ -510,9 +510,9 @@ int Application::perform (int argc, const char* argv[]) {
    std::string file;
    for (int j (0); j < argc; ++j) {
       file = argv[j];
-      if (DirectorySearch::isValid (argv[j])) {
-         if (file[file.size () - 1] != File::DIRSEPARATOR)
-            file += File::DIRSEPARATOR;
+      if (YGP::DirectorySearch::isValid (argv[j])) {
+         if (file[file.size () - 1] != YGP::File::DIRSEPARATOR)
+            file += YGP::File::DIRSEPARATOR;
          file += "*";
       }
       handleFiles (file.c_str ());
@@ -531,16 +531,16 @@ void Application::handleFiles (const char* pFile) const {
    Check3 (pFile);
    TRACE5 ("Application::handleFiles (const char*) const - " << pFile);
 
-   ExtDirectorySearch ds (pFile);
+   YGP::ExtDirectorySearch ds (pFile);
    std::string node;
-   PathSearch list (filelist);
+   YGP::PathSearch list (filelist);
    while (!(node = list.getNextNode ()).empty ()) {
       bool include (node[0] == 'i');
       node.replace (0, 1, 0, '\0');
       include ? ds.addFilesToInclude (node) : ds.addFilesToExclude (node);
    } // end-while
 
-   const File* file = ds.find (IDirectorySearch::FILE_NORMAL);
+   const YGP::File* file = ds.find (YGP::IDirectorySearch::FILE_NORMAL);
    while (file) {
       HANDLER fnc = getFileTypeHandler (strrchr (file->name (), '.'));
       if (fnc) {
@@ -600,15 +600,15 @@ void Application::handleFiles (const char* pFile) const {
    if (options & RECURSIVE) {
       std::string files (ds.getFileSpec ());      // Use same filespecification
 
-      file = ds.find (ds.getDirectory () + "*", DirectorySearch::FILE_DIRECTORY);
+      file = ds.find (ds.getDirectory () + "*", YGP::DirectorySearch::FILE_DIRECTORY);
       while (file) {
-         if (!IDirectorySearch::isSpecial (file->name ())) {
+         if (!YGP::IDirectorySearch::isSpecial (file->name ())) {
             LOCKOUTPUT
             writer->printSeparator (std::cout, *file, iniOpts.separate, iniOpts.title);
             UNLOCKOUTPUT
             std::string strFile (file->path ());
             strFile += file->name ();
-            strFile += File::DIRSEPARATOR;
+            strFile += YGP::File::DIRSEPARATOR;
             strFile += files;
             handleFiles (strFile.c_str ());
          }
@@ -643,7 +643,7 @@ void* Application::processThread (void* pThread) {
       }
    } // end-while
 
-   ParseObject::freeBuffer ();
+   YGP::ParseObject::freeBuffer ();
 
    LOCKTHREADS
    Check3 (find (aThreads.begin (), aThreads.end (), pThread));
@@ -658,13 +658,13 @@ void* Application::processThread (void* pThread) {
 //Parameters: pFile: File to processs
 //            fnc: Handling function
 /*--------------------------------------------------------------------------*/
-void Application::processFile (const File& file, HANDLER fnc) const {
-   TRACE1 ("Application::processFile (const File&) const - " << file.name ());
+void Application::processFile (const YGP::File& file, HANDLER fnc) const {
+   TRACE1 ("Application::processFile (const YGP::File&) const - " << file.name ());
 
    std::string strFile (file.path ());
    strFile += file.name ();
 
-   Xifstream ifile;
+   YGP::Xifstream ifile;
    ifile.open (strFile.c_str (), std::ios::in | std::ios::binary);
    if (!ifile) {
       LOCKOUTPUT;
@@ -679,7 +679,7 @@ void Application::processFile (const File& file, HANDLER fnc) const {
 
       try {
          Properties prop;
-         (this->*fnc) ((Xistream&)ifile, prop);
+         (this->*fnc) ((YGP::Xistream&)ifile, prop);
          convertFromWideChar (prop);
          LOCKOUTPUT
          writer->printFile (std::cout, file, prop);
@@ -702,7 +702,7 @@ void Application::processFile (const File& file, HANDLER fnc) const {
 //Parameters: hFile: File to processs
 //            result: Result of parsing
 /*--------------------------------------------------------------------------*/
-void Application::processHTML (Xistream& hFile, Properties& result) const
+void Application::processHTML (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseHTML obj;
    obj.parse (hFile, result);
@@ -713,7 +713,7 @@ void Application::processHTML (Xistream& hFile, Properties& result) const
 //Parameters: hFile: File to processs
 //            result: Result of parsing
 /*--------------------------------------------------------------------------*/
-void Application::processPDF (Xistream& hFile, Properties& result) const
+void Application::processPDF (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParsePDF::parse (hFile, result);
 }
@@ -723,7 +723,7 @@ void Application::processPDF (Xistream& hFile, Properties& result) const
 //Parameters: hFile: File to processs
 //            result: Result of parsing
 /*--------------------------------------------------------------------------*/
-void Application::processMP3 (Xistream& hFile, Properties& result) const
+void Application::processMP3 (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseMP3::parse (hFile, result);
 }
@@ -733,7 +733,7 @@ void Application::processMP3 (Xistream& hFile, Properties& result) const
 //Parameters: hFile: File to processs
 //            result: Result of parsing
 /*--------------------------------------------------------------------------*/
-void Application::processStarOffice (Xistream& hFile, Properties& result) const
+void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseStarOffice obj;
    obj.parse (hFile, result);
@@ -744,7 +744,7 @@ void Application::processStarOffice (Xistream& hFile, Properties& result) const
 /// \param hFile: File to processs
 /// \param result: Result of parsing
 /*--------------------------------------------------------------------------*/
-void Application::processOpenOffice (Xistream& hFile, Properties& result) const
+void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseOpenOffice obj;
    obj.parse (hFile, result);
@@ -755,7 +755,7 @@ void Application::processOpenOffice (Xistream& hFile, Properties& result) const
 //Parameters: hFile: File to processs
 //            result: Result of parsing
 /*--------------------------------------------------------------------------*/
-void Application::processOffice (Xistream& hFile, Properties& result) const
+void Application::processOffice (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseWord obj;
    obj.parse (hFile, result);
@@ -766,7 +766,7 @@ void Application::processOffice (Xistream& hFile, Properties& result) const
 //Parameters: hFile: File to processs
 //            result: Result of parsing
 /*--------------------------------------------------------------------------*/
-void Application::processJPG (Xistream& hFile, Properties& result) const
+void Application::processJPG (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseJPEG obj;
    obj.parse (hFile, result);
@@ -853,7 +853,7 @@ void Application::readINIFile (const char* pFile) {
 //Returns   : int: Status
 /*--------------------------------------------------------------------------*/
 int main (int argc, const char* argv[]) {
-   IVIOApplication::initI18n (PACKAGE, LOCALEDIR),
+   YGP::IVIOApplication::initI18n (PACKAGE, LOCALEDIR),
 
    Application::initI18n ();
    Application appl (argc, argv);

@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include <Parse.h>
+#include <YGP/Parse.h>
 
 struct Properties;
 
@@ -30,7 +30,7 @@ class ParseStarOffice  {
    ParseStarOffice ();
    ~ParseStarOffice () { }
 
-   void parse (Xistream& stream, Properties& result) throw (std::string) {
+   void parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
       prop = &result;
       stream.seekg (0x800);
       selDocument.parse (stream); }
@@ -41,23 +41,23 @@ class ParseStarOffice  {
    int foundValue (const char*, unsigned int);
    int foundProps (const char*, unsigned int);
 
-   typedef OFParseAttomic<ParseStarOffice>  OMParseAttomic;
-   typedef OFParseSequence<ParseStarOffice> OMParseSequence;
+   typedef YGP::OFParseAttomic<ParseStarOffice>  OMParseAttomic;
+   typedef YGP::OFParseSequence<ParseStarOffice> OMParseSequence;
 
-   ParseExact        idSOffice;
-   ParseExact        skipIDStart;
-   ParseSkip         skip;
-   ParseText         skip2;
-   OMParseAttomic    length;
-   OMParseAttomic    value;
+   YGP::ParseExact idSOffice;
+   YGP::ParseExact skipIDStart;
+   YGP::ParseSkip  skip;
+   YGP::ParseText  skip2;
+   OMParseAttomic  length;
+   OMParseAttomic  value;
 
-   ParseSelection   selDocument;                              // Startsequence
-   OMParseSequence  seqEntries;
-   ParseSequence    seqProperties;
+   YGP::ParseSelection selDocument;                           // Startsequence
+   OMParseSequence     seqEntries;
+   YGP::ParseSequence  seqProperties;
 
-   ParseObject* _selDocument[4];
-   ParseObject* _seqEntries[4];
-   ParseObject* _seqProperties[3];
+   YGP::ParseObject* _selDocument[4];
+   YGP::ParseObject* _seqEntries[4];
+   YGP::ParseObject* _seqProperties[3];
 
    Properties*  prop;
    enum types { NONE = -1, CREATOR = 0, AUTHOR, TITLE, COMMENT } actEntry;

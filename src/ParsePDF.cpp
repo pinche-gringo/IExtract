@@ -37,8 +37,8 @@
 
 #include <sstream>
 
-#include <Check.h>
-#include <Trace_.h>
+#include <YGP/Check.h>
+#include <YGP/Trace_.h>
 
 #include "Properties.h"
 
@@ -166,19 +166,19 @@ ParsePDF::~ParsePDF () {
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the offset of /Prev entry was read
 //Parameters: pLength: Pointer to offset
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundPrevOffset (const char* pOffset, unsigned int) {
    TRACE9 ("ParsePDF::foundPrevOffset (const char*, unsigned int) - " << pOffset);
    Check3 (pOffset);
    offPrev = atoi (pOffset);
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the offset of the cross reference table was read
 //Parameters: pLength: Pointer to offset
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundOffset (const char* pOffset, unsigned int) {
    TRACE9 ("ParsePDF::foundOffset (const char*, unsigned int) - " << pOffset);
@@ -186,28 +186,28 @@ int ParsePDF::foundOffset (const char* pOffset, unsigned int) {
 
    file->seekg (atoi (pOffset), std::ios::beg);
    selXRef.setMaxCard (0);
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the start number of the entries in the cross
 //            reference table was read
 //Parameters: pNumber: Pointer to startnumber of objects
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundStartNumber (const char* pNumber, unsigned int) {
    TRACE5 ("ParsePDF::foundStartNumber (const char*, unsigned int) - " << pNumber);
    Check3 (pNumber); Check3 (file);
 
    actObject = atoi (pNumber);
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the number of the entries in the cross reference
 //            table was read
 //Parameters: pNumber: Pointer to number of objects
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundNumber (const char* pNumber, unsigned int) {
    TRACE5 ("ParsePDF::foundNumber (const char*, unsigned int) - " << pNumber);
@@ -215,13 +215,13 @@ int ParsePDF::foundNumber (const char* pNumber, unsigned int) {
 
    seqXRefTableEntries.setMaxCard (atoi (pNumber));
    skip.setValue ("\x0d\x0a");
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the offset of an object was read
 //Parameters: pLength: Pointer to offset
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundObjOffset (const char* pOffset, unsigned int) {
    TRACE9 ("ParsePDF::foundObjOffset (const char*, unsigned int) - " << pOffset
@@ -229,7 +229,7 @@ int ParsePDF::foundObjOffset (const char* pOffset, unsigned int) {
    Check3 (pOffset); Check3 (file);
 
    aOffsets[actObject++] = atoi (pOffset);
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -259,19 +259,19 @@ void ParsePDF::parseInfoObject () {
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the ID of an object was read
 //Parameters: pLength: Pointer to ID
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundObjectID (const char* pID, unsigned int len) {
    TRACE5 ("ParsePDF::foundObjectID (const char*, unsigned int) - " << pID);
    Check3 (pID); Check3 (file);
 
    infoObject = atoi (pID);
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after an end-of-object tag was read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundEndObj (const char*, unsigned int) {
    TRACE9 ("ParsePDF::foundEndObj (const char*, unsigned int)");
@@ -283,65 +283,65 @@ int ParsePDF::foundEndObj (const char*, unsigned int) {
       seqInfoValue.setMaxCard (0);
       _seqInfoValue[1] = NULL;
    }
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the title was read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundTitle (const char* pTitle, unsigned int) {
    TRACE5 ("ParsePDF::foundTitle (const char*, unsigned int)");
    actEntry = TITLE;
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the author was read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundAuthor (const char*, unsigned int) {
    TRACE5 ("ParsePDF::foundAuthor (const char*, unsigned int)");
    actEntry = AUTHOR;
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the comment was read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundComment (const char*, unsigned int) {
    TRACE5 ("ParsePDF::foundComment (const char*, unsigned int)");
    actEntry = COMMENT;
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the start of a hex-value was read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundBracket (const char*, unsigned int) {
    TRACE5 ("ParsePDF::foundBracket (const char*, unsigned int)");
    endOfValue.setValue (">");
    value.setValue (">");
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the start of a string value was read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundParenthesis (const char*, unsigned int) {
    TRACE5 ("ParsePDF::foundParenthesis (const char*, unsigned int)");
    endOfValue.setValue (")");
    value.setValue (")");
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the value for an entry was read
 //Parameters: pLength: Pointer to value
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundValue (const char* pValue, unsigned int len) {
    TRACE9 ("ParsePDF::foundValue (const char*, unsigned int) - " << pValue);
@@ -379,7 +379,7 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
       }
       actEntry = NONE;
    }
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -387,7 +387,7 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
 //Parameters: stream: Stream to parse
 //            result: Result where to store found data
 /*--------------------------------------------------------------------------*/
-void ParsePDF::parse (Xistream& stream, Properties& result) throw (std::string) {
+void ParsePDF::parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
    ParsePDF obj;
    stream.seekg (-40, std::ios::end);
    obj.prop = &result;

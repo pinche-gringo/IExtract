@@ -36,8 +36,8 @@
 #include <iomanip>
 #include <iostream>
 
-#include <Check.h>
-#include <Trace_.h>
+#include <YGP/Check.h>
+#include <YGP/Trace_.h>
 
 #include "ParseWord.h"
 #include "Properties.h"
@@ -134,7 +134,7 @@ ParseWord::ParseWord()
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the number of entries has been parsed
 //Parameters: pEntries: Pointer to number of entries
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundNrEntries (const char* pEntries, unsigned int) {
    Check3 (pEntries);
@@ -142,13 +142,13 @@ int ParseWord::foundNrEntries (const char* pEntries, unsigned int) {
    TRACE4 ("ParseWord::foundNrEntries (const char*) - Entries: " << cEntries);
 
    seqEntries.setMaxCard (cEntries);
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the number of entries has been parsed
 //Parameters: pType: Pointer to found type
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundType (const char* pType, unsigned int) {
    Check3 (pType);
@@ -156,17 +156,17 @@ int ParseWord::foundType (const char* pType, unsigned int) {
    TRACE9 ("ParseWord::foundType (const char*) - Type: " << actEntry);
 
    _seqEntries[1] = ((getTypeIndex (actEntry) != -1)
-                     ? static_cast<ParseObject*> (&offset)
-                     : static_cast<ParseObject*> (&skip));
+                     ? static_cast<YGP::ParseObject*> (&offset)
+                     : static_cast<YGP::ParseObject*> (&skip));
 
    cRead += 8;
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the offset of the comment-entry was found
 //Parameters: offset: Pointer to offset
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundOffset (const char* offset, unsigned int) {
    Check3 (offset);
@@ -177,27 +177,27 @@ int ParseWord::foundOffset (const char* offset, unsigned int) {
            << hex << off << dec << ')');
 
    aOffsets[off] = actEntry;
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the length of the title was read
 //Parameters: length: Pointer to length
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundLength (const char* length, unsigned int) {
    Check3 (length);
    if ((len = *(int*)length))
       title.setMaxCard (len);
    TRACE8 ("ParseWord::foundLength (const char*, unsigned int): " << len);
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after a title was read
 //Parameters: pTitle: Pointer to title
 //            len: Length of title
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
    Check3 (pTitle);
@@ -227,12 +227,12 @@ int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
               << " bytes for next entry");
    }
 
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the header of the properthies has been read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundPropertiesHeader (const char*, unsigned int) {
    TRACE1 ("ParseWord::foundPropertiesHeader (const char*) - Bytes read: "
@@ -253,17 +253,17 @@ int ParseWord::foundPropertiesHeader (const char*, unsigned int) {
    // Stop parsing of word document after this sequence terminates
    wordDoc.setMinCard (1);
    wordDoc.setMaxCard (1);
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the ID for the start of the values has been read
-//Returns   : int: Status: ParseObject::PARSE_OK
+//Returns   : int: Status: YGP::ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundValueStart (const char*, unsigned int) {
    TRACE9 ("ParseWord::foundValueStart (const char*)");
    selValueStart.setMaxCard (0);
-   return ParseObject::PARSE_OK;
+   return YGP::ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
