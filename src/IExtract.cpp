@@ -90,8 +90,7 @@ class Application : public IVIOApplication {
  public:
    Application (const int argc, const char* argv[])
       : IVIOApplication (argc, argv, lo), options (0), outputStyle (TEXT)
-      , ageOfNewFiles (30 * 24 * 60 * 60), pTextForNewFiles (NULL)
-      , format (DEFAULT_FORMAT), title ("")
+      , ageOfNewFiles (30 * 24 * 60 * 60), format (DEFAULT_FORMAT), title ("")
 #ifdef ENABLE_THREADS
       , listFiles (), mxListFiles (), aThreads (0), mxThreads (), mxOutput ()
 #endif
@@ -148,8 +147,9 @@ class Application : public IVIOApplication {
       throw (std::string);
 
    enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4 };
+
+   std::string newText;
    unsigned long ageOfNewFiles;
-   const char* pTextForNewFiles;
    unsigned int options;
 
    std::string format;
@@ -187,6 +187,7 @@ class Application : public IVIOApplication {
 };
 
 
+// TODO: If this table gets bigger change it to std::map!
 const Application::FILEHANDLERS Application::handlers[] = {
    { "htm", &Application::processHTML },
    { "html", &Application::processHTML },
@@ -195,6 +196,7 @@ const Application::FILEHANDLERS Application::handlers[] = {
    { "sdw", &Application::processStarOffice },
    { "sdc", &Application::processStarOffice },
    { "sdd", &Application::processStarOffice },
+   { "sda", &Application::processStarOffice },
    { "jpg", &Application::processJPG },
    { "jpeg", &Application::processJPG },
    { "doc", &Application::processOffice },
@@ -244,18 +246,32 @@ void Application::showHelp () const {
                 "  File(s) ... Files to analyze (the last part can contain wildcards)\n\n"
                 "TIME (in option -n) may be omited or may have an multiplier suffix: m for 30.\n\n"
                 "LIST is a list of files; seperated with the path-separator of the operating\n"
-                "     system (':' for UNICES, ';' for Windows). E.g. *.html:*.doc\n\n"
+                "     system (':' for UNICES, ';' for Windows). E.g. *.html"
+             << PathSearch::PATHSEPARATOR << "*.doc\n\n"
                 "FORMAT specifies how to print the entries;\n"
                 "       %a is substituted with the author\n"
                 "       %c is substituted with the comment\n"
                 "       %d is substituted with the modification time of the file\n"
+                "       %D is substituted with the modification time of the file (day only)\n"
                 "       %n is substituted with the name of the file\n"
                 "       %N is substituted with path and name of the file\n"
                 "       %p is substituted with the path of the file\n"
-                "       %t is substituted with the title\n\n"
+                "       %t is substituted with the title\n"
+                "       %(LETTERS) is substituted with first of the above substitutions\n"
+                "          producing a non-empty string (e.g. %(nt) is the filename if not \n"
+                "          empty or else the title.)\n\n"
                 "TITLE specifies the headers for the output; seperateod with (|); columns must\n"
                 "      contain at least one character\n\n"
-                "Currently supported files are: HTML, JPEG, WinWord, Excel & Powerpoint\n";
+                "The format of the INI file is like this (entries can be missing):\n\n"
+                "   [Output]\n"
+                "   Format=<a href=\"%N\" title=\"%c\">%n</a>|%t|%a|%D\n"
+                "   Title=File|Title|Author|Date\n"
+                "   TextForNewFiles=-n9:<img src=../images/new.gif>\n\n"
+                "Currently supported files are:\n"
+                "  - HTML (*.html, *.htm, *.shtml, *.shtm)\n"
+                "  - JPEG (*.jpeg, *.jpg)\n"
+                "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
+                "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n";
 }
 
 /*--------------------------------------------------------------------------*/
@@ -319,7 +335,7 @@ bool Application::handleOption (const char option) {
          }
          if (time)
             ageOfNewFiles = time * 24 * 60 * 60;
-         pTextForNewFiles = pEnd + 1;
+         newText = pEnd + 1;
       }
 
       break; }
@@ -375,7 +391,8 @@ int Application::perform (int argc, const char* argv[]) {
 
    for (unsigned int i (0); i < (sizeof (t) / sizeof (t[0])); ++i)
       if (outputStyle == t[i].opt) {
-         writer = t[i].fnc (format.c_str (), ageOfNewFiles, pTextForNewFiles);
+         writer = t[i].fnc (format.c_str (), ageOfNewFiles,
+                            newText.size () ? newText.c_str () : NULL);
       }
    assert (writer);
 
@@ -433,7 +450,7 @@ void Application::handleFiles (const char* pFile) const {
             try {
                ((Application*)this)->aThreads.push_back (
                   OThread<Application>::create2 ((Application*)this,
-                                                &Application::processThread, NULL));
+                                                 &Application::processThread, NULL));
             }
             catch (std::string& err) {
                cerr << PACKAGE "-error: " << err << '\n';
@@ -655,6 +672,7 @@ void Application::readINIFile (const char* pFile) {
       INISECTION (Output);
       INIATTR2 (Output, std::string, format, Format);
       INIATTR2 (Output, std::string, title, Title);
+      INIATTR2 (Output, std::string, newText, TextForNewFiles);
       INIATTR (Output, std::string, Style);
 
       unsigned int rc (INIFILE_READ ());
