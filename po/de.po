@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.3 ($Revision$)\n"
-"POT-Creation-Date: 2003-01-27 00:05-0500\n"
+"POT-Creation-Date: 2003-02-10 00:28-0500\n"
 "PO-Revision-Date: 2003-01-26 18:46-0500\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: Aleman <??@li.org>\n"
@@ -60,7 +60,7 @@ msgstr "Titel der Ausgabe"
 #: src/IExtract.cpp:248
 msgid ""
 "Separate subdirectories with TEXT (default: empty);\n"
-"implies recursion into subdirectories (--recursive)"
+"                          implies recursion into subdirectories (--recursive)"
 msgstr ""
 "Trenne Unterverzeichnisse mit TEXT (Default: Leer);\n"
 "                           Impliziert Rekursion in Unterverzeichnisse\n"
@@ -144,39 +144,43 @@ msgid "FORMAT specifies how to print the entries;\n"
 msgstr "FORMAT specifieziert, wie die Einträge geschrieben werden sollen:\n"
 
 #: src/IExtract.cpp:265
+msgid "       The pipe symbol (|) separates columns\n"
+msgstr "       Das Pipe-Zeichen (|) trennt Spalten\n"
+
+#: src/IExtract.cpp:266
 msgid "       %a is substituted with the author\n"
 msgstr "       %a wird mit dem Autor ersetzt\n"
 
-#: src/IExtract.cpp:266
+#: src/IExtract.cpp:267
 #, c-format
 msgid "       %c is substituted with the comment\n"
 msgstr "       %c wird mit dem Kommentar ersetzt\n"
 
-#: src/IExtract.cpp:267
+#: src/IExtract.cpp:268
 #, c-format
 msgid "       %d is substituted with the modification time of the file\n"
 msgstr "       %d wird mit dem Datum der letzten Änderung der Datei ersetzt\n"
 
-#: src/IExtract.cpp:268
+#: src/IExtract.cpp:269
 msgid ""
 "       %D is substituted with the modification time of the file (day only)\n"
 msgstr "       %d wird mit dem Tag der letzten Änderung der Datei ersetzt\n"
 
-#: src/IExtract.cpp:269
+#: src/IExtract.cpp:270
 #, c-format
 msgid "       %n is substituted with the name of the file\n"
 msgstr "       %n wird mit dem Namen der Datei ersetzt\n"
 
-#: src/IExtract.cpp:270
+#: src/IExtract.cpp:271
 msgid "       %N is substituted with path and name of the file\n"
 msgstr "       %N wird mit dem Pfad und dem Namen der Datei ersetzt\n"
 
-#: src/IExtract.cpp:271
+#: src/IExtract.cpp:272
 #, c-format
 msgid "       %p is substituted with the path of the file\n"
 msgstr "       %p wird mit dem Pfad der Datei ersetzt\n"
 
-#: src/IExtract.cpp:272
+#: src/IExtract.cpp:273
 msgid ""
 "       %P is substituted with the path of the file in UNIX style (with /)\n"
 msgstr ""
@@ -184,23 +188,23 @@ msgstr ""
 "mit\n"
 "          einem Schrägstrich (/)) ersetzt\n"
 
-#: src/IExtract.cpp:273
+#: src/IExtract.cpp:274
 #, c-format
 msgid "       %s is substituted with the size of the file\n"
 msgstr "       %s wird mit der Dateigröße ersetzt\n"
 
-#: src/IExtract.cpp:274
+#: src/IExtract.cpp:275
 msgid "       %S is substituted with the size of the file (human readable)\n"
 msgstr ""
 "       %S wird mit der Dateigröße (in einem für den Menschen lesbaren "
 "Format)\n"
 "          ersetzt\n"
 
-#: src/IExtract.cpp:275
+#: src/IExtract.cpp:276
 msgid "       %t is substituted with the title\n"
 msgstr "       %t wird mit dem gefundenen Titel ersetzt\n"
 
-#: src/IExtract.cpp:276
+#: src/IExtract.cpp:277
 msgid ""
 "       %U is substituted with path and name of the file in UNIX style "
 "(with /)\n"
@@ -209,20 +213,20 @@ msgstr ""
 "(Verzeichnisse\n"
 "          getrennt mit einem Schrägstrich (/)) ersetzt\n"
 
-#: src/IExtract.cpp:277
+#: src/IExtract.cpp:278
 msgid ""
 "       %(LETTERS) is substituted with first of the above substitutions\n"
 msgstr ""
 "       %(LETTERS) wird mit der ersten der obigen Ersetzungen ersetzt, die "
 "einen\n"
 
-#: src/IExtract.cpp:278
+#: src/IExtract.cpp:279
 msgid ""
 "          producing a non-empty string (e.g. %(tn) is the titel if not \n"
 msgstr ""
 "          nicht-leeren String ergibt (z.B.: %(tn) ist der Titel, wenn vor-\n"
 
-#: src/IExtract.cpp:279
+#: src/IExtract.cpp:280
 msgid ""
 "          empty or else the filename.)\n"
 "\n"
@@ -230,17 +234,17 @@ msgstr ""
 "          handen, sonst der Dateiname)\n"
 "\n"
 
-#: src/IExtract.cpp:280
+#: src/IExtract.cpp:281
 #, c-format
 msgid ""
 "       In every other constellation the '%' is removed!\n"
 "\n"
 msgstr ""
-"          In jeder anderen Zusammensetzung wird das Prozent lediglich "
+"        In jeder anderen Zusammensetzung wird das Prozent lediglich "
 "entfernt!\n"
 "\n"
 
-#: src/IExtract.cpp:281
+#: src/IExtract.cpp:282
 msgid ""
 "TITLE specifies the headers for the output; separated with (|); columns "
 "must\n"
@@ -248,7 +252,7 @@ msgstr ""
 "TITLE spezifiziert den Kopf der Ausgabe; die Spalten werden mit dem "
 "Schrägstrich\n"
 
-#: src/IExtract.cpp:282
+#: src/IExtract.cpp:283
 msgid ""
 "      contain at least one character\n"
 "\n"
@@ -256,38 +260,38 @@ msgstr ""
 "      getrennt; jede Spalte muß zumindest ein Zeichen aufweisen\n"
 "\n"
 
-#: src/IExtract.cpp:283
+#: src/IExtract.cpp:284
 msgid ""
 "TEXT specifies the text to separate subdirectories; with the following\n"
 msgstr ""
 "TEXT spezifiziert den Text, der die einzelnen Unterverzeichnisse trennt; "
 "die\n"
 
-#: src/IExtract.cpp:284
+#: src/IExtract.cpp:285
 msgid "     conversion strings:\n"
 msgstr "     folgenden Platzhalter werden unterstützt:\n"
 
-#: src/IExtract.cpp:285
+#: src/IExtract.cpp:286
 #, c-format
 msgid "       %e prints the end-of-output for the specified output style\n"
 msgstr ""
 "       %e wird mit dem Ende-der-Ausgabe (des jeweiligen Stils) ersetzt\n"
 
-#: src/IExtract.cpp:286
+#: src/IExtract.cpp:287
 #, c-format
 msgid "       %n is substituted with the name of the directory\n"
 msgstr "       %n wird mit dem Namen des Verzeichnisses ersetzt\n"
 
-#: src/IExtract.cpp:287
+#: src/IExtract.cpp:288
 msgid "       %N is substituted with the full path of the directory\n"
 msgstr "       %N wird mit dem Pfad zum und Namen des Verzeichnisses ersetzt\n"
 
-#: src/IExtract.cpp:288
+#: src/IExtract.cpp:289
 #, c-format
 msgid "       %p is substituted with the path to the directory\n"
 msgstr "       %p wird mit dem Pfad zum Verzeichnis ersetzt\n"
 
-#: src/IExtract.cpp:289
+#: src/IExtract.cpp:290
 msgid ""
 "       %P is substituted with the path to the directory in UNIX style "
 "(with /)\n"
@@ -296,13 +300,13 @@ msgstr ""
 "getrennt\n"
 "          mit einem Schrägstrich (/)) ersetzt\n"
 
-#: src/IExtract.cpp:290
+#: src/IExtract.cpp:291
 #, c-format
 msgid "       %s prints the start-of-output for the specified output style\n"
 msgstr ""
-"        %s wird mit dem Start-der-Ausgabe (des jeweiligen Stils) ersetzt\n"
+"       %s wird mit dem Start-der-Ausgabe (des jeweiligen Stils) ersetzt\n"
 
-#: src/IExtract.cpp:291
+#: src/IExtract.cpp:292
 msgid ""
 "       %U is substituted with the full path of the dir in UNIX style "
 "(with /)\n"
@@ -310,8 +314,17 @@ msgid ""
 msgstr ""
 "       %U wird mit dem Pfad zum und Names des Verzeichnissses im UNIX-Stil\n"
 "          (Verzeichnisse getrennt mit einem Schrägstrich (/)) ersetzt\n"
+"\n"
 
-#: src/IExtract.cpp:292
+#: src/IExtract.cpp:293
+msgid ""
+"     As with FORMAT, the pipe symbol (|) separates columns.\n"
+"\n"
+msgstr ""
+"     Genau wie bei FORMAT, trennt das Pipe-Zeichen (|) einzelne Spalten.\n"
+"\n"
+
+#: src/IExtract.cpp:294
 msgid ""
 "The format of the INI file is like this (entries can be missing):\n"
 "\n"
@@ -319,26 +332,26 @@ msgstr ""
 "INI-Files haben folgendes Format (Einträge können fehlen):\n"
 "\n"
 
-#: src/IExtract.cpp:300
+#: src/IExtract.cpp:302
 msgid "Currently supported files are:"
 msgstr "Unterstützte Dateientypen sind:"
 
-#: src/IExtract.cpp:324 src/IExtract.cpp:367 src/IExtract.cpp:378
-#: src/IExtract.cpp:415 src/IExtract.cpp:428
+#: src/IExtract.cpp:326 src/IExtract.cpp:369 src/IExtract.cpp:380
+#: src/IExtract.cpp:391 src/IExtract.cpp:421 src/IExtract.cpp:434
 #, ycp-format
 msgid "-warning: Option `%1' needs an argument! Ignoring option!\n"
 msgstr "-Warnung: Option \"%1\" benötigt ein Argument! Ignoriere Option!\n"
 
-#: src/IExtract.cpp:339
+#: src/IExtract.cpp:341
 #, ycp-format
 msgid "-warning: Style of output `%1' is not valid! Using text\n"
 msgstr "-Warning: \"%1\" ist kein gültiger Ausgabestil! Verwende text\n"
 
-#: src/IExtract.cpp:353
+#: src/IExtract.cpp:355
 msgid "-warning: Invalid number of threads!\n"
 msgstr "-Warnung: Ungültige Anzahl von Threads (Hintergrundprozessen)!\n"
 
-#: src/IExtract.cpp:391
+#: src/IExtract.cpp:397
 #, ycp-format
 msgid ""
 "-warning: Argument for new files `%1' is not valid! Ignoring option `n'\n"
@@ -346,20 +359,20 @@ msgstr ""
 "-Warnung: \"%1\" ist kein gültiges Argument für neue Datein!\n"
 "Ignoriere Option \"n\"\n"
 
-#: src/IExtract.cpp:437
+#: src/IExtract.cpp:443
 #, ycp-format
 msgid "-warning: Ignoring invalid option `%1'\n"
 msgstr "-Warnung: Ignoriere unbekannte Option \"%1\"\n"
 
-#: src/IExtract.cpp:531 src/IExtract.cpp:655
+#: src/IExtract.cpp:537 src/IExtract.cpp:661
 msgid "-error: "
 msgstr "-Fehler: "
 
-#: src/IExtract.cpp:542
+#: src/IExtract.cpp:548
 msgid "Unknown file-type"
 msgstr "Unbekannter Dateityp"
 
-#: src/IExtract.cpp:636
+#: src/IExtract.cpp:642
 #, ycp-format
 msgid ""
 "-error: File `%1' can't be opened!\n"
@@ -368,16 +381,18 @@ msgstr ""
 "Datei \"%1\" kann nicht geöffnet werden!\n"
 "Ursache: "
 
-#: src/IExtract.cpp:657
+#: src/IExtract.cpp:663
 msgid "Error while processing: "
 msgstr "Error beim Bearbeiten: "
 
-#: src/IExtract.cpp:791
+#: src/IExtract.cpp:797
 #, ycp-format
 msgid ""
 "-warning: The INI-file `%1' contains an invalid entry for the output style (`"
 "%2')! Using text\n"
-msgstr "-Warnung: Das INI-File \"%1\" enthält einen ungültigen Eintrag für den Ausgabestil (\"%2\")! Verwende text\n"
+msgstr ""
+"-Warnung: Das INI-File \"%1\" enthält einen ungültigen Eintrag für den "
+"Ausgabestil (\"%2\")! Verwende text\n"
 
 #: src/ParsePDF.cpp:56
 msgid "Tag for offset of cross reference table"

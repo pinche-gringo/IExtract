@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.3 ($Revision$)\n"
-"POT-Creation-Date: 2003-01-27 22:43-0500\n"
+"POT-Creation-Date: 2003-02-10 00:28-0500\n"
 "PO-Revision-Date: 2003-01-27 00:05-0500\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: ESPAÑOL <??@li.org>\n"
@@ -51,7 +51,7 @@ msgstr "Especifa el estilo de la salida (text, HTML o LaTeX)"
 
 #: src/IExtract.cpp:246
 msgid "Format of output; default: "
-msgstr "Formato de la salida; estandardo: "
+msgstr "Formato de la salida; por defecto: "
 
 #: src/IExtract.cpp:247
 msgid "Title of output"
@@ -62,7 +62,7 @@ msgid ""
 "Separate subdirectories with TEXT (default: empty);\n"
 "                          implies recursion into subdirectories (--recursive)"
 msgstr ""
-"Separa carpetas bajos con TEXT (estandardo: vacio);\n"
+"Separa carpetas bajos con TEXT (por defecto: vacio);\n"
 "                          implica recursión en carpetas (--recursive)"
 
 #: src/IExtract.cpp:249
@@ -75,11 +75,13 @@ msgstr "Mostra todos los archivos (también tipos inconocidos)"
 
 #: src/IExtract.cpp:252
 msgid "Number of threads for examining files (default: 1)"
-msgstr "Número de procesos del fondo (threads) adicional (estandardo: 1)"
+msgstr "Número de procesos del fondo (threads) adicional (por defecto: 1)"
 
 #: src/IExtract.cpp:254
 msgid "Show TEXT for files younger than DAYS days (def: 30)"
-msgstr "Mostra TEXT por archivos más joven que DAYS (est: 30)"
+msgstr ""
+"Mostra TEXT por archivos más joven que DAYS (por\n"
+"                          defecto: 30)"
 
 #: src/IExtract.cpp:255
 msgid "Files to inspect"
@@ -156,7 +158,9 @@ msgstr "       %c está cambiado por el comentario\n"
 #: src/IExtract.cpp:268
 #, c-format
 msgid "       %d is substituted with the modification time of the file\n"
-msgstr "       %d está cambiado por la fecha y la hora del último cambio del archivo\n"
+msgstr ""
+"       %d está cambiado por la fecha y la hora del último cambio del "
+"archivo\n"
 
 #: src/IExtract.cpp:269
 msgid ""
@@ -181,7 +185,8 @@ msgstr "       %p está cambiado por el camino del archivo\n"
 msgid ""
 "       %P is substituted with the path of the file in UNIX style (with /)\n"
 msgstr ""
-"       %p está cambiado por el camino del archivo en estilo UNIX (separado con\n"
+"       %p está cambiado por el camino del archivo en estilo UNIX (separado "
+"con\n"
 "          un slash (/))\n"
 
 #: src/IExtract.cpp:274
@@ -191,7 +196,9 @@ msgstr "       %s está cambiado por el tamaño del archivo\n"
 
 #: src/IExtract.cpp:275
 msgid "       %S is substituted with the size of the file (human readable)\n"
-msgstr "       %S está cambiado por el tamaño del archivo en estilo para seres humanos\n"
+msgstr ""
+"       %S está cambiado por el tamaño del archivo en estilo para seres "
+"humanos\n"
 
 #: src/IExtract.cpp:276
 msgid "       %t is substituted with the title\n"
@@ -202,48 +209,63 @@ msgid ""
 "       %U is substituted with path and name of the file in UNIX style "
 "(with /)\n"
 msgstr ""
-"       %U está cambiado por nombre y camino del archivo en estilo UNIX (separado\n"
+"       %U está cambiado por nombre y camino del archivo en estilo UNIX "
+"(separado\n"
 "          con un slash (/))\n"
 
 #: src/IExtract.cpp:278
 msgid ""
 "       %(LETTERS) is substituted with first of the above substitutions\n"
-msgstr "       %(LETRAS) está cambiado por el primer cambio (de las reglas anteriores)\n"
+msgstr ""
+"       %(LETRAS) está cambiado por el primer cambio (de las reglas "
+"anteriores)\n"
 
 #: src/IExtract.cpp:279
 msgid ""
 "          producing a non-empty string (e.g. %(tn) is the titel if not \n"
-msgstr "         que produce un text no vacio (p.e. %(tn) será el titulo (si hay) o el\n"
+msgstr ""
+"         que produce un text no vacio (p.e. %(tn) será el titulo (si hay) o "
+"el\n"
 
 #: src/IExtract.cpp:280
 msgid ""
 "          empty or else the filename.)\n"
 "\n"
-msgstr "         nombre del archivo)\n\n"
+msgstr ""
+"         nombre del archivo)\n"
+"\n"
 
 #: src/IExtract.cpp:281
 #, c-format
 msgid ""
 "       In every other constellation the '%' is removed!\n"
 "\n"
-msgstr "       En todas las otras formas el '%' está borrado!\n\n"
+msgstr ""
+"       En todas las otras formas el '%' está borrado!\n"
+"\n"
 
 #: src/IExtract.cpp:282
 msgid ""
 "TITLE specifies the headers for the output; separated with (|); columns "
 "must\n"
-msgstr "TITLE especifica la cabeza por la salida; separada por la raya vertical (|);\n"
+msgstr ""
+"TITLE especifica la cabeza por la salida; separada por la raya vertical "
+"(|);\n"
 
 #: src/IExtract.cpp:283
 msgid ""
 "      contain at least one character\n"
 "\n"
-msgstr "      cada columna tiene que contener al menos una letra!\n\n"
+msgstr ""
+"      cada columna tiene que contener al menos una letra!\n"
+"\n"
 
 #: src/IExtract.cpp:284
 msgid ""
 "TEXT specifies the text to separate subdirectories; with the following\n"
-msgstr "TEXT especifica el texto por separar carpetas bajas; el signo del perciento (%)\n"
+msgstr ""
+"TEXT especifica el texto por separar carpetas bajas; el signo del perciento "
+"(%)\n"
 
 #: src/IExtract.cpp:285
 msgid "     conversion strings:\n"
@@ -273,7 +295,8 @@ msgid ""
 "       %P is substituted with the path to the directory in UNIX style "
 "(with /)\n"
 msgstr ""
-"       %P está cambiado por el camino hasta la carpeta en estilo UNIX (separado\n"
+"       %P está cambiado por el camino hasta la carpeta en estilo UNIX "
+"(separado\n"
 "          por un slash (/)).\n"
 
 #: src/IExtract.cpp:291
@@ -287,20 +310,26 @@ msgid ""
 "(with /)\n"
 "\n"
 msgstr ""
-"       %U está cambiado por el nombre y el camino de la carpeta en estilo UNIX\n"
+"       %U está cambiado por el nombre y el camino de la carpeta en estilo "
+"UNIX\n"
 "          (separado por un slash (/))\n"
 
 #: src/IExtract.cpp:293
 msgid ""
 "     As with FORMAT, the pipe symbol (|) separates columns.\n"
 "\n"
-msgstr "     Como con FORMAT, la raya vertical (|) separa a los columnas.\n\n"
+msgstr ""
+"     Como con FORMAT, la raya vertical (|) separa a los columnas.\n"
+"\n"
 
 #: src/IExtract.cpp:294
 msgid ""
 "The format of the INI file is like this (entries can be missing):\n"
 "\n"
-msgstr "Archivos por initializar tienen el siguente formato (entradas pueden faltar):\n\n"
+msgstr ""
+"Archivos por initializar tienen el siguente formato (entradas pueden "
+"faltar):\n"
+"\n"
 
 #: src/IExtract.cpp:302
 msgid "Currently supported files are:"
@@ -325,7 +354,8 @@ msgstr "-aviso: El número de los proceses del fondo (threads) no es valido!\n"
 #, ycp-format
 msgid ""
 "-warning: Argument for new files `%1' is not valid! Ignoring option `n'\n"
-msgstr "-aviso: Argumento por archivos nuevos '%1' no es valido! Ignoro opción 'n'\n"
+msgstr ""
+"-aviso: Argumento por archivos nuevos '%1' no es valido! Ignoro opción 'n'\n"
 
 #: src/IExtract.cpp:443
 #, ycp-format
@@ -358,7 +388,9 @@ msgstr "Error procesando: "
 msgid ""
 "-warning: The INI-file `%1' contains an invalid entry for the output style (`"
 "%2')! Using text\n"
-msgstr "-avios: El archivo por iniciar '%1' contiene una entrada invalida por el estilo de la salida ('%2')! Uso text\n"
+msgstr ""
+"-avios: El archivo por iniciar '%1' contiene una entrada invalida por el "
+"estilo de la salida ('%2')! Uso text\n"
 
 #: src/ParsePDF.cpp:56
 msgid "Tag for offset of cross reference table"

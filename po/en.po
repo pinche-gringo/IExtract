@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.3 ($Revision$)\n"
-"POT-Creation-Date: 2003-01-27 22:43-0500\n"
+"POT-Creation-Date: 2003-02-10 00:28-0500\n"
 "PO-Revision-Date: 2003-01-26 19:03-0500\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: ENGLISH <??@li.org>\n"
