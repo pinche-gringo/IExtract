@@ -32,7 +32,6 @@
 
     <style type="text/css">
       <!--
-      /* NB-like presentation */
       td.selected { vertical-align:middle; background-color:#5BAAEA; }
       td.unselected { vertical-align:middle; background-color:lightgrey; }
 
@@ -110,6 +109,9 @@
       </dd>
 
       <dt><b>StarOffice documents</b></dt>
+      <dd><p>Searches for the content of the properties dialog.</p></dd>
+
+      <dt><b>OpenOffice documents</b></dt>
       <dd><p>Searches for the content of the properties dialog.</p></dd>
     </dl>
 
@@ -303,8 +305,7 @@
     <address><a href="mailto:g17m0@lycos.com">Mail comments</a></address>
 <!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
 <!-- hhmts start -->
-Last modified: Wed Mar 26 16:37:56 PET 2003
+Last modified: Wed Jun 18 19:37:56 PET 2003
 <!-- hhmts end -->
-     - $Revision$
   </body>
 </html>
