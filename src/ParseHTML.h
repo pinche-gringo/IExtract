@@ -42,8 +42,10 @@ class ParseHTML  {
    int foundComment (const char*, unsigned int);
    int foundEndOfHead (const char*, unsigned int);
    int foundEndScript (const char*, unsigned int);
+   int foundScript (const char*, unsigned int);
 
    typedef YGP::OFParseText<ParseHTML> OMParseText;
+   typedef YGP::OFParseSequence<ParseHTML> OMParseSequence;
    typedef YGP::OFParseUpperExact<ParseHTML> OMParseUpperExact;
 
    YGP::ParseExact      startTag;
@@ -55,6 +57,8 @@ class ParseHTML  {
    OMParseText          title;
    OMParseText          value;
    YGP::ParseText       otherTag;
+   YGP::ParseText       scriptType;
+   YGP::ParseText       otherMetaEntry;
    YGP::ParseText       ignore;
 
    // Elements to parse meta contents
@@ -76,7 +80,7 @@ class ParseHTML  {
    YGP::ParseSequence  seqTitle;
    YGP::ParseSequence  seqMetaCmd;
    YGP::ParseSequence  seqMetaName;
-   YGP::ParseSequence  seqScript;
+   OMParseSequence     seqScript;
    YGP::ParseSelection selMetaCmds;
    YGP::ParseSelection selMetaTags;
    YGP::ParseSelection selScriptContent;
