@@ -18,8 +18,8 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
+#include <map>
 #include <string>
-#include <vector>
 
 #include <Parse.h>
 
@@ -32,12 +32,7 @@ class ParsePDF {
    ParsePDF ();
    virtual ~ParsePDF ();
 
-   static void parse (Xistream& stream, Properties& result) throw (std::string) {
-      ParsePDF obj;
-      stream.seekg (-40, ios::end);
-      obj.prop = &result;
-      obj.file = &stream;
-      obj.selXRef.parse (stream); }
+   static void parse (Xistream& stream, Properties& result) throw (std::string);
 
  private:
    ParsePDF (const ParsePDF& other);
@@ -54,6 +49,8 @@ class ParsePDF {
    int foundObjOffset (const char*, unsigned int);
    int foundObjectID (const char*, unsigned int);
    int foundEndObj (const char*, unsigned int);
+
+   void parseInfoObject ();
 
    typedef OFParseExact<ParsePDF>   OMParseExact;
    typedef OFParseTextEsc<ParsePDF> OMParseTextEsc;
@@ -72,6 +69,7 @@ class ParsePDF {
    ParseExact      tagTrailer;
    ParseExact      startObj;
    ParseExact      objInfo;
+   ParseExact      objPrev;
    OMParseAttomic  idObject;
    ParseExact      idObj;
    ParseAttomic    number;
@@ -91,6 +89,8 @@ class ParsePDF {
    ParseSequence  seqTrailer;
    ParseSelection selValues;
    ParseSequence  seqInfo;
+   ParseSequence  seqPrev;
+   ParseSequence  seqInfoObj;
    ParseSequence  seqInfoValue;
    ParseSelection selType;
 
@@ -99,8 +99,10 @@ class ParsePDF {
    ParseObject* _seqXRefTable[6];
    ParseObject* _seqXRefTableEntries[3];
    ParseObject* _seqTrailer[4];
-   ParseObject* _selValues[4];
-   ParseObject* _seqInfo[8];
+   ParseObject* _selValues[5];
+   ParseObject* _seqInfo[4];
+   ParseObject* _seqPrev[3];
+   ParseObject* _seqInfoObj[6];
    ParseObject* _seqInfoValue[4];
    ParseObject* _selType[6];
 
@@ -108,8 +110,10 @@ class ParsePDF {
 
    enum { NONE = -1, TITLE = 0, AUTHOR, COMMENT } actEntry;
    Xistream* file;
-   unsigned int startObject;
-   vector<unsigned int> aOffsets;
+   unsigned int offPrev;
+   unsigned int actObject;
+   unsigned int infoObject;
+   map <unsigned int, unsigned int> aOffsets;
 };
 
 #endif

@@ -27,7 +27,10 @@
 
 #include <stdlib.h>
 
+#include <strstream>
+
 #define CHECK 9
+#define TRACELEVEL 9
 #include <Check.h>
 #include <Trace_.h>
 
@@ -43,7 +46,7 @@
 //Purpose   : (Default-)Constructor
 /*--------------------------------------------------------------------------*/
 ParsePDF::ParsePDF () 
-   : startObject (0), actEntry (NONE)
+   :  infoObject (-1U), actEntry (NONE), actObject (0), offPrev (0)
      , startXRef (ID, "Tag for offset of cross reference table")
      , offXRef ("\\9", "Offset of cross reference table", *this, &ParsePDF::foundOffset, 10, 1)
      , skipS (ID1, "Start of startxref-tag", 20)
@@ -55,6 +58,7 @@ ParsePDF::ParsePDF ()
      , tagTrailer ("trailer", "Tag for trailer")
      , startObj ("<<", "Start of object")
      , objInfo ("/Info", "Reference to info object")
+     , objPrev ("/Prev", "Referenct to other trailer")
      , idObject ("\\9", "ID of object", *this, &ParsePDF::foundObjectID, 10)
      , idObj ("1", "ID of object (repeated)")
      , number ("\\9", "Generation", 10)
@@ -72,6 +76,8 @@ ParsePDF::ParsePDF ()
      , seqTrailer (_seqTrailer, "Trailer")
      , selValues (_selValues, "Trailer values", -1, 0)
      , seqInfo (_seqInfo, "Info entry")
+     , seqPrev (_seqPrev, "Prev entry")
+     , seqInfoObj (_seqInfoObj, "Info object")
      , seqInfoValue (_seqInfoValue, "Info values", -1, 0)
      , selType (_selType, "Valid type") {
    _selXRef[0] = &seqXRef;
@@ -101,18 +107,26 @@ ParsePDF::ParsePDF ()
    _seqTrailer[3] = NULL;
 
    _selValues[0] = &seqInfo;
-   _selValues[1] = &endObj;
-   _selValues[2] = &skip;
-   _selValues[3] = NULL;
+   _selValues[1] = &seqPrev;
+   _selValues[2] = &endObj;
+   _selValues[3] = &skip;
+   _selValues[4] = NULL;
 
    _seqInfo[0] = &objInfo;
    _seqInfo[1] = &idObject;
-   _seqInfo[2] = &idObj;
-   _seqInfo[3] = &number;
-   _seqInfo[4] = &tagObj;
-   _seqInfo[5] = &startObj;
-   _seqInfo[6] = &seqInfoValue;
-   _seqInfo[7] = NULL;
+   _seqInfo[2] = &skip;
+   _seqInfo[3] = NULL;
+
+   _seqPrev[0] = &objPrev;
+   _seqPrev[1] = &offObject;
+   _seqPrev[2] = NULL;
+
+   _seqInfoObj[0] = &idObj;
+   _seqInfoObj[1] = &number;
+   _seqInfoObj[2] = &tagObj;
+   _seqInfoObj[3] = &startObj;
+   _seqInfoObj[4] = &seqInfoValue;
+   _seqInfoObj[5] = NULL;
 
    _seqInfoValue[0] = &selType;
    _seqInfoValue[1] = &value;
@@ -158,7 +172,7 @@ int ParsePDF::foundStartNumber (const char* pNumber, unsigned int) {
    TRACE5 ("ParsePDF::foundStartNumber (const char*, unsigned int) - " << pNumber);
    Check3 (pNumber); Check3 (file);
 
-   startObject = atoi (pNumber);
+   actObject = atoi (pNumber);
    return ParseObject::PARSE_OK;
 }
 
@@ -186,9 +200,37 @@ int ParsePDF::foundObjOffset (const char* pOffset, unsigned int) {
    TRACE5 ("ParsePDF::foundObjOffset (const char*, unsigned int) - " << pOffset);
    Check3 (pOffset); Check3 (file);
 
-   aOffsets.push_back (atoi (pOffset));
+   aOffsets[actObject] = atoi (pOffset);
+   if (actObject == infoObject)
+      parseInfoObject ();
+   else
+      actObject++;
    return ParseObject::PARSE_OK;
 }
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Parses the info object
+/*--------------------------------------------------------------------------*/
+void ParsePDF::parseInfoObject () {
+   Check3 (infoObject != -1U);
+   Check3 (aOffsets.find (infoObject) != aOffsets.end ());
+
+   TRACE5 ("ParsePDF::parseInfoObject () - Going to pos " << aOffsets[infoObject]
+           << "; searching for " << infoObject);
+
+   file->seekg (aOffsets[infoObject], ios::beg);
+
+   ostrstream str;
+   str << infoObject;
+   idObj.setValue (str.str ());
+   idObj.setMaxCard (str.pcount ());
+   idObj.setMinCard (str.pcount ());
+   skip.setValue ("\\ ");
+
+   Check3 (file);
+   seqInfoObj.parse (*file);
+}
+
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the ID of an object was read
@@ -199,15 +241,7 @@ int ParsePDF::foundObjectID (const char* pID, unsigned int len) {
    TRACE5 ("ParsePDF::foundObjectID (const char*, unsigned int) - " << pID);
    Check3 (pID); Check3 (file);
 
-   Check (aOffsets.size () > (atoi (pID) - startObject));
-   TRACE9 ("ParsePDF::foundObjectID (const char*, unsigned int) - Going to pos "
-           << aOffsets[atoi (pID) - startObject]);
-   file->seekg (aOffsets[atoi (pID) - startObject], ios::beg);
-
-   idObj.setValue (pID);
-   idObj.setMaxCard (len);
-   idObj.setMinCard (len);
-   skip.setValue ("\\ ");
+   infoObject = atoi (pID);
    return ParseObject::PARSE_OK;
 }
 
@@ -217,10 +251,14 @@ int ParsePDF::foundObjectID (const char* pID, unsigned int len) {
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundEndObj (const char*, unsigned int) {
    TRACE9 ("ParsePDF::foundEndObj (const char*, unsigned int)");
-   selValues.setMaxCard (0);
-   skip.setValue ("(<");
-   seqInfoValue.setMaxCard (0);
-   _seqInfoValue[1] = NULL;
+   if (selValues.getMaxCard ()) {
+      selValues.setMaxCard (0);
+      skip.setValue ("(<");
+   }
+   else {
+      seqInfoValue.setMaxCard (0);
+      _seqInfoValue[1] = NULL;
+   }
    return ParseObject::PARSE_OK;
 }
 
@@ -276,3 +314,24 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
    }
    return ParseObject::PARSE_OK;
 }
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Method to parse a PDF object
+//Parameters: stream: Stream to parse
+//            result: Result where to store found data
+/*--------------------------------------------------------------------------*/
+void ParsePDF::parse (Xistream& stream, Properties& result) throw (std::string) {
+   ParsePDF obj;
+   stream.seekg (-40, ios::end);
+   obj.prop = &result;
+   obj.file = &stream;
+
+   // Now parse first cross reference table (including trailer)
+   unsigned int rc (obj.selXRef.parse (stream));
+   if (!rc) {
+      // If an info object was found and this object is already know: Parse it
+      if ((obj.infoObject != -1U) && obj.aOffsets[obj.infoObject])
+         obj.parseInfoObject ();
+   }
+}
+
