@@ -25,6 +25,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
+#include <IExtract-cfg.h>
 #include <gzo-cfg.h>
 
 #include <ctype.h>
@@ -114,10 +115,12 @@ class Application : public IVIOApplication {
    virtual bool        shallShowInfo () const { return false; }
    virtual int         perform (int argc, const char* argv[]);
    virtual const char* name () const { return PACKAGE; }
-   virtual const char* description () const
-      { return PACKAGE " V" VERSION " - Compiled on " __DATE__ " - " __TIME__
-               "\n\nAuthor: Markus Schwab; e-Mail: g17m0@lycos.com"
-               "\nDistributed under the terms of the GNU General Public License"; }
+   virtual const char* description () const {
+      static std::string version (PACKAGE " V" VERSION " - ");
+      version += _("Compiled on %1 at %2\n\nAuthor: Markus Schwab; email: g17m0@lycos.com\nDistributed under the terms of the GNU General Public License");
+      version.replace (version.find ("%1"), 2, __DATE__);
+      version.replace (version.find ("%2"), 2, __TIME__);
+      return version.c_str (); }
 
    // Help-handling
    virtual void showHelp () const;
@@ -200,11 +203,13 @@ const Application::FILEHANDLERS Application::handlers[] = {
    { "jpg", &Application::processJPG },
    { "mp3", &Application::processMP3 },
    { "pdf", &Application::processPDF },
+   { "php", &Application::processHTML },
    { "ppt", &Application::processOffice },
    { "sda", &Application::processStarOffice },
    { "sdc", &Application::processStarOffice }, 
    { "sdd", &Application::processStarOffice },
    { "sdw", &Application::processStarOffice },
+   { "sht", &Application::processHTML },
    { "shtm", &Application::processHTML },
    { "shtml", &Application::processHTML },
    { "xls", &Application::processOffice } };
@@ -215,7 +220,9 @@ const IVIOApplication::longOptions Application::lo[] = {
    { "recursive", 'r' },
    { "format", 'f' },
    { "title", 'T' },
+#ifdef ENABLE_THREADS
    { "threads", 't' },
+#endif
    { "include", 'i' },
    { "exclude", 'x' },
    { "show-errors", 'e' },
@@ -232,74 +239,71 @@ const IVIOApplication::longOptions Application::lo[] = {
 //Purpose   : Displays the help
 /*--------------------------------------------------------------------------*/
 void Application::showHelp () const {
-   std::cout << "Extracts a description out of files (depending on the file-type)"
-                "\n\nUsage: "
-             << PACKAGE " [OPTIONS] <File(s)>\n\n"
-                "  -r, --recursive ....... Recurse into subdirectories\n"
-                "  -o, --output=STYLE .... Sets the output-style (text, HTML or LaTeX)\n"
-                "  -f, --format=FORMAT ... Format of output (default: " DEFAULT_FORMAT "\n"
-                "  -T, --title=TITLE ..... Title of output\n"
-                "  -s, --separate=TEXT ... Separate subdirectories with TEXT (default: empty);\n"
-                "                          implies recursion into subdirectories (--recursive)\n"
-                "  -e, --show-errors ..... Puts error messages (additionally) into output\n"
-                "  -a, --all ............. Show all files (including unknown types) in output\n"
+   cout << _("Extracts a description out of files (depending on the file-type)\n\nUsage:")
+        << " " PACKAGE " " << _("[OPTIONS] <File(s)>")
+        << "\n\n  -r, --recursive ....... " << _("Recurse into subdirectories")
+        << "\n  -o, --output=STYLE .... " << _("Sets the output-style (text, HTML or LaTeX)")
+        << "\n  -f, --format=FORMAT ... " << _("Format of output; default: ") << DEFAULT_FORMAT
+        << "\n  -T, --title=TITLE ..... " << _("Title of output")
+        << "\n  -s, --separate=TEXT ... " << _("Separate subdirectories with TEXT (default: empty);\n                          implies recursion into subdirectories (--recursive)")
+        << "\n  -e, --show-errors ..... " << _("Puts error messages (additionally) into the output")
+        << "\n  -a, --all ............. " << _("Show all files (including unknown types) in output")
 #ifdef ENABLE_THREADS
-                "  -t, --threads=NR ...... Number of threads for examining files (default: 1)\n"
+        << "\n  -t, --threads=NR ...... " << _("Number of threads for examining files (default: 1)")
 #endif
-                "  -n, --new=DAYS:TEXT ... Show TEXT for files younger than DAYS days (def: 30)\n"
-                "  -i, --include=LIST .... Files to inspect\n"
-                "  -x, --exclude=LIST .... Files to not inspect\n"
-                "  -I, --ini-file=FILE ... Read further options from specified file\n"
-                "  -V, --version ......... Output version information and exit\n"
-                "  -h, -?, --help ........ Displays this help and exit\n"
-                "  File(s) ... Files to analyze (the last part can contain wildcards)\n\n"
-                "DAYS (in option -n) may be omited or may have an multiplier suffix: m for 30.\n\n"
-                "LIST is a list of files; seperated with the path-separator of the operating\n"
-                "     system (':' for UNICES, ';' for Windows). E.g. *.html"
-             << PathSearch::PATHSEPARATOR << "*.doc\n\n"
-                "FORMAT specifies how to print the entries;\n"
-                "       %a is substituted with the author\n"
-                "       %c is substituted with the comment\n"
-                "       %d is substituted with the modification time of the file\n"
-                "       %D is substituted with the modification time of the file (day only)\n"
-                "       %n is substituted with the name of the file\n"
-                "       %N is substituted with path and name of the file\n"
-                "       %p is substituted with the path of the file\n"
-                "       %P is substituted with the path of the file in UNIX style (with /)\n"
-                "       %s is substituted with the size of the file\n"
-                "       %D is substituted with the size of the file (human readable)\n"
-                "       %t is substituted with the title\n"
-                "       %U is substituted with path and name of the file in UNIX style (with /)\n"
-                "       %(LETTERS) is substituted with first of the above substitutions\n"
-                "          producing a non-empty string (e.g. %(nt) is the filename if not \n"
-                "          empty or else the title.)\n\n"
-                "       In every other constellation the '%' is removed!\n"
-                "TITLE specifies the headers for the output; separated with (|); columns must\n"
-                "      contain at least one character\n\n"
-                "TEXT specifies the text to separate subdirectories; with the following\n"
-                "     conversion strings:\n"
-                "       %e prints the end-of-output for the specified output style\n"
-                "       %n is substituted with the name of the directory\n"
-                "       %N is substituted with the full path of the directory\n"
-                "       %p is substituted with the path to the directory\n"
-                "       %P is substituted with the path to the directory in UNIX style (with /)\n"
-                "       %s prints the start-of-output for the specified output style\n"
-                "       %U is substituted with the full path of the dir in UNIX style (with /)\n"
-                "The format of the INI file is like this (entries can be missing):\n\n"
-                "   [Output]\n"
-                "   Format=<a href=\"%N\" title=\"%c\">%n</a>|%t|%a|%D\n"
-                "   Title=File|Title|Author|Date\n"
-                "   TextForNewFiles=<img src=../images/new.gif>\n"
-                "   MaxAgeForNewFiles=15\n"
-                "   DirSeparatorText=%eListing of %n%s\n"
-                "   Style=HTML\n\n"
-                "Currently supported files are:\n"
-                "  - HTML (*.html, *.htm, *.shtml, *.shtm)\n"
-                "  - JPEG (*.jpeg, *.jpg)\n"
-                "  - MP3 (*.mp3)\n"
-                "  - PDF (*.pdf)\n"
-                "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
-                "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n";
+        << "\n  -n, --new=DAYS:TEXT ... " << _("Show TEXT for files younger than DAYS days (def: 30)")
+        << "\n  -i, --include=LIST .... " << _("Files to inspect")
+        << "\n  -x, --exclude=LIST .... " << _("Files not to inspect")
+        << "\n  -I, --ini-file=FILE ... " << _("Read further options from specified file")
+        << "\n  -V, --version ......... " << _("Output version information and exit")
+        << "\n  -h, -?, --help ........ " << _("Displays this help and exit\n")
+        << _("  File(s) ... Files to analyze (the last part can contain wildcards)\n\n")
+        << _("DAYS (in option -n) may be omited or may have an multiplier suffix: m for 30.\n\n")
+        << _("LIST is a list of files; seperated with the path-separator of the operating\n")
+        << _("     system (':' for UNICES, ';' for Windows). E.g. *.html:*.doc\n\n")
+        << _("FORMAT specifies how to print the entries;\n")
+        << _("       %a is substituted with the author\n")
+        << _("       %c is substituted with the comment\n")
+        << _("       %d is substituted with the modification time of the file\n")
+        << _("       %D is substituted with the modification time of the file (day only)\n")
+        << _("       %n is substituted with the name of the file\n")
+        << _("       %N is substituted with path and name of the file\n")
+        << _("       %p is substituted with the path of the file\n")
+        << _("       %P is substituted with the path of the file in UNIX style (with /)\n")
+        << _("       %s is substituted with the size of the file\n")
+        << _("       %S is substituted with the size of the file (human readable)\n")
+        << _("       %t is substituted with the title\n")
+        << _("       %U is substituted with path and name of the file in UNIX style (with /)\n")
+        << _("       %(LETTERS) is substituted with first of the above substitutions\n")
+        << _("          producing a non-empty string (e.g. %(tn) is the titel if not \n")
+        << _("          empty or else the filename.)\n\n")
+        << _("       In every other constellation the '%' is removed!\n\n")
+        << _("TITLE specifies the headers for the output; separated with (|); columns must\n")
+        << _("      contain at least one character\n\n")
+        << _("TEXT specifies the text to separate subdirectories; with the following\n")
+        << _("     conversion strings:\n")
+        << _("       %e prints the end-of-output for the specified output style\n")
+        << _("       %n is substituted with the name of the directory\n")
+        << _("       %N is substituted with the full path of the directory\n")
+        << _("       %p is substituted with the path to the directory\n")
+        << _("       %P is substituted with the path to the directory in UNIX style (with /)\n")
+        << _("       %s prints the start-of-output for the specified output style\n")
+        << _("       %U is substituted with the full path of the dir in UNIX style (with /)\n\n")
+        << _("The format of the INI file is like this (entries can be missing):\n\n")
+        << ("   [Output]\n"
+            "   Format=<a href=\")%N\" title=\"%c\">%n</a>|%t|%a|%D\n"
+            "   Title=File|Title|Author|Date\n"
+            "   TextForNewFiles=<img src=../images/new.gif>\n"
+            "   MaxAgeForNewFiles=15\n"
+            "   DirSeparatorText=%eListing of %n%s\n"
+            "   Style=HTML\n\n")
+        << _("Currently supported files are:")
+        << ("\n  - HTML (*.html, *.htm, *.shtml, *.shtm, *.sht, *.php)\n"
+            "  - JPEG (*.jpeg, *.jpg)\n"
+            "  - MP3 (*.mp3)\n"
+            "  - PDF (*.pdf)\n"
+            "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
+            "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n");
 }
 
 /*--------------------------------------------------------------------------*/
@@ -317,7 +321,9 @@ bool Application::handleOption (const char option) {
       if (pSep) 
          iniOpts.separate = pSep;
       else {
-         cerr << PACKAGE "-warning: Option s needs an argument! Ignoring option!";
+         std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
+         error.replace (error.find ("%1"), 2, 1, 's');
+         cerr << PACKAGE << error;
          break; } }
       // Don't add a break in OK case, as -s implies -r!
       
@@ -330,8 +336,9 @@ bool Application::handleOption (const char option) {
               && (outputStyle = TEXT, strcmp (pType, "text"))
               && (outputStyle = LATEX, strcmp (pType, "LaTeX")))) {
          outputStyle = TEXT;
-         cerr << PACKAGE "-warning: Style of output " << pType << " is not "
-                 "valid! Using text\n";
+         std::string error (_("-warning: Style of output `%1' is not valid! Using text\n"));
+         error.replace (error.find ("%1"), 2, pType);
+         cerr << PACKAGE << error;
       }
       break; }
 
@@ -343,7 +350,7 @@ bool Application::handleOption (const char option) {
       if (!pThreads
           || (!(cThreads = strtoul (pThreads, &pEnd, 10)))
           || (!pEnd || *pEnd)) {
-         cerr << PACKAGE "-warning: Invalid number of threads!\n";
+         cerr << PACKAGE << _("-warning: Invalid number of threads!\n");
       }
       else
          aThreads.reserve (cThreads);
@@ -356,27 +363,39 @@ bool Application::handleOption (const char option) {
       const char* pFormat = getOptionValue ();
       if (pFormat) 
          iniOpts.format = pFormat;
-      else
-         cerr << PACKAGE "-warning: Option f needs an argument! Ignoring option!";
+      else {
+         std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
+         error.replace (error.find ("%1"), 2, 1, 'f');
+         cerr << PACKAGE << error;
+      }
       break; }
 
    case 'T': {
       const char* pTitle = getOptionValue ();
       if (pTitle) 
          iniOpts.title = pTitle;
-      else
-         cerr << PACKAGE "-warning: Option t needs an argument! Ignoring option!";
+      else {
+         std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
+         error.replace (error.find ("%1"), 2, 1, 'T');
+         cerr << PACKAGE << error;
+      }
       break; }
 
    case 'n': {
       const char* pNew = getOptionValue ();
       char* pEnd = NULL;
       unsigned int time (0);
-      if (!pNew
-          || ((time = strtoul (pNew, &pEnd, 10)),
-              (!pEnd || ((*pEnd != ':') && (*pEnd != 'm')))))
-         cerr << PACKAGE "-warning: Argument for new files " << pNew << " is not"
-                 " valid! Ignoring option n\n";
+      if (!pNew) {
+         std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
+         error.replace (error.find ("%1"), 2, 1, 'n');
+         cerr << PACKAGE << error;
+      }
+      else if ((time = strtoul (pNew, &pEnd, 10)),
+               (!pEnd || ((*pEnd != ':') && (*pEnd != 'm')))) {
+         std::string error (_("-warning: Argument for new files `%1' is not valid! Ignoring option `n'\n"));
+         error.replace (error.find ("%1"), 2, pNew);
+         cerr << PACKAGE << error;
+      }
       else {
          if (*pEnd == 'm') {
             ++pEnd;
@@ -396,8 +415,11 @@ bool Application::handleOption (const char option) {
          filelist += files;
          filelist += PathSearch::PATHSEPARATOR;
       }
-      else
-         cerr << PACKAGE "-warning: Option x needs an argument! Ignoring option!";
+      else {
+         std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
+         error.replace (error.find ("%1"), 2, 1, 'x');
+         cerr << PACKAGE << error;
+      }
       break; }
 
    case 'a': options |= SHOW_ALL; break;
@@ -406,15 +428,20 @@ bool Application::handleOption (const char option) {
       const char* pFile = getOptionValue ();
       if (pFile)
          readINIFile (pFile);
-      else
-         cerr << PACKAGE "-warning: No file specified! Ignoring option\n";
+      else {
+         std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
+         error.replace (error.find ("%1"), 2, 1, 'I');
+         cerr << PACKAGE << error;
+      }
       break; }
 
    case 'V': std::cout << description () << '\n'; exit (0);
 
-   default:
-      std::cerr << PACKAGE "-warning: Ignoring invalid option '"
-                << option << "'\n";
+   default: {
+      std::string error (_("-warning: Ignoring invalid option `%1'\n"));
+      error.replace (error.find ("%1"), 2, 1, option);
+      cerr << PACKAGE << error;
+   }
    }
    return true;
 }
@@ -505,7 +532,7 @@ void Application::handleFiles (const char* pFile) const {
                                                  &Application::processThread, NULL));
             }
             catch (std::string& err) {
-               cerr << PACKAGE "-error: " << err << '\n';
+               cerr << PACKAGE << _("-error: ") << err << '\n';
             }
          UNLOCKTHREADS
 #else
@@ -516,7 +543,7 @@ void Application::handleFiles (const char* pFile) const {
          if (options & SHOW_ALL) {
             LOCKOUTPUT
             writer->printMessage (cout, *file,
-                                 (options & SHOW_ERRORS) ? "Unknown file-type" : "");
+                                 (options & SHOW_ERRORS) ? _("Unknown file-type") : "");
             UNLOCKOUTPUT
          }
       file = ds.next ();
@@ -609,9 +636,10 @@ void Application::processFile (const File& file, HANDLER fnc) const {
    Xifstream ifile;
    ifile.open (strFile.c_str (), ios::in | ios::binary);
    if (!ifile) {
-      LOCKOUTPUT
-      std::cerr << PACKAGE "-error: File " << strFile.c_str ()
-               << " can't be opened!\nReason: ";
+      LOCKOUTPUT;
+      std::string error (_("-error: File `%1' can't be opened!\nReason: "));
+      error.replace (error.find ("%1"), 2, strFile);
+      std::cerr << PACKAGE << error;
       perror ("");
       UNLOCKOUTPUT
    }
@@ -627,10 +655,10 @@ void Application::processFile (const File& file, HANDLER fnc) const {
          UNLOCKOUTPUT
       }
       catch (std::string& err) {
-         LOCKOUTPUT
-         std::cerr << PACKAGE "-error: " << err.c_str () << '\n';
+         LOCKOUTPUT;
+         std::cerr << PACKAGE << _("-error: ") << err.c_str () << '\n';
          err = ((options & SHOW_ERRORS)
-                ? std::string ("Error while processing: ") + err
+                ? std::string (_("Error while processing: ")) + err
                 : "");
          writer->printMessage (cout, file, err);
          UNLOCKOUTPUT
@@ -759,14 +787,17 @@ void Application::readINIFile (const char* pFile) {
    if (iniOpts.style.size ()) {
       if (iniOpts.style == "HTML")
          outputStyle = HTML;
-      else if (iniOpts.style == "text")
-         outputStyle = TEXT;
       else if (iniOpts.style == "LaTeX")
          outputStyle = LATEX;
-      else
-         cerr << PACKAGE "-warning: The INI-file '" << pFile << "' contains an "
-                 "invalid entry for the output style ('" << iniOpts.style
-              << "')! Using text\n";
+      else {
+         outputStyle = TEXT;
+         if (iniOpts.style != "text") {
+            std::string error (_("-warning: The INI-file `%1' contains an invalid entry for the output style (`%2')! Using text\n"));
+            error.replace (error.find ("%1"), 2, pFile);
+            error.replace (error.find ("%2"), 2, iniOpts.style);
+            cerr << PACKAGE << error;
+         }
+      }
    }
 }
 
@@ -778,6 +809,8 @@ void Application::readINIFile (const char* pFile) {
 //Returns   : int: Status
 /*--------------------------------------------------------------------------*/
 int main (int argc, const char* argv[]) {
+   IVIOApplication::initI18n (PACKAGE, LOCALEDIR),
+
    Application::initI18n ();
    Application appl (argc, argv);
    return appl.run ();
