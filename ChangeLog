@@ -1,27 +1,49 @@
+2003-08-12  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Commented changes in V0.4.00
+
+	* README: Section planned added
+
+	* po/es.po: Fixed 'compiled at'-string
+
+	* configure.in: Testing for YGP
+
+	* src/IExtract.cpp:
+	  Removed explicit convertion of char* to string (in handler-init)
+
+2003-06-19  Markus Schwab  <g17m0@lycos.com>
+
+	* Windows/IExtract-cfg.h: Versionnr. to 0.4.00
+
+	* README: Actualized to reflect handling of OpenOffice
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Handling of OpenOffice docs added
+
 2003-06-18  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog: Added po-updates
 
 	* po/POTFILES.in: ParseOpenOffice added
 
 	* po/de.po, po/en.po, po/es.po:
-	New messages (for OpenOffice) translated
-
-	* ChangeLog, NEWS: Commented changes in V0.4.00
+	  New messages (for OpenOffice) translated
 
 	* configure.in:
-	Setting version to 0.4.00; Searching for libYMP (and not libGeneral)
+	  Setting version to 0.4.00; Searching for libYMP (and not libGeneral)
 
 	* Makefile.am:
-	Including IExtract-cfg.h for Windows version to distribution
+	  Including IExtract-cfg.h for Windows version to distribution
 
 	* src/Writer.cpp:
-	Including C++ standard headers (and not C standard headers)
+	  Including C++ standard headers (and not C standard headers)
 
 	* src/ParsePDF.cpp: Corrected typo in subsystem
 
 	* src/Makefile.am: Renamed OpenOfice to OpenOffice (ehem)
 
 	* src/IExtract.cpp:
-	Added sxi and sxm extension, removed sxa; Declaring processOpenOffice
+	  Added sxi and sxm extension, removed sxa; Declaring processOpenOffice
 
 	* src/ParseOOffice.cpp, src/ParseOOffice.h: New file.
 
@@ -76,7 +98,7 @@
 	  Removed OutIterator; Changing special characters
 
 	* src/ParseMP3.cpp:
-	  Stripping also \0, but returning allways at least one character
+	  Stripping also \0, but returning always at least one character
 
 	* src/ParseHTML.cpp, src/ParsePDF.cpp, src/ParseSOffice.cpp, src/ParseWord.cpp:
 	  Removed warnings when compiling with -Wall
