@@ -44,8 +44,10 @@ static const unsigned LEN_CONTENT     = 1024;
 #define ID1 "\xF9"
 static const char* ID = ID1 "\x4F\x68\x10\xAB\x91\x08\x00\x2B\x27\xB3\xD9\x30\x00\x00\x00";
 
-#define SEP1 "\x02"
-static const char* SEP = SEP1 "\x00\x00\x00\xe4\x04\x00\x00\x1e\x00\x00\x00";
+#define SEP1_1 "\x02"
+static const char* SEP1 = SEP1_1 "\x00\x00\x00\xe4\x04\x00\x00\x1e\x00\x00\x00";
+#define SEP2_1 "\x02"
+static const char* SEP2 = SEP2_1 "\x00\x00\x00\x10\x27\x00\x00\x1e\x00\x00\x00";
 
 
 #ifdef WORDS_BIGENDIAN
@@ -79,7 +81,8 @@ static const unsigned int aTypes[] = { TYPE_TITLE, TYPE_AUTHOR, TYPE_COMMENT };
 ParseWord::ParseWord()
    : len (0), cEntries (0), actEntry (-1U), cRead (0), prop (NULL)
    , id (ID, "ID for title", 16, 16, false), skip (4)
-   , idValue (SEP, "ID for values", *this, &ParseWord::foundValueStart, 12, 12, false)
+   , idValue1 (SEP1, "ID for values (I)", *this, &ParseWord::foundValueStart, 12, 12, false)
+   , idValue2 (SEP2, "ID for values (II)", *this, &ParseWord::foundValueStart, 12, 12, false)
    , nrEntries ("\\*", "Number of entries", *this, &ParseWord::foundNrEntries, 4, 4, false)
    , type ("\\*", "Type of entry", *this, &ParseWord::foundType, 4, 4, false)
    , offset ("\\*", "Offset of Comment", *this, &ParseWord::foundOffset, 4, 4, false)
@@ -111,10 +114,11 @@ ParseWord::ParseWord()
    _seqTitle[2] = &skip;
    _seqTitle[3] = NULL;
 
-   _selValueStart[0] = &idValue;
-   _selValueStart[1] = &skipIDStart;
-   _selValueStart[2] = &ignore;
-   _selValueStart[3] = NULL;
+   _selValueStart[0] = &idValue1;
+   _selValueStart[1] = &idValue2;
+   _selValueStart[2] = &skipIDStart;
+   _selValueStart[3] = &ignore;
+   _selValueStart[4] = NULL;
 
    _wordDoc[0] = &seqProperties;
    _wordDoc[1] = &skipIDStart;

@@ -58,7 +58,8 @@ class ParseWord  {
    typedef OFParseSequence<ParseWord> OMParseSequence;
 
    ParseExact      id;
-   OMParseExact    idValue;
+   OMParseExact    idValue1;
+   OMParseExact    idValue2;
    ParseSkip       skip;
    OMParseAttomic  nrEntries;
    OMParseAttomic  type;
@@ -78,7 +79,7 @@ class ParseWord  {
    ParseObject* _seqProperties[7];
    ParseObject* _seqTitle[4];
    ParseObject* _seqEntries[3];
-   ParseObject* _selValueStart[4];
+   ParseObject* _selValueStart[5];
 
    // Map for offsets to supported type. 1st: Offset, 2nd: Type
    map<unsigned int, unsigned int> aOffsets;
