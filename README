@@ -31,6 +31,12 @@ XHTML) or LaTeX (tabular) format. Note that there is some extra formatting of
 the text (like checking for LaTeX or HTML special characters) done.
 
 
+Planed
+------
+
+  - Supporting RTF files
+
+
 Installation
 ------------
 
