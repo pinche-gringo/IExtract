@@ -28,7 +28,7 @@
 #include "ParseHTML.h"
 #include "Properties.h"
 
-static const unsigned LEN_TAG         = 512;
+static const unsigned LEN_TAG         = 5120;
 static const unsigned LEN_TITLE       = 512;
 static const unsigned LEN_COMMAND     = 1024;
 
@@ -47,7 +47,7 @@ ParseHTML::ParseHTML ()
      , tagMeta ("META", "Meta tag")
      , tagTitle ("TITLE", "Title-tag", *this, &ParseHTML::foundTitle)
      , tagEndTitle ("/TITLE", "Title-tag")
-     , tagEndHead ("/HEAD", "End of header", *this, &ParseHTML::foundEndOfHead)
+     , tagEndHead ("/HEADER", "End of header", *this, &ParseHTML::foundEndOfHead, 7, 5)
      , title ("<", "Title of document", *this, &ParseHTML::foundValue, LEN_TITLE)
      , value ("\">", "Value of entry", *this, &ParseHTML::foundValue, LEN_TITLE)
      , otherTag (">", "Other HTML tag", LEN_TAG)
