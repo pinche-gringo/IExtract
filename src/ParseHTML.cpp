@@ -26,9 +26,6 @@
 
 #include <assert.h>
 
-#include <iomanip.h>
-#include <iostream.h>
-
 #include "ParseHTML.h"
 
 static const unsigned LEN_TAG         = 512;
