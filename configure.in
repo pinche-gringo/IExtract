@@ -1,14 +1,11 @@
 dnl Process this file with autoconf to produce a configure script.
 
+AC_PREREQ(2.52)
 AC_REVISION($Revision$)
+AC_INIT(IExtract, 0.4.01, [g17m0@lycos.com], IExtract)
 
-AC_INIT()
-
-MAJOR_VERSION=0
-MINOR_VERSION=4
-MICRO_VERSION=01
-RELEASE=$MAJOR_VERSION.$MINOR_VERSION
-VERSION=$RELEASE.$MICRO_VERSION
+RELEASE=${PACKAGE_VERSION%.*}
+VERSION=AC_PACKAGE_VERSION
 AC_SUBST(VERSION)
 AC_SUBST(RELEASE)
 
@@ -16,14 +13,11 @@ INCLUDES="-DLOCALEDIR=\\\"\$(datadir)/locale\\\""
 AC_SUBST(INCLUDES)
 dnl AC_CANONICAL_SYSTEM
 
-AC_LANG_C
-AC_LANG_CPLUSPLUS
-
 AC_C_BIGENDIAN
 
 ALL_LINGUAS="de en es"
 
-AM_INIT_AUTOMAKE(IExtract, $VERSION)
+AM_INIT_AUTOMAKE(dist-bzip2)
 AM_CONFIG_HEADER(IExtract-cfg.h)
 
 AC_PROG_CXX
@@ -37,7 +31,7 @@ dnl Checks for programs.
 
 dnl Checks for libraries.
 AC_CHECK_LIB(stdc++, main)
-PKG_CHECK_MODULES(YMP, YGP >= 0.6.10, [],
+PKG_CHECK_MODULES(YMP, YGP >= 0.6.40, [],
                   [AC_MSG_ERROR(Need libYGP to make); exit])
 
 dnl Checks for header files.
