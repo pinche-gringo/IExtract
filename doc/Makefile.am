@@ -2,4 +2,4 @@
 
 SUBDIRS=.
 
-EXTRA_DIST=IExtract.html.en
+EXTRA_DIST=IExtract.html.en IExtract.html.es IExtract.html.de
