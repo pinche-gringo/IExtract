@@ -29,7 +29,6 @@
 #include <iomanip>
 #include <iostream>
 
-#define TRACELEVEL 9
 #include <Trace_.h>
 
 #include "ParseWord.h"
@@ -58,10 +57,10 @@ ParseWord::ParseWord()
    , title ("\0", "Title of document", *this, &ParseWord::foundTitle, 1, 1, false)
    , skipIDStart (ID1, "Other command", 1, 1)
    , ignore (ID1, "Content", LEN_CONTENT)
-   , seqTitle (_seqTitle, "Title entry", 1, 1)
+   , seqTitle (_seqTitle, "Title entry", 1, 1, false)
    , seqEntries (_seqEntries, "Entry description", *this,
-                 &ParseWord::foundPropertiesHeader, 1, 1)
-   , seqProperties (_seqProperties, "Properties", 1, 1)
+                 &ParseWord::foundPropertiesHeader, 1, 1, false)
+   , seqProperties (_seqProperties, "Properties", 1, 1, false)
    , wordDoc (_wordDoc, "Word document", -1, 1) {
 
    _seqProperties[0] = &id;
@@ -159,17 +158,17 @@ int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
            << " (" << len << " bytes)");
 
    if (actEntry == TYPE_TITLE) {
-      strTitle.assign (pTitle, len);
       if (offComment != -1U) {
          actEntry = TYPE_COMMENT;
-         skip.setMinCard (offComment -= (len & 0x3) + len + 9);
+         skip.setMinCard (offComment -= len + 12);
          skip.setMaxCard (offComment);
          TRACE7 ("ParseWord::foundTitle (const char*) - Skipping " << offComment
                  << " bytes for comment");
       }
+      strTitle.assign (pTitle, len - 1);
    }
    else {
-      strComment.assign (pTitle, len);
+      strComment.assign (pTitle, len - 1);
       offComment = -1U;
    }
 
