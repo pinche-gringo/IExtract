@@ -2,7 +2,7 @@
 <!-- $Id$ -->
 
 <!--
-  Anti-Copyright (A) 2003 Markus Schwab (g17m0@lycos.com)
+  Anticopyright (C) 2003, 2004 Markus Schwab (g17m0@lycos.com)
 
   This is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
@@ -28,7 +28,7 @@
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Anticopyright (A) 2003, distributed under the GNU General Public License">
+    <meta name="DC.Rights" content="Copyright (C) 2003, 2004; distributed under the GNU General Public License">
 
     <style type="text/css">
       <!--
@@ -96,7 +96,7 @@
         <p>It applies the same as for JPEGs: I have no documentation of that
           format (nor do I have the programs) and so I can only hope to handle
           them correctly. That said: All of the documents I have/had access to
-          was processed correctly.</p></dd>
+          were processed correctly.</p></dd>
 
       <dt><b>MP3</b></dt>
       <dd><p>Extracts the content of the ID3 tag (version 1.x). The title of
@@ -105,7 +105,9 @@
       <dt><b>PDF</b></dt>
       <dd><p>PDF documents contain a so called <i>Document Information
             directory</i> with various keys. The content of this directory is
-          extracted (with the "Subject"-key as comment).</p></dd>
+          extracted (with the "Subject"-key as comment).</p>
+
+        <p>Encrypted documents are not decrypted!</p></dd>
       </dd>
 
       <dt><b>StarOffice documents</b></dt>
