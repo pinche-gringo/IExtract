@@ -53,7 +53,7 @@ AC_ARG_ENABLE(debug,
               else
                   CXXFLAGS="-O2 -UTRACELEVEL"; fi)
 AC_ARG_ENABLE(checks,
-              AC_HELP_STRING([[[[[--enable-checks=[LEVEL]]]]]],
+              AC_HELP_STRING([[[[[--enable-checks[=LEVEL]]]]]],
                              [Enables additional (internal) checks (LEVEL=0..9)]),
               if test "$enableval" != "no"; then
                   test "$enableval" == "yes" && enableval=0
