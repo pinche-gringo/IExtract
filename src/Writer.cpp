@@ -25,6 +25,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <time.h>
+#include <locale.h>
 
 #include <iostream>
 
@@ -33,6 +34,7 @@
 
 #include <File.h>
 #include <ATStamp.h>
+#include <ANumeric.h>
 #include <Tokenize.h>
 
 #include "Writer.h"
@@ -115,7 +117,7 @@ void Writer::printSeparator (std::ostream& out, const File& file,
          std::string path (file.path ());
          unsigned int pos (0);
          while ((pos = path.find (File::DIRSEPARATOR, pos)) != std::string::npos)
-            path.replace (pos, 1, '/');
+            path.replace (pos, 1, 1, '/');
 
          if (data[pos] == 'U')
             path += file.name ();
@@ -125,23 +127,6 @@ void Writer::printSeparator (std::ostream& out, const File& file,
    }
    out << data.substr (oldPos, pos - oldPos);
 }
-
-/*--------------------------------------------------------------------------*/
-//Purpose   : Checks if the iterator is on a name entry (%n or %N)
-//Returns   : bool: True if on a name entry
-/*--------------------------------------------------------------------------*/
-bool Writer::OutIterator::isAtName () const {
-   int pos (0);
-   std::string node (columns_.getActNode ());
-                     
-   while (((pos = node.find ('%', pos)) != std::string::npos)
-          && (pos++ < node.size ()))
-      if ((node[pos] == 'n') || (node[pos] == 'N'))
-         return true;
-
-   return false;
-}
-
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Returns the substitute for a control character
@@ -154,6 +139,8 @@ bool Writer::OutIterator::isAtName () const {
 //              'N': With path and name of the file
 //              'p': With the path of the file
 //              'P': With the path of the file in UNIX style (separated by /)
+//              's': With the size of the file in bytes
+//              'S': With the size of the file (human readable)
 //              't': With the title (of the properties)
 //              'U': With path and name of the file in UNIX style (separated by /)
 //              Other chars: With the character itself
@@ -190,11 +177,20 @@ void Writer::OutIterator::getSubstitute (const char ctrl, std::string& subst) co
       subst = file->path ();
       unsigned int pos (0);
       while ((pos = subst.find (File::DIRSEPARATOR, pos)) != std::string::npos)
-         subst.replace (pos, 1, '/');
+         subst.replace (pos, 1, 1, '/');
 
       if (ctrl == 'U')
          subst += file->name ();
          break; }
+
+   case 's':
+   case 'S': {
+      Check3 (file);
+      ANumeric size (file->size ());
+      subst = "";
+      subst = ((ctrl == 'S') ? convertToHumanString (file->size ())
+               : ANumeric::toString (file->size ()));
+      break; }
 
    default:
       subst = ctrl;
@@ -202,6 +198,35 @@ void Writer::OutIterator::getSubstitute (const char ctrl, std::string& subst) co
 
    TRACE9 ("Writer::OutIterator::getSubstitute (const char, std::string&) - Replacing '"
            << ctrl << "' with " << subst);
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Returns the next token; special characters are expanded
+//Returns   : std::string: Next (expanded) token
+/*--------------------------------------------------------------------------*/
+std::string Writer::OutIterator::convertToHumanString (unsigned long value) {
+   if (value < 1000)
+      return ANumeric::toString (value);
+
+   std::string tString (1, 'k');
+
+   if (value > 1000000) {
+      tString = 'M';
+      value >>= 10;
+   }
+
+   if (value < 10000) {
+      static struct lconv* loc = localeconv ();
+      value += 50;
+      double temp (value);
+      temp /= 102.4;
+      tString = (char ((int (temp) % 10) + '0')) + tString;
+      value = (unsigned long)(temp / 10);
+      tString = loc->decimal_point + tString;
+   }
+   else
+      value >>= 10;
+   return ANumeric::toString (value) + tString;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -311,7 +336,7 @@ void HTMLWriter::printMessage (std::ostream& out, const File& file,
       out << "<td>E</td>";
    }
 
-   out << "<a href=\"" << file.path () << file.name () << "\">" << file.name ()
+   out << "<td><a href=\"" << file.path () << file.name () << "\">" << file.name ()
        << "</a></td><td colspan=" << (columns () - 1) << '>' << msg
        << "</td></tr>\n";
 }

@@ -79,13 +79,13 @@ class Writer {
 
       std::string operator* () const;
 
-      bool isAtName () const;
-
     private:
       OutIterator (const std::string& format) : columns_ (format), p (NULL), file (NULL) {
          columns_.getNextNode ('|'); }
 
       void getSubstitute (const char ctrl, std::string& substitute) const;
+
+      static std::string convertToHumanString (unsigned long value);
 
       Tokenize columns_;
 
