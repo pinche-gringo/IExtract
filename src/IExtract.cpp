@@ -306,6 +306,7 @@ void Application::showHelp () const {
       << _("       %(LETTERS) is substituted with first of the above substitutions\n"
            "          producing a non-empty string (e.g. %(tn) is the titel if not \n"
            "          empty or else the filename.)\n")
+       // xgettext:no-c-format
       << _("       %*LETTER changes the substitution slightly. For file names it causes a\n"
            "          conversion of special characters; for the others it suppresses them\n\n")
        // xgettext:no-c-format
