@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = src
+SUBDIRS = intl src doc po
 
 dist-hook:
 	# Add files for windows; don't make own Makefile[.am], as a
