@@ -25,6 +25,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+
 #include <gzo-cfg.h>
 
 #include <ctype.h>
@@ -93,12 +94,13 @@ class Application : public IVIOApplication {
  public:
    Application (const int argc, const char* argv[])
       : IVIOApplication (argc, argv, lo), options (0), outputStyle (TEXT)
-      , ageOfNewFiles (30 * 24 * 60 * 60), iniOpts ()
+      , iniOpts ()
 #ifdef ENABLE_THREADS
       , listFiles (), mxListFiles (), aThreads (0), mxThreads (), mxOutput ()
 #endif
       , writer (NULL) {
       iniOpts.format = DEFAULT_FORMAT;
+      iniOpts.ageOfNewFiles = 30 * 24 * 60 * 60;
 #ifdef ENABLE_THREADS
       aThreads.reserve (1);
 #endif
@@ -132,7 +134,6 @@ class Application : public IVIOApplication {
       const char* pExt;
       HANDLER     pFnc; } FILEHANDLERS;
    HANDLER getFileTypeHandler (const char* pExt) const;
-
    static const FILEHANDLERS handlers[];
 
    static void convertFromUnicode (Properties& prop);
@@ -153,7 +154,6 @@ class Application : public IVIOApplication {
 
    enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4 };
 
-   unsigned long ageOfNewFiles;
    unsigned int options;
 
    Options iniOpts;
@@ -245,14 +245,14 @@ void Application::showHelp () const {
 #ifdef ENABLE_THREADS
                 "  -t, --threads=NR ...... Number of threads for examining files (default: 1)\n"
 #endif
-                "  -n, --new=TIME:TEXT ... Show TEXT for files younger than TIME days (def: 30)\n"
+                "  -n, --new=DAYS:TEXT ... Show TEXT for files younger than DAYS days (def: 30)\n"
                 "  -i, --include=LIST .... Files to inspect\n"
                 "  -x, --exclude=LIST .... Files to not inspect\n"
                 "  -I, --ini-file=FILE ... Read further options from specified file\n"
                 "  -V, --version ......... Output version information and exit\n"
                 "  -h, -?, --help ........ Displays this help and exit\n"
                 "  File(s) ... Files to analyze (the last part can contain wildcards)\n\n"
-                "TIME (in option -n) may be omited or may have an multiplier suffix: m for 30.\n\n"
+                "DAYS (in option -n) may be omited or may have an multiplier suffix: m for 30.\n\n"
                 "LIST is a list of files; seperated with the path-separator of the operating\n"
                 "     system (':' for UNICES, ';' for Windows). E.g. *.html"
              << PathSearch::PATHSEPARATOR << "*.doc\n\n"
@@ -264,7 +264,9 @@ void Application::showHelp () const {
                 "       %n is substituted with the name of the file\n"
                 "       %N is substituted with path and name of the file\n"
                 "       %p is substituted with the path of the file\n"
+                "       %P is substituted with the path of the file in UNIX style (separated with /)\n"
                 "       %t is substituted with the title\n"
+                "       %U is substituted with path and name of the file in UNIX style\n"
                 "       %(LETTERS) is substituted with first of the above substitutions\n"
                 "          producing a non-empty string (e.g. %(nt) is the filename if not \n"
                 "          empty or else the title.)\n\n"
@@ -277,12 +279,17 @@ void Application::showHelp () const {
                 "       %n is substituted with the name of the directory\n"
                 "       %N is substituted with the path and name of the directory\n"
                 "       %p is substituted with the path of the directory\n"
+                "       %P is substituted with the path of the file in UNIX style (separated with /)\n"
                 "       %s prints the start-of-output for the specified output style\n\n"
+                "       %U is substituted with path and name of the file in UNIX style\n"
                 "The format of the INI file is like this (entries can be missing):\n\n"
                 "   [Output]\n"
                 "   Format=<a href=\"%N\" title=\"%c\">%n</a>|%t|%a|%D\n"
                 "   Title=File|Title|Author|Date\n"
-                "   TextForNewFiles=-n9:<img src=../images/new.gif>\n\n"
+                "   TextForNewFiles=<img src=../images/new.gif>\n"
+                "   MaxAgeForNewFiles=15\n"
+                "   DirSeparatorText=%eListing of %n%s\n"
+                "   Style=HTML\n\n"
                 "Currently supported files are:\n"
                 "  - HTML (*.html, *.htm, *.shtml, *.shtm)\n"
                 "  - JPEG (*.jpeg, *.jpg)\n"
@@ -372,10 +379,9 @@ bool Application::handleOption (const char option) {
             time *= 30;
          }
          if (time)
-            ageOfNewFiles = time * 24 * 60 * 60;
+            iniOpts.ageOfNewFiles = time * 24 * 60 * 60;
          iniOpts.newText = pEnd + 1;
       }
-
       break; }
 
    case 'x':
@@ -434,7 +440,7 @@ int Application::perform (int argc, const char* argv[]) {
 
    for (unsigned int i (0); i < (sizeof (t) / sizeof (t[0])); ++i)
       if (outputStyle == t[i].opt)
-         writer = t[i].fnc (iniOpts.format, iniOpts.newText, ageOfNewFiles);
+         writer = t[i].fnc (iniOpts.format, iniOpts.newText, iniOpts.ageOfNewFiles);
    Check3 (writer);
 
    writer->printStart (cout, iniOpts.title);
@@ -443,7 +449,8 @@ int Application::perform (int argc, const char* argv[]) {
    for (unsigned int j (0); j < argc; ++j) {
       file = argv[j];
       if (DirectorySearch::isValid (argv[j])) {
-         file += File::DIRSEPARATOR;
+         if (file[file.size () - 1] != File::DIRSEPARATOR)
+            file += File::DIRSEPARATOR;
          file += "*";
       }
       handleFiles (file.c_str ());
@@ -462,7 +469,7 @@ void Application::handleFiles (const char* pFile) const {
    Check3 (pFile);
    TRACE5 ("Application::handleFiles (const char*) const - " << pFile);
 
-   XDirSrch ds (pFile);
+   ExtDirectorySearch ds (pFile);
    string node;
    PathSearch list (filelist);
    while (!(node = list.getNextNode ()).empty ()) {
@@ -573,6 +580,8 @@ void* Application::processThread (void* pThread) {
          break;
       }
    } // end-while
+
+   ParseObject::freeBuffer ();
 
    LOCKTHREADS
    Check3 (find (aThreads.begin (), aThreads.end (), pThread));
