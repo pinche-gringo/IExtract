@@ -1,30 +1,33 @@
 2003-06-18  Markus Schwab  <g17m0@lycos.com>
 
-	* NEWS, ChangeLog: Commented changes in V0.4.00
+	* po/POTFILES.in: ParseOpenOffice added
 
-	* Writer.cpp:
-	  Including C++ standard headers (and not C standard headers)
+	* po/de.po, po/en.po, po/es.po:
+	New messages (for OpenOffice) translated
 
-	* ParsePDF.cpp: Corrected typo in subsystem
+	* ChangeLog, NEWS: Commented changes in V0.4.00
 
-	* Makefile.am: Renamed OpenOfice to OpenOffice (ehem)
+	* configure.in:
+	Setting version to 0.4.00; Searching for libYMP (and not libGeneral)
 
-	* IExtract.cpp:
-	  Added sxi and sxm extension, removed sxa; Declaring processOpenOffice
+	* Makefile.am:
+	Including IExtract-cfg.h for Windows version to distribution
 
-	* ParseOOffice.cpp, ParseOOffice.h: New file.
+	* src/Writer.cpp:
+	Including C++ standard headers (and not C standard headers)
 
-	* IExtract.cpp:
-	  Formatted in UNIX-styel (with LF); Handling OpenOffice documents
+	* src/ParsePDF.cpp: Corrected typo in subsystem
 
-	* Makefile.am: ParseOOffice added
+	* src/Makefile.am: Renamed OpenOfice to OpenOffice (ehem)
 
-	* ParseHTML.cpp, ParseHTML.h, ParseJPG.cpp, ParseJPG.h, ParseSOffice.cpp, ParseSOffice.h, ParseWord.cpp, ParseWord.h, Properties.h, Writer.cpp, Writer.h:
-	 Re-formatted in UNIX-style (with LF as line separater
+	* src/IExtract.cpp:
+	Added sxi and sxm extension, removed sxa; Declaring processOpenOffice
+
+	* src/ParseOOffice.cpp, src/ParseOOffice.h: New file.
 
 2003-06-04  Markus Schwab  <g17m0@lycos.com>
 
-	* IExtract.cpp: Marking string as no-c-format (for gettext)
+	* src/IExtract.cpp: Marking string as no-c-format (for gettext)
 
 2003-06-03  Markus Schwab  <g17m0@lycos.com>
 
