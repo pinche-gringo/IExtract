@@ -76,17 +76,36 @@ unsigned int Writer::columns () const {
 
 
 /*--------------------------------------------------------------------------*/
+//Purpose   : Checks if the iterator is on a name entry (%n or %N)
+//Returns   : bool: True if on a name entry
+/*--------------------------------------------------------------------------*/
+bool Writer::OutIterator::isAtName () const {
+   int pos (0);
+   std::string node (columns_.getActNode ());
+                     
+   while (((pos = node.find ('%', pos)) != std::string::npos)
+          && (pos++ < node.size ()))
+      if ((node[pos] == 'n') || (node[pos] == 'N'))
+         return true;
+
+   return false;
+}
+
+
+/*--------------------------------------------------------------------------*/
 //Purpose   : Returns the next token; special characters are expanded
 //Returns   : std::string: Next (expanded) token
 /*--------------------------------------------------------------------------*/
 std::string Writer::OutIterator::operator* () const {
    assert (file);
-   std::string token (pFormat, len);
 
-   TRACE2 ("Writer::OutIterator::operator* () - Token = '" << token << '\'');
+   int pos (0);
+   std::string token (columns_.getActNode ());
 
-   unsigned int pos (0);
-   while ((pos = token.find ('%', pos)) != std::string::npos)
+   TRACE2 ("Writer::OutIterator::operator* () - Node = '" << token << '\'');
+
+   while (((pos = token.find ('%', pos)) != std::string::npos)
+          && (pos < token.size ()))
       switch (token[pos + 1]) {
       case 'a': if (p) token.replace (pos, 2, p->strAuthor); break;
 
@@ -113,28 +132,6 @@ std::string Writer::OutIterator::operator* () const {
    return token;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Calculates the length of the next token
-//Parameters: pFormat: Token to inspect
-//Returns   : unsigned int: Length of token
-/*--------------------------------------------------------------------------*/
-unsigned int Writer::OutIterator::lengthOfToken (const char* pFormat) {
-   assert (pFormat);
-   const char* pEnd = ((*pFormat == '%')
-                       ? ((pFormat[1] == '%')
-                          ? (strchr (pFormat + 2, '%'))
-                          : pFormat + 2)
-                       : strchr (pFormat, '%'));
-
-   // Skip over "%%"
-   while (pEnd && (*pEnd == '%') && (pEnd[1] == '%'))
-      pEnd = strchr (pEnd + 2, '%');
-
-   TRACE2 ("Writer::OutIterator::lengthOfToken (const char* ) - Length = "
-           << (pEnd ? pEnd - pFormat :  strlen (pFormat)));
-   return pEnd ? pEnd - pFormat :  strlen (pFormat);
-}
-
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Destructor
@@ -152,9 +149,12 @@ void HTMLWriter::printStart (std::ostream& out, const char* title) const {
    out << "<table>\n";
 
    if (title) {
+      out << "<thead><tr>";
+      if (pStrNew)
+         out << "<td></td>";
+
       Tokenize titles (title);
       std::string node;
-      out << "<thead><tr>";
       while ((node = titles.getNextNode ('|')).size ())
          out << "<td>" << node << "</td>";
       out << "</tr></thead>";

@@ -56,43 +56,36 @@ class Writer {
 
     public:
       OutIterator (const char* format, const File& outfile)
-         : file (&outfile), p (NULL), pFormat (format), len (lengthOfToken (format)) { }
+         : file (&outfile), p (NULL), columns_ (format) { columns_.getNextNode ('|'); }
       OutIterator (const char* format, const File& outfile, 
                    const struct Properties& prop)
-         : file (&outfile), p (&prop), pFormat (format), len (lengthOfToken (format)) { }
+         : file (&outfile), p (&prop), columns_ (format) { columns_.getNextNode ('|'); }
       ~OutIterator () { }
 
-      OutIterator& operator++ () {
-         setToNextToken ();
-         return *this;
+      std::string operator++ () {
+         return columns_.getNextNode ('|');
       }
-      OutIterator& operator++ (int) {
-         OutIterator& old = *this;
-         setToNextToken ();
+      std::string operator++ (int) {
+         std::string old (columns_.getActNode ());
+         columns_.getNextNode ('|');
          return old;
       }
-      operator void*() const { return (void*)*pFormat; }
-      bool operator! () const { return !*pFormat; }
+
+      operator void*() const { return (void*)columns_.getActNode ().size (); }
+      bool operator! () const { return columns_.getActNode ().empty (); }
 
       std::string operator* () const;
 
-      bool isAtName () const {
-         return (*pFormat == '%') && ((pFormat[1] == 'n') || (pFormat[1] == 'N')); }
+      bool isAtName () const;
 
     private:
-      OutIterator (const char* format) : pFormat (format), p (NULL), file (NULL) { }
+      OutIterator (const char* format) : columns_ (format), p (NULL), file (NULL) {
+         columns_.getNextNode ('|'); }
 
-      void setToNextToken () {
-         assert (pFormat && *pFormat);
-         pFormat += len;
-         len = lengthOfToken (pFormat); }
-
-      static unsigned int lengthOfToken (const char* pFormat);
+      Tokenize columns_;
 
       const File* file;
       const struct Properties* p;
-      const char* pFormat;
-      unsigned int len;
 
       OutIterator (const OutIterator&);
       OutIterator& operator= (const OutIterator&);
