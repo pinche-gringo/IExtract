@@ -59,7 +59,7 @@ ParseWord::ParseWord()
    , length ("\\*", "Length of title", *this, &ParseWord::foundLength, 4, 4, false)
    , title ("\0", "Title of document", *this, &ParseWord::foundTitle, 1, 1, false)
    , skipIDStart (ID1, "Other command", 1, 1)
-   , ignore (ID1, "Content", LEN_CONTENT)
+   , ignore (ID1, "Content", LEN_CONTENT, false)
    , seqTitle (_seqTitle, "Title entry", 1, 1, false)
    , seqEntries (_seqEntries, "Entry description", *this,
                  &ParseWord::foundPropertiesHeader, 1, 1, false)
@@ -186,7 +186,7 @@ int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
       _seqProperties[6] = NULL;
       wordDoc.setMaxCard (1);
    }
-      
+
    return ParseObject::PARSE_OK;
 }
 
@@ -215,5 +215,7 @@ int ParseWord::foundPropertiesHeader (const char*, unsigned int) {
                  << offComment << " bytes for comment");
          actEntry = TYPE_COMMENT;
       }
+      else
+        _seqProperties[5] = NULL;
    return ParseObject::PARSE_OK;
 }
