@@ -181,7 +181,7 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-f,&nbsp;--format=FORMATO</b></td>
-        <td><p>Formato de la salida (por defecto: %n&brvbar;-&brvbar;%t&brvbar;%a&brvbar;%c&brvbar;%d)</p>
+        <td>Formato de la salida (por defecto: %n&brvbar;-&brvbar;%t&brvbar;%a&brvbar;%c&brvbar;%d)
 
           <p>La salida se puede estar en columnas; indicado por un rayo
             (&brvbar;) en el formato.</p>
@@ -221,15 +221,15 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-T,&nbsp;--title=T&Iacute;TULO</b></td>
-        <td><p>T&iacute;tulo de la salida (escrito tambi&eacute;n si no hay mas salida).</p>
+        <td>T&iacute;tulo de la salida (escrito tambi&eacute;n si no hay mas salida).
 
           <p>T&Iacute;TULO especifica los campos de la salida; separada por la raya (&brvbar;);
             cada campo tiene que contener al menos una letra.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-s,&nbsp;--separate=TEXTO</b></td>
-        <td><p>Separar subcarpetas por TEXTO (por defecto: vacio);
-            implica recursar por subcarpetas (--recursive)</p>
+        <td>Separar subcarpetas por TEXTO (por defecto: vacio);
+          implica recursar por subcarpetas (--recursive).
 
           <p>El signo del porciento (%) indica que la letra siguente tiene significado
               especial:</p>
@@ -246,27 +246,47 @@
           </ul></td></tr>
       <tr><td>&nbsp;</td></tr>
 
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-p,&nbsp;--prepend=TEXTO</b></td>
+        <td>Especifica un texto, cual est&aacute; mostrado antes cualquiera
+          salida (p.ej. por un encabezamiento).</td></tr>
+      <tr><td>&nbsp;</td></tr>
+
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-P,&nbsp;--pre-file=ARCHIVO</b></td>
+        <td>Especifica un archivo, cual contento est&aacute; mostrado antes
+          cualquiera salida (p.ej. por un encabezamiento).</td></tr>
+      <tr><td>&nbsp;</td></tr>
+
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-a,&nbsp;--append=TEXTO</b></td>
+        <td>Especifica un texto, cual est&aacute; mostrado despu&eacute;s
+          cualquiera salida (p.ej. por un pie de p&aacute;gina).</td></tr>
+      <tr><td>&nbsp;</td></tr>
+
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-A,&nbsp;--app-file=ARCHIVO</b></td>
+        <td>Especifica un archivo, cual contento est&aacute; mostrado despu&eacute;s
+          cualquiera salida (p.ej. por un pie de p&aacute;gina).</td></tr>
+      <tr><td>&nbsp;</td></tr>
+
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-e,&nbsp;--show-errors</b></td>
         <td>Incluye mensajes de error en la salida.</td></tr>
       <tr><td>&nbsp;</td></tr>
 
-      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-a,&nbsp;--all</b></td>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-u,&nbsp;--add-unknown</b></td>
         <td>Muestra todos los archivos (incluyendo los inconocidos) en la salida.</td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-n,&nbsp;--new=[D&Iacute;AS:]TEXTO</b></td>
-        <td><p>Muestra TEXTO en el primer campo por archivos m&aacute;s joven que 
-            D&Iacute;AS d&iacute;as (por defecto: 30)</p>
+        <td>Muestra TEXTO en el primer campo por archivos m&aacute;s joven que 
+          D&Iacute;AS d&iacute;as (por defecto: 30).
 
           <p>D&Iacute;AS puede faltar o tener un ap&eacute;ndice de multiplicaci&oacute;n:
             m por 30.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-i,&nbsp;--include=LISTA</b></td>
-        <td><p>Especifica cu&aacute;les archivos deben que est&aacute; investigado; eso
-            puede ser una lista tambi&eacute;n; separado por la la letra separado del
-            camino del sistema operativo (dos puntos (:) en Unices; punto y coma (;)
-            en Windoze).</p>
+        <td>Especifica cu&aacute;les archivos deben que est&aacute; investigado; eso
+          puede ser una lista tambi&eacute;n; separado por la la letra separado del
+          camino del sistema operativo (dos puntos (:) en Unices; punto y coma (;)
+          en Windoze).
 
           <p>Los archivos pueden contener los comodines tipicales de UNIX.
             <a href="IExtract.html.de#Fileformat">Detalles</a> se encuentra
@@ -274,10 +294,10 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-x,&nbsp;--exclude=LISTA</b></td>
-        <td><p>Especifica cu&aacute;les archivos <b>no</b> deben que est&aacute;
-            investigado; eso puede ser una lista tambi&eacute;n; separado por la la
-            letra separado del camino del sistema operativo (dos puntos (:) en Unices;
-            punto y coma (;) en Windoze).</p>
+        <td>Especifica cu&aacute;les archivos <b>no</b> deben que est&aacute;
+          investigado; eso puede ser una lista tambi&eacute;n; separado por la la
+          letra separado del camino del sistema operativo (dos puntos (:) en Unices;
+          punto y coma (;) en Windoze).
 
           <p>Los archivos pueden contener los comodines tipicales de UNIX.
             <a href="IExtract.html.de#Fileformat">Detalles</a> se encuentra
@@ -291,8 +311,8 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-t,&nbsp;--threads=N&Uacute;MERO</b></td>
-        <td><p>Pone el n&uacute;mero por los proceses del fondo (threads) para exerminar
-            los archivos (adicional al proceso por la busqueada).</p>
+        <td>Pone el n&uacute;mero por los proceses del fondo (threads) para exerminar
+          los archivos (adicional al proceso por la busqueada).
 
           <p>Aquel opci&oacute;n solamente est&aacute; existente, si el programa
             estaba configurado (compilado) con <code>--enable-threads</code> (o
@@ -307,9 +327,13 @@
         <td>Muestra la ayuda y termina.</td></tr>
       <tr><td>&nbsp;</td></tr>
 
-      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>File(s)</b></td>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>Archivo(s)</b></td>
         <td>Especifica la carpeta y/o los archivos para investigar.</td></tr>
     </table>
+
+    <p>Los opciones <i>append</i> y <i>app-file</i> (o equivalente
+      <i>prepend</i> y <i>pre-file</i>) pueden ser repetidos. Cada
+      opci&oacute;n nuevo a&ntilde;ade su texto a los anteriores.</p>
 
     <h2><a name="INIfile"></a>Formato de archivos por iniciar</h2>
     <p>Archivos por iniciar tienen el siguente formato (entradas pueden faltar):</p>

@@ -180,7 +180,7 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-f,&nbsp;--format=FORMAT</b></td>
-        <td><p>Format der Ausgabe (Default: %n&brvbar;-&brvbar;%t&brvbar;%a&brvbar;%c&brvbar;%d)</p>
+        <td>Format der Ausgabe (Default: %n&brvbar;-&brvbar;%t&brvbar;%a&brvbar;%c&brvbar;%d)
 
           <p>Die Ausgabe kann in Spalten unterteilt werden (sinnvoll for allem
             f&uuml;r die erzeugten HTML/LaTeX-Tabellen; getrennt wird durch den
@@ -222,16 +222,16 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-T,&nbsp;--title=TITEL</b></td>
-        <td><p>Titel/&Uuml;berschrift der Ausgabe (wird auch ausgegeben, wenn
-            gar keine Datei behandelt wurde).</p>
+        <td>Titel/&Uuml;berschrift der Ausgabe (wird auch ausgegeben, wenn
+          gar keine Datei behandelt wurde).
 
           <p>TITEL gibt die Spalten der Ausgaben an; getrennt mit dem vertikalen Strich
             (&brvbar;); jede Spalte mu&szlig; zumindest ein Zeichen enthalten.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-s,&nbsp;--separate=TEXT</b></td>
-        <td><p>Trenne Unterverzeichnisse mit TEXT (default: leer);
-            impliziert das Durchsuchen der Unterverzeichnisse (--recursive).</p>
+        <td>Trenne Unterverzeichnisse mit TEXT (default: leer);
+            impliziert das Durchsuchen der Unterverzeichnisse (--recursive).
 
           <p>Das Prozentzeichen (%) &auml;ndert die Bedeutung des n&auml;chsten
             Zeichens:</p>
@@ -250,30 +250,52 @@
           </ul></td></tr>
       <tr><td>&nbsp;</td></tr>
 
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-p,&nbsp;--prepend=TEXT</b></td>
+        <td>Erm&ouml;glicht einen Text anzugeben, der am Anfang der (gesamten)
+          Ausgabe geschrieben wird (z. B. f&uuml;r eine Kopfzeile).</td></tr>
+      <tr><td>&nbsp;</td></tr>
+
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-P,&nbsp;--pre-file=FILE</b></td>
+        <td>Erm&ouml;glicht eine Datei anzugeben, deren Inhalt am Anfang der
+          (gesamten) Ausgabe geschrieben wird (z. B. f&uuml;r eine
+          Kopfzeile).</td></tr>
+      <tr><td>&nbsp;</td></tr>
+
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-a,&nbsp;--append=TEXT</b></td>
+        <td>Erm&ouml;glicht einen Text anzugeben, der am Ende der (gesamten)
+          Ausgabe geschrieben wird (z. B. f&uuml;r eine Fu&szlig;zeile).</td></tr>
+      <tr><td>&nbsp;</td></tr>
+
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-A,&nbsp;--app-file=FILE</b></td>
+        <td>Erm&ouml;glicht eine Datei anzugeben, deren Inhalt am Ende der
+          (gesamten) Ausgabe geschrieben wird (z. B. f&uuml;r eine
+          Fu&szlig;zeile).</td></tr>
+      <tr><td>&nbsp;</td></tr>
+
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-e,&nbsp;--show-errors</b></td>
         <td>Liefert eine Fehlermeldung (in der Ausgabe), wenn das Untersuchen
           der Datei scheitern sollte.</td></tr>
       <tr><td>&nbsp;</td></tr>
 
-      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-a,&nbsp;--all</b></td>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-u,&nbsp;--add-unknown</b></td>
         <td>Zeige alle Dateien (auch die nicht unterst&uuml;tzten) in der
           Ausgabe.</td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-n,&nbsp;--new=[TAGE:]TEXT</b></td>
-        <td><p>Zeige TEXT (in einer eigenen Spalte) f&uuml;r Dateien, die j&uuml;nger
-            als TAGE (default: 30) Tage sind. Diese Spalte ist immer die erste
-            Spalte in der Ausgabe.</p>
+        <td>Zeige TEXT (in einer eigenen Spalte) f&uuml;r Dateien, die j&uuml;nger
+          als TAGE (default: 30) Tage sind. Diese Spalte ist immer die erste
+          Spalte in der Ausgabe.
 
           <p>TAGE kann entweder ausgelassen werden oder einen Anhang aufweisen.
             Bei 'm' wird die Anzahl der Tage mit 30 multipliziert.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-i,&nbsp;--include=LISTE</b></td>
-        <td><p>Spezifiziert, welche Dateien untersucht werden sollen; dies kann
-            auch eine Liste von Dateiein sein, wobei jeder Eintrag mit dem Trennzeichen
-            des Betriebssystem (der Doppelpunkt (:) f&uuml;r UNICES; der Strichpunkt
-            (;) f&uuml;r Windows) getrennt wird.</p>
+        <td>Spezifiziert, welche Dateien untersucht werden sollen; dies kann
+          auch eine Liste von Dateiein sein, wobei jeder Eintrag mit dem Trennzeichen
+          des Betriebssystem (der Doppelpunkt (:) f&uuml;r UNICES; der Strichpunkt
+          (;) f&uuml;r Windows) getrennt wird.
 
           <p>Die Dateiangaben k&ouml;nnen die UNIX-typischen Platzhaltern
             enthalten. <a href="IExtract.html.de#Fileformat">Details</a>
@@ -281,10 +303,10 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-x,&nbsp;--exclude=LISTE</b></td>
-        <td><p>Spezifiziert, welche Dateien <b>nicht</b> untersucht werden sollen; dies kann
-            auch eine Liste von Dateiein sein, wobei jeder Eintrag mit dem Trennzeichen
-            des Betriebssystem (der Doppelpunkt (:) f&uuml;r UNICES; der Strichpunk
-            (;) f&uuml;r Windows) getrennt wird.</p>
+        <td>Spezifiziert, welche Dateien <b>nicht</b> untersucht werden sollen; dies kann
+          auch eine Liste von Dateiein sein, wobei jeder Eintrag mit dem Trennzeichen
+          des Betriebssystem (der Doppelpunkt (:) f&uuml;r UNICES; der Strichpunk
+          (;) f&uuml;r Windows) getrennt wird.
 
           <p>Die Dateiangaben k&ouml;nnen die UNIX-typischen Platzhaltern
             enthalten. <a href="IExtract.html.de#Fileformat">Details</a>
@@ -298,9 +320,9 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-t,&nbsp;--threads=NR</b></td>
-        <td><p>Setzt die Nummer der Threads (Hintergrundprozesse) zum Untersuchen
-            der Dateien. Diese Nummer ist zus&auml;tzlich zum Haupt-Thread, der
-            nach den zu behandelnden Dateien sucht.</p>
+        <td>Setzt die Nummer der Threads (Hintergrundprozesse) zum Untersuchen
+          der Dateien. Diese Nummer ist zus&auml;tzlich zum Haupt-Thread, der
+          nach den zu behandelnden Dateien sucht.
 
           <p>Diese Option ist nur vorhanden, wenn das Programm mit
             <code>--enable-threads</code> (oder <code>-DENABLE_THREADS</code>)
@@ -316,9 +338,12 @@
       <tr><td>&nbsp;</td></tr>
     </table>
 
+    <p>Die Optionen <i>append</i> und <i>app-file</i> (bzw. &auml;quivalent
+      <i>prepend</i> und <i>pre-file</i>) k&ouml;nnen beliebig oft wiederholt
+      werden. Der jeweilige Text wird den vorher angegeben hinzugef&uuml;gt.</p>
+
     <h2><a name="INIfile"></a>Format des INI-Files</h2>
     <p>Das INI-Files hat folgendes Format (Eintr&auml;ge k&ouml;nnen fehlen):</p>
-
 
     <pre>   [Output]
    Format=FORMAT

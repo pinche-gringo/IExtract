@@ -120,7 +120,7 @@
       <dd><p>Searches for the content of the "info" block.</p></dd>
     </dl>
 
-    <p>The output can be in HTML-format (a table), XML (default XHTML), (LaTeX
+    <p>The output can be in HTML-format (a table), XML (default XHTML), LaTeX
       (tabular) format or plain text. Note that special characters are
       converted in the exctracted information.</p>
 
@@ -174,7 +174,7 @@
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-f,&nbsp;--format=FORMAT</b></td>
-          <td><p>Format of the output (default: %n&brvbar;-&brvbar;%t&brvbar;%a&brvbar;%c&brvbar;%d)</p>
+          <td>Format of the output (default: %n&brvbar;-&brvbar;%t&brvbar;%a&brvbar;%c&brvbar;%d)
 
             <p>The output can be separted in columns; indicated by the pipe character
               (&brvbar;) in the format string.</p>
@@ -211,7 +211,7 @@
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-T,&nbsp;--title=TITLE</b></td>
-          <td><p>Title of the output (written even if there's no further output).</p>
+          <td>Title of the output (written even if there's no further output).
 
             <p>TITLE specifies the columns for the output; separated with the
               pipe character (&brvbar;); every columns must contain at least one
@@ -219,8 +219,8 @@
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-s,&nbsp;--separate=TEXT</b></td>
-          <td><p>Separate subdirectories with TEXT (default: empty);
-            implies recursion into subdirectories (--recursive).</p>
+          <td>Separate subdirectories with TEXT (default: empty); implies
+            recursion into subdirectories (--recursive).
 
             <p>The percent sign (%) indicates that the following character has
               a special meaning:</p>
@@ -237,25 +237,45 @@
             </ul></td></tr>
         <tr><td>&nbsp;</td></tr>
 
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-p,&nbsp;--prepend=TEXT</b></td>
+          <td>Specifies a text, which is written before any other output
+          (e. g. for a headline).</td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-P,&nbsp;--pre-file=FILE</b></td>
+          <td>Specifies a file, whose content is written before any other
+            output (e.g. for a header).</td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-a,&nbsp;--append=TEXT</b></td>
+          <td>Specifies a text, which is written after any other output
+          (e. g. for a footline).</td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-A,&nbsp;--app-file=FILE</b></td>
+          <td>Specifies a file, whose content is written after any other
+            output (e.g. for a footer).</td></tr>
+        <tr><td>&nbsp;</td></tr>
+
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-e,&nbsp;--show-errors</b></td>
           <td>Puts error messages (additionally) into the output</td></tr>
         <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-a,&nbsp;--all</b></td>
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-u,&nbsp;--add-unknown</b></td>
           <td>Show all files (including unknown types) in the output</td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-n,&nbsp;--new=[DAYS:]TEXT</b></td>
-          <td><p>Show (leading) TEXT (in his own column) for files younger than
-              DAYS days (default: 30)</p>
+          <td>Show (leading) TEXT (in his own column) for files younger than
+            DAYS days (default: 30)
 
             <p>DAYS may be omited or may have an multiplier suffix: m for 30.</p></td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-i,&nbsp;--include=LIST</b></td>
-          <td><p>Specifies which files should be inspected; this can be even a
-              list of files; separated with the path-separator of the operating
-              system (the colon (:) for UNICES; the semicolon (;) for Windows).</p>
+          <td>Specifies which files should be inspected; this can be even a
+            list of files; separated with the path-separator of the operating
+            system (the colon (:) for UNICES; the semicolon (;) for Windows).
 
             <p>File specifications can contain the UNIX-typical wildcards.
             <a href="IExtract.html.en#Fileformat">Details</a> can be found
@@ -263,9 +283,9 @@
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-x,&nbsp;--exclude=LIST</b></td>
-          <td><p>Specifies which files should <b>not</b> be inspected; this can be
-              even a list of files; separated with the path-separator of the operating
-              system (the colon (:) for UNICES; the semicolon (;) for Windows).</p>
+          <td>Specifies which files should <b>not</b> be inspected; this can be
+            even a list of files; separated with the path-separator of the operating
+            system (the colon (:) for UNICES; the semicolon (;) for Windows).
 
             <p>File specifications can contain the UNIX-typical wildcards.
             <a href="IExtract.html.en#Fileformat">Details</a> can be found
@@ -279,8 +299,8 @@
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-t,&nbsp;--threads=NR</b></td>
-          <td><p>Set the number of threads for examing files. This threads are additional
-              to the main thread which searches for the files to examine.</p>
+          <td>Set the number of threads for examing files. This threads are additional
+            to the main thread which searches for the files to examine.
 
             <p>This option is only available, if the program has been configured
               (or compiled) with <code>--enable-threads</code> (or
@@ -298,6 +318,10 @@
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>File(s)</b></td>
           <td>Specifies the starting directory and/or the files to inspect.</td></tr>
     </table>
+
+    <p>The options <i>append</i> and <i>app-file</i> (or equivalently
+      <i>prepend</i> and <i>pre-file</i>) can be repeated. Each new options
+      adds its text to the previous ones.</p>
 
     <h2><a name="INIfile"></a>Format of the INI file</h2>
     <p>The format of the INI file is like this (entries can be missing):</p>
