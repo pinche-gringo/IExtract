@@ -54,7 +54,7 @@ CLEAN :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 CPP=cl.exe
-CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "..\..\General\Common" /I "..\..\General\Windows" /I "." /D "NDEBUG" /D PACKAGE=\"IExtract\" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
+CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "." /D "NDEBUG" /D PACKAGE=\"IExtract\" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -98,12 +98,12 @@ LINK32_OBJS= \
 	"$(INTDIR)\ParseHTML.obj" \
 	"$(INTDIR)\ParseJPG.obj" \
 	"$(INTDIR)\ParseMP3.obj" \
+	"$(INTDIR)\ParseOOffice.obj" \
 	"$(INTDIR)\ParsePDF.obj" \
+	"$(INTDIR)\ParseRTF.obj" \
 	"$(INTDIR)\ParseSOffice.obj" \
 	"$(INTDIR)\ParseWord.obj" \
-	"$(INTDIR)\Writer.obj" \
-	"$(INTDIR)\ParseOOffice.obj" \
-	"$(INTDIR)\ParseRTF.obj"
+	"$(INTDIR)\Writer.obj"
 
 "$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -142,7 +142,7 @@ CLEAN :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 CPP=cl.exe
-CPP_PROJ=/nologo /MTd /W3 /Gm /GX /ZI /Od /I "C:\Projects\Include" /I "." /D "_DEBUG" /D PACKAGE=\"IExtract\" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
+CPP_PROJ=/nologo /MTd /W3 /Gm /GX /ZI /Od /I "." /D "_DEBUG" /D PACKAGE=\"IExtract\" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c 
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -180,18 +180,18 @@ BSC32_FLAGS=/nologo /o"$(OUTDIR)\IExtract.bsc"
 BSC32_SBRS= \
 	
 LINK32=link.exe
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib vcgenerals.lib /nologo /subsystem:console /incremental:yes /pdb:"$(OUTDIR)\IExtract.pdb" /debug /machine:I386 /out:"$(OUTDIR)\IExtract.exe" /pdbtype:sept /libpath:"C:\Projects\Lib" 
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib vcgenerals.lib /nologo /subsystem:console /incremental:yes /pdb:"$(OUTDIR)\IExtract.pdb" /debug /machine:I386 /out:"$(OUTDIR)\IExtract.exe" /pdbtype:sept 
 LINK32_OBJS= \
 	"$(INTDIR)\IExtract.obj" \
 	"$(INTDIR)\ParseHTML.obj" \
 	"$(INTDIR)\ParseJPG.obj" \
 	"$(INTDIR)\ParseMP3.obj" \
+	"$(INTDIR)\ParseOOffice.obj" \
 	"$(INTDIR)\ParsePDF.obj" \
+	"$(INTDIR)\ParseRTF.obj" \
 	"$(INTDIR)\ParseSOffice.obj" \
 	"$(INTDIR)\ParseWord.obj" \
-	"$(INTDIR)\Writer.obj" \
-	"$(INTDIR)\ParseOOffice.obj" \
-	"$(INTDIR)\ParseRTF.obj"
+	"$(INTDIR)\Writer.obj"
 
 "$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
