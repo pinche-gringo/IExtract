@@ -31,6 +31,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <mcheck.h>
+static int x = (mtrace (), 0);
+
 #include <string>
 
 #ifdef ENABLE_THREADS
@@ -65,6 +68,7 @@
 #include <INIFile.h>
 
 #include "Writer.h"
+#include "Options.h"
 #include "ParseJPG.h"
 #include "ParseHTML.h"
 #include "ParseWord.h"
@@ -90,11 +94,12 @@ class Application : public IVIOApplication {
  public:
    Application (const int argc, const char* argv[])
       : IVIOApplication (argc, argv, lo), options (0), outputStyle (TEXT)
-      , ageOfNewFiles (30 * 24 * 60 * 60), format (DEFAULT_FORMAT), title ("")
+      , ageOfNewFiles (30 * 24 * 60 * 60), iniOpts ()
 #ifdef ENABLE_THREADS
       , listFiles (), mxListFiles (), aThreads (0), mxThreads (), mxOutput ()
 #endif
       , writer (NULL) {
+      iniOpts.format = DEFAULT_FORMAT;
 #ifdef ENABLE_THREADS
       aThreads.reserve (1);
 #endif
@@ -148,12 +153,11 @@ class Application : public IVIOApplication {
 
    enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4 };
 
-   std::string newText;
    unsigned long ageOfNewFiles;
    unsigned int options;
 
-   std::string format;
-   std::string title;
+   Options iniOpts;
+
    Writer* writer;
 
 #ifdef ENABLE_THREADS
@@ -315,9 +319,9 @@ bool Application::handleOption (const char option) {
 
    case 'e': options |= SHOW_ERRORS; break;
 
-   case 'f': format = getOptionValue (); break;
+   case 'f': iniOpts.format = getOptionValue (); break;
 
-   case 'T': title = getOptionValue (); break;
+   case 'T': iniOpts.title = getOptionValue (); break;
 
    case 'n': {
       const char* pNew = getOptionValue ();
@@ -335,7 +339,7 @@ bool Application::handleOption (const char option) {
          }
          if (time)
             ageOfNewFiles = time * 24 * 60 * 60;
-         newText = pEnd + 1;
+         iniOpts.newText = pEnd + 1;
       }
 
       break; }
@@ -379,7 +383,7 @@ int Application::perform (int argc, const char* argv[]) {
       return -1;
    }
 
-   assert (format.size ());
+   assert (iniOpts.format.size ());
 
    typedef Writer* (*CREATEWRITER) (const char*, unsigned long, const char*);
    static struct {
@@ -391,12 +395,12 @@ int Application::perform (int argc, const char* argv[]) {
 
    for (unsigned int i (0); i < (sizeof (t) / sizeof (t[0])); ++i)
       if (outputStyle == t[i].opt) {
-         writer = t[i].fnc (format.c_str (), ageOfNewFiles,
-                            newText.size () ? newText.c_str () : NULL);
+         writer = t[i].fnc (iniOpts.format.c_str (), ageOfNewFiles,
+                            iniOpts.newText.size () ? iniOpts.newText.c_str () : NULL);
       }
    assert (writer);
 
-   writer->printStart (cout, title.size () ? title.c_str () : NULL);
+   writer->printStart (cout, iniOpts.title.size () ? iniOpts.title.c_str () : NULL);
 
    std::string file;
    for (unsigned int j (0); j < argc; ++j) {
@@ -669,29 +673,26 @@ void Application::readINIFile (const char* pFile) {
    std::string Style;
    try {
       INIFILE (pFile);
-      INISECTION (Output);
-      INIATTR2 (Output, std::string, format, Format);
-      INIATTR2 (Output, std::string, title, Title);
-      INIATTR2 (Output, std::string, newText, TextForNewFiles);
-      INIATTR (Output, std::string, Style);
+      INIOBJ (iniOpts, Output);
 
       unsigned int rc (INIFILE_READ ());
    }
    catch (std::string& error) {
-      TRACE1 ("Application::readINIFile (const char*) - Error reading INI-file '"
-              << pFile << "'\nReason: " << error);
+      std::cerr << PACKAGE "-error: Can't read INI-file '" << pFile
+                << "'\nReason: " << error << '\n';
    }
 
-   if (Style.size ()) {
-      if (Style == "HTML")
+   if (iniOpts.style.size ()) {
+      if (iniOpts.style == "HTML")
          outputStyle = HTML;
-      else if (Style == "text")
+      else if (iniOpts.style == "text")
          outputStyle = TEXT;
-      else if (Style == "LaTeX")
+      else if (iniOpts.style == "LaTeX")
          outputStyle = LATEX;
       else
          cerr << PACKAGE "-warning: The INI-file '" << pFile << "' contains an "
-            "invalid entry for the output style ('" << Style << "')! Using text\n";
+                 "invalid entry for the output style ('" << iniOpts.style
+              << "')! Using text\n";
    }
 }
 
