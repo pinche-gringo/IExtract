@@ -36,6 +36,11 @@
 #include "ParseOOffice.h"
 
 
+#ifdef _MSC_VER
+#pragma warning(disable:4355) // disable warning about this in initlist
+#endif
+
+
 #define ID_METASTART   "m"
 #define ID_METAINFO    ID_METASTART "eta.xml<?xml version=\""
 #define ID_TITLE       "dc:title"
