@@ -41,7 +41,7 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\General\Common" /I "..\..\General\Windows" /D "NDEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.2" /D MICRO_VERSION="03" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.2\" /D MICRO_VERSION=\"03\" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\General\Common" /I "..\..\General\Windows" /D "NDEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.3" /D MICRO_VERSION="00" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.3\" /D MICRO_VERSION=\"00\" /YX /FD /c
 # ADD BASE RSC /l 0x407 /d "NDEBUG"
 # ADD RSC /l 0x407 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -64,7 +64,7 @@ LINK32=link.exe
 # PROP Intermediate_Dir "Debug"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\General\Common" /I "..\..\General\Windows" /D "_DEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.2" /D MICRO_VERSION="01" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.2\" /D MICRO_VERSION=\"01\" /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\General\Common" /I "..\..\General\Windows" /D "_DEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.3" /D MICRO_VERSION="00" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.3\" /D MICRO_VERSION=\"00\" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x407 /d "_DEBUG"
 # ADD RSC /l 0x407 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -134,6 +134,10 @@ SOURCE=..\..\General\Common\IVIOAppl.cpp
 # Begin Source File
 
 SOURCE=..\..\General\Common\Parse.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\ParseMP3.cpp
 # End Source File
 # Begin Source File
 
@@ -242,6 +246,10 @@ SOURCE=..\..\General\Common\Mutex.h
 # Begin Source File
 
 SOURCE=..\..\General\Common\Parse.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\ParseMP3.h
 # End Source File
 # Begin Source File
 

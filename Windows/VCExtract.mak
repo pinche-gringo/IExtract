@@ -41,6 +41,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ANumeric.obj"
 	-@erase "$(INTDIR)\ATime.obj"
 	-@erase "$(INTDIR)\ATStamp.obj"
+	-@erase "$(INTDIR)\Check.obj"
 	-@erase "$(INTDIR)\DirSrch.obj"
 	-@erase "$(INTDIR)\File.obj"
 	-@erase "$(INTDIR)\FileRExp.obj"
@@ -51,6 +52,7 @@ CLEAN :
 	-@erase "$(INTDIR)\IVIOAppl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\ParseHTML.obj"
+	-@erase "$(INTDIR)\ParseMP3.obj"
 	-@erase "$(INTDIR)\ParseJPG.obj"
 	-@erase "$(INTDIR)\ParseSOffice.obj"
 	-@erase "$(INTDIR)\ParsePDF.obj"
@@ -69,7 +71,7 @@ CLEAN :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 CPP=cl.exe
-CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "..\..\General\Common" /I "..\..\General\Windows" /D "NDEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.2" /D MICRO_VERSION="03" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.2\" /D MICRO_VERSION=\"03\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c
+CPP_PROJ=/nologo /MT /W3 /GX /O2 /I "..\..\General\Common" /I "..\..\General\Windows" /D "NDEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.3" /D MICRO_VERSION="00" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.3\" /D MICRO_VERSION=\"00\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /c
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -113,6 +115,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\ANumeric.obj" \
 	"$(INTDIR)\ATime.obj" \
 	"$(INTDIR)\ATStamp.obj" \
+	"$(INTDIR)\Check.obj" \
 	"$(INTDIR)\DirSrch.obj" \
 	"$(INTDIR)\File.obj" \
 	"$(INTDIR)\FileRExp.obj" \
@@ -123,6 +126,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\IVIOAppl.obj" \
 	"$(INTDIR)\Parse.obj" \
 	"$(INTDIR)\ParseHTML.obj" \
+	"$(INTDIR)\ParseMP3.obj" \
 	"$(INTDIR)\ParseJPG.obj" \
 	"$(INTDIR)\ParseWord.obj" \
 	"$(INTDIR)\PathSrch.obj" \
@@ -156,6 +160,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ANumeric.obj"
 	-@erase "$(INTDIR)\ATime.obj"
 	-@erase "$(INTDIR)\ATStamp.obj"
+	-@erase "$(INTDIR)\Check.obj"
 	-@erase "$(INTDIR)\DirSrch.obj"
 	-@erase "$(INTDIR)\File.obj"
 	-@erase "$(INTDIR)\FileRExp.obj"
@@ -166,6 +171,7 @@ CLEAN :
 	-@erase "$(INTDIR)\IVIOAppl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\ParseHTML.obj"
+	-@erase "$(INTDIR)\ParseMP3.obj"
 	-@erase "$(INTDIR)\ParseJPG.obj"
 	-@erase "$(INTDIR)\ParseSOffice.obj"
 	-@erase "$(INTDIR)\ParsePDF.obj"
@@ -187,7 +193,7 @@ CLEAN :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 CPP=cl.exe
-CPP_PROJ=/nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\General\Common" /I "..\..\General\Windows" /D "_DEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.2" /D MICRO_VERSION="03" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.2\" /D MICRO_VERSION=\"03\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c
+CPP_PROJ=/nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\General\Common" /I "..\..\General\Windows" /D "_DEBUG" /D PACKAGE=\"IExtract\" /D VERSION="0.3" /D MICRO_VERSION="00" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D VERSION=\"0.3\" /D MICRO_VERSION=\"00\" /Fp"$(INTDIR)\IExtract.pch" /YX /Fo"$(INTDIR)\\" /Fd"$(INTDIR)\\" /FD /GZ /c
 
 .c{$(INTDIR)}.obj::
    $(CPP) @<<
@@ -231,6 +237,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\ANumeric.obj" \
 	"$(INTDIR)\ATime.obj" \
 	"$(INTDIR)\ATStamp.obj" \
+	"$(INTDIR)\Check.obj" \
 	"$(INTDIR)\DirSrch.obj" \
 	"$(INTDIR)\File.obj" \
 	"$(INTDIR)\FileRExp.obj" \
@@ -241,6 +248,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\IVIOAppl.obj" \
 	"$(INTDIR)\Parse.obj" \
 	"$(INTDIR)\ParseHTML.obj" \
+	"$(INTDIR)\ParseMP3.obj" \
 	"$(INTDIR)\ParseJPG.obj" \
 	"$(INTDIR)\ParseWord.obj" \
 	"$(INTDIR)\PathSrch.obj" \
@@ -286,6 +294,11 @@ SOURCE=..\..\General\Common\ANumeric.cpp
 SOURCE=..\..\General\Common\ATime.cpp
 
 "$(INTDIR)\ATime.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+SOURCE=..\..\General\Common\Check.cpp
+
+"$(INTDIR)\Check.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
@@ -346,6 +359,12 @@ SOURCE=..\..\General\Common\IVIOAppl.cpp
 SOURCE=..\..\General\Common\Parse.cpp
 
 "$(INTDIR)\Parse.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\src\ParseMP3.cpp
+
+"$(INTDIR)\ParseMP3.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
