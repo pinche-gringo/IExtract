@@ -209,6 +209,11 @@
             <li><b>%(BUCHSTABEN)</b> wird ersetzt durch die erste (der obigen)
               Ersetzung, die einen nicht-leeren String liefert (z.B.:. %(tn) entweder
               der Titel (wenn vorhanden), sonst der Dateiname).</li>
+            <li><b>%*BUCHSTABE</b> &auml;ndert die obige Ersetzung ein
+              wenig. F&uuml;r die Ersetzung eines Dateinamens erfolgt
+              zus&auml;tzlich eine Konvertierung von Sonderzeichen
+              (abh&auml;ngig vom Ausgabemodus); f&uuml;r die anderen wird
+              diese Konvertierung unterlassen.</li>
           </ul>
 
           <p>In jeder anderen Zusammenstellung wird das '%' einfach entfernt!</p></td></tr>

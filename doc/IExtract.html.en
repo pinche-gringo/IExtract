@@ -199,6 +199,10 @@
               <li><b>%(LETTERS)</b> is substituted with first of the above substitutions
                 producing a non-empty string (e.g. %(tn) is the tile if not 
                 empty or else the filename.)</li>
+              <li><b>%*LETTER</b> changes the substitution slightly. If LETTER
+                is a filename substitution, it additionally changes "special
+                characters" (which depend of the output-mode) in the file
+                name; for the others it suppresses this change.</li>
             </ul>
 
             <p>In every other constellation the '%' is removed!</p></td></tr>

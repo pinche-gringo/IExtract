@@ -209,6 +209,10 @@
             <li><b>%(LETRAS)</b> est&aacute; cambiado por el primer cambio (de las
               reglas anteriores) que produce un text no vacio (p.e. %(tn) ser&aacute;
               el t&iacute;tulo (si hay) o el nombre del archivo)</li>
+            <li><b>%*LETRA</b> cambia la significancia de LETRA un pocito. Para
+              cambios del nombre del archivo causa adicional el cambio de
+              letras especiales (cuales dependenden del modo de la salida) y
+              por los demas suprime ese cambio adicional.</li>
           </ul>
 
           <p>En todas las otras formas el  '%' est&aacute; borrado!</p></td></tr>
