@@ -258,6 +258,7 @@ void TextWriter::printStart (std::ostream& out, const char* title) const {
       std::string node;
       while ((node = titles.getNextNode ('|')).size ())
          out << node << " ";
+      out << '\n';
    }
 }
 
