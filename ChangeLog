@@ -1,3 +1,35 @@
+2003-06-18  Markus Schwab  <g17m0@lycos.com>
+
+	* NEWS, ChangeLog: Commented changes in V0.4.00
+
+	* Writer.cpp:
+	  Including C++ standard headers (and not C standard headers)
+
+	* ParsePDF.cpp: Corrected typo in subsystem
+
+	* Makefile.am: Renamed OpenOfice to OpenOffice (ehem)
+
+	* IExtract.cpp:
+	  Added sxi and sxm extension, removed sxa; Declaring processOpenOffice
+
+	* ParseOOffice.cpp, ParseOOffice.h: New file.
+
+	* IExtract.cpp:
+	  Formatted in UNIX-styel (with LF); Handling OpenOffice documents
+
+	* Makefile.am: ParseOOffice added
+
+	* ParseHTML.cpp, ParseHTML.h, ParseJPG.cpp, ParseJPG.h, ParseSOffice.cpp, ParseSOffice.h, ParseWord.cpp, ParseWord.h, Properties.h, Writer.cpp, Writer.h:
+	 Re-formatted in UNIX-style (with LF as line separater
+
+2003-06-04  Markus Schwab  <g17m0@lycos.com>
+
+	* IExtract.cpp: Marking string as no-c-format (for gettext)
+
+2003-06-03  Markus Schwab  <g17m0@lycos.com>
+
+	* Makefile.am: Using pkg-config to search for libAttr
+
 2003-06-03  Markus Schwab  <g17m0@lycos.com>
 
 	* NEWS, ChangeLog: Commented changes in V0.3.02
