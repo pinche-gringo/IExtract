@@ -52,6 +52,7 @@ class ParsePDF {
    int foundNumber (const char*, unsigned int);
    int foundStartNumber (const char*, unsigned int);
    int foundObjOffset (const char*, unsigned int);
+   int foundObjectID (const char*, unsigned int);
    int foundEndObj (const char*, unsigned int);
 
    typedef OFParseExact<ParsePDF>   OMParseExact;
@@ -71,6 +72,11 @@ class ParsePDF {
    ParseExact      tagTrailer;
    ParseExact      startObj;
    ParseExact      objInfo;
+   OMParseAttomic  idObject;
+   ParseExact      idObj;
+   ParseAttomic    number;
+   ParseExact      tagObj;
+   ParseAttomic    endOfValue;
    OMParseExact    endObj;
 
    OMParseExact    tagTitle;
@@ -85,7 +91,7 @@ class ParsePDF {
    ParseSequence  seqTrailer;
    ParseSelection selValues;
    ParseSequence  seqInfo;
-   ParseSelection seqInfoValue;
+   ParseSequence  seqInfoValue;
    ParseSelection selType;
 
    ParseObject* _selXRef[4];
@@ -94,9 +100,9 @@ class ParsePDF {
    ParseObject* _seqXRefTableEntries[3];
    ParseObject* _seqTrailer[4];
    ParseObject* _selValues[4];
-   ParseObject* _seqInfo[5];
-   ParseObject* _seqInfoValue[3];
-   ParseObject* _selType[5];
+   ParseObject* _seqInfo[8];
+   ParseObject* _seqInfoValue[4];
+   ParseObject* _selType[6];
 
    Properties* prop;
 
