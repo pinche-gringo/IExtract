@@ -46,9 +46,26 @@ static const unsigned LEN_CONTENT     = 1024;
 #define ID1 "\xF9"
 static const char* ID = ID1 "\x4F\x68\x10\xAB\x91\x08\x00\x2B\x27\xB3\xD9\x30\x00\x00\x00";
 
-static const unsigned int TYPE_TITLE   = 2;
-static const unsigned int TYPE_AUTHOR  = 4;
-static const unsigned int TYPE_COMMENT = 6;
+#ifdef WORDS_BIGENDIAN
+   static const unsigned int TYPE_TITLE   = 0x2000000;
+   static const unsigned int TYPE_AUTHOR  = 0x4000000;
+   static const unsigned int TYPE_COMMENT = 0x6000000;
+
+inline unsigned int get4BytesLSB (const char* pAddr) {
+   return (((unsigned char)(*pAddr) << 24) + ((unsigned char)pAddr[1] << 16)
+           + ((unsigned char)pAddr[2] << 8) + ((unsigned char)pAddr[3]));
+}
+
+#else
+   static const unsigned int TYPE_TITLE   = 2;
+   static const unsigned int TYPE_AUTHOR  = 4;
+   static const unsigned int TYPE_COMMENT = 6;
+
+inline unsigned int get4BytesLSB (const char* pAddr) {
+   return *(unsigned int*)pAddr;
+}
+
+#endif
 
 
 static const unsigned int aTypes[] = { TYPE_TITLE, TYPE_AUTHOR, TYPE_COMMENT };
@@ -105,7 +122,7 @@ ParseWord::ParseWord()
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundNrEntries (const char* pEntries, unsigned int) {
    assert (pEntries);
-   cEntries = *(unsigned int*)pEntries;
+   cEntries = get4BytesLSB (pEntries);
    TRACE4 ("ParseWord::foundNrEntries (const char*) - Entries: " << cEntries);
 
    seqEntries.setMaxCard (cEntries);
@@ -137,7 +154,7 @@ int ParseWord::foundOffset (const char* offset, unsigned int) {
    assert (offset);
    assert (getTypeIndex (actEntry) != -1);
 
-   unsigned int off (*(unsigned int*)offset);
+   unsigned int off (get4BytesLSB (offset));
    TRACE9 ("ParseWord::foundType (const char*) - Offset: " << off << " (0x"
            << hex << off << dec << ')');
 

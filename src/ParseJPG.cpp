@@ -26,6 +26,9 @@
 
 #include <assert.h>
 
+
+// Note TRACELEVEL 9 is not recomended as the title very likely contains
+// special characters!
 #include <Trace_.h>
 
 #include "ParseJPG.h"
@@ -35,13 +38,54 @@
 #pragma warning(disable:4355) // disable warning about this in initlist
 #endif
 
+#ifdef WORDS_BIGENDIAN
+#  define TYPE_TITLE     0x9b9c0100
+#  define TYPE_COMMENT   0x9c9c0100
 
-#define TYPE_TITLE     0x019c9b
-#define TYPE_COMMENT   0x019c9c
+#  define TYPE_TITLE2    0x1c026900
+#  define TYPE_COMMENT2  0x1c027800
+#  define TYPE_AUTHOR2   0x1c026e00
 
-#define TYPE_TITLE2    0x69021c
-#define TYPE_COMMENT2  0x78021c
-#define TYPE_AUTHOR2   0x6e021c
+#  define ENTRY_BLOCK    0x3842494d
+#  define ENTRY_TYPE     0x6e000000
+
+inline unsigned short get2BytesLSB (const char* pAddr) {
+   return ((unsigned char)(*pAddr) << 8) + (unsigned char)pAddr[1];
+}
+
+inline unsigned short get2BytesMSB (const char* pAddr) {
+   return *(unsigned short*)pAddr;
+}
+
+inline unsigned int get4BytesLSB (const char* pAddr) {
+   return (((unsigned char)(*pAddr) << 24) + ((unsigned char)pAddr[1] << 16)
+           + ((unsigned char)pAddr[2] << 8) + ((unsigned char)pAddr[3]));
+}
+
+#else
+#  define TYPE_TITLE     0x019c9b
+#  define TYPE_COMMENT   0x019c9c
+
+#  define TYPE_TITLE2    0x69021c
+#  define TYPE_COMMENT2  0x78021c
+#  define TYPE_AUTHOR2   0x6e021c
+
+#  define ENTRY_BLOCK    0x4d494238
+#  define ENTRY_TYPE     0x6e
+
+inline unsigned short get2BytesLSB (const char* pAddr) {
+   return *(unsigned short*)pAddr;
+}
+
+inline unsigned short get2BytesMSB (const char* pAddr) {
+   return ((unsigned char)(*pAddr) << 8) + (unsigned char)pAddr[1];
+}
+
+inline unsigned int get4BytesLSB (const char* pAddr) {
+   return *(unsigned int*)pAddr;
+}
+
+#endif
 
 
 /*--------------------------------------------------------------------------*/
@@ -167,19 +211,19 @@ int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
    TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Header: *"
            << hex << (unsigned int)pAct << " = " << (*(unsigned int*)pAct) << dec);
 
-   if (*(unsigned int*)pAct == 0x4d494238) {
+   if (*(unsigned int*)pAct == ENTRY_BLOCK) {
       pAct += 6;
       pAct += (unsigned int)*pAct;
 
       TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Entry: *"
               << hex << (unsigned int)pAct << " = " << (*(unsigned int*)pAct) << dec);
 
-      if (*(unsigned int*)pAct == 0x6e) {
+      if (*(unsigned int*)pAct == ENTRY_TYPE) {
          pAct += 4;
          pTitle = pAct + (unsigned int)*pAct++;
          do {
             TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Type: *"
-                    << hex << (unsigned int)pAct << " = " << (*(unsigned int*)pAct) << dec);
+                    << hex << (unsigned int)pAct << " = " << get4BytesLSB (pAct) << dec);
 
             static string Properties::* values[] = { &Properties::strTitle,
                                                      &Properties::strComment,
@@ -192,7 +236,8 @@ int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
                if (*(unsigned int*)pAct == aSupportedTypes[i]) {
                   pAct += 4;
                   TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - " << i
-                          << ": Assigning " << (unsigned int)(*pAct) << " chars");
+                          << ": Assigning " << (unsigned int)(*pAct) << " chars = "
+                          << pAct + 1);
                   (prop->*(values[i])).assign (pAct + 1, (unsigned int)*pAct);
                   pAct -= 4;
                   break;
@@ -216,7 +261,7 @@ int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundLength (const char* length, unsigned int) {
    assert (length);
-   lengths[1] = ((unsigned char)(*length) << 8) + (unsigned char)length[1];
+   lengths[1] = get2BytesMSB (length);
    TRACE8 ("ParseJPEG::foundLength (const char*, unsigned int): " << lengths[1]);
    if (lengths[1]) {
       title.setMaxCard (lengths[1]);
@@ -239,8 +284,8 @@ int ParseJPEG::foundLength2 (const char* length, unsigned int) {
    for (unsigned int i (0);
         i < (sizeof (lengths) / sizeof (lengths[0])); ++i)
       if (actEntry == aSupportedTypes[i]) {
-         lengths[i] = *(unsigned short*)length;
-         TRACE9 ("ParseWord::foundLength2 (const char*) - " << lengths[i]
+         lengths[i] = get2BytesLSB (length);
+         TRACE9 ("ParseJPEG::foundLength2 (const char*) - " << lengths[i]
                  << " (0x" << hex << lengths[i] << dec << ')');
          actEntry = i;
          return ParseObject::PARSE_OK;
@@ -257,7 +302,7 @@ int ParseJPEG::foundLength2 (const char* length, unsigned int) {
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundNumber (const char* nr, unsigned int) {
    assert (nr);
-   seqEntries.setMaxCard (cEntries = (*(unsigned short*)nr));
+   seqEntries.setMaxCard (cEntries = (get2BytesLSB (nr)));
    seqEntries.setMinCard (cEntries);
    length2.setMaxCard (4);
    TRACE8 ("ParseJPEG::foundNumber (const char*, unsigned int): " << cEntries);
@@ -273,7 +318,7 @@ int ParseJPEG::foundNumber (const char* nr, unsigned int) {
 int ParseJPEG::foundType (const char* pType, unsigned int) {
    assert (pType);
    actEntry = *(unsigned int*)pType;
-   TRACE9 ("ParseWord::foundType (const char*) - " << hex << actEntry << dec);
+   TRACE9 ("ParseJPEG::foundType (const char*) - " << hex << actEntry << dec);
    cRead += 12;
    return ParseObject::PARSE_OK;
 }
@@ -287,8 +332,8 @@ int ParseJPEG::foundType (const char* pType, unsigned int) {
 int ParseJPEG::foundOffset (const char* pOffset, unsigned int len) {
    assert (pOffset);
    if (actEntry != -1U) {
-      offsets[actEntry] = *(unsigned int*)pOffset;
-      TRACE9 ("ParseWord::foundOffset (const char*) - " << offsets[actEntry]
+      offsets[actEntry] = get4BytesLSB (pOffset);
+      TRACE9 ("ParseJPEG::foundOffset (const char*) - " << offsets[actEntry]
               << " (0x" << hex << offsets[actEntry] << dec << ')');
    }
    return ParseObject::PARSE_OK;
