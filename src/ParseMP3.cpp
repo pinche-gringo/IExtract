@@ -76,9 +76,9 @@ std::string ParseMP3::strip (std::string& value, unsigned int pos, unsigned int 
    while (len > pos) {
       TRACE9 ("ParseMP3::strip (std::string&, unsigned int, unsigned int) - "
               << value[len]);
-      if (value[len] != ' ')
+      if ((value[len] != ' ') && (value[len]))
          break;
       --len;
    }
-   return value.substr (pos, len - pos + 1);
+   return (pos == len) ? " " : value.substr (pos, len - pos + 1);
 }
