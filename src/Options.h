@@ -38,6 +38,7 @@ class Options : public Entity {
    std::string title;      // %attrib%; Title
    std::string newText;    // %attrib%; TextForNewFiles
    std::string style;      // %attrib%; Style
+   std::string separate;   // %attrib%; DirSeparator
 };
 
 
