@@ -29,7 +29,11 @@
 
 #include <iostream>
 
+#include <Trace_.h>
+
 #include <File.h>
+#include <ATStamp.h>
+#include <Tokenize.h>
 
 #include "Writer.h"
 #include "Properties.h"
@@ -37,13 +41,14 @@
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Konstructor
-//Parameters: showOptions: Options how to display files
+//Parameters: format: Format how to display entries
 //            age: Maximal age for new files
 //            pNew: Text to display for new files
 /*--------------------------------------------------------------------------*/
-Writer::Writer (unsigned int showOptions, unsigned long age, const char* pNew)
-   : options (showOptions), pStrNew (pNew) {
+Writer::Writer (const char* format, unsigned long age, const char* pNew)
+   : pStrNew (pNew), pFormat (format) {
    assert (pNew ? age : 1);
+   assert (pFormat);
 
    limit = time (NULL) - age;
 }
@@ -52,6 +57,82 @@ Writer::Writer (unsigned int showOptions, unsigned long age, const char* pNew)
 //Purpose   : Destructor
 /*--------------------------------------------------------------------------*/
 Writer::~Writer () {
+}
+
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Counts the number of columns
+//Returns   : unsigned int: Number of columns
+/*--------------------------------------------------------------------------*/
+unsigned int Writer::columns () const {
+   unsigned int cols (0);
+   OutIterator i (pFormat);
+   while (i) {
+      ++i;
+      ++cols;
+   }
+   return cols;
+}
+
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Returns the next token; special characters are expanded
+//Returns   : std::string: Next (expanded) token
+/*--------------------------------------------------------------------------*/
+std::string Writer::OutIterator::operator* () const {
+   assert (file);
+   std::string token (pFormat, len);
+
+   TRACE2 ("Writer::OutIterator::operator* () - Token = '" << token << '\'');
+
+   unsigned int pos (0);
+   while ((pos = token.find ('%', pos)) != std::string::npos)
+      switch (token[pos + 1]) {
+      case 'a': if (p) token.replace (pos, 2, p->strAuthor); break;
+
+      case 'c': if (p) token.replace (pos, 2, p->strComment); break;
+
+      case 'd': {
+         ATimestamp stamp (file->time ());
+         token.replace (pos, 2, stamp.toString ()); break; }
+
+      case 'n': token.replace (pos, 2, file->name ()); break;
+
+      case 'N': {
+         std::string name (file->path ());
+         name += file->name ();
+         token.replace (pos, 2, name);
+         break; }
+
+      case 'p': token.replace (pos, 2, file->path ()); break;
+
+      case 't': if (p) token.replace (pos, 2, p->strTitle); break;
+
+      case '%': token.replace (pos, 1, 0, '\0'); break;
+      }
+   return token;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Calculates the length of the next token
+//Parameters: pFormat: Token to inspect
+//Returns   : unsigned int: Length of token
+/*--------------------------------------------------------------------------*/
+unsigned int Writer::OutIterator::lengthOfToken (const char* pFormat) {
+   assert (pFormat);
+   const char* pEnd = ((*pFormat == '%')
+                       ? ((pFormat[1] == '%')
+                          ? (strchr (pFormat + 2, '%'))
+                          : pFormat + 2)
+                       : strchr (pFormat, '%'));
+
+   // Skip over "%%"
+   while (pEnd && (*pEnd == '%') && (pEnd[1] == '%'))
+      pEnd = strchr (pEnd + 2, '%');
+
+   TRACE2 ("Writer::OutIterator::lengthOfToken (const char* ) - Length = "
+           << (pEnd ? pEnd - pFormat :  strlen (pFormat)));
+   return pEnd ? pEnd - pFormat :  strlen (pFormat);
 }
 
 
@@ -65,9 +146,20 @@ HTMLWriter::~HTMLWriter () {
 /*--------------------------------------------------------------------------*/
 //Purpose   : Prints the start for an HTML-table
 //Parameters: out: Stream where to put the output
+//            title: Title information
 /*--------------------------------------------------------------------------*/
-void HTMLWriter::printStart (std::ostream& out) const {
+void HTMLWriter::printStart (std::ostream& out, const char* title) const {
    out << "<table>\n";
+
+   if (title) {
+      Tokenize titles (title);
+      std::string node;
+      out << "<thead><tr>";
+      while ((node = titles.getNextNode ('|')).size ())
+         out << "<td>" << node << "</td>";
+      out << "</tr></thead>";
+   }
+   out << "<tbody>";
 }
 
 /*--------------------------------------------------------------------------*/
@@ -78,16 +170,26 @@ void HTMLWriter::printStart (std::ostream& out) const {
 /*--------------------------------------------------------------------------*/
 void HTMLWriter::printFile (std::ostream& out, const File& file,
                             const Properties& prop) const {
-   out << "<tr valign=top><td>";
-   if (pStrNew && isNew (file))
-      out << pStrNew;
-   out << "</td><td><a href=\"" << file.path ()
-       << file.name () << "\">";
-   if (options & SHOW_PATH)
-      out << file.path ();
-   out << file.name () << "</td><td>-</td><td>"
-       << (prop.strComment.empty () ? prop.strTitle : prop.strComment)
-       << "</td></tr>\n";
+   out << "<tr valign=top>";
+   if (pStrNew) {
+      out << "<td>";
+      if (isNew (file))
+         out << pStrNew;
+      out << "</td>";
+   }
+
+   OutIterator i (pFormat, file, prop);
+   while (i) {
+      out << "<td>";
+      if (i.isAtName ())
+         out << "<a href=\"" << file.path () << file.name () << "\">";
+      out << *i;
+      if (i.isAtName ())
+         out << "</a>";
+      out << "</td>";
+      ++i;
+   }
+   out << "</tr>\n";
 }
 
 /*--------------------------------------------------------------------------*/
@@ -100,15 +202,33 @@ void HTMLWriter::printMessage (std::ostream& out, const File& file,
                                const char* msg) const {
    assert (msg);
 
-   out << "<tr valign=top><td>";
-   if (pStrNew && isNew (file))
-      out << pStrNew;
-   out << "</td><td><a href=\"" << file.path ()
-       << file.name () << "\">";
-   if (options & SHOW_PATH)
-      out << file.path ();
-   out << file.name () << "</td><td>-</td><td>" << msg
-       << "</td></tr>\n";
+   out << "<tr valign=top>";
+   if (pStrNew) {
+      out << "<td>";
+      if (isNew (file))
+         out << pStrNew;
+      out << "</td>";
+   }
+
+   unsigned int cols (columns ());
+   TRACE9 ("HTMLWriter::printMessage (ostream&, const File&, const char*) - "
+           << cols << " Columns");
+   OutIterator i (pFormat, file);
+   while (i) {
+      out << "<td>";
+      if (i.isAtName ())
+         out << "<a href=\"" << file.path () << file.name () << "\">" << *i
+             << "</a>";
+      out << "</td>";
+      --cols;
+      if (i.isAtName ())
+         break;
+      ++i;
+   }
+
+   TRACE5 ("HTMLWriter::printMessage (ostream&, const File&, const char*) - "
+           << msg << " for " << cols << " Columns");
+   out << "<td colspan=" << cols << '>' << msg << "</td></tr>\n";
 }
 
 /*--------------------------------------------------------------------------*/
@@ -116,7 +236,7 @@ void HTMLWriter::printMessage (std::ostream& out, const File& file,
 //Parameters: out: Stream where to put the output
 /*--------------------------------------------------------------------------*/
 void HTMLWriter::printEnd (std::ostream& out) const {
-   out << "</table>\n";
+   out << "</tbody></table>\n";
 }
 
 
@@ -128,6 +248,20 @@ TextWriter::~TextWriter () {
 
 
 /*--------------------------------------------------------------------------*/
+//Purpose   : Prints the start for an HTML-table
+//Parameters: out: Stream where to put the output
+//            title: Title information
+/*--------------------------------------------------------------------------*/
+void TextWriter::printStart (std::ostream& out, const char* title) const {
+   if (title) {
+      Tokenize titles (title);
+      std::string node;
+      while ((node = titles.getNextNode ('|')).size ())
+         out << node << " ";
+   }
+}
+
+/*--------------------------------------------------------------------------*/
 //Purpose   : Prints a file entry in text-format
 //Parameters: out: Stream where to put the output
 //            file: File whose data should be printed
@@ -137,10 +271,17 @@ void TextWriter::printFile (std::ostream& out, const File& file,
                             const Properties& prop) const {
    if (pStrNew && isNew (file))
       out << pStrNew << ": ";
-   if (options & SHOW_PATH)
-      out << file.path ();
-   out << file.name () << " - "
-       << (prop.strComment.empty () ? prop.strTitle : prop.strComment) << '\n';
+
+   OutIterator i (pFormat, file, prop);
+   std::string result;
+   while (i) {
+      result = *i;
+      out << result;
+      if (result.size ())
+          out << ' ';
+      ++i;
+   }
+   out << '\n';
 }
 
 /*--------------------------------------------------------------------------*/
@@ -154,7 +295,5 @@ void TextWriter::printMessage (std::ostream& out, const File& file,
    assert (msg);
    if (pStrNew && isNew (file))
       out << pStrNew << ": ";
-   if (options & SHOW_PATH)
-      out << file.path ();
    out << file.name () << " - " << msg << '\n';
 }

@@ -17,6 +17,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+
+#include <string.h>
+
+#include <string>
+
 #include <iosfwd>
 
 struct File;
@@ -26,25 +31,72 @@ struct Properties;
 // Baseclass of output classes
 class Writer {
  public:
-   Writer (unsigned int showOptions = 0, unsigned long age = 0,
-           const char* pNew = NULL);
+   Writer (const char* format, unsigned long age = 0, const char* pNew = NULL);
    virtual ~Writer ();
 
-   virtual void printStart (std::ostream& out) const { };
+   virtual void printStart (std::ostream& out, const char* title = NULL) const { };
    virtual void printFile (std::ostream& out, const File& file,
                            const Properties& prop) const = 0;
    virtual void printMessage (std::ostream& out, const File& file,
                               const char* msg) const = 0;
    virtual void printEnd (std::ostream& out) const { };
 
-   typedef enum { SHOW_PATH = 0x1 } showOptions;
-
  protected:
    bool isNew (const File& file) const {
       return file.time () > limit; }
 
+   unsigned int columns () const;
+
    unsigned int  options;
    const char*   pStrNew;
+   const char*   pFormat;
+
+   class OutIterator {
+      friend class Writer;
+
+    public:
+      OutIterator (const char* format, const File& outfile)
+         : file (&outfile), p (NULL), pFormat (format), len (lengthOfToken (format)) { }
+      OutIterator (const char* format, const File& outfile, 
+                   const struct Properties& prop)
+         : file (&outfile), p (&prop), pFormat (format), len (lengthOfToken (format)) { }
+      ~OutIterator () { }
+
+      OutIterator& operator++ () {
+         setToNextToken ();
+         return *this;
+      }
+      OutIterator& operator++ (int) {
+         OutIterator& old = *this;
+         setToNextToken ();
+         return old;
+      }
+      operator void*() const { return (void*)*pFormat; }
+      bool operator! () const { return !*pFormat; }
+
+      std::string operator* () const;
+
+      bool isAtName () const {
+         return (*pFormat == '%') && ((pFormat[1] == 'n') || (pFormat[1] == 'N')); }
+
+    private:
+      OutIterator (const char* format) : pFormat (format), p (NULL), file (NULL) { }
+
+      void setToNextToken () {
+         assert (pFormat && *pFormat);
+         pFormat += len;
+         len = lengthOfToken (pFormat); }
+
+      static unsigned int lengthOfToken (const char* pFormat);
+
+      const File* file;
+      const struct Properties* p;
+      const char* pFormat;
+      unsigned int len;
+
+      OutIterator (const OutIterator&);
+      OutIterator& operator= (const OutIterator&);
+   };
 
  private:
    unsigned long limit;
@@ -54,40 +106,39 @@ class Writer {
 // Class to write fileinfo in HTML format
 class HTMLWriter : public Writer {
  public:
-   HTMLWriter (unsigned int showOptions = 0, unsigned long age = 0,
-               const char* pNew = NULL)
-      : Writer (showOptions, age, pNew) { }
+   HTMLWriter (const char* format, unsigned long age = 0, const char* pNew = NULL)
+      : Writer (format, age, pNew) { }
    virtual ~HTMLWriter ();
 
-   virtual void printStart (std::ostream& out) const;
+   virtual void printStart (std::ostream& out, const char* title = NULL) const;
    virtual void printFile (std::ostream& out, const File& file,
                            const Properties& prop) const;
    virtual void printMessage (std::ostream& out, const File& file,
                               const char* msg) const;
    virtual void printEnd (std::ostream& out) const;
 
-   static HTMLWriter* create (unsigned int options, unsigned long age = 0,
+   static HTMLWriter* create (const char* format, unsigned long age = 0,
                               const char* pNew = NULL) {
-      return new HTMLWriter (options, age, pNew); }
+      return new HTMLWriter (format, age, pNew); }
 };
 
 
 // Class to write fileinfo in text format
 class TextWriter : public Writer {
  public:
-   TextWriter (unsigned int showOptions = 0, unsigned long age = 0,
-               const char* pNew = NULL)
-      : Writer (showOptions, age, pNew) { }
+   TextWriter (const char* format, unsigned long age = 0, const char* pNew = NULL)
+      : Writer (format, age, pNew) { }
    virtual ~TextWriter ();
 
+   virtual void printStart (std::ostream& out, const char* title = NULL) const;
    virtual void printFile (std::ostream& out, const File& file,
                            const Properties& prop) const;
    virtual void printMessage (std::ostream& out, const File& file,
                               const char* msg) const;
 
-   static TextWriter* create (unsigned int options, unsigned long age = 0,
+   static TextWriter* create (const char* format, unsigned long age = 0,
                               const char* pNew = NULL) {
-      return new TextWriter (options, age, pNew); }
+      return new TextWriter (format, age, pNew); }
 };
 
 
