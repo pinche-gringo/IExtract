@@ -121,6 +121,10 @@ SOURCE=..\src\IExtract.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\General\Common\INIFile.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\General\Common\IVIOAppl.cpp
 # End Source File
 # Begin Source File
@@ -206,6 +210,10 @@ SOURCE=..\..\General\Common\FileRExp.h
 # Begin Source File
 
 SOURCE=..\..\General\Common\IDirSrch.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\General\Common\INIFile.h
 # End Source File
 # Begin Source File
 

@@ -46,6 +46,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FileRExp.obj"
 	-@erase "$(INTDIR)\IDirSrch.obj"
 	-@erase "$(INTDIR)\IExtract.obj"
+	-@erase "$(INTDIR)\INIFile.obj"
 	-@erase "$(INTDIR)\IVIOAppl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\ParseHTML.obj"
@@ -105,7 +106,10 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"$(OUTDIR)\IExtract.pdb" /machine:I386 /out:"$(OUTDIR)\IExtract.exe" 
 LINK32_OBJS= \
+	"$(INTDIR)\ADate.obj" \
 	"$(INTDIR)\ANumeric.obj" \
+	"$(INTDIR)\ATime.obj" \
+	"$(INTDIR)\ATStamp.obj" \
 	"$(INTDIR)\DirSrch.obj" \
 	"$(INTDIR)\File.obj" \
 	"$(INTDIR)\FileRExp.obj" \
@@ -123,9 +127,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Writer.obj" \
 	"$(INTDIR)\XDirSrch.obj" \
 	"$(INTDIR)\XStrBuf.obj" \
-	"$(INTDIR)\ADate.obj" \
-	"$(INTDIR)\ATime.obj" \
-	"$(INTDIR)\ATStamp.obj"
+	"$(INTDIR)\INIFile.obj"
 
 "$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -153,6 +155,7 @@ CLEAN :
 	-@erase "$(INTDIR)\FileRExp.obj"
 	-@erase "$(INTDIR)\IDirSrch.obj"
 	-@erase "$(INTDIR)\IExtract.obj"
+	-@erase "$(INTDIR)\INIFile.obj"
 	-@erase "$(INTDIR)\IVIOAppl.obj"
 	-@erase "$(INTDIR)\Parse.obj"
 	-@erase "$(INTDIR)\ParseHTML.obj"
@@ -215,7 +218,10 @@ BSC32_SBRS= \
 LINK32=link.exe
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:yes /pdb:"$(OUTDIR)\IExtract.pdb" /debug /machine:I386 /out:"$(OUTDIR)\IExtract.exe" /pdbtype:sept 
 LINK32_OBJS= \
+	"$(INTDIR)\ADate.obj" \
 	"$(INTDIR)\ANumeric.obj" \
+	"$(INTDIR)\ATime.obj" \
+	"$(INTDIR)\ATStamp.obj" \
 	"$(INTDIR)\DirSrch.obj" \
 	"$(INTDIR)\File.obj" \
 	"$(INTDIR)\FileRExp.obj" \
@@ -233,9 +239,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\Writer.obj" \
 	"$(INTDIR)\XDirSrch.obj" \
 	"$(INTDIR)\XStrBuf.obj" \
-	"$(INTDIR)\ADate.obj" \
-	"$(INTDIR)\ATime.obj" \
-	"$(INTDIR)\ATStamp.obj"
+	"$(INTDIR)\INIFile.obj"
 
 "$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -306,6 +310,12 @@ SOURCE=..\..\General\Common\IDirSrch.cpp
 SOURCE=..\src\IExtract.cpp
 
 "$(INTDIR)\IExtract.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\..\General\Common\INIFile.cpp
+
+"$(INTDIR)\INIFile.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
