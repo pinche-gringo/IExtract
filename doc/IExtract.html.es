@@ -76,7 +76,7 @@
     <dl>
       <dt><b>HTML</b></dt>
       <dd><p>Busca para el texto entre los tags <code>&lt;title&gt;</code> y
-          <code>&lt;/title&gt;</code> y el contento de los tags <code>meta</code>
+          <code>&lt;/title&gt;</code> y el contenido de los tags <code>meta</code>
           (tanto en formato HTML 4.0 como "Dublin Core").</p>
 
         <p>Archivos tienen que tener la extensi&oacute;n <code>*.htm</code>, <code>*.html</code>,
@@ -102,13 +102,13 @@
       </dd>
 
       <dt><b>MP3</b></dt>
-      <dd><p>Extrae el contento del tag ID3 (versi&oacute;n 1.x). El
+      <dd><p>Extrae el contenido del tag ID3 (versi&oacute;n 1.x). El
           t&iacute;tulo del &aacute;lbum se pone en el campo comentario.</p></dd>
 
       <dt><b>PDF</b></dt>
       <dd><p>Documentos de PDF contienen un llamado <i>Document Information
             directory</i> (Directorio de informaciones del documento) con varias
-          llaves. El contento de aquel directorio est&aacute; extraido (con el
+          llaves. El contenido de aquel directorio est&aacute; extraido (con el
           contenido de la llave "Subject" (sujecto) como comentario).</p>
 
         <p>&iexcl;Datos codificados no est&aacute;n decifrados!</p></dd>
@@ -252,7 +252,7 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-P,&nbsp;--pre-file=ARCHIVO</b></td>
-        <td>Especifica un archivo, cual contento est&aacute; mostrado antes
+        <td>Especifica un archivo, cual contenido est&aacute; mostrado antes
           cualquiera salida (p.ej. por un encabezamiento).</td></tr>
       <tr><td>&nbsp;</td></tr>
 
@@ -262,7 +262,7 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-A,&nbsp;--app-file=ARCHIVO</b></td>
-        <td>Especifica un archivo, cual contento est&aacute; mostrado despu&eacute;s
+        <td>Especifica un archivo, cual contenido est&aacute; mostrado despu&eacute;s
           cualquiera salida (p.ej. por un pie de p&aacute;gina).</td></tr>
       <tr><td>&nbsp;</td></tr>
 
