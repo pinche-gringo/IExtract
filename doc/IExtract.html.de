@@ -2,18 +2,18 @@
 <!-- $Id$ -->
 
 <!--
-  Copyright (C) 2003, 2004 Markus Schwab (g17m0@lycos.com)
+  Copyright (C) 2003 - 2005 Markus Schwab (g17m0@lycos.com)
 
   This is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
   License as published by the Free Software Foundation; either
   version 2 of the License, or (at your option) any later version.
- 
+
   This is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
- 
+
   You should have received a copy of the GNU General Public
   License along with this library; if not, write to the Free
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -176,7 +176,7 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-o,&nbsp;--output=STIL</b></td>
-        <td>Setzt den Stil der Ausgabe (text, HTML oder LaTeX)</td></tr>
+        <td>Setzt den Stil der Ausgabe (text, HTML oder LaTeX).</td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-f,&nbsp;--format=FORMAT</b></td>
@@ -329,12 +329,24 @@
             konfiguriert (beziehungsweise &uuml;bersetzt) wurde!</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-S,&nbsp;--sort</b></td>
+        <td>Die gefundenen Dateien werden alphabetisch sortiert.</td></tr>
+      <tr><td>&nbsp;</td></tr>
+
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-X,&nbsp;--ignore-ext</b></td>
+        <td>Wenn die Dateierweiterung (Extension) unbekannt ist, verwende
+          die vorherige, um den Typ der Datei zu bestimmen. Das ist sinnvoll
+          f&uuml;r z.B. in mehreren Sprachen verf&uuml;gbaren HTML-Dokumenten,
+          die i.A. die Sprache als zus&auml;tzliche Dateierweiterung aufweisen
+          (z.B. index.html.de).</td></tr>
+      <tr><td>&nbsp;</td></tr>
+
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-V,&nbsp;--version</b></td>
-        <td>Ausgabe der Versionsinformation und beenden</td></tr>
+        <td>Ausgabe der Versionsinformation und beenden.</td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-h, -?,&nbsp;--help</b></td>
-        <td>Ausgeben der Hilfe und beenden</td></tr>
+        <td>Ausgeben der Hilfe und beenden.</td></tr>
       <tr><td>&nbsp;</td></tr>
     </table>
 
@@ -351,15 +363,12 @@
    TextForNewFiles=TEXT
    MaxAgeForNewFiles=TAGE
    DirSeparatorText=TEXT
-   Style=STIL</pre>
+   Style=STIL
+   SortFiles=1</pre>
 
     <p>Es werden die gleichen Ersetzungen wie f&uuml;r die Optionen durchgef&uuml;hrt!</p>
 
     <hr>
     <address><a href="mailto:g17m0@lycos.com">Sende etwaige Kommentare</a></address>
-<!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
-<!-- hhmts start -->
-Last modified: Wed Jun 18 19:41:18 PET 2003
-<!-- hhmts end -->
   </body>
 </html>

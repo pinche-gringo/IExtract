@@ -2,18 +2,18 @@
 <!-- $Id$ -->
 
 <!--
-  Copyright (C) 2003, 2004 Markus Schwab (g17m0@lycos.com)
+  Copyright (C) 2003 - 2005 Markus Schwab (g17m0@lycos.com)
 
   This is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
   License as published by the Free Software Foundation; either
   version 2 of the License, or (at your option) any later version.
- 
+
   This is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
- 
+
   You should have received a copy of the GNU General Public
   License along with this library; if not, write to the Free
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -170,7 +170,7 @@
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-o,&nbsp;--output=STYLE</b></td>
-          <td>Sets the style of the output (text, HTML or LaTeX)</td></tr>
+          <td>Sets the style of the output (text, HTML or LaTeX.)</td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-f,&nbsp;--format=FORMAT</b></td>
@@ -199,7 +199,7 @@
               <li><b>%U</b> is substituted with path and name of the file in UNIX style
                 (the nodes separated with a slash (/)</li>
               <li><b>%(LETTERS)</b> is substituted with first of the above substitutions
-                producing a non-empty string (e.g. %(tn) is the tile if not 
+                producing a non-empty string (e.g. %(tn) is the tile if not
                 empty or else the filename.)</li>
               <li><b>%*LETTER</b> changes the substitution slightly. If LETTER
                 is a filename substitution, it additionally changes "special
@@ -307,12 +307,23 @@
               <code>-DENABLE_THREADS</code>)!</p></td></tr>
         <tr><td>&nbsp;</td></tr>
 
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-S,&nbsp;--sort</b></td>
+          <td>Sorts the found files alphabetically.</td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-X,&nbsp;--ignore-ext</b></td>
+          <td>If the file extension is unknown, take the previous to determine
+	    the type of the file. This is usefull for e.g. HTML documents
+	    available in various languages, which usually contain the language
+	    as additional extension (like index.html.en).</td></tr>
+        <tr><td>&nbsp;</td></tr>
+
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-V,&nbsp;--version</b></td>
-          <td>Output version information and exit</td></tr>
+          <td>Output version information and exit.</td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-h, -?,&nbsp;--help</b></td>
-          <td>Displays this help and exit</td></tr>
+          <td>Displays this help and exit.</td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>File(s)</b></td>
@@ -332,15 +343,12 @@
    TextForNewFiles=TEXT
    MaxAgeForNewFiles=DAYS
    DirSeparatorText=TEXT
-   Style=STYLE</pre>
+   Style=STYLE
+   SortFiles=1</pre>
 
     <p>The same substituations as withhin the options are performed!</p>
 
     <hr>
     <address><a href="mailto:g17m0@lycos.com">Mail comments</a></address>
-<!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
-<!-- hhmts start -->
-Last modified: Wed Jun 18 19:37:56 PET 2003
-<!-- hhmts end -->
   </body>
 </html>
