@@ -95,9 +95,10 @@
       <dt><b>Microsoft Office Dokumente</b></dt>
       <dd><p>Sucht nach dem Inhalt des "Eigenschaften" Dialogs.</p>
 
-        <p>Nat&uuml;rlich ist dieses Format nicht dokumentiert und daher gibt es
-          auch hierkeine Garantie, da&szlig; alle Dokumente korrekt behandelt
-          werden.</p></dd>
+        <p>Ich habe keine Dokumentation dieses Formats (genausowenig wie Office
+          selbst) und daher gibt es auch hier keine Garantie, da&szlig; alle
+          Dokumente korrekt behandelt werden. Dennoch: Alle meiner mir
+          zug&auml;nglichen Dokumente wurden korrekt verarbeitet.</p></dd>
 
       <dt><b>MP3</b></dt>
       <dd><p>Sucht nach dem ID3 tag (version 1.x) am Ende der Datei. Der Titel des
@@ -114,8 +115,9 @@
       <dd><p>Liest die Eintr&auml;ge des "Eigenschaften"-Dialogs.</p></dd>
     </dl>
 
-    <p>Die Ausgabe kann sowohl in HTML-format (table), LaTeX (tabular) Format oder
-      als Klartext erfolgen.</p>
+    <p>Die Ausgabe kann sowohl in HTML-format (table), XML (default XHTML),
+      LaTeX (tabular) Format oder als Klartext erfolgen. Beachte, da&szlig;
+      etwaige Sonderzeichen in den ausgelesenen Daten konvertiert werden.</p>
 
     <p>Das Verhalten des Programms wird von einem INI-File (~/.IExtract f&uuml;r
       UNICES oder %HOMEDRIVE%%HOMEPATH%IExtract.ini f&uuml;r Windows) gesteuert.
@@ -145,9 +147,9 @@
     <dl>
       <dt><b>*.mp3</b></dt>
       <dd>Untersucht lediglich MP3-Dateien</dd>
-      <dt><b>[^A-Za-z]*</b></dt>
-      <dd>Untersucht Dateien, die nicht mit einem Buchstaben beginnen.</dd>
-      <dt><b>[[:alnum:]]*</b></dt>
+      <dt><b>[A-Za-z]*</b></dt>
+      <dd>Untersucht Dateien, die mit einem Buchstaben beginnen.</dd>
+      <dt><b>[^[:alnum:]]*</b></dt>
       <dd>Untersucht Dateien, die nicht mit einem Buchstaben oder einer Nummer
         beginnen.</dd>
       <dt><b>???.txt</b></dt>
@@ -318,7 +320,7 @@
     <address><a href="mailto:g17m0@lycos.com">Sende etwaige Kommentare</a></address>
 <!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
 <!-- hhmts start -->
-Last modified: Sat Feb  1 01:17:09 PET 2003
+Last modified: Wed Mar 26 16:41:18 PET 2003
 <!-- hhmts end -->
      - $Revision$
   </body>

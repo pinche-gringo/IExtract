@@ -94,8 +94,10 @@
       <dt><b>Microsoft Office documents</b></dt>
       <dd><p>Searches for the content of the properties dialog.</p>
 
-        <p>It applies the same as for JPEGs: The format is not documented and so I
-          can only hope to handle all of their documents correctly.</p></dd>
+        <p>It applies the same as for JPEGs: I have no documentation of that
+          format (nor do I have the programs) and so I can only hope to handle
+          them correctly. That said: All of the documents I have/had access to
+          was processed correctly.</p></dd>
 
       <dt><b>MP3</b></dt>
       <dd><p>Extracts the content of the ID3 tag (version 1.x). The title of
@@ -111,8 +113,9 @@
       <dd><p>Searches for the content of the properties dialog.</p></dd>
     </dl>
 
-    <p>The output can be in HTML-format (a table), LaTeX (tabular) format or
-      plain text.</p>
+    <p>The output can be in HTML-format (a table), XML (default XHTML), (LaTeX
+      (tabular) format or plain text. Note that special characters are
+      converted in the exctracted information.</p>
 
     <p>The behaviour of the program is controlled with a INI file (~/.IExtract for
       UNICES or %HOMEDRIVE%%HOMEPATH%IExtract.ini for Windows). See
@@ -126,7 +129,7 @@
       UNIX-typical wildcards (an asterisk (*) for any number of any
       characters, the question-mark (?)  for any single character and a
       range of valid characters in brackets ([) and (]), either by
-      listening all of, by specifying the borders separated with a minus
+      listing all of, by specifying the borders separated with a minus
       (-) or by specifying its class (in '[:' and ':]') To invert this
       selection a leading caret (^) or an exclaimation mark (!)  can be
       used). This is also true for the Windows version.</p>
@@ -136,9 +139,9 @@
     <dl>
       <dt><b>*.mp3</b></dt>
       <dd>Inspect only MP3 files.</dd>
-      <dt><b>[^A-Za-z]*</b></dt>
-      <dd>Inspect files which don't start with a letter.</dd>
-      <dt><b>[[:alnum:]]*</b></dt>
+      <dt><b>[A-Za-z]*</b></dt>
+      <dd>Inspect files which start with a letter.</dd>
+      <dt><b>[^[:alnum:]]*</b></dt>
       <dd>Inspect files which don't start with a letter or a number.</dd>
       <dt><b>???.txt</b></dt>
       <dd>Inspect text-files having a name with exactly 3 characters.</dd>
@@ -300,7 +303,7 @@
     <address><a href="mailto:g17m0@lycos.com">Mail comments</a></address>
 <!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
 <!-- hhmts start -->
-Last modified: Sat Feb  1 01:16:30 PET 2003
+Last modified: Wed Mar 26 16:37:56 PET 2003
 <!-- hhmts end -->
      - $Revision$
   </body>

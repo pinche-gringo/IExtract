@@ -97,9 +97,9 @@
       <dt><b>Documentos de Microsoft Office</b></dt>
       <dd><p>Busca para el contenido de la ventana "propiedades".</p>
 
-        <p>Por supuesto ese formato no es documentado (al menos no p&uacute;blico)
-          y por eso no puedo garantizar que todos los documentos est&aacute;n
-          procesado correctamente.</p>
+        <p>No tengo documentaci&oacute;n por ese formato y por eso no puedo
+          garantizar que todos los documentos est&aacute;n procesado
+          correctamente. Dicho ese, lo funciona con todos mis documentos.</p>
       </dd>
 
       <dt><b>MP3</b></dt>
@@ -117,8 +117,9 @@
       <dd><p>Busca para el contenido de la ventana "propiedades".</p>
     </dl>
 
-    <p>La salida puede ser en el formato HTML (una tabla), LaTeX (tabular) o simple
-      texto.</p>
+    <p>La salida puede ser en el formato HTML (una tabla), XML (XHTML por
+      defecto), LaTeX (tabular) o simple texto. Nota que letras especiales en
+      la informaci&oacute;n extraido est&aacute; cambiado.</p>
 
     <p>El comportamiento del programa est&aacute; controlado con un archivo de
       iniciaci&oacute;n (~/.IExtract para UNICES o %HOMEDRIVE%%HOMEPATH%IExtract.ini
@@ -148,10 +149,10 @@
     <dl>
       <dt><b>*.mp3</b></dt>
       <dd>Inspecta solamente archivos MP3</dd>
-      <dt><b>[^A-Za-z]*</b></dt>
+      <dt><b>[A-Za-z]*</b></dt>
       <dd>Inspecta ficheros que comienzan con una letra.</dd>
-      <dt><b>[[:alnum:]]*</b></dt>
-      <dd>Inspecta ficheros que comienzan con una letra o un n&uacute;mero.</dd>
+      <dt><b>[^[:alnum:]]*</b></dt>
+      <dd>Inspecta ficheros que no comienzan con una letra o un n&uacute;mero.</dd>
       <dt><b>???.txt</b></dt>
       <dd>Inspecta ficheros de texto que tienen 3 letras.</dd>
     </dl>
@@ -314,7 +315,7 @@
     <address><a href="mailto:g17m0@lycos.com">Envia comentarios</a></address>
 <!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
 <!-- hhmts start -->
-Last modified: Sat Feb  1 01:21:01 PET 2003
+Last modified: Wed Mar 26 16:35:48 PET 2003
 <!-- hhmts end -->
      - $Revision$
   </body>
