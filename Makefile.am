@@ -3,7 +3,7 @@
 SUBDIRS = src
 
 dist-hook:
-	# Add files for windows; don't make own Makefile[.am], as one
+	# Add files for windows; don't make own Makefile[.am], as a
 	# Windows-compiler might need its own Makefile
 	mkdir $(distdir)/Windows
 	cp -p $(srcdir)/Windows/*.ds? $(srcdir)/Windows/*.mak $(distdir)/Windows
