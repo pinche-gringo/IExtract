@@ -24,6 +24,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+
+#include <IExtract-cfg.h>
+
 #include <Check.h>
 #include <Trace_.h>
 
@@ -57,14 +60,14 @@ inline unsigned short get2BytesLSB (const char* pAddr) {
 /*--------------------------------------------------------------------------*/
 ParseStarOffice::ParseStarOffice ()
    : prop (NULL), actEntry (NONE)
-     , idSOffice (ID, "StarOffice ID", false), skip (7)
-     , skip2 (ID1, "Unused contents 2", 0x900, 1, false, false)
-     , skipIDStart (ID1, "Start of StarOffice IDs", 256, 1, false)
-     , length ("\\*", "Length of data-entry", *this, &ParseStarOffice::foundLength, 2, 2, false)
-     , value ("\\*", "Property-entry", *this, &ParseStarOffice::foundValue, 1, 0, false)
-     , seqProperties (_seqProperties, "Properties", 1, 1, false)
-     , seqEntries (_seqEntries, "Entries of properties", *this, &ParseStarOffice::foundProps, 4, 4, false)
-     , selDocument (_selDocument, "StarOffice document", -1) {
+     , idSOffice (ID, _("StarOffice ID"), false), skip (7)
+     , skip2 (ID1, _("Unused contents 2"), 0x900, 1, false, false)
+     , skipIDStart (ID1, _("Start of StarOffice IDs"), 256, 1, false)
+     , length ("\\*", _("Length of data-entry"), *this, &ParseStarOffice::foundLength, 2, 2, false)
+     , value ("\\*", _("Property-entry"), *this, &ParseStarOffice::foundValue, 1, 0, false)
+     , seqProperties (_seqProperties, _("Properties"), 1, 1, false)
+     , seqEntries (_seqEntries, _("Entries of properties"), *this, &ParseStarOffice::foundProps, 4, 4, false)
+     , selDocument (_selDocument, _("StarOffice document"), -1) {
 
    _selDocument[0] = &seqProperties;
    _selDocument[1] = &skipIDStart;

@@ -25,6 +25,8 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
+#include <IExtract-cfg.h>
+
 #ifdef _MSC_VER
 #pragma warning(disable:4355) // disable warning about this in initlist
 #pragma warning(disable:4786) // disable warning about truncating debug info
@@ -51,43 +53,43 @@
 /*--------------------------------------------------------------------------*/
 ParsePDF::ParsePDF ()
    :  infoObject (-1U), actEntry (NONE), actObject (0), offPrev (0)
-     , startXRef (ID, "Tag for offset of cross reference table")
-     , offXRef ("\\9", "Offset of cross reference table", *this, &ParsePDF::foundOffset, 10, 1)
-     , skipS (ID1, "Start of startxref-tag", 20)
-     , skip (ID1, "Unused data", 256, 1, true, false)
-     , idXRef ("xref", "Tag for cross reference table")
-     , nrStart ("\\9", "Number of cross reference entries", *this, &ParsePDF::foundStartNumber, 10)
-     , count ("\\9", "Number of cross reference entries", *this, &ParsePDF::foundNumber, 10)
-     , offObject ("\\9", "Offset of object", *this, &ParsePDF::foundObjOffset, 10, 1, false)
-     , tagTrailer ("trailer", "Tag for trailer")
-     , startObj ("<<", "Start of object")
-     , objInfo ("/Info", "Reference to info object")
-     , objPrev ("/Prev", "Reference to other trailer")
-     , objOffPrev ("\\9", "Offset of /Prev entry", *this, &ParsePDF::foundPrevOffset, 10, 1)
-     , idObject ("\\9", "ID of object", *this, &ParsePDF::foundObjectID, 10)
-     , idObj ("1", "ID of object (repeated)")
-     , number ("\\9", "Generation", 10)
-     , tagObj ("obj", "Tag for an object")
-     , startOfValue1 ("(", "Start of value ('(')", *this, &ParsePDF::foundParenthesis)
-     , startOfValue2 ("<", "Start of value ('<')", *this, &ParsePDF::foundBracket)
-     , endOfValue (")", "End of value")
-     , endObj (">>", "End of object", *this, &ParsePDF::foundEndObj)
-     , tagTitle ("/Title", "Tag for title", *this, &ParsePDF::foundTitle)
-     , tagAuthor ("/Author", "Tag for author", *this, &ParsePDF::foundAuthor)
-     , tagComment ("/Subject", "Tag for comment (subject)", *this, &ParsePDF::foundComment)
-     , value (")>", "Value of entry", *this, &ParsePDF::foundValue, 512)
-     , selXRef (_selXRef, "Pointer to position of cross reference table", -1, 0)
-     , seqXRef (_seqXRef, "Position of cross reference table")
-     , seqXRefTable (_seqXRefTable, "Cross reference table")
-     , seqXRefTableEntries (_seqXRefTableEntries, "Entries in cross reference table", 0, 0)
-     , seqTrailer (_seqTrailer, "Trailer")
-     , selValues (_selValues, "Trailer values", -1, 0)
-     , seqInfo (_seqInfo, "Info entry")
-     , seqPrev (_seqPrev, "Prev entry")
-     , seqInfoObj (_seqInfoObj, "Info object")
-     , seqInfoValue (_seqInfoValue, "Info values", -1, 0)
-     , selStartOfValue (_selStartOfValue, "Start of values")
-     , selType (_selType, "Valid type") {
+     , startXRef (ID, _("Tag for offset of cross reference table"))
+     , offXRef ("\\9", _("Offset of cross reference table"), *this, &ParsePDF::foundOffset, 10, 1)
+     , skipS (ID1, _("Start of startxref-tag"), 20)
+     , skip (ID1, _("Unused data"), 256, 1, true, false)
+     , idXRef ("xref", _("Tag for cross reference table"))
+     , nrStart ("\\9", _("Number of cross reference entries"), *this, &ParsePDF::foundStartNumber, 10)
+     , count ("\\9", _("Number of cross reference entries"), *this, &ParsePDF::foundNumber, 10)
+     , offObject ("\\9", _("Offset of object"), *this, &ParsePDF::foundObjOffset, 10, 1, false)
+     , tagTrailer ("trailer", _("Tag for trailer"))
+     , startObj ("<<", _("Start of object"))
+     , objInfo ("/Info", _("Reference to info object"))
+     , objPrev ("/Prev", _("Reference to other trailer"))
+     , objOffPrev ("\\9", _("Offset of /Prev entry"), *this, &ParsePDF::foundPrevOffset, 10, 1)
+     , idObject ("\\9", _("ID of object"), *this, &ParsePDF::foundObjectID, 10)
+     , idObj ("1", _("ID of object (repeated)"))
+     , number ("\\9", _("Generation"), 10)
+     , tagObj ("obj", _("Tag for an object"))
+     , startOfValue1 ("(", _("Start of value ('(')"), *this, &ParsePDF::foundParenthesis)
+     , startOfValue2 ("<", _("Start of value ('<')"), *this, &ParsePDF::foundBracket)
+     , endOfValue (")", _("End of value"))
+     , endObj (">>", _("End of object"), *this, &ParsePDF::foundEndObj)
+     , tagTitle ("/Title", _("Tag for title"), *this, &ParsePDF::foundTitle)
+     , tagAuthor ("/Author", _("Tag for author"), *this, &ParsePDF::foundAuthor)
+     , tagComment ("/Subject", _("Tag for comment (subject)"), *this, &ParsePDF::foundComment)
+     , value (")>", _("Value of entry"), *this, &ParsePDF::foundValue, 512)
+     , selXRef (_selXRef, _("Pointer to position of cross reference table"), -1, 0)
+     , seqXRef (_seqXRef, _("Position of cross reference table"))
+     , seqXRefTable (_seqXRefTable, _("Cross reference table"))
+     , seqXRefTableEntries (_seqXRefTableEntries, _("Entries in cross reference table"), 0, 0)
+     , seqTrailer (_seqTrailer, _("Trailer"))
+     , selValues (_selValues, _("Trailer values"), -1, 0)
+     , seqInfo (_seqInfo, _("Info entry"))
+     , seqPrev (_seqPrev, _("Prev entry"))
+     , seqInfoObj (_seqInfoObj, _("Info object"))
+     , seqInfoValue (_seqInfoValue, _("Info values"), -1, 0)
+     , selStartOfValue (_selStartOfValue, _("Start of values"))
+     , selType (_selType, _("Valid type")) {
    _selXRef[0] = &seqXRef;
    _selXRef[1] = &skipS;
    _selXRef[2] = &skip;
@@ -395,8 +397,8 @@ void ParsePDF::parse (Xistream& stream, Properties& result) throw (std::string) 
    unsigned int rc (obj.selXRef.parse (stream));
    while (!(rc || obj.aOffsets[obj.infoObject])) {
       if (!obj.offPrev)
-         throw (std::string ("Document does not contain neither an /Info"
-                             " nor a /Prev entry"));
+         throw (std::string (_("Document does not contain neither an /Info"
+                               " nor a /Prev entry")));
 
       stream.seekg (obj.offPrev, ios::beg);
       obj.offPrev = 0;

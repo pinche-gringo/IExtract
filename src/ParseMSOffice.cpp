@@ -24,6 +24,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+
+#include <IExtract-cfg.h>
+
 #ifdef _MSC_VER
 #pragma warning(disable:4355) // disable warning about this in initlist
 #pragma warning(disable:4786) // disable warning about truncating debug info
@@ -80,22 +83,22 @@ static const unsigned int aTypes[] = { TYPE_TITLE, TYPE_AUTHOR, TYPE_COMMENT };
 /*--------------------------------------------------------------------------*/
 ParseWord::ParseWord()
    : len (0), cEntries (0), actEntry (-1U), cRead (0), prop (NULL)
-   , id (ID, "ID for title", 16, 16, false), skip (4)
-   , idValue1 (SEP1, "ID for values (I)", *this, &ParseWord::foundValueStart, 12, 12, false)
-   , idValue2 (SEP2, "ID for values (II)", *this, &ParseWord::foundValueStart, 12, 12, false)
-   , nrEntries ("\\*", "Number of entries", *this, &ParseWord::foundNrEntries, 4, 4, false)
-   , type ("\\*", "Type of entry", *this, &ParseWord::foundType, 4, 4, false)
-   , offset ("\\*", "Offset of Comment", *this, &ParseWord::foundOffset, 4, 4, false)
-   , length ("\\*", "Length of title", *this, &ParseWord::foundLength, 4, 4, false)
-   , title ("\0", "Title of document", *this, &ParseWord::foundTitle, 1, 1, false)
-   , skipIDStart (ID1, "Other command", 16, 1)
-   , ignore (ID1, "Content", LEN_CONTENT, 1, false, false)
-   , selValueStart (_selValueStart, "Start of value ID", -1, 0)
-   , seqTitle (_seqTitle, "Title entry", 1, 0, false)
-   , seqEntries (_seqEntries, "Entry description", *this,
+   , id (ID, _("ID for title"), 16, 16, false), skip (4)
+   , idValue1 (SEP1, _("ID for values (I)"), *this, &ParseWord::foundValueStart, 12, 12, false)
+   , idValue2 (SEP2, _("ID for values (II)"), *this, &ParseWord::foundValueStart, 12, 12, false)
+   , nrEntries ("\\*", _("Number of entries"), *this, &ParseWord::foundNrEntries, 4, 4, false)
+   , type ("\\*", _("Type of entry"), *this, &ParseWord::foundType, 4, 4, false)
+   , offset ("\\*", _("Offset of Comment"), *this, &ParseWord::foundOffset, 4, 4, false)
+   , length ("\\*", _("Length of title"), *this, &ParseWord::foundLength, 4, 4, false)
+   , title ("\0", _("Title of document"), *this, &ParseWord::foundTitle, 1, 1, false)
+   , skipIDStart (ID1, _("Other command"), 16, 1)
+   , ignore (ID1, _("Content"), LEN_CONTENT, 1, false, false)
+   , selValueStart (_selValueStart, _("Start of value ID"), -1, 0)
+   , seqTitle (_seqTitle, _("Title entry"), 1, 0, false)
+   , seqEntries (_seqEntries, _("Entry description"), *this,
                  &ParseWord::foundPropertiesHeader, 1, 1, false)
-   , seqProperties (_seqProperties, "Properties", 1, 1, false)
-   , wordDoc (_wordDoc, "Word document", -1, 1) {
+   , seqProperties (_seqProperties, _("Properties"), 1, 1, false)
+   , wordDoc (_wordDoc, _("Word document"), -1, 1) {
 
    _seqProperties[0] = &id;
    _seqProperties[1] = &skip;

@@ -25,6 +25,8 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
+#include <IExtract-cfg.h>
+
 // Note TRACELEVEL 9 is not recomended as the title very likely contains
 // special characters!
 #include <Check.h>
@@ -93,28 +95,28 @@ inline unsigned int get4BytesLSB (const char* pAddr) {
 //Purpose   : (Default-)Constructor
 /*--------------------------------------------------------------------------*/
 ParseJPEG::ParseJPEG ()
-   : idJPEG ("\xff\xd8", "JPEG-ID", false)
-   , idFormat1 ("\xff\xe0", "ID of format 1", 2, 2, false)
-   , idComment1 ("\xff\xfe", "ID of short comments", false)
-   , idComment2 ("\xff\xe1", "ID of long comments", false)
-   , idComment3 ("\xff\xed", "ID of XXL comments", false)
-   , title ("\\*", "Comment", *this, &ParseJPEG::foundTitle, 1, 1, false)
-   , title3 ("\\*", "Comment values", *this, &ParseJPEG::foundTitle3, 1, 1, false)
-   , type ("\\*", "Type of entry", *this, &ParseJPEG::foundType, 4, 4, false)
-   , number ("\\*", "Number of records", *this, &ParseJPEG::foundNumber, 2, 2, false)
-   , length1 ("\\*", "Length (MSB first)", *this, &ParseJPEG::foundLength, 2, 2, false)
-   , length2 ("\\*", "Length (LSB first)", *this, &ParseJPEG::foundLength2, 2, 2, false)
-   , offset ("\\*", "Offset", *this, &ParseJPEG::foundOffset, 4, 4, false)
+   : idJPEG ("\xff\xd8", _("JPEG-ID"), false)
+   , idFormat1 ("\xff\xe0", _("ID of format 1"), 2, 2, false)
+   , idComment1 ("\xff\xfe", _("ID of short comments"), false)
+   , idComment2 ("\xff\xe1", _("ID of long comments"), false)
+   , idComment3 ("\xff\xed", _("ID of XXL comments"), false)
+   , title ("\\*", _("Comment"), *this, &ParseJPEG::foundTitle, 1, 1, false)
+   , title3 ("\\*", _("Comment values"), *this, &ParseJPEG::foundTitle3, 1, 1, false)
+   , type ("\\*", _("Type of entry"), *this, &ParseJPEG::foundType, 4, 4, false)
+   , number ("\\*", _("Number of records"), *this, &ParseJPEG::foundNumber, 2, 2, false)
+   , length1 ("\\*", _("Length (MSB first)"), *this, &ParseJPEG::foundLength, 2, 2, false)
+   , length2 ("\\*", _("Length (LSB first)"), *this, &ParseJPEG::foundLength2, 2, 2, false)
+   , offset ("\\*", _("Offset"), *this, &ParseJPEG::foundOffset, 4, 4, false)
    , skip (16)
-   , selFormat (_selFormat, "Possible comments", 1, 0, false)
-   , seqFormat1 (_seqFormat1, "Format style 1", 1, 1, false)
-   , selProperties (_selProperties, "Properties", 1, 0, false)
-   , seqPropShort (_seqPropShort, "Short properties", 1, 1, false)
-   , seqPropLong (_seqPropLong, "Long properties", 1, 1, false)
-   , seqPropXXL (_seqPropXXL, "XXL properties", 1, 1, false)
-   , seqEntries (_seqEntries, "List of property entries", *this,
+   , selFormat (_selFormat, _("Possible comments"), 1, 0, false)
+   , seqFormat1 (_seqFormat1, _("Format style 1"), 1, 1, false)
+   , selProperties (_selProperties, _("Properties"), 1, 0, false)
+   , seqPropShort (_seqPropShort, _("Short properties"), 1, 1, false)
+   , seqPropLong (_seqPropLong, _("Long properties"), 1, 1, false)
+   , seqPropXXL (_seqPropXXL, _("XXL properties"), 1, 1, false)
+   , seqEntries (_seqEntries, _("List of property entries"), *this,
                  &ParseJPEG::foundPropertiesHeader, 1, 1, false)
-   , jpegImage (_jpegImage, "JPEG image", 1, 1)
+   , jpegImage (_jpegImage, _("JPEG image"), 1, 1)
    , cRead (0), actEntry (TYPE_TITLE), cEntries (0) {
 
    _jpegImage[0] = &idJPEG;

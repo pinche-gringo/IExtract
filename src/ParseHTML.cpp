@@ -24,6 +24,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+
+#include <IExtract-cfg.h>
+
 #include <Check.h>
 #include "ParseHTML.h"
 #include "Properties.h"
@@ -43,32 +46,32 @@ static const unsigned LEN_COMMAND     = 1024;
 /*--------------------------------------------------------------------------*/
 ParseHTML::ParseHTML ()
    : prop (NULL), actEntry (NONE)
-     , startTag ("<", "Start of HTML-tag"), endTag (">", "End of HTML-tag")
-     , tagMeta ("META", "Meta tag")
-     , tagTitle ("TITLE", "Title-tag", *this, &ParseHTML::foundTitle)
-     , tagEndTitle ("/TITLE", "Title-tag")
-     , tagEndHead ("/HEADER", "End of header", *this, &ParseHTML::foundEndOfHead, 7, 5)
-     , title ("<", "Title of document", *this, &ParseHTML::foundValue, LEN_TITLE)
-     , value ("\">", "Value of entry", *this, &ParseHTML::foundValue, LEN_TITLE)
-     , otherTag (">", "Other HTML tag", LEN_TAG)
-     , ignore ("<", "Unused information", LEN_COMMAND)
-     , quote ("\"", "Quote", 1, 0, true)
-     , equal ("=", "Equal sign", 1, 0, true)
-     , name ("NAME", "Name of meta tag")
-     , content ("CONTENT", "Content specifier")
-     , description ("DESCRIPTION", "Description", *this, &ParseHTML::foundComment)
-     , author ("AUTHOR", "Author", *this, &ParseHTML::foundAuthor)
-     , DCdescription  ("DC.DESCRIPTION", "Description in Dublin Core", *this, &ParseHTML::foundComment)
-     , DCauthor ("DC.CREATOR", "Author in Dublin Core", *this, &ParseHTML::foundAuthor)
-     , DCtitle ("DC.TITLE", "Title in Dublin Core", *this, &ParseHTML::foundTitle)
-     , seqMetaCmd (_seqMetaCmd, "Meta entry")
-     , seqMetaName (_seqMetaName, "Name entry for meta tag")
-     , seqTitle (_seqTitle, "Title entry")
-     , selMetaTags (_selMetaTags, "Recogniced meta tags", 1, 0)
-     , selMetaCmds (_selMetaCmds, "Meta entries")
-     , selCmd (_selCmd, "Valid HTML command")
-     , seqTag (_seqTag, "Valid HTML tag")
-     , htmlDoc (_htmlDoc, "HTML document", -1, 1) {
+     , startTag ("<", _("Start of HTML-tag")), endTag (">", _("End of HTML-tag"))
+     , tagMeta ("META", _("Meta tag"))
+     , tagTitle ("TITLE", _("Title-tag"), *this, &ParseHTML::foundTitle)
+     , tagEndTitle ("/TITLE", _("Title-tag"))
+     , tagEndHead ("/HEADER", _("End of header"), *this, &ParseHTML::foundEndOfHead, 7, 5)
+     , title ("<", _("Title of document"), *this, &ParseHTML::foundValue, LEN_TITLE)
+     , value ("\">", _("Value of entry"), *this, &ParseHTML::foundValue, LEN_TITLE)
+     , otherTag (">", _("Other HTML tag"), LEN_TAG)
+     , ignore ("<", _("Unused information"), LEN_COMMAND)
+     , quote ("\"", _("Quote"), 1, 0, true)
+     , equal ("=", _("Equal sign"), 1, 0, true)
+     , name ("NAME", _("Name of meta tag"))
+     , content ("CONTENT", _("Content specifier"))
+     , description ("DESCRIPTION", _("Description"), *this, &ParseHTML::foundComment)
+     , author ("AUTHOR", _("Author"), *this, &ParseHTML::foundAuthor)
+     , DCdescription  ("DC.DESCRIPTION", _("Description in Dublin Core"), *this, &ParseHTML::foundComment)
+     , DCauthor ("DC.CREATOR", _("Author in Dublin Core"), *this, &ParseHTML::foundAuthor)
+     , DCtitle ("DC.TITLE", _("Title in Dublin Core"), *this, &ParseHTML::foundTitle)
+     , seqMetaCmd (_seqMetaCmd, _("Meta entry"))
+     , seqMetaName (_seqMetaName, _("Name entry for meta tag"))
+     , seqTitle (_seqTitle, _("Title entry"))
+     , selMetaTags (_selMetaTags, _("Recogniced meta tags"), 1, 0)
+     , selMetaCmds (_selMetaCmds, _("Meta entries"))
+     , selCmd (_selCmd, _("Valid HTML command"))
+     , seqTag (_seqTag, _("Valid HTML tag"))
+     , htmlDoc (_htmlDoc, _("HTML document"), -1, 1) {
 
    _seqMetaCmd[0] = &tagMeta;
    _seqMetaCmd[1] = &selMetaCmds;
