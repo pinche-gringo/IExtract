@@ -19,16 +19,16 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 //-->
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE">
 <html>
   <head>
     <title>IExtract - Auslesen von Informationen aus Dokumenten</title>
     <meta name="description" content="Documentation of the IExtract-utility">
-    <meta name="keywords" content="documentation, docu, IExtract, iextract, utility">
+    <meta name="keywords" content="documentation, docu, IExtract, iextract, utility, tool">
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Anticopyright (A) 2003, distributed under the GNU General Public License">
+    <meta name="DC.Rights" content="Anticopyright (A) 2003, vertrieben unter den Bedingungen der GNU General Public License">
   </head>
 
   <body>
@@ -46,7 +46,7 @@
       <dt><b>HTML</b></dt>
       <dd><p>Sucht nach Text zwischen den <code>&lt;title&gt;</code> und
           <code>&lt;/title&gt;</code> tags beziehungsweise den Inhalt der <code>meta</code>
-          tags (sowohl nach HTML 4.0 und Dublin Core).
+          tags (sowohl nach HTML 4.0 und "Dublin Core").</p>
 
         <p>Die Dateien m&uuml;ssen die Erweiterung <code>*.htm</code>, <code>*.html</code>,
           <code>*.shtm</code>, <code>*.shtml</code> oder <code>*.php</code> haben.</p></dd>
@@ -66,7 +66,7 @@
       <dd><p>Sucht nach dem Inhalt des "Eigenschaften" Dialogs.</p>
 
         <p>Nat&uuml;rlich ist dieses Format nicht dokumentiert (zumindest nicht
-          &oouml;ffentlich; M$ will da wohl auch Cash machen - oder nur ein
+          &ouml;ffentlich; M$ will da wohl auch Cash machen - oder nur ein
           l&auml;cherliches Format verschweigen?) und daher gibt es auch hier
           keine Garantie, da&szlig; alle Dokumente korrekt behandelt werden.</p></dd>
 
@@ -117,7 +117,7 @@
 
             <p>Die Ausgabe kann in Spalten unterteilt werden (sinnvoll for allem
               f&uuml;r die erzeugten HTML/LaTeX-Tabellen; getrennt wird durch den
-              Schr&aauml;gstrich (&brvbar;).</p>
+              Schr&auml;gstrich (&brvbar;).</p>
 
             <p>Das Prozentzeichen (%) &auml;ndert die Bedeutung des n&auml;chsten
               Zeichens:</p>
@@ -214,7 +214,7 @@
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-I,&nbsp;--ini-file=FILE</b></td>
-          <td>Lies weitere Optionen aus der angegebenen Datei.Das
+          <td>Lies weitere Optionen aus der angegebenen Datei. Das
             <a href="IExtract.html.de#INIfile">Format des INI-Files</a> ist
             sp&auml;ter im Dokument beschrieben.</p></td></tr>
         <tr><td>&nbsp;</td></tr>
@@ -234,7 +234,7 @@
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-h, -?,&nbsp;--help</b></td>
-          <td>Ausgeben dieser Hilfe und beenden</td></tr>
+          <td>Ausgeben der Hilfe und beenden</td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>File(s)</b></td>
@@ -256,10 +256,10 @@
     <p>Es werden die gleichen Ersetzungen wie f&uuml;r die Optionen durchgef&uuml;hrt!</p>
 
     <hr>
-    <address><a href="mailto:g17m0@lycos.com">Mail comments</a></address>
+    <address><a href="mailto:g17m0@lycos.com">Sende etwaige Kommentare</a></address>
 <!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
 <!-- hhmts start -->
-Last modified: Sat Jan 25 15:56:44 PET 2003
+Last modified: Sat Jan 25 20:18:26 PET 2003
 <!-- hhmts end -->
      - $Revision$
   </body>

@@ -33,6 +33,7 @@
 
   <body>
     <h1>IExtract - Extracting information out of documents</h1>
+    <hr>
 
     <p><code>IExtract</code> is a little utility designed to extract the
       properites (title, author and comment) out of different documents and
@@ -44,10 +45,10 @@
     <dl>
       <dt><b>HTML</b></dt>
       <dd><p>Searches for the text between the <code>&lt;title&gt;</code> and
-          <code>&lt;title&gt;</code> tags and the content of the <code>meta</code>
-          tags (both according to HTML 4.0 and Dublin Core).
+          <code>&lt;/title&gt;</code> tags and the content of the <code>meta</code>
+          tags (both according to HTML 4.0 and Dublin Core).</p>
 
-        <p>Files must have the extensions <code>*.htm</code>, <code>*.html</code>,
+        <p>The files must have the extensions <code>*.htm</code>, <code>*.html</code>,
           <code>*.shtm</code>, <code>*.shtml</code> or <code>*.php</code>.</p></dd>
 
       <dt><b>JPEG</b></dt>
@@ -61,11 +62,16 @@
           <code>*.jpeg</code>.</p></dd>
 
       <dt><b>Microsoft Office documents</b></dt>
-      <dd><p>Searches for the content of the properties dialog.</p></dd>
+      <dd><p>Searches for the content of the properties dialog.</p>
+
+        <p>The same applies as for JPEGs: The format is not documented (as if M$
+          would document anything, if they can't suck out money from it - or is it,
+          because their format is just too pathetic?) and so I can only hope to
+          handle all of their documents correctly.</p></dd>
 
       <dt><b>MP3</b></dt>
-      <dd><p>Extracts the content of the ID3 (version 1.x). The title of the album
-          is returned in the comment field.</p></dd>
+      <dd><p>Extracts the content of the ID3 tag (version 1.x). The title of
+          the album is returned in the comment field.</p></dd>
 
       <dt><b>PDF</b></dt>
       <dd><p>PDF documents contain a so called <i>Document Information
@@ -127,8 +133,8 @@
               <li><b>%U</b> is substituted with path and name of the file in UNIX style
                 (the nodes separated with a slash (/)</li>
               <li><b>%(LETTERS)</b> is substituted with first of the above substitutions
-                producing a non-empty string (e.g. %(nt) is the filename if not 
-                empty or else the title.)</li>
+                producing a non-empty string (e.g. %(tn) is the tile if not 
+                empty or else the filename.)</li>
             </ul>
 
             <p>In every other constellation the '%' is removed!</p></td></tr>
@@ -137,13 +143,14 @@
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-T,&nbsp;--title=TITLE</b></td>
           <td><p>Title of the output (written even if there's no further output).</p>
 
-            <p>TITLE specifies the headers for the output; separated with (&brvbar;);
-              every columns must contain at least one character.</p></td></tr>
+            <p>TITLE specifies the columns for the output; separated with the
+              pipe character (&brvbar;); every columns must contain at least one
+              character.</p></td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-s,&nbsp;--separate=TEXT</b></td>
           <td><p>Separate subdirectories with TEXT (default: empty);
-            implies recursion into subdirectories (--recursive)</p>
+            implies recursion into subdirectories (--recursive).</p>
 
             <p>The percent sign (%) indicates that the following character has
               a special meaning:</p>
@@ -170,7 +177,7 @@
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-n,&nbsp;--new=[DAYS:]TEXT</b></td>
           <td><p>Show (leading) TEXT (in his own column) for files younger than
-              DAYS days (def: 30)</p>
+              DAYS days (default: 30)</p>
 
             <p>DAYS may be omited or may have an multiplier suffix: m for 30.</p></td></tr>
         <tr><td>&nbsp;</td></tr>
@@ -192,15 +199,18 @@
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-I,&nbsp;--ini-file=FILE</b></td>
-          <td>Read further options from the specified file</td></tr>
+          <td>Read further options from the specified file. See
+            <a href="IExtract.html.en#INIfile">Format of the INI file</a> for further
+            information.</td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-t,&nbsp;--threads=NR</b></td>
           <td><p>Set the number of threads for examing files. This threads are additional
               to the main thread which searches for the files to examine.</p>
 
-            <p>This option is only available, if the program has been compiled with
-              <code>--enable-threads</code> (or <code>-DENABLE_THREADS</code>)!</p></td></tr>
+            <p>This option is only available, if the program has been configured
+              (or compiled) with <code>--enable-threads</code> (or
+              <code>-DENABLE_THREADS</code>)!</p></td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-V,&nbsp;--version</b></td>
@@ -218,7 +228,6 @@
     <h2><a name="INIfile"></a>Format of the INI file</h2>
     <p>The format of the INI file is like this (entries can be missing):</p>
 
-
     <pre>   [Output]
    Format=FORMAT
    Title=TEXT
@@ -229,12 +238,11 @@
 
     <p>The same substituations as withhin the options are performed!</p>
 
-
     <hr>
     <address><a href="mailto:g17m0@lycos.com">Mail comments</a></address>
 <!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
 <!-- hhmts start -->
-Last modified: Sat Jan 25 11:53:42 PET 2003
+Last modified: Sat Jan 25 16:16:36 PET 2003
 <!-- hhmts end -->
      - $Revision$
   </body>
