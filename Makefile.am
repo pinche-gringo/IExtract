@@ -1,10 +1,14 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = intl src doc po
+SUBDIRS = m4  intl src doc po
 
+# Add files for windows; don't make own Makefile[.am], as a
+# Windows-compiler might need its own Makefile
 dist-hook:
-	# Add files for windows; don't make own Makefile[.am], as a
-	# Windows-compiler might need its own Makefile
 	mkdir $(distdir)/Windows
 	cp -p $(srcdir)/Windows/*.ds? $(srcdir)/Windows/*.mak $(distdir)/Windows
 	cp -p  $(srcdir)/Make.bat $(distdir)/
+
+ACLOCAL_AMFLAGS = -I m4
+
+EXTRA_DIST = config.rpath
