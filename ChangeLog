@@ -1,3 +1,26 @@
+2004-01-22  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.5.11 commented
+
+	* INSTALL: Actualized build-process for Windows
+
+	* po/de.po, po/en.po, po/es.po: Actualized
+
+	* Windows/VCExtract.mak: Linking against (static) VCGeneral library
+
+	* src/IExtract.cpp, src/ParseOOffice.cpp:
+	  Disabled MSVC warnings about truncated debug-info
+
+	* src/Writer.cpp: Workaround for MSVC stupidity
+
+	* src/ParseRTF.cpp: Disabled checks
+
+2004-01-21  Markus Schwab  <g17m0@lycos.com>
+
+	* configure.in: Version to 0.5.11
+
+	* INSTALL, README: Actualized
+
 2004-01-04  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.5.10 commented

@@ -1,3 +1,9 @@
+Overview of changes in version 0.5.11:
+
+  - Actualized info files (README, INSTALL)
+  - Linking with static libYGP (Windows version)
+  - Changes for MSVC
+
 Overview of changes in version 0.5.10:
 
   - Fixed in/exluding of files (how could I overlook that?)
