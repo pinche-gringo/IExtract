@@ -27,6 +27,7 @@
 #include <gzo-cfg.h>
 
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <string>
@@ -50,6 +51,7 @@ class Application : public IVIOApplication {
  public:
    Application (const int argc, const char* argv[])
       : IVIOApplication (argc, argv, lo), options (0), outputStyle (TEXT)
+      , ageOfNewFiles (30 * 24 * 60 * 60), pTextForNewFiles ("")
       , showOptions (0) { }
   ~Application () { }
 
@@ -85,6 +87,8 @@ class Application : public IVIOApplication {
 
    enum { RECURSIVE = 0x1, VERBOSE = 0x2, SHOW_ALL = 0x4, SHOW_ERRORS = 0x8 };
    unsigned int showOptions;
+   unsigned long ageOfNewFiles;
+   const char* pTextForNewFiles;
    unsigned int options;
 
    enum { TEXT = 0, HTML } outputStyle;
@@ -119,6 +123,7 @@ const IVIOApplication::longOptions Application::lo[] = {
    { "show-errors", 'e' },
    { "show-path", 'p' },
    { "all", 'a' },
+   { "new", 'n' },
    { "verbose", 'v' },
    { "version", 'V' },
    { "output", 'o' },
@@ -132,15 +137,17 @@ void Application::showHelp () const {
    std::cout << "Extracts a description out of files (depending on the file-type)"
                 "\n\nUsage: "
              << PACKAGE " [OPTIONS] <File(s)>\n\n"
-                "  -r, --recursive ...... Recurse into subdirectories\n"
-                "  -o, --output=STYLE ... Sets the output-style (text or HTML)\n"
-                "  -e, --show-errors .... Puts error messages (additionally) into output\n"
-                "  -p, --show-path ...... Print path for files in output\n"
-                "  -a, --all ............ Show all files (including unknown types) in output\n"
-                "  -v, --verbose, ....... Displays the processed files (be verbose)\n"
-                "  -V, --version ........ Output version information and exit\n"
-                "  -h, -?, --help ....... Displays this help and exit\n"
+                "  -r, --recursive ....... Recurse into subdirectories\n"
+                "  -o, --output=STYLE .... Sets the output-style (text or HTML)\n"
+                "  -e, --show-errors ..... Puts error messages (additionally) into output\n"
+                "  -p, --show-path ....... Print path for files in output\n"
+                "  -a, --all ............. Show all files (including unknown types) in output\n"
+                "  -n, --new=TIME:TEXT ... Show TEXT for files younger than TIME days (default: 30)\n"
+                "  -v, --verbose, ........ Displays the processed files (be verbose)\n"
+                "  -V, --version ......... Output version information and exit\n"
+                "  -h, -?, --help ........ Displays this help and exit\n"
                 "  File(s) ... File to analyze (the last part can contain wildcards)\n\n"
+                "TIME (in option -n) may be omited or may have an multiplier suffix: m for 30."
                 "Currently supported files are: HTML, JPEG, WinWord, Excel & Powerpoint\n";
 }
 
@@ -160,15 +167,35 @@ bool Application::handleOption (const char option) {
       const char* pType = getOptionValue ();
       if (!pType
           || ((outputStyle = HTML, strcmp (pType, "HTML"))
-              && (outputStyle = TEXT, strcmp (pType, "text")))) {
+              && (outputStyle = TEXT, strcmp (pType, "text"))))
          cerr << PACKAGE "-warning: Style of output " << pType << " is not"
                  "valid! Using text\n";
-      }
       break; }
 
    case 'e': options |= SHOW_ERRORS; break;
 
    case 'p': showOptions |= Writer::SHOW_PATH; break;
+
+   case 'n': {
+      const char* pNew = getOptionValue ();
+      char* pEnd = NULL;
+      unsigned int time (0);
+      if (!pNew
+          || ((time = strtoul (pNew, &pEnd, 10)),
+              (!pEnd || ((*pEnd != ':') && (*pEnd != 'm')))))
+         cerr << PACKAGE "-warning: Argument for new files " << pNew << " is not"
+                 "valid! Ignoring option\n";
+      else {
+         if (*pEnd == 'm') {
+            ++pEnd;
+            time *= 30;
+         }
+         time *= 24 * 60 * 60;
+         ageOfNewFiles = time;
+         pTextForNewFiles = pEnd + 1;
+      }
+                                          
+      break; }
 
    case 'v': options |= VERBOSE; break;
 
@@ -195,7 +222,7 @@ int Application::perform (int argc, const char* argv[]) {
       return -1;
    }
 
-   typedef Writer* (*CREATEWRITER) (unsigned int);
+   typedef Writer* (*CREATEWRITER) (unsigned int, unsigned long, const char*);
    static struct {
       unsigned int opt;
       CREATEWRITER fnc;
@@ -205,7 +232,7 @@ int Application::perform (int argc, const char* argv[]) {
    Writer* writer = NULL;
    for (unsigned int i (0); i < (sizeof (t) / sizeof (t[0])); ++i)
       if (outputStyle == t[i].opt) {
-         writer = t[i].fnc (showOptions);
+         writer = t[i].fnc (showOptions, ageOfNewFiles, pTextForNewFiles);
       }
    assert (writer);
 

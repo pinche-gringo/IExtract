@@ -26,7 +26,8 @@ struct Properties;
 // Baseclass of output classes
 class Writer {
  public:
-   Writer (unsigned int showOptions = 0) : options (showOptions) { }
+   Writer (unsigned int showOptions = 0, unsigned long age = 0,
+           const char* pNew = NULL);
    virtual ~Writer ();
 
    virtual void printStart (std::ostream& out) const { };
@@ -37,14 +38,23 @@ class Writer {
    typedef enum { SHOW_PATH = 0x1 } showOptions;
 
  protected:
-   unsigned int options;
+   bool isNew (const File& file) const {
+      return file.time () > limit; }
+
+   unsigned int  options;
+   const char*   pStrNew;
+
+ private:
+   unsigned long limit;
 };
 
 
 // Class to write fileinfo in HTML format
 class HTMLWriter : public Writer {
  public:
-   HTMLWriter (unsigned int showOptions = 0) : Writer (showOptions) { }
+   HTMLWriter (unsigned int showOptions = 0, unsigned long age = 0,
+               const char* pNew = NULL)
+      : Writer (showOptions, age, pNew) { }
    virtual ~HTMLWriter ();
 
    virtual void printStart (std::ostream& out) const;
@@ -52,22 +62,26 @@ class HTMLWriter : public Writer {
                            const Properties& prop) const;
    virtual void printEnd (std::ostream& out) const;
 
-   static HTMLWriter* create (unsigned int options) {
-      return new HTMLWriter (options); }
+   static HTMLWriter* create (unsigned int options, unsigned long age = 0,
+                              const char* pNew = NULL) {
+      return new HTMLWriter (options, age, pNew); }
 };
 
 
 // Class to write fileinfo in text format
 class TextWriter : public Writer {
  public:
-   TextWriter (unsigned int showOptions = 0) : Writer (showOptions) { }
+   TextWriter (unsigned int showOptions = 0, unsigned long age = 0,
+               const char* pNew = NULL)
+      : Writer (showOptions, age, pNew) { }
    virtual ~TextWriter ();
 
    virtual void printFile (std::ostream& out, const File& file,
                            const Properties& prop) const;
 
-   static TextWriter* create (unsigned int options) {
-      return new TextWriter (options); }
+   static TextWriter* create (unsigned int options, unsigned long age = 0,
+                              const char* pNew = NULL) {
+      return new TextWriter (options, age, pNew); }
 };
 
 

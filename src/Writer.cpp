@@ -25,6 +25,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 #include <assert.h>
+#include <time.h>
 
 #include <iostream>
 
@@ -33,6 +34,19 @@
 #include "Writer.h"
 #include "Properties.h"
 
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Konstructor
+//Parameters: showOptions: Options how to display files
+//            age: Maximal age for new files
+//            pNew: Text to display for new files
+/*--------------------------------------------------------------------------*/
+Writer::Writer (unsigned int showOptions, unsigned long age, const char* pNew)
+   : options (showOptions), pStrNew (pNew) {
+   assert (pNew ? age : 1);
+
+   limit = time (NULL) - age;
+}
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Destructor
@@ -64,7 +78,10 @@ void HTMLWriter::printStart (std::ostream& out) const {
 /*--------------------------------------------------------------------------*/
 void HTMLWriter::printFile (std::ostream& out, const File& file,
                             const Properties& prop) const {
-   out << "<tr valign=top><td>&nbsp;&nbsp;<a href=\"" << file.path ()
+   out << "<tr valign=top><td>";
+   if (pStrNew && isNew (file))
+      out << pStrNew;
+   out << "</td><td><a href=\"" << file.path ()
        << file.name () << "\">";
    if (options & SHOW_PATH)
       out << file.path ();
@@ -99,6 +116,8 @@ void TextWriter::printFile (std::ostream& out, const File& file,
                             const Properties& prop) const {
    if (options & SHOW_PATH)
       out << file.path ();
+   if (pStrNew && isNew (file))
+      out << pStrNew << ": ";
    out << file.name () << " - "
        << (prop.strComment.empty () ? prop.strTitle : prop.strComment) << '\n';
 }
