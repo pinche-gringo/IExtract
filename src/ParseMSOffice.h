@@ -47,16 +47,18 @@ class ParseWord  {
    int foundOffset (const char*, unsigned int);
    int foundLength (const char*, unsigned int);
    int foundTitle (const char*, unsigned int);
-
+   int foundValueStart (const char*, unsigned int);
    int foundPropertiesHeader (const char*, unsigned int);
 
    static int getTypeIndex (unsigned int type);
 
    typedef OFParseText<ParseWord>     OMParseText;
+   typedef OFParseExact<ParseWord>    OMParseExact;
    typedef OFParseAttomic<ParseWord>  OMParseAttomic;
    typedef OFParseSequence<ParseWord> OMParseSequence;
 
    ParseExact      id;
+   OMParseExact    idValue;
    ParseSkip       skip;
    OMParseAttomic  nrEntries;
    OMParseAttomic  type;
@@ -66,15 +68,17 @@ class ParseWord  {
    ParseAttomic    skipIDStart;
    ParseText       ignore;
 
+   ParseSelection  selValueStart;
    ParseSequence   seqTitle;
    OMParseSequence seqEntries;
    ParseSequence   seqProperties;
    ParseSelection  wordDoc;                                    // Startsequence
 
-   ParseObject* _wordDoc[5];
-   ParseObject* _seqProperties[6];
+   ParseObject* _wordDoc[4];
+   ParseObject* _seqProperties[7];
    ParseObject* _seqTitle[4];
    ParseObject* _seqEntries[3];
+   ParseObject* _selValueStart[4];
 
    // Map for offsets to supported type. 1st: Offset, 2nd: Type
    map<unsigned int, unsigned int> aOffsets;
