@@ -7,19 +7,19 @@
 CFG=IExtract - Win32 Debug
 !MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
 !MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den Befehl
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "IExtract.mak".
-!MESSAGE
+!MESSAGE 
 !MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
 !MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
-!MESSAGE
+!MESSAGE 
 !MESSAGE NMAKE /f "IExtract.mak" CFG="IExtract - Win32 Debug"
-!MESSAGE
+!MESSAGE 
 !MESSAGE Für die Konfiguration stehen zur Auswahl:
-!MESSAGE
+!MESSAGE 
 !MESSAGE "IExtract - Win32 Release" (basierend auf  "Win32 (x86) Console Application")
 !MESSAGE "IExtract - Win32 Debug" (basierend auf  "Win32 (x86) Console Application")
-!MESSAGE
+!MESSAGE 
 
 # Begin Project
 # PROP AllowPerConfigDependencies 0
@@ -39,9 +39,10 @@ RSC=rc.exe
 # PROP Use_Debug_Libraries 0
 # PROP Output_Dir "Release"
 # PROP Intermediate_Dir "Release"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "..\..\General\Common" /I "..\..\General\Windows" /I "." /D "NDEBUG" /D PACKAGE=\"IExtract\" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "." /D "NDEBUG" /D PACKAGE=\"IExtract\" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x407 /d "NDEBUG"
 # ADD RSC /l 0x407 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -49,7 +50,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib vcgenerals.lib /nologo /subsystem:console /machine:I386
 
 !ELSEIF  "$(CFG)" == "IExtract - Win32 Debug"
 
@@ -62,9 +63,10 @@ LINK32=link.exe
 # PROP Use_Debug_Libraries 1
 # PROP Output_Dir "Debug"
 # PROP Intermediate_Dir "Debug"
+# PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "..\..\General\Common" /I "..\..\General\Windows" /I "." /D "_DEBUG" /D PACKAGE=\"IExtract\" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "." /D "_DEBUG" /D PACKAGE=\"IExtract\" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
 # ADD BASE RSC /l 0x407 /d "_DEBUG"
 # ADD RSC /l 0x407 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -72,9 +74,9 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib vcgenerals.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 
-!ENDIF
+!ENDIF 
 
 # Begin Target
 
@@ -85,59 +87,7 @@ LINK32=link.exe
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=..\..\General\Common\ADate.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\ANumeric.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\ATime.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\ATStamp.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\DirSrch.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\File.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\FileRExp.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\IDirSrch.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\src\IExtract.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\INIFile.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\Entity.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\IVIOAppl.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\Parse.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\src\ParseMP3.cpp
 # End Source File
 # Begin Source File
 
@@ -149,6 +99,22 @@ SOURCE=..\src\ParseJPG.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\ParseMP3.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\ParseOOffice.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\ParsePDF.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\ParseRTF.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\src\ParseSOffice.cpp
 # End Source File
 # Begin Source File
@@ -157,35 +123,7 @@ SOURCE=..\src\ParseWord.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\ParsePDF.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\PathSrch.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\StackTrc.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\Thread.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\Tokenize.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\src\Writer.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\XDirSrch.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\XStrBuf.cpp
 # End Source File
 # End Group
 # Begin Group "Header-Dateien"
@@ -193,59 +131,11 @@ SOURCE=..\..\General\Common\XStrBuf.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=..\..\General\Common\ADate.h
+SOURCE=..\src\ParseHTML.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\General\Common\ANumeric.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\ATime.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\ATStamp.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\AttrVal.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\DirSrch.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\File.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\FileRExp.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\IDirSrch.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\INIFile.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\Entity.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\IVIOAppl.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\Mutex.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\Parse.h
+SOURCE=..\src\ParseJPG.h
 # End Source File
 # Begin Source File
 
@@ -253,11 +143,15 @@ SOURCE=..\src\ParseMP3.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\ParseHTML.h
+SOURCE=..\src\ParseOOffice.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\ParseJPG.h
+SOURCE=..\src\ParsePDF.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\ParseRTF.h
 # End Source File
 # Begin Source File
 
@@ -269,35 +163,7 @@ SOURCE=..\src\ParseWord.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\src\ParsePDF.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\PathSrch.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\Thread.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\Tokenize.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\src\Writer.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\XDirSrch.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\XStrBuf.h
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\General\Common\XStream.h
 # End Source File
 # End Group
 # Begin Group "Ressourcendateien"
