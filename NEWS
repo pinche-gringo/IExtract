@@ -1,3 +1,9 @@
+Overview of changes in version 0.5.10:
+
+  - Fixed in/exluding of files (how could I overlook that?)
+  - Added option to include only the name (without extension) of file to output
+  - Conversion of special characters can be switched on or off in output
+
 Overview of changes in version 0.5.00:
 
  - Handling RTF documents

@@ -1,3 +1,30 @@
+2004-01-04  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.5.10 commented
+
+	* src/Writer.cpp, src/Writer.h:
+	  Conversion of special characters can be switched on an off
+
+	* src/IExtract.cpp: Explaining new substitution scheme
+
+	* configure.in, Windows/IExtract-cfg.h: Version to 0.5.10
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es, po/de.po, po/en.po, po/es.po:
+	  New substitution-scheme explained
+
+2003-12-28  Markus Schwab  <g17m0@lycos.com>
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Commented the new substitutes %e and %E
+
+	* po/de.po, po/en.po, po/es.po: Addes messages about %e and %E
+
+	* src/IExtract.cpp:
+	  Fixed bug setting files to in/exclude; Informing about %e/%E
+
+	* src/Writer.cpp:
+	  Substituting %E and %e with filename w/out extension and only extension
+
 2003-12-28  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.5.00 commented
