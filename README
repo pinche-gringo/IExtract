@@ -18,6 +18,8 @@ to the extension - so don't cheat ;) ):
 	  Dublin Core) is extracted.
   - PDF: The content of the "document information dictionary" is extracted
          Note that the content of the "Subject" key is returned as comment!
+  - OpenOffice documents (*.sxw, *.sxc, *.sxd, *.sdi, *.sxm); the comments of
+          the properties dialog is extracted
   - StarOffice documents (*.sdw, *.sdc, *.sdd, *.sda); the comments of the
           properties dialog is extracted
   - MS office documents (*.doc, *.xls, *.ppt); the comment of the properties
