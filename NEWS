@@ -2,6 +2,9 @@ Overview of changes in version 0.2.02
 
   - Added support for PDF files
   - Option "-e" reports also the error of the parser in the output
+  - Asserts replaced with Checks, so internal errors (might) show as MsgBox
+  - Handling also MS Office docs having OLE (?) objects between property header
+    and the actual properties (whyever they are doing that?!)
 
 Overview of changes in version 0.2.01
 

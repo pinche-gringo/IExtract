@@ -1,4 +1,59 @@
+2002-11-21  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.2.02 commented
+
+	* src/IExtract.cpp, src/Makefile.am, src/ParseHTML.cpp, src/ParseJPG.cpp, src/ParsePDF.cpp, src/ParsePDF.h, src/ParseSOffice.cpp, src/Writer.cpp:
+	  Asserts replaced with Checks
+
+	* src/ParseWord.cpp, src/ParseWord.h:
+	  Handling documents having OLE-objects (?) in between property header and values
+
+	* README: e-Mail corrected to report bugs corrected
+
+2002-11-18  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseJPG.cpp, src/ParseJPG.h, src/ParsePDF.cpp, src/ParsePDF.h, src/ParseSOffice.cpp, src/ParseSOffice.h, src/ParseWord.cpp, src/ParseWord.h, src/ParseHTML.cpp:
+	  Adapted to new Parser interface
+
+2002-11-15  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParsePDF.cpp: Corrected hex-convertion
+
+	* src/ParsePDF.h: convertToInt deleted
+
+	* configure.in: Version to 0.2.02
+
+	* src/ParsePDF.cpp, src/ParsePDF.h:
+	  Handling of linearized docus added; Strings can be in hex-format
+
+	* README: Handling of PDF files commented
+
+	* NEWS: Changes in V0.2.02 commented
+
+	* src/ParsePDF.cpp, src/ParsePDF.h:
+	  Rewritten to better use it for linearized files; works as before
+
+2002-11-14  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParsePDF.cpp, src/ParsePDF.h:
+	Works for not-linearized files and text values
+
+	* src/ParsePDF.cpp, src/ParsePDF.h: Parsing /Info object added
+
+	* src/Makefile.am: ParsePDF added
+
+	* src/IExtract.cpp: Binary search in handlers-table; handling PDF files; reporting parse error
+
+	* src/ParsePDF.cpp, src/ParsePDF.h: New file.
+
+2002-11-10  Markus Schwab  <g17m0@lycos.com>
+
+	* src/IExtract.cpp: Parsing INI-file via Options-Entity
+
+	* src/Options.h: New file.
+
 2002-11-07  Markus Schwab  <g17m0@lycos.com>
+
 
 	* ChangeLog, NEWS: Changes of V0.2.01 commented
 
