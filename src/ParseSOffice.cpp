@@ -59,15 +59,16 @@ inline unsigned short get2BytesLSB (const char* pAddr) {
 //Purpose   : (Default-)Constructor
 /*--------------------------------------------------------------------------*/
 ParseStarOffice::ParseStarOffice ()
-   : prop (NULL), actEntry (NONE)
-     , idSOffice (ID, _("StarOffice ID"), false), skip (7)
-     , skip2 (ID1, _("Unused contents 2"), 0x900, 1, false, false)
+   : idSOffice (ID, _("StarOffice ID"), false)
      , skipIDStart (ID1, _("Start of StarOffice IDs"), 256, 1, false)
+     , skip (7)
+     , skip2 (ID1, _("Unused contents 2"), 0x900, 1, false, false)
      , length ("\\*", _("Length of data-entry"), *this, &ParseStarOffice::foundLength, 2, 2, false)
      , value ("\\*", _("Property-entry"), *this, &ParseStarOffice::foundValue, 1, 0, false)
-     , seqProperties (_seqProperties, _("Properties"), 1, 1, false)
+     , selDocument (_selDocument, _("StarOffice document"), -1U)
      , seqEntries (_seqEntries, _("Entries of properties"), *this, &ParseStarOffice::foundProps, 4, 4, false)
-     , selDocument (_selDocument, _("StarOffice document"), -1U) {
+     , seqProperties (_seqProperties, _("Properties"), 1, 1, false)
+     , prop (NULL), actEntry (NONE) {
 
    _selDocument[0] = &seqProperties;
    _selDocument[1] = &skipIDStart;

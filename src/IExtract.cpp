@@ -95,12 +95,12 @@ static const char* const DEFAULT_XML_FORMAT ("<tr><td>%n</td><td>%t</td>"
 class Application : public IVIOApplication {
  public:
    Application (const int argc, const char* argv[])
-      : IVIOApplication (argc, argv, lo), options (0), outputStyle (TEXT)
-        , iniOpts (), chgFlag (0)
+      : IVIOApplication (argc, argv, lo), options (0), chgFlag (0), iniOpts ()
+        , writer (NULL), outputStyle (TEXT)
 #ifdef ENABLE_THREADS
-        , listFiles (), mxListFiles (), aThreads (0), mxThreads (), mxOutput ()
+        , aThreads (0)
 #endif
-        , writer (NULL) {
+   {
       iniOpts.format = DEFAULT_FORMAT;
       iniOpts.ageOfNewFiles = 30 * 24 * 60 * 60;
 #ifdef ENABLE_THREADS
@@ -165,6 +165,11 @@ class Application : public IVIOApplication {
    Options iniOpts;
 
    Writer* writer;
+   std::string filelist;
+
+   enum { TEXT = 0, HTML, LATEX, XML } outputStyle;
+
+   static const longOptions lo[];
 
 #ifdef ENABLE_THREADS
    vector<Thread*> aThreads;
@@ -188,12 +193,6 @@ class Application : public IVIOApplication {
    Mutex           mxListFiles;
    queue<FILEFNC>  listFiles;
 #endif
-
-   std::string filelist;
-
-   enum { TEXT = 0, HTML, LATEX, XML } outputStyle;
-
-   static const longOptions lo[];
 };
 
 
@@ -476,7 +475,7 @@ int Application::perform (int argc, const char* argv[]) {
    typedef Writer* (*CREATEWRITER) (const std::string&, const std::string&,
                                     unsigned long);
    static struct {
-      unsigned int opt;
+      int opt;
       CREATEWRITER fnc;
    } t[] = { { TEXT, (CREATEWRITER)&TextWriter::create },
              { HTML, (CREATEWRITER)&HTMLWriter::create },
@@ -491,7 +490,7 @@ int Application::perform (int argc, const char* argv[]) {
    writer->printStart (std::cout, iniOpts.title);
 
    std::string file;
-   for (unsigned int j (0); j < argc; ++j) {
+   for (int j (0); j < argc; ++j) {
       file = argv[j];
       if (DirectorySearch::isValid (argv[j])) {
          if (file[file.size () - 1] != File::DIRSEPARATOR)
@@ -792,7 +791,7 @@ void Application::readINIFile (const char* pFile) {
       INIFILE (pFile);
       INIOBJ (iniOpts, Output);
 
-      unsigned int rc (INIFILE_READ ());
+      INIFILE_READ ();
    }
    catch (std::string& err) {
       TRACE1 (err);

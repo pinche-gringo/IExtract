@@ -237,7 +237,7 @@ std::string Writer::convertToHumanString (unsigned long value) {
 //Returns   : std::string: Next (expanded) token
 /*--------------------------------------------------------------------------*/
 std::string Writer::getNextNode (const File& file, const Properties& prop) const {
-   int pos (0);
+   unsigned int pos (0);
    std::string token (const_cast<Writer*> (this)->columns_.getNextNode ('|'));
    if (token.empty ()) {
       const_cast<Writer*> (this)->columns_.reset ();

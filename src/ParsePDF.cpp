@@ -52,8 +52,7 @@
 //Purpose   : (Default-)Constructor
 /*--------------------------------------------------------------------------*/
 ParsePDF::ParsePDF ()
-   :  infoObject (-1U), actEntry (NONE), actObject (0), offPrev (0)
-     , startXRef (ID, _("Tag for offset of cross reference table"))
+   : startXRef (ID, _("Tag for offset of cross reference table"))
      , offXRef ("\\9", _("Offset of cross reference table"), *this, &ParsePDF::foundOffset, 10, 1)
      , skipS (ID1, _("Start of startxref-tag"), 20, 1, true)
      , skip (ID1, _("Unused data"), 256, 1, true, false)
@@ -70,14 +69,14 @@ ParsePDF::ParsePDF ()
      , idObj ("1", _("ID of object (repeated)"))
      , number ("\\9", _("Generation"), 10)
      , tagObj ("obj", _("Tag for an object"))
-     , startOfValue1 ("(", _("Start of value ('(')"), *this, &ParsePDF::foundParenthesis)
-     , startOfValue2 ("<", _("Start of value ('<')"), *this, &ParsePDF::foundBracket)
-     , endOfValue (")", _("End of value"))
      , endObj (">>", _("End of object"), *this, &ParsePDF::foundEndObj)
      , tagTitle ("/Title", _("Tag for title"), *this, &ParsePDF::foundTitle)
      , tagAuthor ("/Author", _("Tag for author"), *this, &ParsePDF::foundAuthor)
      , tagComment ("/Subject", _("Tag for comment (subject)"), *this, &ParsePDF::foundComment)
      , value (")>", _("Value of entry"), *this, &ParsePDF::foundValue, 512)
+     , startOfValue1 ("(", _("Start of value ('(')"), *this, &ParsePDF::foundParenthesis)
+     , startOfValue2 ("<", _("Start of value ('<')"), *this, &ParsePDF::foundBracket)
+     , endOfValue (")", _("End of value"))
      , selXRef (_selXRef, _("Pointer to position of cross reference table"), -1U, 0)
      , seqXRef (_seqXRef, _("Position of cross reference table"))
      , seqXRefTable (_seqXRefTable, _("Cross reference table"))
@@ -88,8 +87,9 @@ ParsePDF::ParsePDF ()
      , seqPrev (_seqPrev, _("Prev entry"))
      , seqInfoObj (_seqInfoObj, _("Info object"))
      , seqInfoValue (_seqInfoValue, _("Info values"), -1U, 0)
+     , selType (_selType, _("Valid type"))
      , selStartOfValue (_selStartOfValue, _("Start of values"))
-     , selType (_selType, _("Valid type")) {
+     , actEntry (NONE), offPrev (0), actObject (0), infoObject (-1U) {
    _selXRef[0] = &seqXRef;
    _selXRef[1] = &skipS;
    _selXRef[2] = &skip;

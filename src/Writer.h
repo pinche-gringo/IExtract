@@ -62,7 +62,7 @@ class Writer {
    static std::string convertToHumanString (unsigned long value);
 
  private:
-   unsigned long limit;
+   long limit;
    Tokenize columns_;
 };
 

@@ -45,8 +45,7 @@ static const unsigned LEN_COMMAND     = 1024;
 //Purpose   : (Default-)Constructor
 /*--------------------------------------------------------------------------*/
 ParseHTML::ParseHTML ()
-   : prop (NULL), actEntry (NONE)
-     , startTag ("<", _("Start of HTML-tag")), endTag (">", _("End of HTML-tag"))
+   : startTag ("<", _("Start of HTML-tag")), endTag (">", _("End of HTML-tag"))
      , tagMeta ("META", _("Meta tag"))
      , tagTitle ("TITLE", _("Title-tag"), *this, &ParseHTML::foundTitle)
      , tagEndTitle ("/TITLE", _("Title-tag"))
@@ -64,14 +63,14 @@ ParseHTML::ParseHTML ()
      , DCdescription  ("DC.DESCRIPTION", _("Description in Dublin Core"), *this, &ParseHTML::foundComment)
      , DCauthor ("DC.CREATOR", _("Author in Dublin Core"), *this, &ParseHTML::foundAuthor)
      , DCtitle ("DC.TITLE", _("Title in Dublin Core"), *this, &ParseHTML::foundTitle)
+     , seqTag (_seqTag, _("Valid HTML tag"))
+     , seqTitle (_seqTitle, _("Title entry"))
      , seqMetaCmd (_seqMetaCmd, _("Meta entry"))
      , seqMetaName (_seqMetaName, _("Name entry for meta tag"))
-     , seqTitle (_seqTitle, _("Title entry"))
-     , selMetaTags (_selMetaTags, _("Recogniced meta tags"), 1, 0)
      , selMetaCmds (_selMetaCmds, _("Meta entries"))
+     , selMetaTags (_selMetaTags, _("Recogniced meta tags"), 1, 0)
      , selCmd (_selCmd, _("Valid HTML command"))
-     , seqTag (_seqTag, _("Valid HTML tag"))
-     , htmlDoc (_htmlDoc, _("HTML document"), -1U, 1) {
+     , htmlDoc (_htmlDoc, _("HTML document"), -1U, 1), prop (NULL), actEntry (NONE) {
 
    _seqMetaCmd[0] = &tagMeta;
    _seqMetaCmd[1] = &selMetaCmds;

@@ -82,23 +82,24 @@ static const unsigned int aTypes[] = { TYPE_TITLE, TYPE_AUTHOR, TYPE_COMMENT };
 //Purpose   : (Default-)Constructor
 /*--------------------------------------------------------------------------*/
 ParseWord::ParseWord()
-   : len (0), cEntries (0), actEntry (-1U), cRead (0), prop (NULL)
-   , id (ID, _("ID for title"), 16, 16, false), skip (4)
-   , idValue1 (SEP1, _("ID for values (I)"), *this, &ParseWord::foundValueStart, 12, 12, false)
-   , idValue2 (SEP2, _("ID for values (II)"), *this, &ParseWord::foundValueStart, 12, 12, false)
-   , nrEntries ("\\*", _("Number of entries"), *this, &ParseWord::foundNrEntries, 4, 4, false)
-   , type ("\\*", _("Type of entry"), *this, &ParseWord::foundType, 4, 4, false)
-   , offset ("\\*", _("Offset of Comment"), *this, &ParseWord::foundOffset, 4, 4, false)
-   , length ("\\*", _("Length of title"), *this, &ParseWord::foundLength, 4, 4, false)
-   , title ("\0", _("Title of document"), *this, &ParseWord::foundTitle, 1, 1, false)
-   , skipIDStart (ID1, _("Other command"), 16, 1)
-   , ignore (ID1, _("Content"), LEN_CONTENT, 1, false, false)
-   , selValueStart (_selValueStart, _("Start of value ID"), -1U, 0)
-   , seqTitle (_seqTitle, _("Title entry"), 1, 0, false)
-   , seqEntries (_seqEntries, _("Entry description"), *this,
-                 &ParseWord::foundPropertiesHeader, 1, 1, false)
-   , seqProperties (_seqProperties, _("Properties"), 1, 1, false)
-   , wordDoc (_wordDoc, _("Word document"), -1U, 1) {
+   : id (ID, _("ID for title"), 16, 16, false)
+     , idValue1 (SEP1, _("ID for values (I)"), *this, &ParseWord::foundValueStart, 12, 12, false)
+     , idValue2 (SEP2, _("ID for values (II)"), *this, &ParseWord::foundValueStart, 12, 12, false)
+     , skip (4)
+     , nrEntries ("\\*", _("Number of entries"), *this, &ParseWord::foundNrEntries, 4, 4, false)
+     , type ("\\*", _("Type of entry"), *this, &ParseWord::foundType, 4, 4, false)
+     , offset ("\\*", _("Offset of Comment"), *this, &ParseWord::foundOffset, 4, 4, false)
+     , length ("\\*", _("Length of title"), *this, &ParseWord::foundLength, 4, 4, false)
+     , title ("\0", _("Title of document"), *this, &ParseWord::foundTitle, 1, 1, false)
+     , skipIDStart (ID1, _("Other command"), 16, 1)
+     , ignore (ID1, _("Content"), LEN_CONTENT, 1, false, false)
+     , selValueStart (_selValueStart, _("Start of value ID"), -1U, 0)
+     , seqTitle (_seqTitle, _("Title entry"), 1, 0, false)
+     , seqEntries (_seqEntries, _("Entry description"), *this,
+                   &ParseWord::foundPropertiesHeader, 1, 1, false)
+     , seqProperties (_seqProperties, _("Properties"), 1, 1, false)
+     , wordDoc (_wordDoc, _("Word document"), -1U, 1)
+     , cRead (0), cEntries (0), actEntry (-1U), len (0), prop (NULL) {
 
    _seqProperties[0] = &id;
    _seqProperties[1] = &skip;
@@ -186,7 +187,7 @@ int ParseWord::foundOffset (const char* offset, unsigned int) {
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundLength (const char* length, unsigned int) {
    Check3 (length);
-   if (len = *(int*)length)
+   if ((len = *(int*)length))
       title.setMaxCard (len);
    TRACE8 ("ParseWord::foundLength (const char*, unsigned int): " << len);
    return ParseObject::PARSE_OK;
