@@ -7,12 +7,17 @@ Anti-Copyright (A) 2002 Markus Schwab <g17m0@lycos.com>
 -----------------------------------------------------------------------
 
 
-At the moment only the following documents are supported:
+At the moment only the following documents are supported (identified according
+to the extension - so don't cheat ;) ):
 
-  - JPEG: The comment is extracted.
-  - HTML: The text in between <title> and </title> is extracted.
-  - M$ office documents (*.doc, *.xls, *.ppt); the comment of the properties
-       dialog is extracted.
+  - JPEG: Extracts the properties according two styles; either one simple
+ 	  comment (as written by e.g. The GIMP) or a more complex versions
+	  (as created by Windows XP or PhotoShop).
+  - HTML: The text in between <title> and </title> and/or the content of
+	  the meta tags (supported are the tags according HTML 4.0 and
+	  Dublin Core)
+  - MS office documents (*.doc, *.xls, *.ppt); the comment of the properties
+	  dialog is extracted.
 
 The found results can be written either in text or HTML (table) format.
 
@@ -42,7 +47,7 @@ If you report a bug, please be sure to add anything which might be of use! Like
 
   - The version of the utility.
   - The version of the used General library.
-  - How to reproduce the bug.
+  - How to reproduce the bug; a file provocing it would be great.
   - In case of a crash there should also be a stackdump in your systemlog which
     might help in localizing the bug.
   - Anything else you think might be helpful.
