@@ -5,7 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.5 ($Revision$)\n"
-"POT-Creation-Date: 2004-04-10 21:56-0500\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-10-06 22:02-0400\n"
 "PO-Revision-Date: 2004-01-03 19:32-0500\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: ENGLISH <??@li.org>\n"
@@ -216,7 +217,7 @@ msgid ""
 msgstr ""
 
 #: src/IExtract.cpp:322
-#, no-c-format
+#, c-format
 msgid ""
 "       %*LETTER changes the substitution slightly. For file names it causes "
 "a\n"

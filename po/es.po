@@ -1,12 +1,13 @@
 # Tradución española de los mensajes de IExtract
 # Copyright (C) 2003 Markus Schwab
-# Markus Schwab <g17m0@lycos.com>, 2003.
+# Markus Schwab <g17m0@lycos.com>, 2003 - 2005.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.5 ($Revision$)\n"
-"POT-Creation-Date: 2004-04-10 21:56-0500\n"
-"PO-Revision-Date: 2004-04-10 21:56-0500\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-10-06 22:02-0400\n"
+"PO-Revision-Date: 2005-01-07 00:18-0400\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: ESPAÑOL <??@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +25,7 @@ msgstr ""
 "Compilado el %1 a las %2\n"
 "\n"
 "Escritor: Markus Schwab; correo-e: g17m0@lycos.com\n"
-"Distributado bajo los condicones de la GNU Licensia General Público"
+"Distribuido bajo los condiciones de la GNU Licensia General Público"
 
 #: src/IExtract.cpp:276
 msgid ""
@@ -253,7 +254,7 @@ msgstr ""
 "         nombre del archivo)\n"
 
 #: src/IExtract.cpp:322
-#, no-c-format
+#, c-format
 msgid ""
 "       %*LETTER changes the substitution slightly. For file names it causes "
 "a\n"
@@ -272,7 +273,7 @@ msgid ""
 "       In every other constellation the '%' is removed!\n"
 "\n"
 msgstr ""
-"       En todas las otras formas el '%' está borrado!\n"
+"       ¡En todas las demás formas el '%' está borrado!\n"
 "\n"
 
 #: src/IExtract.cpp:326
@@ -288,7 +289,7 @@ msgid ""
 "      contain at least one character\n"
 "\n"
 msgstr ""
-"      cada columna tiene que contener al menos una letra!\n"
+"      ¡cada columna tiene que contener al menos una letra!\n"
 "\n"
 
 #: src/IExtract.cpp:328
@@ -370,25 +371,25 @@ msgstr "Los documentos siguentos son procesados:"
 #: src/IExtract.cpp:441 src/IExtract.cpp:475 src/IExtract.cpp:488
 #: src/IExtract.cpp:500 src/IExtract.cpp:529
 msgid "-warning: Option `%1' needs an argument! Ignoring option!\n"
-msgstr "-aviso: Opción '%1' necesita un argumento! Ignoro opción!\n"
+msgstr "-aviso: Opción '%1' necesita un argumento! ¡Ignoro opción!\n"
 
 #: src/IExtract.cpp:389
 msgid "-warning: Style of output `%1' is not valid! Using text\n"
-msgstr "-aviso: Estilo de la salida '%1' no es valido! Uso text\n"
+msgstr "-aviso: ¡Estilo de la salida '%1' no es valido! Uso text\n"
 
 #: src/IExtract.cpp:403
 msgid "-warning: Invalid number of threads!\n"
-msgstr "-aviso: El número de los proceses del fondo (threads) no es valido!\n"
+msgstr "-aviso: ¡El número de los proceses del fondo (threads) no es valido!\n"
 
 #: src/IExtract.cpp:447
 msgid ""
 "-warning: Argument for new files `%1' is not valid! Ignoring option `n'\n"
 msgstr ""
-"-aviso: Argumento por archivos nuevos '%1' no es valido! Ignoro opción 'n'\n"
+"-aviso: ¡Argumento por archivos nuevos '%1' no es valido! Ignoro opción 'n'\n"
 
 #: src/IExtract.cpp:512
 msgid "-error: `%1' is not a (readable) file! Ignoring option `%2'!\n"
-msgstr "-error: No puedo leer archivo '%1'! Ignoro opción '%2'!\n"
+msgstr "-error: ¡No puedo leer archivo '%1'! ¡Ignoro opción '%2'!\n"
 
 #: src/IExtract.cpp:538
 msgid "-warning: Ignoring invalid option `%1'\n"
@@ -407,7 +408,7 @@ msgid ""
 "-error: File `%1' can't be opened!\n"
 "Reason: "
 msgstr ""
-"-error: No se puede abrir archivo '%1'!\n"
+"-error: ¡No se puede abrir archivo '%1'!\n"
 "Causa: "
 
 #: src/IExtract.cpp:766
@@ -419,7 +420,7 @@ msgid ""
 "-warning: The INI-file `%1' contains an invalid entry for the output style (`"
 "%2')! Using text\n"
 msgstr ""
-"-avios: El archivo por iniciar '%1' contiene una entrada invalida por el "
+"-avios: ¡El archivo por iniciar '%1' contiene una entrada invalida por el "
 "estilo de la salida ('%2')! Uso text\n"
 
 #: src/ParsePDF.cpp:55
