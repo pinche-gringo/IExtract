@@ -9,10 +9,10 @@ Anti-Copyright (A) 2002 Markus Schwab <g17m0@lycos.com>
 
 At the moment only the following documents are supported:
 
+  - JPEG: The comment is extracted.
   - HTML: The text in between <title> and </title> is extracted.
-  - M$ office documents (*.doc, *.xls, *.ppt): The utility searches for text
-       behind the signature "x02\x00\x00\x00\xe4\x04\x00\x00\x1e\x00\x00\x00"
-       (with regards to the length after the signature).
+  - M$ office documents (*.doc, *.xls, *.ppt); the comment of the properties
+       dialog is extracted.
 
 The found results can be written either in text or HTML (table) format.
 
@@ -27,8 +27,9 @@ Windows
 -------
 
 Is supported (principally), though because of missing standards not that easy
-(at least, if you have a different setup than me). But I have a running version.
-See the (end of the) file INSTALL.
+(at least, if you have a different setup than me). See the (end of the) file
+INSTALL. Note that the General library is linked statically (and not used as
+a DLL).
 
 
 How to report bugs and/or send patches
