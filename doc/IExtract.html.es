@@ -2,18 +2,18 @@
 <!-- $Id$ -->
 
 <!--
-  Copyright (C) 2003, 2004 Markus Schwab (g17m0@lycos.com)
+  Copyright (C) 2003 - 2005 Markus Schwab (g17m0@lycos.com)
 
   This is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
   License as published by the Free Software Foundation; either
   version 2 of the License, or (at your option) any later version.
- 
+
   This is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   General Public License for more details.
- 
+
   You should have received a copy of the GNU General Public
   License along with this library; if not, write to the Free
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -177,7 +177,7 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-o,&nbsp;--output=ESTILO</b></td>
-        <td>Especifica el estilo de la salida (text, HTML o LaTeX)</td></tr>
+        <td>Especifica el estilo de la salida (text, HTML o LaTeX).</td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-f,&nbsp;--format=FORMATO</b></td>
@@ -275,7 +275,7 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-n,&nbsp;--new=[D&Iacute;AS:]TEXTO</b></td>
-        <td>Muestra TEXTO en el primer campo por archivos m&aacute;s joven que 
+        <td>Muestra TEXTO en el primer campo por archivos m&aacute;s joven que
           D&Iacute;AS d&iacute;as (por defecto: 30).
 
           <p>D&Iacute;AS puede faltar o tener un ap&eacute;ndice de multiplicaci&oacute;n:
@@ -319,6 +319,18 @@
             <code>-DENABLE_THREADS</code>)!</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-S,&nbsp;--sort</b></td>
+        <td>Sortea los fichereos alfabeticalmente.</td></tr>
+      <tr><td>&nbsp;</td></tr>
+
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-X,&nbsp;--ignore-ext</b></td>
+        <td>Si la extensi&oacute;n de los ficheros est&aacute; desconocida,
+	  usa la extensi&oacute;n anterior para determinar el tipo del archivo.
+	  Eso sirve por ejemplo para documentos HTML en varios idiomas, cuales
+	  suelen tener el idioma a&ntilde;adido como segunda extensi&oacute;n
+	  (como index.html.es).</td></tr>
+      <tr><td>&nbsp;</td></tr>
+
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-V,&nbsp;--version</b></td>
         <td>Muestra informaci&oacute;n sobre la versi&oacute;n y termina.</td></tr>
       <tr><td>&nbsp;</td></tr>
@@ -344,15 +356,12 @@
    TextForNewFiles=TEXTO
    MaxAgeForNewFiles=D&Iacute;AS
    DirSeparatorText=T&Iacute;TULO
-   Style=ESTILO</pre>
+   Style=ESTILO
+   SortFiles=1</pre>
 
-    <p>Pasan los mismos cambias como con las opciones!</p>
+    <p>Pasan los mismos cambios como con las opciones!</p>
 
     <hr>
     <address><a href="mailto:g17m0@lycos.com">Envia comentarios</a></address>
-<!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
-<!-- hhmts start -->
-Last modified: Wed Jun 18 19:35:48 PET 2003
-<!-- hhmts end -->
   </body>
 </html>
