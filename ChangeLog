@@ -1,3 +1,33 @@
+2004-04-17  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.5.20 commented
+
+	* src/IExtract.cpp: Worked around stupid MS-VC++ bug
+
+	* Windows/VCExtract.mak: Regenerated from new project file
+
+	* Windows/IExtract.dsp: Removed old references to libYGP-files
+
+	* Windows/IExtract-cfg.h: Version to 0.5.20
+
+	* Make.bat: Removed building with GCC
+
+	* INSTALL: Removed compiling with GCC; mentioning clean target in make
+
+2004-04-11  Markus Schwab  <g17m0@lycos.com>
+
+	* doc/IExtract.html.es: Fixed translation of content
+
+	* po/de.po, po/en.po, po/es.po: Messages handling options a/A/p/P added
+
+	* src/IExtract.cpp:
+	  Renamed option -a to -u; Appending/prepending of text added; Cleanup
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Explained new options; renamed --all to --add-unknown
+
+	* configure.in: Version to 0.5.20
+
 2004-01-31  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.5.12 commented

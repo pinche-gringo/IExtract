@@ -1,3 +1,9 @@
+Overview of changes in version 0.5.20:
+
+  - New options to prepend/append text to the whole output
+  - Option -a (--all) renamed to -u (--add-unknown)
+  - Minor fixes in the help files
+
 Overview of changes in version 0.5.12:
 
   - Skipping over scripts in HTML headers
