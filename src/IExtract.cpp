@@ -24,6 +24,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+#undef  ENABLE_THREADS
+#define ENABLE_THREADS
+
 #include <gzo-cfg.h>
 
 #include <assert.h>
@@ -32,8 +35,29 @@
 
 #include <string>
 
-#include <Mutex.h>
-#include <Thread.h>
+#ifdef ENABLE_THREADS
+#  include <queue>
+#  include <vector>
+#  include <algorithm>
+
+#  include <Mutex.h>
+#  include <Thread.h>
+#  define LOCKFILES     { ((Application*)this)->mxListFiles.lock (); }
+#  define UNLOCKFILES   { ((Application*)this)->mxListFiles.unlock (); }
+#  define LOCKTHREADS   { ((Application*)this)->mxThreads.lock (); }
+#  define UNLOCKTHREADS { ((Application*)this)->mxThreads.unlock (); }
+#  define LOCKOUTPUT    { ((Application*)this)->mxOutput.lock (); }
+#  define UNLOCKOUTPUT  { ((Application*)this)->mxOutput.unlock (); }
+#else
+#  define LOCKFILES
+#  define UNLOCKFILES
+#  define LOCKTHREADS
+#  define UNLOCKTHREADS
+#  define LOCKOUTPUT
+#  define UNLOCKOUTPUT
+#endif
+
+#include <Trace_.h>
 #include <XStream.h>
 #include <DirSrch.h>
 #include <XDirSrch.h>
@@ -46,9 +70,16 @@
 #include "ParseWord.h"
 #include "Properties.h"
 
-#if SYSTEM == WINDOWS
-#  define strcmp stricmp
+#if SYSTEM == UNIX
+#  include <unistd.h>
+#elif SYSTEM == WINDOWS
+#  define WIN32_LEAN_AND_MEAN
+#  include <windows.h>
+
+#  define strcasecmp stricmp
+#  define sleep      Sleep
 #endif
+
 
 // Class to run Extract-Application
 class Application : public IVIOApplication {
@@ -56,22 +87,27 @@ class Application : public IVIOApplication {
    Application (const int argc, const char* argv[])
       : IVIOApplication (argc, argv, lo), options (0), outputStyle (TEXT)
       , ageOfNewFiles (30 * 24 * 60 * 60), pTextForNewFiles (NULL)
-      , showOptions (0), cThreads (0) { }
+#ifdef ENABLE_THREADS
+      , listFiles (), mxListFiles (), aThreads (0), mxThreads (), mxOutput ()
+#endif
+      , showOptions (0), writer (NULL) {
+#ifdef ENABLE_THREADS
+      aThreads.reserve (1);
+#endif
+  }
   ~Application () { }
 
  protected:
    virtual bool handleOption (const char option);
 
    // Program-handling
-   virtual bool shallShowInfo () const { return false; }
+   virtual bool        shallShowInfo () const { return false; }
    virtual int         perform (int argc, const char* argv[]);
    virtual const char* name () const { return PACKAGE; }
    virtual const char* description () const
-      { return (options & VERBOSE) ?
-                PACKAGE " V" VERSION "." MICRO_VERSION " - Compiled on " __DATE__ " - " __TIME__
-                "\nAuthor: Markus Schwab; e-Mail: g17m0@lycos.com"
-                "\nDistributed under the terms of the GNU General Public License"
-              : PACKAGE " V" VERSION; }
+      { return PACKAGE " V" VERSION "." MICRO_VERSION " - Compiled on " __DATE__ " - " __TIME__
+               "\n\nAuthor: Markus Schwab; e-Mail: g17m0@lycos.com"
+               "\nDistributed under the terms of the GNU General Public License"; }
 
    // Help-handling
    virtual void showHelp () const;
@@ -90,21 +126,34 @@ class Application : public IVIOApplication {
 
    static const FILEHANDLERS handlers[];
 
-   void handleFiles (Writer& writer, const char* pFile) const;
-   void processFile (const File& file, HANDLER fnc, Writer& writer) const;
+   void handleFiles (const char* pFile) const;
+   void processFile (const File& file) const;
+#ifdef ENABLE_THREADS
+   void* processThread (void*);
+#endif
 
    void processJPG (Xistream& hFile, Properties& result) const throw (std::string);
    void processHTML (Xistream& hFile, Properties& result) const throw (std::string);
    void processOffice (Xistream& hFile, Properties& result) const
       throw (std::string);
 
-   enum { RECURSIVE = 0x1, VERBOSE = 0x2, SHOW_ALL = 0x4, SHOW_ERRORS = 0x8 };
+   enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4 };
    unsigned int showOptions;
    unsigned long ageOfNewFiles;
    const char* pTextForNewFiles;
    unsigned int options;
 
-   unsigned int cThreads;
+   Writer* writer;
+
+#ifdef ENABLE_THREADS
+   vector<Thread*> aThreads;
+   Mutex           mxThreads;
+
+   Mutex           mxOutput;
+
+   Mutex        mxListFiles;
+   queue<File>  listFiles;
+#endif
 
    string filelist;
 
@@ -136,7 +185,6 @@ const IVIOApplication::longOptions Application::lo[] = {
    { "show-path", 'p' },
    { "all", 'a' },
    { "new", 'n' },
-   { "verbose", 'v' },
    { "version", 'V' },
    { "output", 'o' },
    { NULL, '\0' } };
@@ -154,11 +202,12 @@ void Application::showHelp () const {
                 "  -e, --show-errors ..... Puts error messages (additionally) into output\n"
                 "  -p, --show-path ....... Print path for files in output\n"
                 "  -a, --all ............. Show all files (including unknown types) in output\n"
+#ifdef ENABLE_THREADS
                 "  -t, --threads=NR ...... Number of threads for examining files (default: 0)\n"
+#endif
                 "  -n, --new=TIME:TEXT ... Show TEXT for files younger than TIME days (def: 30)\n"
                 "  -i, --include=NODES ... Node of files to inspect\n"
                 "  -x, --exclude=NODES ... Node of files to not inspect\n"
-                "  -v, --verbose, ........ Displays the processed files (be verbose)\n"
                 "  -V, --version ......... Output version information and exit\n"
                 "  -h, -?, --help ........ Displays this help and exit\n"
                 "  File(s) ... File to analyze (the last part can contain wildcards)\n\n"
@@ -189,16 +238,20 @@ bool Application::handleOption (const char option) {
                  "valid! Using text\n";
       break; }
 
+#ifdef ENABLE_THREADS
    case 't': {
       const char* pThreads = getOptionValue ();
+      unsigned int cThreads (0);
       char* pEnd = NULL;
       if (!pThreads
-          || ((cThreads = strtoul (pThreads, &pEnd, 10)),
-              !pEnd || *pEnd)) {
+          || (!(cThreads = strtoul (pThreads, &pEnd, 10)))
+          || (!pEnd || *pEnd)) {
          cerr << PACKAGE "-warning: Invalid number of threads!\n";
-         cThreads = 0;
       }
+      else
+         aThreads.reserve (cThreads);
       break; }
+#endif
 
    case 'e': options |= SHOW_ERRORS; break;
 
@@ -233,11 +286,9 @@ bool Application::handleOption (const char option) {
       filelist += PathSearch::PATHSEPARATOR;
       break; }
 
-   case 'v': options |= VERBOSE; break;
-
    case 'a': options |= SHOW_ALL; break;
 
-   case 'V': options |= VERBOSE; std::cout << description () << '\n'; exit (0);
+   case 'V': std::cout << description () << '\n'; exit (0);
 
    default:
       std::cerr << PACKAGE "-warning: Ignoring invalid option '"
@@ -265,7 +316,6 @@ int Application::perform (int argc, const char* argv[]) {
    } t[] = { { TEXT, (CREATEWRITER)&TextWriter::create },
              { HTML, (CREATEWRITER)&HTMLWriter::create } };
 
-   Writer* writer = NULL;
    for (unsigned int i (0); i < (sizeof (t) / sizeof (t[0])); ++i)
       if (outputStyle == t[i].opt) {
          writer = t[i].fnc (showOptions, ageOfNewFiles, pTextForNewFiles);
@@ -281,7 +331,21 @@ int Application::perform (int argc, const char* argv[]) {
          file += File::DIRSEPARATOR;
          file += "*";
       }
-      handleFiles (*writer, file.c_str ());
+      handleFiles (file.c_str ());
+   }
+
+   // Wait for threads to terminte
+   while (true) {
+      LOCKTHREADS
+      if (aThreads.empty ()) {
+         UNLOCKTHREADS
+         break;
+      }
+      if(aThreads[0])
+         Thread::waitForThread (*aThreads[0]);
+      else
+         aThreads.erase (aThreads.begin ());
+      UNLOCKTHREADS
    }
 
    writer->printEnd (cout);
@@ -290,14 +354,12 @@ int Application::perform (int argc, const char* argv[]) {
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Expands the filespecification and processes every file
-//Parameters: writer: Class to use for output
-//            pFile: Filespecification; may contain wildcards
+//Parameters: pFile: Filespecification; may contain wildcards
 //Requires  : pFile not NULL
 /*--------------------------------------------------------------------------*/
-void Application::handleFiles (Writer& writer, const char* pFile) const {
+void Application::handleFiles (const char* pFile) const {
    assert (pFile);
-   if (options & VERBOSE) {
-      std::cout << "Handling file(s) " << pFile << '\n'; std::cout.flush (); }
+   TRACE5 ("Application::handleFiles (const char*) const - " << pFile);
 
    XDirSrch ds (pFile);
    string node;
@@ -310,19 +372,27 @@ void Application::handleFiles (Writer& writer, const char* pFile) const {
 
    const File* file = ds.find (IDirectorySearch::FILE_NORMAL);
    while (file) {
-      if (options & VERBOSE) {
-         std::cout << "Handling file " << file->name () << '\n'; std::cout.flush (); }
-
-      HANDLER fnc = getFileTypeHandler (strrchr (file->name (), '.'));
-      if (fnc)
-         processFile (*file, fnc, writer);
-      else
-         if (options & SHOW_ALL)
-            writer.printMessage (cout, *file,
-                                 (options & SHOW_ERRORS) ? "Unknown file-type" : "");
+#ifdef ENABLE_THREADS
+      LOCKFILES
+      while (listFiles.size () > 100) {
+         UNLOCKFILES
+         sleep (0);
+         LOCKFILES
+      }
+      ((Application*)this)->listFiles.push (*file);
+      UNLOCKFILES
+      LOCKTHREADS
+      bool newThread (aThreads.size () < aThreads.capacity ());
+      if (newThread)
+         ((Application*)this)->aThreads.push_back (
+            OThread<Application>::create2 ((Application*)this,
+                                             &Application::processThread, NULL));
+      UNLOCKTHREADS
+#else
+      processFile (*file);
+#endif
       file = ds.next ();
    } // end-while
-
 
    // Now handle subdirectories (if specified)
    if (options & RECURSIVE) {
@@ -335,44 +405,94 @@ void Application::handleFiles (Writer& writer, const char* pFile) const {
             strFile += file->name ();
             strFile += File::DIRSEPARATOR;
             strFile += files;
-            handleFiles (writer, strFile.c_str ());
+            handleFiles (strFile.c_str ());
          }
          file = ds.next ();
       }
    }
 }
 
+#ifdef ENABLE_THREADS
+/*--------------------------------------------------------------------------*/
+//Purpose   : Threadfunction to process files (as long as the filelist is full)
+/*--------------------------------------------------------------------------*/
+void* Application::processThread (void* pThread) {
+   assert (pThread);
+   TRACE1 ("Application::processThread (void*) - " << ((Thread*)pThread)->getID ());
+   File file;
+
+   while (true) {
+      LOCKFILES
+      if (listFiles.size ()) {
+         file = listFiles.front ();
+         TRACE1 ("Application::processThread (void*) - File " << file.name ()
+                  << "; Remaining: " << listFiles.size ());
+         listFiles.pop ();
+         UNLOCKFILES
+         processFile (file);
+      }
+      else {
+         UNLOCKFILES
+         break;
+      }
+   } // end-while
+
+   TRACE9 ("Thread ends!");
+   LOCKTHREADS
+   assert (find (aThreads.begin (), aThreads.end (), pThread));
+   aThreads.erase (find (aThreads.begin (), aThreads.end (), pThread));
+   UNLOCKTHREADS
+   return NULL;
+}
+#endif
+
 /*--------------------------------------------------------------------------*/
 //Purpose   : Processes a single file with a known handler
-//Parameters: file: File to processs
-//            fnc: Function to handle the file
-//            writer: Output
+//Parameters: pFile: File to processs
 /*--------------------------------------------------------------------------*/
-void Application::processFile (const File& file, HANDLER fnc, Writer& writer) const {
-   std::string strFile (file.path ());
-   strFile += file.name ();
+void Application::processFile (const File& file) const {
+   TRACE1 ("Application::processFile (const File&) const - " << file.name ());
 
-   Xifstream ifile;
-   ifile.open (strFile.c_str (), ios::in | ios::binary);
-   if (!ifile) {
-      std::cerr << PACKAGE "-error: File " << strFile.c_str ()
-                << " can't be opened!\nReason: ";
-      perror ("");
-   }
-   else {
-      ifile.init ();
+   HANDLER fnc = getFileTypeHandler (strrchr (file.name (), '.'));
+   if (fnc) {
+      std::string strFile (file.path ());
+      strFile += file.name ();
 
-      try {
-         Properties prop;
-         (this->*fnc) ((Xistream&)ifile, prop);
-         writer.printFile (cout, file, prop);
+      Xifstream ifile;
+      ifile.open (strFile.c_str (), ios::in | ios::binary);
+      if (!ifile) {
+         LOCKOUTPUT
+         std::cerr << PACKAGE "-error: File " << strFile.c_str ()
+                  << " can't be opened!\nReason: ";
+         perror ("");
+         UNLOCKOUTPUT
       }
-      catch (std::string& err) {
-         std::cerr << PACKAGE "-error: " << err.c_str () << '\n';
-         writer.printMessage (cout, file,
-                              (options & SHOW_ERRORS) ? "Error while processing" : "");
-      } // end-catch
-   } // end-else file could be opened
+      else {
+         ifile.init ();
+
+         try {
+            Properties prop;
+            (this->*fnc) ((Xistream&)ifile, prop);
+            LOCKOUTPUT
+            writer->printFile (cout, file, prop);
+            UNLOCKOUTPUT
+         }
+         catch (std::string& err) {
+            LOCKOUTPUT
+            std::cerr << PACKAGE "-error: " << err.c_str () << '\n';
+            writer->printMessage (cout, file,
+                                 (options & SHOW_ERRORS) ? "Error while processing" : "");
+            UNLOCKOUTPUT
+         } // end-catch
+      } // end-else file could be opened
+   }
+   else
+      if (options & SHOW_ALL) {
+         LOCKOUTPUT
+         writer->printMessage (cout, file,
+                               (options & SHOW_ERRORS) ? "Unknown file-type" : "");
+         UNLOCKOUTPUT
+      }
 }
 
 /*--------------------------------------------------------------------------*/
@@ -382,9 +502,6 @@ void Application::processFile (const File& file, HANDLER fnc, Writer& writer) co
 /*--------------------------------------------------------------------------*/
 void Application::processHTML (Xistream& hFile, Properties& result) const
    throw (std::string) {
-   if (options & VERBOSE)
-      std::cout << "Processing HTML-file\n";
-
    ParseHTML obj;
    obj.parse (hFile, result);
 }
@@ -396,9 +513,6 @@ void Application::processHTML (Xistream& hFile, Properties& result) const
 /*--------------------------------------------------------------------------*/
 void Application::processOffice (Xistream& hFile, Properties& result) const
    throw (std::string) {
-   if (options & VERBOSE)
-      std::cout << "Processing MS Office document\n";
-
    ParseWord obj;
    obj.parse (hFile, result);
 }
@@ -410,9 +524,6 @@ void Application::processOffice (Xistream& hFile, Properties& result) const
 /*--------------------------------------------------------------------------*/
 void Application::processJPG (Xistream& hFile, Properties& result) const
    throw (std::string) {
-   if (options & VERBOSE)
-      std::cout << "Processing JPEG image\n";
-
    ParseJPEG obj;
    obj.parse (hFile, result);
 }
@@ -426,7 +537,7 @@ Application::HANDLER Application::getFileTypeHandler (const char* pExt) const {
    if (pExt && *pExt++) {
       unsigned int i (0);
       for (; i < (sizeof (handlers) / sizeof (handlers[0])); ++i)
-         if (!strcmp (handlers[i].pExt, pExt))
+         if (!strcasecmp (handlers[i].pExt, pExt))
             return handlers[i].pFnc;
    }
 
