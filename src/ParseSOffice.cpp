@@ -55,9 +55,9 @@ inline unsigned short get2BytesLSB (const char* pAddr) {
 #define ID ID1 "fxDocumentInfo"
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : (Default-)Constructor
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// (Default-)Constructor
+//-----------------------------------------------------------------------------
 ParseStarOffice::ParseStarOffice ()
    : idSOffice (ID, _("StarOffice ID"), false)
      , skipIDStart (ID1, _("Start of StarOffice IDs"), 256, 1, false)
@@ -86,12 +86,12 @@ ParseStarOffice::ParseStarOffice ()
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after a value was read
-//Parameters: pLength: Pointer to value
-//            len: Length of data
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after a value was read
+/// \param pLength: Pointer to value
+/// \param len: Length of data
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseStarOffice::foundValue (const char* pTitle, unsigned int len) {
    TRACE1 ("ParseStarOffice::foundValue (const char*, unsigned int) - "
            << len << " byte = " << pTitle);
@@ -116,11 +116,11 @@ int ParseStarOffice::foundValue (const char* pTitle, unsigned int len) {
    return YGP::ParseObject::PARSE_OK;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after the length of the next value was read
-//Parameters: pLength: Pointer to length
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after the length of the next value was read
+/// \param pLength: Pointer to length
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseStarOffice::foundLength (const char* pLength, unsigned int) {
    TRACE5 ("ParseStarOffice::foundLength (const char*, unsigned int) - "
            << get2BytesLSB (pLength));
@@ -130,10 +130,10 @@ int ParseStarOffice::foundLength (const char* pLength, unsigned int) {
    return YGP::ParseObject::PARSE_OK;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after the property-entries have been parsed
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after the property-entries have been parsed
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseStarOffice::foundProps (const char*, unsigned int) {
    TRACE9 ("ParseStarOffice::foundProps (const char*, unsigned int)");
 

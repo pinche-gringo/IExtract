@@ -28,6 +28,7 @@
 #include <IExtract-cfg.h>
 
 #include <YGP/Check.h>
+
 #include "ParseHTML.h"
 #include "Properties.h"
 
@@ -41,9 +42,9 @@ static const unsigned LEN_COMMAND     = 1024;
 #endif
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : (Default-)Constructor
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// (Default-)Constructor
+//-----------------------------------------------------------------------------
 ParseHTML::ParseHTML ()
    : startTag ("<", _("Start of HTML-tag")), endTag (">", _("End of HTML-tag"))
      , tagMeta ("META", _("Meta tag"))
@@ -124,53 +125,53 @@ ParseHTML::ParseHTML ()
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after a title was read
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
-int ParseHTML::foundValue (const char* pTitle, unsigned int len) {
+//-----------------------------------------------------------------------------
+/// Callback after a title was read
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+int ParseHTML::foundValue (const char* pValue, unsigned int len) {
    if (actEntry != NONE) {
       static std::string Properties::* values[] =
          { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
 
       Check3 (prop);
-      (prop->*(values[actEntry])).assign (pTitle, len);
+      (prop->*(values[actEntry])).assign (pValue, len);
    }
    actEntry = NONE;
    return YGP::ParseObject::PARSE_OK;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after a title tag was read
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after a title tag was read
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseHTML::foundTitle (const char*, unsigned int) {
    actEntry = TITLE;
    return YGP::ParseObject::PARSE_OK;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after an author-tag was read
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after an author-tag was read
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseHTML::foundAuthor (const char*, unsigned int) {
    actEntry = AUTHOR;
    return YGP::ParseObject::PARSE_OK;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after a comment tag was read
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after a comment tag was read
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseHTML::foundComment (const char*, unsigned int) {
    actEntry = COMMENT;
    return YGP::ParseObject::PARSE_OK;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after a title tag was read
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after a title tag was read
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseHTML::foundEndOfHead (const char*, unsigned int) {
    htmlDoc.setMaxCard (1);
    return YGP::ParseObject::PARSE_OK;

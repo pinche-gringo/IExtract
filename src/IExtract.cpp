@@ -1,4 +1,3 @@
-//$Id$
 
 //PROJECT     : Extract
 //SUBSYSTEM   : Extract
@@ -254,9 +253,9 @@ Application::~Application () {
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Displays the help
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Displays the help
+//-----------------------------------------------------------------------------
 void Application::showHelp () const {
    std::cout << _("Extracts a description out of files (depending on the file-type)\n\nUsage:")
       << " " PACKAGE " " << _("[OPTIONS] <File(s)>")
@@ -329,12 +328,12 @@ void Application::showHelp () const {
       "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n");
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Checks the validity of the passed option
-//Parameters: option: Actual option
-//Returns   : bool: Status; false: Invalid option/option-value
-//Require   : option not '\0´'
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Checks the validity of the passed option
+/// \param option: Actual option
+/// \returns \c bool: Status; false: Invalid option/option-value Require :
+///     option not '\0´'
+//-----------------------------------------------------------------------------
 bool Application::handleOption (const char option) {
    Check3 (option != '\0');
 
@@ -476,12 +475,12 @@ bool Application::handleOption (const char option) {
    return true;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Performs the job of the applications
-//Parameters: argc: Number of parameters (without options)
-//            argv: Array with pointer to arguments
-//Returns   : int: Status
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Performs the job of the applications
+/// \param argc: Number of parameters (without options)
+/// \param argv: Array with pointer to arguments
+/// \returns \c int: Status
+//-----------------------------------------------------------------------------
 int Application::perform (int argc, const char* argv[]) {
    if (!argc) {                        // Check if enough arguments are passed
       showHelp ();
@@ -526,11 +525,11 @@ int Application::perform (int argc, const char* argv[]) {
    return 0;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Expands the filespecification and processes every file
-//Parameters: pFile: Filespecification; may contain wildcards
-//Requires  : pFile not NULL
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Expands the filespecification and processes every file
+/// \param pFile: Filespecification; may contain wildcards
+/// \pre pFile not NULL
+//-----------------------------------------------------------------------------
 void Application::handleFiles (const char* pFile) const {
    Check3 (pFile);
    TRACE5 ("Application::handleFiles (const char*) const - " << pFile);
@@ -622,9 +621,9 @@ void Application::handleFiles (const char* pFile) const {
 }
 
 #ifdef ENABLE_THREADS
-/*--------------------------------------------------------------------------*/
-//Purpose   : Threadfunction to process files (as long as the filelist is full)
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Threadfunction to process files (as long as the filelist is full)
+//-----------------------------------------------------------------------------
 void* Application::processThread (void* pThread) {
    Check3 (pThread);
    FILEFNC file;
@@ -657,11 +656,11 @@ void* Application::processThread (void* pThread) {
 }
 #endif
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Processes a single file with a known handler
-//Parameters: pFile: File to processs
-//            fnc: Handling function
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Processes a single file with a known handler
+/// \param pFile: File to processs
+/// \param fnc: Handling function
+//-----------------------------------------------------------------------------
 void Application::processFile (const YGP::File& file, HANDLER fnc) const {
    TRACE1 ("Application::processFile (const YGP::File&) const - " << file.name ());
 
@@ -701,86 +700,86 @@ void Application::processFile (const YGP::File& file, HANDLER fnc) const {
    } // end-else file could be opened
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Tries to extract the properties of a HTML-document
-//Parameters: hFile: File to processs
-//            result: Result of parsing
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of a HTML-document
+/// \param hFile: File to processs
+/// \param result: Result of parsing
+//-----------------------------------------------------------------------------
 void Application::processHTML (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseHTML obj;
    obj.parse (hFile, result);
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Tries to extract the properties of a PDF document
-//Parameters: hFile: File to processs
-//            result: Result of parsing
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of a PDF document
+/// \param hFile: File to processs
+/// \param result: Result of parsing
+//-----------------------------------------------------------------------------
 void Application::processPDF (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParsePDF::parse (hFile, result);
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Tries to extract the properties of a MP3 file
-//Parameters: hFile: File to processs
-//            result: Result of parsing
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of a MP3 file
+/// \param hFile: File to processs
+/// \param result: Result of parsing
+//-----------------------------------------------------------------------------
 void Application::processMP3 (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseMP3::parse (hFile, result);
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Tries to extract the properties of a StarOffice document
-//Parameters: hFile: File to processs
-//            result: Result of parsing
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of a StarOffice document
+/// \param hFile: File to processs
+/// \param result: Result of parsing
+//-----------------------------------------------------------------------------
 void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseStarOffice obj;
    obj.parse (hFile, result);
 }
 
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
 /// Tries to extract the properties of a OpenOffice document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
 void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseOpenOffice obj;
    obj.parse (hFile, result);
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Tries to extract the properties of a MS-office document
-//Parameters: hFile: File to processs
-//            result: Result of parsing
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of a MS-office document
+/// \param hFile: File to processs
+/// \param result: Result of parsing
+//-----------------------------------------------------------------------------
 void Application::processOffice (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseWord obj;
    obj.parse (hFile, result);
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Tries to extract the properties of a JPEG image
-//Parameters: hFile: File to processs
-//            result: Result of parsing
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of a JPEG image
+/// \param hFile: File to processs
+/// \param result: Result of parsing
+//-----------------------------------------------------------------------------
 void Application::processJPG (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseJPEG obj;
    obj.parse (hFile, result);
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Returns a handling function to a filetype
-//Parameters: pExt: Pointer to file extensions
-//Returns   : HANDLER: Method to handle this filetype; NULL in case of error
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Returns a handling function to a filetype
+/// \param pExt: Pointer to file extensions
+/// \returns \c HANDLER: Method to handle this filetype; NULL in case of error
+//-----------------------------------------------------------------------------
 Application::HANDLER Application::getFileTypeHandler (const char* pExt) const {
    if (pExt && *pExt++) {
       std::map<const std::string, HANDLER>::const_iterator i
@@ -792,10 +791,10 @@ Application::HANDLER Application::getFileTypeHandler (const char* pExt) const {
    return NULL;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Converts wide characters to normal strings
-//Parameters: prop: Properties to convert
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Converts wide characters to normal strings
+/// \param prop: Properties to convert
+//-----------------------------------------------------------------------------
 void Application::convertFromWideChar (Properties& prop) {
    static std::string Properties::* values[] = { &Properties::strTitle,
                                                  &Properties::strComment,
@@ -810,11 +809,11 @@ void Application::convertFromWideChar (Properties& prop) {
       }
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Reads the options of the INI-file
-//Parameters: pFile: Pointer to filename
-//Requieres : pFile not NULL
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Reads the options of the INI-file
+/// \param pFile: Pointer to filename
+/// \param Requieres : pFile not NULL
+//-----------------------------------------------------------------------------
 void Application::readINIFile (const char* pFile) {
    TRACE5 ("Application::readINIFile (const char*) - " << pFile);
    Check3 (pFile);
@@ -850,12 +849,12 @@ void Application::readINIFile (const char* pFile) {
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Entrypoint of application
-//Parameters: argc: Anzahl der Parameter
-//            argv: Array mit Zeigern auf Parameter
-//Returns   : int: Status
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Entrypoint of application
+/// \param argc: Anzahl der Parameter
+/// \param argv: Array mit Zeigern auf Parameter
+/// \returns \c int: Status
+//-----------------------------------------------------------------------------
 int main (int argc, const char* argv[]) {
    YGP::IVIOApplication::initI18n (PACKAGE, LOCALEDIR),
 

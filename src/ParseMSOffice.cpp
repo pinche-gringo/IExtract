@@ -78,9 +78,9 @@ inline unsigned int get4BytesLSB (const char* pAddr) {
 static const unsigned int aTypes[] = { TYPE_TITLE, TYPE_AUTHOR, TYPE_COMMENT };
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : (Default-)Constructor
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// (Default-)Constructor
+//-----------------------------------------------------------------------------
 ParseWord::ParseWord()
    : id (ID, _("ID for title"), 16, 16, false)
      , idValue1 (SEP1, _("ID for values (I)"), *this, &ParseWord::foundValueStart, 12, 12, false)
@@ -131,11 +131,11 @@ ParseWord::ParseWord()
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after the number of entries has been parsed
-//Parameters: pEntries: Pointer to number of entries
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after the number of entries has been parsed
+/// \param pEntries: Pointer to number of entries
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseWord::foundNrEntries (const char* pEntries, unsigned int) {
    Check3 (pEntries);
    cEntries = get4BytesLSB (pEntries);
@@ -145,11 +145,11 @@ int ParseWord::foundNrEntries (const char* pEntries, unsigned int) {
    return YGP::ParseObject::PARSE_OK;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after the number of entries has been parsed
-//Parameters: pType: Pointer to found type
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after the number of entries has been parsed
+/// \param pType: Pointer to found type
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseWord::foundType (const char* pType, unsigned int) {
    Check3 (pType);
    actEntry = *(unsigned int*)pType;
@@ -163,11 +163,11 @@ int ParseWord::foundType (const char* pType, unsigned int) {
    return YGP::ParseObject::PARSE_OK;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after the offset of the comment-entry was found
-//Parameters: offset: Pointer to offset
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after the offset of the comment-entry was found
+/// \param offset: Pointer to offset
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseWord::foundOffset (const char* offset, unsigned int) {
    Check3 (offset);
    Check3 (getTypeIndex (actEntry) != -1);
@@ -180,11 +180,11 @@ int ParseWord::foundOffset (const char* offset, unsigned int) {
    return YGP::ParseObject::PARSE_OK;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after the length of the title was read
-//Parameters: length: Pointer to length
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after the length of the title was read
+/// \param length: Pointer to length
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseWord::foundLength (const char* length, unsigned int) {
    Check3 (length);
    if ((len = *(int*)length))
@@ -193,12 +193,12 @@ int ParseWord::foundLength (const char* length, unsigned int) {
    return YGP::ParseObject::PARSE_OK;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after a title was read
-//Parameters: pTitle: Pointer to title
-//            len: Length of title
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after a title was read
+/// \param pTitle: Pointer to title
+/// \param len: Length of title
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
    Check3 (pTitle);
    Check3 (aOffsets[actEntry] < 1000);
@@ -230,10 +230,10 @@ int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
    return YGP::ParseObject::PARSE_OK;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after the header of the properthies has been read
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after the header of the properthies has been read
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseWord::foundPropertiesHeader (const char*, unsigned int) {
    TRACE1 ("ParseWord::foundPropertiesHeader (const char*) - Bytes read: "
            << cRead << " (0x" << hex << cRead << dec << ')');
@@ -256,21 +256,21 @@ int ParseWord::foundPropertiesHeader (const char*, unsigned int) {
    return YGP::ParseObject::PARSE_OK;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Callback after the ID for the start of the values has been read
-//Returns   : int: Status: YGP::ParseObject::PARSE_OK
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Callback after the ID for the start of the values has been read
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
 int ParseWord::foundValueStart (const char*, unsigned int) {
    TRACE9 ("ParseWord::foundValueStart (const char*)");
    selValueStart.setMaxCard (0);
    return YGP::ParseObject::PARSE_OK;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Retrieves the index of the passed type
-//Parameters: type: Type to inspect
-//Returns   : unsigned int: Offset; -1 if type is not valid
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Retrieves the index of the passed type
+/// \param type: Type to inspect
+/// \returns \c unsigned int: Offset; -1 if type is not valid
+//-----------------------------------------------------------------------------
 int ParseWord::getTypeIndex (unsigned int type) {
    for (unsigned int i (0); i < (sizeof (aTypes) / sizeof (aTypes[0])); ++i)
       if (type == aTypes[i])

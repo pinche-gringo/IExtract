@@ -41,12 +41,12 @@
 #include "Properties.h"
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Konstructor
-//Parameters: format: Format how to display entries
-//            New: Text to display for new files
-//            age: Maximal age for new files
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Konstructor
+/// \param format: Format how to display entries
+/// \param New: Text to display for new files
+/// \param age: Maximal age for new files
+//-----------------------------------------------------------------------------
 Writer::Writer (const std::string& format, const std::string& New,
                 unsigned long age)
    : strNew (New), columns_ (format) {
@@ -55,17 +55,17 @@ Writer::Writer (const std::string& format, const std::string& New,
    limit = time (NULL) - age;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Destructor
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Destructor
+//-----------------------------------------------------------------------------
 Writer::~Writer () {
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Counts the number of columns
-//Returns   : unsigned int: Number of columns
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Counts the number of columns
+/// \returns \c unsigned int: Number of columns
+//-----------------------------------------------------------------------------
 unsigned int Writer::columns () const {
    unsigned int cols (1);
    YGP::Tokenize t (columns_);
@@ -74,21 +74,18 @@ unsigned int Writer::columns () const {
    return cols;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints a separating text between directories. The following
-//            characters are substituted:
-//              'e': With the end-of-data as defined by the writer class
-//              's': With the start-of-data as defined by the writer class
-//              'n': With the name of the file
-//              'N': With path and name of the file
-//              'p': With the path of the file
-//              'P': With the path of the file in UNIX style (separated by /)
-//              'U': With path and name of the file in UNIX style (separated by /)
-//Parameters: out: Stream where to put the output
-//            file: File specifying directory
-//            data: Text to print for separation
-//            title: Text to print as header for every new dir
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints a separating text between directories. The following characters are
+/// substituted: 'e': With the end-of-data as defined by the writer class 's':
+/// With the start-of-data as defined by the writer class 'n': With the name
+/// of the file 'N': With path and name of the file 'p': With the path of the
+/// file 'P': With the path of the file in UNIX style (separated by /) 'U':
+/// With path and name of the file in UNIX style (separated by /)
+/// \param out: Stream where to put the output
+/// \param file: File specifying directory
+/// \param data: Text to print for separation
+/// \param title: Text to print as header for every new dir
+//-----------------------------------------------------------------------------
 void Writer::printSeparator (std::ostream& out, const YGP::File& file,
                              const std::string& data, const std::string& title) const {
    unsigned int pos (0);
@@ -128,27 +125,21 @@ void Writer::printSeparator (std::ostream& out, const YGP::File& file,
    out << data.substr (oldPos, pos - oldPos);
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Returns the substitute for a control character
-//            Substitutes:
-//              'a': With the author (of the properties)
-//              'c': With the comment (of the properties)
-//              'd': With the timestamp of the file
-//              'D': With the date of the file
-//              'n': With the name of the file
-//              'N': With path and name of the file
-//              'p': With the path of the file
-//              'P': With the path of the file in UNIX style (separated by /)
-//              's': With the size of the file in bytes
-//              'S': With the size of the file (human readable)
-//              't': With the title (of the properties)
-//              'U': With path and name of the file in UNIX style (separated by /)
-//              Other chars: With the character itself
-//Parameters: ctrl: Control character
-//            subst: String with which to replace the character
-//            file: File subsituting various placeholders
-//            prop: Properties subsituting various placeholders
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Returns the substitute for a control character Substitutes: 'a': With the
+/// author (of the properties) 'c': With the comment (of the properties) 'd':
+/// With the timestamp of the file 'D': With the date of the file 'n': With
+/// the name of the file 'N': With path and name of the file 'p': With the
+/// path of the file 'P': With the path of the file in UNIX style (separated
+/// by /) 's': With the size of the file in bytes 'S': With the size of the
+/// file (human readable) 't': With the title (of the properties) 'U': With
+/// path and name of the file in UNIX style (separated by /) Other chars: With
+/// the character itself
+/// \param ctrl: Control character
+/// \param subst: String with which to replace the character
+/// \param file: File subsituting various placeholders
+/// \param prop: Properties subsituting various placeholders
+//-----------------------------------------------------------------------------
 void Writer::getSubstitute (const char ctrl, std::string& subst, const YGP::File& file,
                             const Properties& prop) const {
    switch (ctrl) {
@@ -201,10 +192,10 @@ void Writer::getSubstitute (const char ctrl, std::string& subst, const YGP::File
            << ctrl << "' with " << subst);
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Returns the next token; special characters are expanded
-//Returns   : std::string: Next (expanded) token
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Returns the next token; special characters are expanded
+/// \returns \c std::string: Next (expanded) token
+//-----------------------------------------------------------------------------
 std::string Writer::convertToHumanString (unsigned long value) {
    if (value < 1000)
       return YGP::ANumeric::toString (value);
@@ -230,12 +221,12 @@ std::string Writer::convertToHumanString (unsigned long value) {
    return YGP::ANumeric::toString (value) + tString;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Returns the next token; special characters are expanded
-//Parameters: file: File subsituting various placeholders
-//            prop: Properties subsituting various placeholders
-//Returns   : std::string: Next (expanded) token
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Returns the next token; special characters are expanded
+/// \param file: File subsituting various placeholders
+/// \param prop: Properties subsituting various placeholders
+/// \returns \c std::string: Next (expanded) token
+//-----------------------------------------------------------------------------
 std::string Writer::getNextNode (const YGP::File& file, const Properties& prop) const {
    unsigned int pos (0);
    std::string token (const_cast<Writer*> (this)->columns_.getNextNode ('|'));
@@ -274,18 +265,18 @@ std::string Writer::getNextNode (const YGP::File& file, const Properties& prop) 
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Destructor
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Destructor
+//-----------------------------------------------------------------------------
 HTMLWriter::~HTMLWriter () {
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints the start of an HTML-table
-//Parameters: out: Stream where to put the output
-//            title: Title information
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints the start of an HTML-table
+/// \param out: Stream where to put the output
+/// \param title: Title information
+//-----------------------------------------------------------------------------
 void HTMLWriter::printStart (std::ostream& out, const std::string& title) const {
    out << "<table>\n";
 
@@ -303,12 +294,12 @@ void HTMLWriter::printStart (std::ostream& out, const std::string& title) const 
    out << "<tbody>";
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints a file entry in HTML format
-//Parameters: out: Stream where to put the output
-//            file: File whose data should be printed
-//            prop: Properties of the file
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints a file entry in HTML format
+/// \param out: Stream where to put the output
+/// \param file: File whose data should be printed
+/// \param prop: Properties of the file
+//-----------------------------------------------------------------------------
 void HTMLWriter::printFile (std::ostream& out, const YGP::File& file,
                             const Properties& prop) const {
    out << "<tr valign=top>";
@@ -325,12 +316,12 @@ void HTMLWriter::printFile (std::ostream& out, const YGP::File& file,
    out << "</tr>\n";
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Changes the HTML special characters quote ("), ampersand (&),
-//            apostrophe ('), less (<) and greater (>) to HTML-values
-//Parameters: value: String to change
-//Returns   : Changed string
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Changes the HTML special characters quote ("), ampersand (&), apostrophe
+/// ('), less (<) and greater (>) to HTML-values
+/// \param value: String to change
+/// \returns \c Changed string
+//-----------------------------------------------------------------------------
 std::string HTMLWriter::changeSpecialChars (const std::string& value) const {
    TRACE5 ("HTMLWriter::changeSpecialChars (const std::string&) - Changing: " << value);
 
@@ -350,12 +341,12 @@ std::string HTMLWriter::changeSpecialChars (const std::string& value) const {
    return chg;
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints a message in HTML-format (inside the table)
-//Parameters: out: Stream where to put the output
-//            file: File to which the message should be print
-//            msg: Message to print (not NULL)
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints a message in HTML-format (inside the table)
+/// \param out: Stream where to put the output
+/// \param file: File to which the message should be print
+/// \param msg: Message to print (not NULL)
+//-----------------------------------------------------------------------------
 void HTMLWriter::printMessage (std::ostream& out, const YGP::File& file,
                                const std::string& msg) const {
    Check3 (!msg.empty ());
@@ -370,27 +361,27 @@ void HTMLWriter::printMessage (std::ostream& out, const YGP::File& file,
        << "</td></tr>\n";
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints the end of an HTML-table
-//Parameters: out: Stream where to put the output
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints the end of an HTML-table
+/// \param out: Stream where to put the output
+//-----------------------------------------------------------------------------
 void HTMLWriter::printEnd (std::ostream& out) const {
    out << "</tbody></table>\n";
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Destructor
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Destructor
+//-----------------------------------------------------------------------------
 TextWriter::~TextWriter () {
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints the start of a text-table
-//Parameters: out: Stream where to put the output
-//            title: Title information
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints the start of a text-table
+/// \param out: Stream where to put the output
+/// \param title: Title information
+//-----------------------------------------------------------------------------
 void TextWriter::printStart (std::ostream& out, const std::string& title) const {
    if (title.size ()) {
       YGP::Tokenize titles (title);
@@ -401,12 +392,12 @@ void TextWriter::printStart (std::ostream& out, const std::string& title) const 
    }
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints a file entry in text-format
-//Parameters: out: Stream where to put the output
-//            file: File whose data should be printed
-//            prop: Properties of the file
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints a file entry in text-format
+/// \param out: Stream where to put the output
+/// \param file: File whose data should be printed
+/// \param prop: Properties of the file
+//-----------------------------------------------------------------------------
 void TextWriter::printFile (std::ostream& out, const YGP::File& file,
                             const Properties& prop) const {
    if (strNew.size () && isNew (file))
@@ -421,12 +412,12 @@ void TextWriter::printFile (std::ostream& out, const YGP::File& file,
    out << '\n';
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints a message
-//Parameters: out: Stream where to put the output
-//            file: File to which the message should be print
-//            msg: Message to print (not NULL)
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints a message
+/// \param out: Stream where to put the output
+/// \param file: File to which the message should be print
+/// \param msg: Message to print (not NULL)
+//-----------------------------------------------------------------------------
 void TextWriter::printMessage (std::ostream& out, const YGP::File& file,
                                const std::string& msg) const {
    Check3 (!msg.empty ());
@@ -436,18 +427,18 @@ void TextWriter::printMessage (std::ostream& out, const YGP::File& file,
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Destructor
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Destructor
+//-----------------------------------------------------------------------------
 LaTeXWriter::~LaTeXWriter () {
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints the start of a LaTeX-table (tabular)
-//Parameters: out: Stream where to put the output
-//            title: Title information
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints the start of a LaTeX-table (tabular)
+/// \param out: Stream where to put the output
+/// \param title: Title information
+//-----------------------------------------------------------------------------
 void LaTeXWriter::printStart (std::ostream& out, const std::string& title) const {
    out << "\\begin{tabular}{";
    for (unsigned int i (0); i < columns (); ++i)
@@ -469,12 +460,12 @@ void LaTeXWriter::printStart (std::ostream& out, const std::string& title) const
    }
  }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints a file entry in LaTeX format
-//Parameters: out: Stream where to put the output
-//            file: File whose data should be printed
-//            prop: Properties of the file
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints a file entry in LaTeX format
+/// \param out: Stream where to put the output
+/// \param file: File whose data should be printed
+/// \param prop: Properties of the file
+//-----------------------------------------------------------------------------
 void LaTeXWriter::printFile (std::ostream& out, const YGP::File& file,
                              const Properties& prop) const {
    if (strNew.size ()) {
@@ -491,12 +482,12 @@ void LaTeXWriter::printFile (std::ostream& out, const YGP::File& file,
    out << "\\\\\n";
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints a message in LaTeX-format (inside the table)
-//Parameters: out: Stream where to put the output
-//            file: File to which the message should be print
-//            msg: Message to print (not NULL)
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints a message in LaTeX-format (inside the table)
+/// \param out: Stream where to put the output
+/// \param file: File to which the message should be print
+/// \param msg: Message to print (not NULL)
+//-----------------------------------------------------------------------------
 void LaTeXWriter::printMessage (std::ostream& out, const YGP::File& file,
                                 const std::string& msg) const {
    Check3 (!msg.empty ());
@@ -511,20 +502,20 @@ void LaTeXWriter::printMessage (std::ostream& out, const YGP::File& file,
        << msg << "}\\\\\n";
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints the end of a LaTeX-table
-//Parameters: out: Stream where to put the output
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints the end of a LaTeX-table
+/// \param out: Stream where to put the output
+//-----------------------------------------------------------------------------
 void LaTeXWriter::printEnd (std::ostream& out) const {
    out << "\\end{tabular}\n";
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Changes the LaTeX special characters quote ("), ampersand (&),
-//            apostrophe ('), less (<) and greater (>) to HTML-values
-//Parameters: value: String to change
-//Returns   : Changed string
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Changes the LaTeX special characters quote ("), ampersand (&), apostrophe
+/// ('), less (<) and greater (>) to HTML-values
+/// \param value: String to change
+/// \returns \c Changed string
+//-----------------------------------------------------------------------------
 std::string LaTeXWriter::changeSpecialChars (const std::string& value) const {
    std::string chg (value);
    static const char toChange[] = { '#', '$', '%', '&', '~', '_', '^', '\\',
@@ -547,18 +538,18 @@ std::string LaTeXWriter::changeSpecialChars (const std::string& value) const {
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Destructor
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Destructor
+//-----------------------------------------------------------------------------
 XMLWriter::~XMLWriter () {
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints the start of an XML-table
-//Parameters: out: Stream where to put the output
-//            title: Title information
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints the start of an XML-table
+/// \param out: Stream where to put the output
+/// \param title: Title information
+//-----------------------------------------------------------------------------
 void XMLWriter::printStart (std::ostream& out, const std::string& title) const {
    out << "<table>\n";
 
@@ -571,12 +562,12 @@ void XMLWriter::printStart (std::ostream& out, const std::string& title) const {
    }
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints a file entry in XML format
-//Parameters: out: Stream where to put the output
-//            file: File whose data should be printed
-//            prop: Properties of the file
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints a file entry in XML format
+/// \param out: Stream where to put the output
+/// \param file: File whose data should be printed
+/// \param prop: Properties of the file
+//-----------------------------------------------------------------------------
 void XMLWriter::printFile (std::ostream& out, const YGP::File& file,
                             const Properties& prop) const {
    if (strNew.size ()) {
@@ -590,12 +581,12 @@ void XMLWriter::printFile (std::ostream& out, const YGP::File& file,
    out << '\n';
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints a message in XML-format (inside the table)
-//Parameters: out: Stream where to put the output
-//            file: File to which the message should be print
-//            msg: Message to print (not NULL)
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints a message in XML-format (inside the table)
+/// \param out: Stream where to put the output
+/// \param file: File to which the message should be print
+/// \param msg: Message to print (not NULL)
+//-----------------------------------------------------------------------------
 void XMLWriter::printMessage (std::ostream& out, const YGP::File& file,
                                const std::string& msg) const {
    Check3 (!msg.empty ());
@@ -605,10 +596,10 @@ void XMLWriter::printMessage (std::ostream& out, const YGP::File& file,
        << "<Description>" << msg << "</Desription></Error>\n";
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Prints the end of an XML-table
-//Parameters: out: Stream where to put the output
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Prints the end of an XML-table
+/// \param out: Stream where to put the output
+//-----------------------------------------------------------------------------
 void XMLWriter::printEnd (std::ostream& out) const {
    out << "</table>\n";
 }

@@ -32,25 +32,25 @@
 #include "ParseMP3.h"
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : (Default-)Constructor
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// (Default-)Constructor
+//-----------------------------------------------------------------------------
 ParseMP3::ParseMP3 () {
 
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Destructor
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Destructor
+//-----------------------------------------------------------------------------
 ParseMP3::~ParseMP3 () {
 }
 
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Method to actually parse the MP3-file
-//Parameters: stream: MP3-file to analyze
-//            result: Out: Found information
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Method to actually parse the MP3-file
+/// \param stream: MP3-file to analyze
+/// \param result: Out: Found information
+//-----------------------------------------------------------------------------
 void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
    stream.seekg (-0x80, std::ios::end);
    std::string value;
@@ -65,12 +65,12 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (std::str
    }
 }
 
-/*--------------------------------------------------------------------------*/
-//Purpose   : Returns the specified substring, removed from trailing spaces
-//Parameters: value: String to manipulate
-//            pos: Starting pos inside the string
-//            len: Maximal length of string
-/*--------------------------------------------------------------------------*/
+//-----------------------------------------------------------------------------
+/// Returns the specified substring, removed from trailing spaces
+/// \param value: String to manipulate
+/// \param pos: Starting pos inside the string
+/// \param len: Maximal length of string
+//-----------------------------------------------------------------------------
 std::string ParseMP3::strip (std::string& value, unsigned int pos, unsigned int len) {
    len += pos;
    while (len > pos) {
