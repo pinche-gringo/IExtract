@@ -17,9 +17,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-#ifdef ENABLE_THREADS
-#  define MULTIBUFFER
-#endif
+#include <map>
+
 #include <Parse.h>
 
 struct Properties;
@@ -45,6 +44,8 @@ class ParseWord  {
 
    int foundPropertiesHeader (const char*, unsigned int);
 
+   static int getTypeIndex (unsigned int type);
+
    typedef OFParseText<ParseWord>     OMParseText;
    typedef OFParseAttomic<ParseWord>  OMParseAttomic;
    typedef OFParseSequence<ParseWord> OMParseSequence;
@@ -65,12 +66,12 @@ class ParseWord  {
    ParseSelection  wordDoc;                                    // Startsequence
 
    ParseObject* _wordDoc[5];
-   ParseObject* _seqProperties[9];
-   ParseObject* _seqTitle[3];
+   ParseObject* _seqProperties[6];
+   ParseObject* _seqTitle[4];
    ParseObject* _seqEntries[3];
 
-   unsigned int offTitle;
-   unsigned int offComment;
+   // Map for offsets to supported type. 1st: Offset, 2nd: Type
+   map<unsigned int, unsigned int> aOffsets;
 
    unsigned int cRead;
    unsigned int cEntries;

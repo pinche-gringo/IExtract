@@ -34,6 +34,10 @@
 #include "ParseWord.h"
 #include "Properties.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable:4355) // disable warning about this in initlist
+#endif
+
 
 static const unsigned LEN_CONTENT     = 1024;
 
@@ -41,7 +45,11 @@ static const unsigned LEN_CONTENT     = 1024;
 static const char* ID = ID1 "\x4F\x68\x10\xAB\x91\x08\x00\x2B\x27\xB3\xD9\x30\x00\x00\x00";
 
 static const unsigned int TYPE_TITLE   = 1;
+static const unsigned int TYPE_AUTHOR  = 4;
 static const unsigned int TYPE_COMMENT = 6;
+
+
+static const unsigned int aTypes[] = { TYPE_TITLE, TYPE_AUTHOR, TYPE_COMMENT };
 
 
 /*--------------------------------------------------------------------------*/
@@ -49,8 +57,7 @@ static const unsigned int TYPE_COMMENT = 6;
 //Parameters: pClassname: Name of class containing parser-data
 /*--------------------------------------------------------------------------*/
 ParseWord::ParseWord()
-   : len (0), cEntries (0), actEntry (-1U), offTitle (-1U), offComment (-1U)
-   , cRead (0), prop (NULL)
+   : len (0), cEntries (0), actEntry (-1U), cRead (0), prop (NULL)
    , id (ID, "ID for title", 16, 16, false)
    , skip ("\\*", "Unused information", 4, 4, false)
    , nrEntries ("\\*", "Number of entries", *this, &ParseWord::foundNrEntries, 4, 4, false)
@@ -58,8 +65,8 @@ ParseWord::ParseWord()
    , offset ("\\*", "Offset of Comment", *this, &ParseWord::foundOffset, 4, 4, false)
    , length ("\\*", "Length of title", *this, &ParseWord::foundLength, 4, 4, false)
    , title ("\0", "Title of document", *this, &ParseWord::foundTitle, 1, 1, false)
-   , skipIDStart (ID1, "Other command", 1, 1)
-   , ignore (ID1, "Content", LEN_CONTENT, false)
+   , skipIDStart (ID1, "Other command", 16, 1)
+   , ignore (ID1, "Content", LEN_CONTENT, false, false)
    , seqTitle (_seqTitle, "Title entry", 1, 1, false)
    , seqEntries (_seqEntries, "Entry description", *this,
                  &ParseWord::foundPropertiesHeader, 1, 1, false)
@@ -70,19 +77,17 @@ ParseWord::ParseWord()
    _seqProperties[1] = &skip;
    _seqProperties[2] = &nrEntries;
    _seqProperties[3] = &seqEntries;
-   _seqProperties[4] = &skip;
-   _seqProperties[5] = &seqTitle;
-   _seqProperties[6] = &skip;
-   _seqProperties[7] = &seqTitle;
-   _seqProperties[8] = NULL;
+   _seqProperties[4] = &seqTitle;
+   _seqProperties[5] = NULL;
 
    _seqEntries[0] = &type;
    _seqEntries[1] = &skip;
    _seqEntries[2] = NULL;
 
-   _seqTitle[0] = &length;
-   _seqTitle[1] = &title;
-   _seqTitle[2] = NULL;
+   _seqTitle[0] = &skip;
+   _seqTitle[1] = &length;
+   _seqTitle[2] = &title;
+   _seqTitle[3] = NULL;
 
    _wordDoc[0] = &seqProperties;
    _wordDoc[1] = &skipIDStart;
@@ -101,7 +106,6 @@ int ParseWord::foundNrEntries (const char* pEntries, unsigned int) {
    cEntries = *(unsigned int*)pEntries;
    TRACE4 ("ParseWord::foundNrEntries (const char*) - Entries: " << cEntries);
 
-   seqEntries.setMinCard (cEntries);
    seqEntries.setMaxCard (cEntries);
    return ParseObject::PARSE_OK;
 }
@@ -116,9 +120,7 @@ int ParseWord::foundType (const char* pType, unsigned int) {
    actEntry = *(unsigned int*)pType;
    TRACE9 ("ParseWord::foundType (const char*) - Type: " << actEntry);
 
-   _seqEntries[1] =
-      (((actEntry == TYPE_TITLE) || (actEntry == TYPE_COMMENT))
-       ? &offset : &skip);
+   _seqEntries[1] = ((getTypeIndex (actEntry) != -1) ? &offset : &skip);
 
    cRead += 8;
    return ParseObject::PARSE_OK;
@@ -131,13 +133,19 @@ int ParseWord::foundType (const char* pType, unsigned int) {
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundOffset (const char* offset, unsigned int) {
    assert (offset);
-   assert ((actEntry == TYPE_TITLE) || (actEntry == TYPE_COMMENT));
+   assert (getTypeIndex (actEntry) != -1);
 
    unsigned int off (*(unsigned int*)offset);
    TRACE9 ("ParseWord::foundType (const char*) - Offset: " << off << " (0x"
            << hex << off << dec << ')');
 
-   ((actEntry == TYPE_TITLE) ? offTitle : offComment) = off;
+   // Correct offset of title entry; wouldn't it be great if every offset
+   // would start from the same address? But obviously in Seatle things are
+   // different. Fuck em!
+   if (actEntry == TYPE_TITLE)
+      off += 8;
+
+   aOffsets[off] = actEntry;
    return ParseObject::PARSE_OK;
 }
 
@@ -162,29 +170,30 @@ int ParseWord::foundLength (const char* length, unsigned int) {
 /*--------------------------------------------------------------------------*/
 int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
    assert (pTitle);
-   assert ((actEntry == TYPE_TITLE) || (actEntry == TYPE_COMMENT));
+   assert (aOffsets[actEntry] > 0);
+
    TRACE1 ("ParseWord::foundTitle (const char*, unsigned int): " << pTitle
            << " (" << len << " bytes)");
 
-   assert (prop);
-   if (actEntry == TYPE_TITLE) {
-      if (offComment != -1U) {
-         actEntry = TYPE_COMMENT;
-         skip.setMinCard (offComment -= len + 12);
-         skip.setMaxCard (offComment);
-         TRACE7 ("ParseWord::foundTitle (const char*) - Skipping " << offComment
-                 << " bytes for comment");
-      }
-      prop->strTitle.assign (pTitle, len - 1);
-   }
-   else {
-      prop->strComment.assign (pTitle, len - 1);
-      offComment = -1U;
-   }
+   static string Properties::* values[] =
+      { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
 
-   if (offComment == -1U) {
-      _seqProperties[6] = NULL;
-      wordDoc.setMaxCard (1);
+   assert (prop);
+   assert (aOffsets.size ());
+   assert (getTypeIndex (aOffsets[actEntry]) != -1);
+   assert ((sizeof (values) / sizeof (values[0]))
+            > getTypeIndex (aOffsets[actEntry]));
+   (prop->*(values[getTypeIndex (aOffsets[actEntry])])).assign (pTitle, len - 1);
+
+   unsigned int off (aOffsets.begin ()->first);
+   aOffsets.erase (aOffsets.begin ());
+   
+   if (aOffsets.size () > 0) {
+      actEntry = aOffsets.begin ()->first;
+      off = aOffsets.begin ()->first - off - len - 4;
+      skip.setMaxCard (off);
+      TRACE7 ("ParseWord::foundTitle (const char*) - Skipping " << off
+              << " bytes for next entry");
    }
 
    return ParseObject::PARSE_OK;
@@ -197,25 +206,32 @@ int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
 int ParseWord::foundPropertiesHeader (const char*, unsigned int) {
    TRACE1 ("ParseWord::foundPropertiesHeader (const char*) - Bytes read: "
            << cRead << " (0x" << hex << cRead << dec << ')');
-   if (offComment != -1U)
-      offComment -= offTitle;
 
-   if (offTitle != -1U) {
-      skip.setMinCard (offTitle -= cRead - 4);
-      skip.setMaxCard (offTitle);
+   // Check if there are any of the supported types in the document
+   if (aOffsets.begin () != aOffsets.end ()) {
       TRACE7 ("ParseWord::foundPropertiesHeader (const char*) - Skipping "
-              << offTitle << " bytes for title");
-      actEntry = TYPE_TITLE;
+              << (aOffsets.begin ()->first - cRead - 4) << " bytes for 1st entry");
+      skip.setMaxCard (aOffsets.begin ()->first - cRead - 4);
+      actEntry = aOffsets.begin ()->first;
+      seqTitle.setMaxCard (aOffsets.size ());
    }
    else
-      if (offComment != -1U) {
-         skip.setMinCard (offComment);
-         skip.setMaxCard (offComment);
-         TRACE7 ("ParseWord::foundPropertiesHeader (const char*) - Skipping "
-                 << offComment << " bytes for comment");
-         actEntry = TYPE_COMMENT;
-      }
-      else
-        _seqProperties[5] = NULL;
+      _seqProperties[5] = NULL;
+
+   wordDoc.setMinCard (1);   
+   wordDoc.setMaxCard (1);   
    return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Retrieves the index of the passed type
+//Parameters: type: Type to inspect
+//Returns   : unsigned int: Offset; -1 if type is not valid
+/*--------------------------------------------------------------------------*/
+int ParseWord::getTypeIndex (unsigned int type) {
+   for (unsigned int i (0); i < (sizeof (aTypes) / sizeof (aTypes[0])); ++i)
+      if (type == aTypes[i])
+         return i;
+
+   return -1;
 }
