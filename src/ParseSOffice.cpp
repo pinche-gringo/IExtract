@@ -47,24 +47,35 @@ inline unsigned short get2BytesLSB (const char* pAddr) {
 }
 #endif
 
+
+// Tag for StarOffice document
+#define ID1 "S"
+#define ID ID1 "fxDocumentInfo"
+
+
 /*--------------------------------------------------------------------------*/
 //Purpose   : (Default-)Constructor
-//Parameters: pClassname: Name of class containing parser-data
 /*--------------------------------------------------------------------------*/
 ParseStarOffice::ParseStarOffice ()
    : prop (NULL), actEntry (NONE)
-     , sofficeID ("SfxDocumentInfo", "StarOffice ID", false)
-     , prefix ("\\*", "Unused contents", 0x8c2, false, false)
+     , idSOffice (ID, "StarOffice ID", false)
      , skip ("\\*", "Unused contents", 7, false, false)
+     , skip2 (ID1, "Unused contents 2", 0x900, false, false)
+     , skipIDStart (ID1, "Start of StarOffice IDs", 256, 1, false)
      , length ("\\*", "Length of data-entry", *this, &ParseStarOffice::foundLength, 2, 2, false)
      , value ("\\*", "Property-entry", *this, &ParseStarOffice::foundValue, 1, 0, false)
-     , seqEntries (_seqEntries, "Entries of properties", 4, 4, false)
-     , seqDocument (_seqDocument, "StarOffice document", 1, 1) {
+     , seqProperties (_seqProperties, "Properties", 1, 1, false)
+     , seqEntries (_seqEntries, "Entries of properties", *this, &ParseStarOffice::foundProps, 4, 4, false)
+     , selDocument (_selDocument, "StarOffice document", -1) {
 
-   _seqDocument[0] = &prefix;
-   _seqDocument[1] = &sofficeID;
-   _seqDocument[2] = &seqEntries;
-   _seqDocument[3] = NULL;
+   _selDocument[0] = &seqProperties;
+   _selDocument[1] = &skipIDStart;
+   _selDocument[2] = &skip2;
+   _selDocument[3] = NULL;
+
+   _seqProperties[0] = &idSOffice;
+   _seqProperties[1] = &seqEntries;
+   _seqProperties[2] = NULL;
 
    _seqEntries[0] = &skip;
    _seqEntries[1] = &length;
@@ -114,5 +125,16 @@ int ParseStarOffice::foundLength (const char* pLength, unsigned int) {
    assert (pLength);
    actEntry = (enum types)((int)actEntry + 1);
    value.setMaxCard (get2BytesLSB (pLength));
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after the property-entries have been parsed
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseStarOffice::foundProps (const char*, unsigned int) {
+   TRACE9 ("ParseStarOffice::foundProps (const char*, unsigned int)");
+
+   selDocument.setMaxCard (1);
    return ParseObject::PARSE_OK;
 }

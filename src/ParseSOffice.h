@@ -32,26 +32,31 @@ class ParseStarOffice  {
 
    void parse (Xistream& stream, Properties& result) throw (std::string) {
       prop = &result;
-      seqDocument.parse (stream); }
+      selDocument.parse (stream); }
 
  private:
    // Callback-methods for type of parsed elementes
    int foundLength (const char*, unsigned int);
    int foundValue (const char*, unsigned int);
+   int foundProps (const char*, unsigned int);
 
-   typedef OFParseAttomic <ParseStarOffice> OMParseAttomic;
+   typedef OFParseAttomic<ParseStarOffice>  OMParseAttomic;
+   typedef OFParseSequence<ParseStarOffice> OMParseSequence;
 
-   ParseIgnore       prefix;
-   ParseExact        sofficeID;
+   ParseExact        idSOffice;
+   ParseExact        skipIDStart;
    ParseIgnore       skip;
+   ParseTextIgnore   skip2;
    OMParseAttomic    length;
    OMParseAttomic    value;
 
-   ParseSequence  seqDocument;                                // Startsequence
-   ParseSequence  seqEntries;
+   ParseSelection   selDocument;                              // Startsequence
+   OMParseSequence  seqEntries;
+   ParseSequence    seqProperties;
 
-   ParseObject* _seqDocument[4];
+   ParseObject* _selDocument[4];
    ParseObject* _seqEntries[4];
+   ParseObject* _seqProperties[3];
 
    Properties*  prop;
    enum types { NONE = -1, CREATOR = 0, AUTHOR, TITLE, COMMENT } actEntry;
