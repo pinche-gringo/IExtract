@@ -18,8 +18,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
-//#define ENABLE_THREADS
-#undef ENABLE_THREADS
 #ifdef ENABLE_THREADS
 #  define MULTIBUFFER
 #endif
@@ -81,7 +79,7 @@ class ParseJPEG  {
    ParseObject*   _jpegImage[3];
    ParseObject*   _selFormat[3];
    ParseObject*   _seqFormat1[4];
-   ParseObject*   _seqFormat2[4];
+   ParseObject*   _seqFormat2[2];
    ParseObject*   _selProperties[3];
    ParseObject*   _seqPropShort[4];
    ParseObject*   _seqPropLong[8];
