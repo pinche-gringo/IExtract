@@ -11,3 +11,4 @@ src/ParseOOffice.cpp
 src/ParseSOffice.cpp
 src/ParseWord.cpp
 src/ParseJPG.cpp
+src/ParseRTF.cpp
