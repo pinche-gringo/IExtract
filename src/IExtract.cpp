@@ -1,4 +1,3 @@
-
 //$Id$
 
 //PROJECT     : Extract
@@ -9,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 10.08.2002
-//COPYRIGHT   : Anticopyright (A) 2002
+//COPYRIGHT   : Anticopyright (A) 2002, 2003
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -56,7 +55,6 @@
 #  define UNLOCKOUTPUT
 #endif
 
-
 #include <Check.h>
 #include <Trace_.h>
 #include <XStream.h>
@@ -68,6 +66,7 @@
 
 #include "Writer.h"
 #include "Options.h"
+#include "ParseMP3.h"
 #include "ParsePDF.h"
 #include "ParseJPG.h"
 #include "ParseHTML.h"
@@ -144,6 +143,7 @@ class Application : public IVIOApplication {
    void* processThread (void*);
 #endif
 
+   void processMP3 (Xistream& hFile, Properties& result) const throw (std::string);
    void processPDF (Xistream& hFile, Properties& result) const throw (std::string);
    void processJPG (Xistream& hFile, Properties& result) const throw (std::string);
    void processHTML (Xistream& hFile, Properties& result) const throw (std::string);
@@ -198,6 +198,7 @@ const Application::FILEHANDLERS Application::handlers[] = {
    { "html", &Application::processHTML },
    { "jpeg", &Application::processJPG },
    { "jpg", &Application::processJPG },
+   { "mp3", &Application::processMP3 },
    { "pdf", &Application::processPDF },
    { "ppt", &Application::processOffice },
    { "sda", &Application::processStarOffice },
@@ -264,9 +265,11 @@ void Application::showHelp () const {
                 "       %n is substituted with the name of the file\n"
                 "       %N is substituted with path and name of the file\n"
                 "       %p is substituted with the path of the file\n"
-                "       %P is substituted with the path of the file in UNIX style (separated with /)\n"
+                "       %P is substituted with the path of the file in UNIX style (with /)\n"
+                "       %s is substituted with the size of the file\n"
+                "       %D is substituted with the size of the file (human readable)\n"
                 "       %t is substituted with the title\n"
-                "       %U is substituted with path and name of the file in UNIX style\n"
+                "       %U is substituted with path and name of the file in UNIX style (with /)\n"
                 "       %(LETTERS) is substituted with first of the above substitutions\n"
                 "          producing a non-empty string (e.g. %(nt) is the filename if not \n"
                 "          empty or else the title.)\n\n"
@@ -277,11 +280,11 @@ void Application::showHelp () const {
                 "     conversion strings:\n"
                 "       %e prints the end-of-output for the specified output style\n"
                 "       %n is substituted with the name of the directory\n"
-                "       %N is substituted with the path and name of the directory\n"
-                "       %p is substituted with the path of the directory\n"
-                "       %P is substituted with the path of the file in UNIX style (separated with /)\n"
-                "       %s prints the start-of-output for the specified output style\n\n"
-                "       %U is substituted with path and name of the file in UNIX style\n"
+                "       %N is substituted with the full path of the directory\n"
+                "       %p is substituted with the path to the directory\n"
+                "       %P is substituted with the path to the directory in UNIX style (with /)\n"
+                "       %s prints the start-of-output for the specified output style\n"
+                "       %U is substituted with the full path of the dir in UNIX style (with /)\n"
                 "The format of the INI file is like this (entries can be missing):\n\n"
                 "   [Output]\n"
                 "   Format=<a href=\"%N\" title=\"%c\">%n</a>|%t|%a|%D\n"
@@ -293,6 +296,7 @@ void Application::showHelp () const {
                 "Currently supported files are:\n"
                 "  - HTML (*.html, *.htm, *.shtml, *.shtm)\n"
                 "  - JPEG (*.jpeg, *.jpg)\n"
+                "  - MP3 (*.mp3)\n"
                 "  - PDF (*.pdf)\n"
                 "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
                 "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n";
@@ -372,7 +376,7 @@ bool Application::handleOption (const char option) {
           || ((time = strtoul (pNew, &pEnd, 10)),
               (!pEnd || ((*pEnd != ':') && (*pEnd != 'm')))))
          cerr << PACKAGE "-warning: Argument for new files " << pNew << " is not"
-                 " valid! Ignoring option\n";
+                 " valid! Ignoring option n\n";
       else {
          if (*pEnd == 'm') {
             ++pEnd;
@@ -646,13 +650,23 @@ void Application::processHTML (Xistream& hFile, Properties& result) const
 }
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Tries to extract the properties of a HTML-document
+//Purpose   : Tries to extract the properties of a PDF document
 //Parameters: hFile: File to processs
 //            result: Result of parsing
 /*--------------------------------------------------------------------------*/
 void Application::processPDF (Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParsePDF::parse (hFile, result);
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Tries to extract the properties of a MP3 file
+//Parameters: hFile: File to processs
+//            result: Result of parsing
+/*--------------------------------------------------------------------------*/
+void Application::processMP3 (Xistream& hFile, Properties& result) const
+   throw (std::string) {
+   ParseMP3::parse (hFile, result);
 }
 
 /*--------------------------------------------------------------------------*/
