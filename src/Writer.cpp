@@ -26,7 +26,7 @@
 
 #include <assert.h>
 
-#include <ostream>
+#include <iostream>
 
 #include <File.h>
 
