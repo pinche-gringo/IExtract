@@ -41,7 +41,6 @@ static const unsigned LEN_COMMAND     = 1024;
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : (Default-)Constructor
-//Parameters: pClassname: Name of class containing parser-data
 /*--------------------------------------------------------------------------*/
 ParseHTML::ParseHTML ()
    : prop (NULL), actEntry (NONE)

@@ -73,7 +73,6 @@ static const unsigned int aTypes[] = { TYPE_TITLE, TYPE_AUTHOR, TYPE_COMMENT };
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : (Default-)Constructor
-//Parameters: pClassname: Name of class containing parser-data
 /*--------------------------------------------------------------------------*/
 ParseWord::ParseWord()
    : len (0), cEntries (0), actEntry (-1U), cRead (0), prop (NULL)

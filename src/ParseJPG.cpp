@@ -90,7 +90,6 @@ inline unsigned int get4BytesLSB (const char* pAddr) {
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : (Default-)Constructor
-//Parameters: pClassname: Name of class containing parser-data
 /*--------------------------------------------------------------------------*/
 ParseJPEG::ParseJPEG ()
    : idJPEG ("\xff\xd8", "JPEG-ID", false)
