@@ -12,14 +12,19 @@ to the extension - so don't cheat ;) ):
 
   - JPEG: Extracts the properties according two styles; either one simple
  	  comment (as written by e.g. The GIMP) or a more complex versions
-	  (as created by Windows XP or PhotoShop).
-  - HTML: The text in between <title> and </title> and/or the content of
+	  (as created by Windows XP or - even more complex - PhotoShop).
+  - HTML: The text in between <title> and </title> and/or the contents of
 	  the meta tags (supported are the tags according HTML 4.0 and
-	  Dublin Core)
+	  Dublin Core) is extracted.
+  - StarOffice documents (*.sdw, *.sdc, *.sdd, *.sda); the comments of the
+          properties dialog is extracted
   - MS office documents (*.doc, *.xls, *.ppt); the comment of the properties
 	  dialog is extracted.
 
-The found results can be written either in text or HTML (table) format.
+The found results can be written either in text, HTML (table) or LaTeX
+(tabular) format. Note that there is no extra formatting of the text (like
+checking for LaTeX or HTML special characters) or special formatting of the
+output.
 
 
 Installation
