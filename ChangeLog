@@ -1,4 +1,24 @@
+2003-12-12  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Commented changes in V0.4.02
+
+	* configure.in: Version to 0.4.02
+
+	* po/en.po, po/es.po, po/de.po: Actualized (only line numbers)
+
+	* src/IExtract.cpp, src/ParseHTML.cpp, src/ParseJPG.cpp, src/ParseMP3.cpp, src/ParsePDF.cpp, src/ParseSOffice.cpp, src/ParseWord.cpp, src/Writer.cpp:
+	  Changed comment style to doxygen format
+
+	* src/IExtract.cpp:
+	  Fixed adding a list of files to in/exclude (adding in/excl-flag to each node)
+
+	* src/ParseHTML.h: Fixed lenght-declaration for _selMetaTags
+
+	* src/IExtract.cpp: Added forgotten namespaces; Fixed a check
+
 2003-11-17  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog: Actualized (for V0.4.01)
 
 	* src/IExtract.cpp, src/Options.h, src/ParseHTML.h, src/ParseJPG.cpp, src/ParseJPG.h, src/ParseMP3.cpp, src/ParseMP3.h, src/ParseOOffice.cpp, src/ParseOOffice.h, src/ParsePDF.cpp, src/ParsePDF.h, src/ParseSOffice.cpp, src/ParseSOffice.h, src/ParseWord.cpp, src/ParseWord.h, src/Properties.h, src/Writer.cpp, src/Writer.h:
 	Including Trace.h (instead of Trace_.h)

@@ -1,3 +1,9 @@
+Overview of changes in version 0.4.02:
+
+  - Fixed adding a list of files to in/exclude
+  - Fixed a bug in the HTML parser (data declaration was wrong)
+  - Changed comment style to doxygen format
+
 Overview of changes in version 0.4.01:
 
   - Linking with available libintl
