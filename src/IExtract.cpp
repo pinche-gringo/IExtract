@@ -455,9 +455,9 @@ void Application::handleFiles (const char* pFile) const {
       }
       TRACE9 ("Application::handleFiles (const char*) - Wait for thread "
               << aThreads[0]->getID ());
-      Thread* thread =aThreads[0];
+      unsigned long id (aThreads[0]->getID ());
       UNLOCKTHREADS
-      Thread::waitForThread (*thread);
+      Thread::waitForThread (id);
    }
 #endif
 
