@@ -1,3 +1,4 @@
+//$Id$
 
 //PROJECT     : Extract
 //SUBSYSTEM   : Extract
@@ -70,6 +71,7 @@
 #include "ParseMP3.h"
 #include "ParsePDF.h"
 #include "ParseJPG.h"
+#include "ParseRTF.h"
 #include "ParseHTML.h"
 #include "ParseWord.h"
 #include "ParseOOffice.h"
@@ -124,7 +126,10 @@ class Application : public YGP::IVIOApplication {
 
    typedef void (Application::*HANDLER) (YGP::Xistream& hFile, Properties& result) const;
    HANDLER getFileTypeHandler (const char* pExt) const;
-   std::map<const std::string, HANDLER> handlers;
+
+   typedef std::map<const std::string, HANDLER> handlerMap;
+   typedef std::pair<const std::string, HANDLER> handlerValue;
+   handlerMap handlers;
 
    static void convertFromWideChar (Properties& prop);
 
@@ -138,6 +143,7 @@ class Application : public YGP::IVIOApplication {
    void processPDF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processJPG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processHTML (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processRTF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processOffice (YGP::Xistream& hFile, Properties& result) const
       throw (std::string);
    void processOpenOffice (YGP::Xistream& hFile, Properties& result) const
@@ -222,28 +228,29 @@ Application::Application (const int argc, const char* argv[])
    aThreads.reserve (1);
 #endif
 
-   handlers["doc"] = &Application::processOffice;
-   handlers["htm"] = &Application::processHTML;
-   handlers["html"] = &Application::processHTML;
-   handlers["jpeg"] = &Application::processJPG;
-   handlers["jpg"] = &Application::processJPG;
-   handlers["mp3"] = &Application::processMP3;
-   handlers["pdf"] = &Application::processPDF;
-   handlers["php"] = &Application::processHTML;
-   handlers["ppt"] = &Application::processOffice;
-   handlers["sda"] = &Application::processStarOffice;
-   handlers["sdc"] = &Application::processStarOffice;
-   handlers["sdd"] = &Application::processStarOffice;
-   handlers["sdw"] = &Application::processStarOffice;
-   handlers["sxc"] = &Application::processOpenOffice;
-   handlers["sxd"] = &Application::processOpenOffice;
-   handlers["sxi"] = &Application::processOpenOffice;
-   handlers["sxm"] = &Application::processOpenOffice;
-   handlers["sxw"] = &Application::processOpenOffice;
-   handlers["sht"] = &Application::processHTML;
-   handlers["shtm"] = &Application::processHTML;
-   handlers["shtml"] = &Application::processHTML;
-   handlers["xls"] = &Application::processOffice;
+   handlers.insert (handlers.end (), handlerValue ("doc", &Application::processOffice));
+   handlers.insert (handlers.end (), handlerValue ("htm", &Application::processHTML));
+   handlers.insert (handlers.end (), handlerValue ("html", &Application::processHTML));
+   handlers.insert (handlers.end (), handlerValue ("jpeg", &Application::processJPG));
+   handlers.insert (handlers.end (), handlerValue ("jpg", &Application::processJPG));
+   handlers.insert (handlers.end (), handlerValue ("mp3", &Application::processMP3));
+   handlers.insert (handlers.end (), handlerValue ("pdf", &Application::processPDF));
+   handlers.insert (handlers.end (), handlerValue ("php", &Application::processHTML));
+   handlers.insert (handlers.end (), handlerValue ("ppt", &Application::processOffice));
+   handlers.insert (handlers.end (), handlerValue ("rtf", &Application::processRTF));
+   handlers.insert (handlers.end (), handlerValue ("sda", &Application::processStarOffice));
+   handlers.insert (handlers.end (), handlerValue ("sdc", &Application::processStarOffice));
+   handlers.insert (handlers.end (), handlerValue ("sdd", &Application::processStarOffice));
+   handlers.insert (handlers.end (), handlerValue ("sdw", &Application::processStarOffice));
+   handlers.insert (handlers.end (), handlerValue ("sht", &Application::processHTML));
+   handlers.insert (handlers.end (), handlerValue ("shtm", &Application::processHTML));
+   handlers.insert (handlers.end (), handlerValue ("shtml", &Application::processHTML));
+   handlers.insert (handlers.end (), handlerValue ("sxc", &Application::processOpenOffice));
+   handlers.insert (handlers.end (), handlerValue ("sxd", &Application::processOpenOffice));
+   handlers.insert (handlers.end (), handlerValue ("sxi", &Application::processOpenOffice));
+   handlers.insert (handlers.end (), handlerValue ("sxm", &Application::processOpenOffice));
+   handlers.insert (handlers.end (), handlerValue ("sxw", &Application::processOpenOffice));
+   handlers.insert (handlers.end (), handlerValue ("xls", &Application::processOffice));
 }
 
 //----------------------------------------------------------------------------
@@ -754,6 +761,18 @@ void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) c
 }
 
 //-----------------------------------------------------------------------------
+/// Tries to extract the properties of a RTF-document
+/// \param hFile: File to processs
+/// \param result: Result of parsing
+//-----------------------------------------------------------------------------
+void Application::processRTF (YGP::Xistream& hFile, Properties& result) const
+   throw (std::string) {
+   TRACE9 ("Parsing RTF");
+   ParseRTF obj;
+   obj.parse (hFile, result);
+}
+
+//-----------------------------------------------------------------------------
 /// Tries to extract the properties of a MS-office document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
@@ -782,8 +801,7 @@ void Application::processJPG (YGP::Xistream& hFile, Properties& result) const
 //-----------------------------------------------------------------------------
 Application::HANDLER Application::getFileTypeHandler (const char* pExt) const {
    if (pExt && *pExt++) {
-      std::map<const std::string, HANDLER>::const_iterator i
-          (handlers.find (pExt));
+      handlerMap::const_iterator i (handlers.find (pExt));
       if (i != handlers.end ())
          return i->second;
    }
