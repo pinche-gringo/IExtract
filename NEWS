@@ -1,3 +1,7 @@
+Overview of changes in version 0.3.02:
+
+  - Using automake 1.7 (so acconfig.h is now included in configure.in)
+
 Overview of changes in version 0.3.01:
 
   - Change special characters for LaTeX, HTML and XML documents.

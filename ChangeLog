@@ -1,3 +1,26 @@
+2003-06-03  Markus Schwab  <g17m0@lycos.com>
+
+	* NEWS, ChangeLog: Commented changes in V0.3.02
+
+	* configure.in, src/Makefile.am: Using pkg-config to search for libAttr
+
+	* Makefile.am: Switched to automake 1.7
+
+	* po/en.po: Actualized
+
+	* po/de.po, po/es.po: Removed warning for '%' in a message
+
+	* po/Makevars: New file.
+
+	* acconfig.h: Deleted
+
+2003-06-03  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* Makefile.am (SUBDIRS): Add m4.
+	(ACLOCAL_AMFLAGS): New variable.
+	(EXTRA_DIST): New variable.
+	* configure.in (AC_OUTPUT): Add m4/Makefile.
+
 2003-03-26  Markus Schwab  <g17m0@lycos.com>
 
 	* NEWS, ChangeLog, README: Changes of Version 0.3.01 documented
