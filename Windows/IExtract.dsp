@@ -149,6 +149,10 @@ SOURCE=..\src\ParseWord.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=..\src\ParsePDF.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\General\Common\PathSrch.cpp
 # End Source File
 # Begin Source File
@@ -246,6 +250,10 @@ SOURCE=..\src\ParseSOffice.h
 # Begin Source File
 
 SOURCE=..\src\ParseWord.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\src\ParsePDF.h
 # End Source File
 # Begin Source File
 

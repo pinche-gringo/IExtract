@@ -52,6 +52,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ParseHTML.obj"
 	-@erase "$(INTDIR)\ParseJPG.obj"
 	-@erase "$(INTDIR)\ParseSOffice.obj"
+	-@erase "$(INTDIR)\ParsePDF.obj"
 	-@erase "$(INTDIR)\ParseWord.obj"
 	-@erase "$(INTDIR)\PathSrch.obj"
 	-@erase "$(INTDIR)\StackTrc.obj"
@@ -129,7 +130,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\Writer.obj" \
 	"$(INTDIR)\XDirSrch.obj" \
 	"$(INTDIR)\XStrBuf.obj" \
-	"$(INTDIR)\ParseSOffice.obj"
+	"$(INTDIR)\ParseSOffice.obj" \
+	"$(INTDIR)\ParsePDF.obj"
 
 "$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -163,6 +165,7 @@ CLEAN :
 	-@erase "$(INTDIR)\ParseHTML.obj"
 	-@erase "$(INTDIR)\ParseJPG.obj"
 	-@erase "$(INTDIR)\ParseSOffice.obj"
+	-@erase "$(INTDIR)\ParsePDF.obj"
 	-@erase "$(INTDIR)\ParseWord.obj"
 	-@erase "$(INTDIR)\PathSrch.obj"
 	-@erase "$(INTDIR)\StackTrc.obj"
@@ -243,7 +246,8 @@ LINK32_OBJS= \
 	"$(INTDIR)\Writer.obj" \
 	"$(INTDIR)\XDirSrch.obj" \
 	"$(INTDIR)\XStrBuf.obj" \
-	"$(INTDIR)\ParseSOffice.obj"
+	"$(INTDIR)\ParseSOffice.obj" \
+	"$(INTDIR)\ParsePDF.obj"
 
 "$(OUTDIR)\IExtract.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -356,6 +360,12 @@ SOURCE=..\src\ParseSOffice.cpp
 SOURCE=..\src\ParseWord.cpp
 
 "$(INTDIR)\ParseWord.obj" : $(SOURCE) "$(INTDIR)"
+	$(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+SOURCE=..\src\ParsePDF.cpp
+
+"$(INTDIR)\ParsePDF.obj" : $(SOURCE) "$(INTDIR)"
 	$(CPP) $(CPP_PROJ) $(SOURCE)
 
 
