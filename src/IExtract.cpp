@@ -28,10 +28,11 @@
 #include <IExtract-cfg.h>
 #include <gzo-cfg.h>
 
-#include <ctype.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cctype>
+#include <cstdlib>
+#include <cstring>
 
+#include <map>
 #include <string>
 
 #ifdef ENABLE_THREADS
@@ -72,6 +73,7 @@
 #include "ParseJPG.h"
 #include "ParseHTML.h"
 #include "ParseWord.h"
+#include "ParseOOffice.h"
 #include "ParseSOffice.h"
 #include "Properties.h"
 
@@ -86,28 +88,16 @@
 #endif
 
 
-static const char* const DEFAULT_FORMAT ("%n|-|%t|%a|%c|%d");
-static const char* const DEFAULT_XML_FORMAT ("<tr><td>%n</td><td>%t</td>"
-                                             "<td>%a</td><td>%c</td><td>%d</td></tr>");
+static const char* const DEFAULT_FORMAT = "%n|-|%t|%a|%c|%d";
+static const char* const DEFAULT_XML_FORMAT = "<tr><td>%n</td><td>%t</td>"
+                                              "<td>%a</td><td>%c</td><td>%d</td></tr>";
 
 
 // Class to run Extract-Application
 class Application : public IVIOApplication {
  public:
-   Application (const int argc, const char* argv[])
-      : IVIOApplication (argc, argv, lo), options (0), chgFlag (0), iniOpts ()
-        , writer (NULL), outputStyle (TEXT)
-#ifdef ENABLE_THREADS
-        , aThreads (0)
-#endif
-   {
-      iniOpts.format = DEFAULT_FORMAT;
-      iniOpts.ageOfNewFiles = 30 * 24 * 60 * 60;
-#ifdef ENABLE_THREADS
-      aThreads.reserve (1);
-#endif
-  }
-  ~Application () { }
+   Application (const int argc, const char* argv[]);
+   ~Application ();
 
  protected:
    virtual void readINIFile (const char* pFile);
@@ -134,13 +124,10 @@ class Application : public IVIOApplication {
    const Application& operator= (const Application&);
 
    typedef void (Application::*HANDLER) (Xistream& hFile, Properties& result) const;
-   typedef struct {
-      const char* pExt;
-      HANDLER     pFnc; } FILEHANDLERS;
    HANDLER getFileTypeHandler (const char* pExt) const;
-   static const FILEHANDLERS handlers[];
+   std::map<const std::string, HANDLER> handlers;
 
-   static void convertFromUnicode (Properties& prop);
+   static void convertFromWideChar (Properties& prop);
 
    void handleFiles (const char* pFile) const;
    void processFile (const File& file, HANDLER fnc) const;
@@ -172,9 +159,9 @@ class Application : public IVIOApplication {
    static const longOptions lo[];
 
 #ifdef ENABLE_THREADS
-   vector<Thread*> aThreads;
-   Mutex           mxThreads;
-   Mutex           mxOutput;
+   std::vector<Thread*> aThreads;
+   Mutex                mxThreads;
+   Mutex                mxOutput;
 
    typedef struct FileFunction : public File {
       HANDLER fnc;
@@ -190,32 +177,10 @@ class Application : public IVIOApplication {
          }
          return *this; }
    } FILEFNC;
-   Mutex           mxListFiles;
-   queue<FILEFNC>  listFiles;
+   Mutex                mxListFiles;
+   std::queue<FILEFNC>  listFiles;
 #endif
 };
-
-
-// TODO: If this table gets bigger change it to std::map!
-const Application::FILEHANDLERS Application::handlers[] = {
-   { "doc", &Application::processOffice },
-   { "htm", &Application::processHTML },
-   { "html", &Application::processHTML },
-   { "jpeg", &Application::processJPG },
-   { "jpg", &Application::processJPG },
-   { "mp3", &Application::processMP3 },
-   { "pdf", &Application::processPDF },
-   { "php", &Application::processHTML },
-   { "ppt", &Application::processOffice },
-   { "sda", &Application::processStarOffice },
-   { "sdc", &Application::processStarOffice },
-   { "sdd", &Application::processStarOffice },
-   { "sdw", &Application::processStarOffice },
-   { "sht", &Application::processHTML },
-   { "shtm", &Application::processHTML },
-   { "shtml", &Application::processHTML },
-   { "xls", &Application::processOffice } };
-
 
 const IVIOApplication::longOptions Application::lo[] = {
    { IVIOAPPL_HELP_OPTION },
@@ -235,6 +200,55 @@ const IVIOApplication::longOptions Application::lo[] = {
    { "version", 'V' },
    { "output", 'o' },
    { NULL, '\0' } };
+
+
+
+//----------------------------------------------------------------------------
+/// Constructor
+/// \Param argc: Number of parameters to the program
+/// \param argv: Array holding (pointer to) arguments
+//----------------------------------------------------------------------------
+Application::Application (const int argc, const char* argv[]) 
+    : IVIOApplication (argc, argv, lo), options (0), chgFlag (0), iniOpts ()
+    , writer (NULL), outputStyle (TEXT)
+#ifdef ENABLE_THREADS
+    , aThreads (0)
+#endif
+{
+   iniOpts.format = DEFAULT_FORMAT;
+   iniOpts.ageOfNewFiles = 30 * 24 * 60 * 60;
+#ifdef ENABLE_THREADS
+   aThreads.reserve (1);
+#endif
+
+   handlers[std::string ("doc")] = &Application::processOffice;
+   handlers["htm"] = &Application::processHTML;
+   handlers["html"] = &Application::processHTML;
+   handlers["jpeg"] = &Application::processJPG;
+   handlers["jpg"] = &Application::processJPG;
+   handlers["mp3"] = &Application::processMP3;
+   handlers["pdf"] = &Application::processPDF;
+   handlers["php"] = &Application::processHTML;
+   handlers["ppt"] = &Application::processOffice;
+   handlers["sda"] = &Application::processStarOffice;
+   handlers["sdc"] = &Application::processStarOffice;
+   handlers["sdd"] = &Application::processStarOffice;
+   handlers["sdw"] = &Application::processStarOffice;
+   handlers["sxa"] = &Application::processOpenOffice;
+   handlers["sxc"] = &Application::processOpenOffice;
+   handlers["sxd"] = &Application::processOpenOffice;
+   handlers["sxw"] = &Application::processOpenOffice;
+   handlers["sht"] = &Application::processHTML;
+   handlers["shtm"] = &Application::processHTML;
+   handlers["shtml"] = &Application::processHTML;
+   handlers["xls"] = &Application::processOffice;
+}
+
+//----------------------------------------------------------------------------
+/// Destructor
+//----------------------------------------------------------------------------
+Application::~Application () {
+}
 
 
 /*--------------------------------------------------------------------------*/
@@ -663,7 +677,7 @@ void Application::processFile (const File& file, HANDLER fnc) const {
       try {
          Properties prop;
          (this->*fnc) ((Xistream&)ifile, prop);
-         convertFromUnicode (prop);
+         convertFromWideChar (prop);
          LOCKOUTPUT
          writer->printFile (std::cout, file, prop);
          UNLOCKOUTPUT
@@ -723,6 +737,17 @@ void Application::processStarOffice (Xistream& hFile, Properties& result) const
 }
 
 /*--------------------------------------------------------------------------*/
+/// Tries to extract the properties of a OpenOffice document
+/// \param hFile: File to processs
+/// \param result: Result of parsing
+/*--------------------------------------------------------------------------*/
+void Application::processOpenOffice (Xistream& hFile, Properties& result) const
+   throw (std::string) {
+   ParseOpenOffice obj;
+   obj.parse (hFile, result);
+}
+
+/*--------------------------------------------------------------------------*/
 //Purpose   : Tries to extract the properties of a MS-office document
 //Parameters: hFile: File to processs
 //            result: Result of parsing
@@ -751,20 +776,20 @@ void Application::processJPG (Xistream& hFile, Properties& result) const
 /*--------------------------------------------------------------------------*/
 Application::HANDLER Application::getFileTypeHandler (const char* pExt) const {
    if (pExt && *pExt++) {
-      unsigned int i (0);
-      for (; i < (sizeof (handlers) / sizeof (handlers[0])); ++i)
-         if (!strcasecmp (handlers[i].pExt, pExt))
-            return handlers[i].pFnc;
+      std::map<const std::string, HANDLER>::const_iterator i
+          (handlers.find (pExt));
+      if (i != handlers.end ())
+         return i->second;
    }
 
    return NULL;
 }
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Converts Unicode characters to normal strings
+//Purpose   : Converts wide characters to normal strings
 //Parameters: prop: Properties to convert
 /*--------------------------------------------------------------------------*/
-void Application::convertFromUnicode (Properties& prop) {
+void Application::convertFromWideChar (Properties& prop) {
    static std::string Properties::* values[] = { &Properties::strTitle,
                                                  &Properties::strComment,
                                                  &Properties::strAuthor};
