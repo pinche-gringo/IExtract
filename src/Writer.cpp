@@ -139,7 +139,7 @@ void Writer::printSeparator (std::ostream& out, const YGP::File& file,
 /// \param writer: writer to use
 /// \returns std::string: String with which to replace the character
 //-----------------------------------------------------------------------------
-std::string Writer::getSubstitute (const char ctrl, const YGP::TableWriter* writer,
+std::string Writer::getSubstitute (char ctrl, const YGP::TableWriter* writer,
 				   bool extend) const {
    Check3 (prop_); Check3 (file_); Check1 (writer);
 
@@ -220,7 +220,7 @@ std::string Writer::getSubstitute (const char ctrl, const YGP::TableWriter* writ
       subst = ctrl;
    }
 
-   TRACE9 ("Writer::getSubstitute (const char, std::string&) - Replacing '"
+   TRACE9 ("Writer::getSubstitute (char, const YGP::TableWriter*, std::string&) - Replacing '"
            << ctrl << "' with " << subst);
    return subst;
 }
@@ -338,7 +338,7 @@ void HTMLWriter::printMessage (std::ostream& out, const YGP::File& file,
 /// Prints the end of an HTML-table
 /// \param out: Stream where to put the output
 //-----------------------------------------------------------------------------
-std::string HTMLWriter::getSubstitute (const char ctrl, bool extend) const {
+std::string HTMLWriter::getSubstitute (char ctrl, bool extend) const {
    return Writer::getSubstitute (ctrl, this, extend);
 }
 
@@ -391,7 +391,7 @@ void TextWriter::printMessage (std::ostream& out, const YGP::File& file,
 /// Prints the end of an text-table
 /// \param out: Stream where to put the output
 //-----------------------------------------------------------------------------
-std::string TextWriter::getSubstitute (const char ctrl, bool extend) const {
+std::string TextWriter::getSubstitute (char ctrl, bool extend) const {
    return Writer::getSubstitute (ctrl, this, extend);
 }
 
@@ -496,7 +496,7 @@ void LaTeXWriter::printMessage (std::ostream& out, const YGP::File& file,
 /// Prints the end of an HTML-table
 /// \param out: Stream where to put the output
 //-----------------------------------------------------------------------------
-std::string LaTeXWriter::getSubstitute (const char ctrl, bool extend) const {
+std::string LaTeXWriter::getSubstitute (char ctrl, bool extend) const {
    return Writer::getSubstitute (ctrl, this, extend);
 }
 

@@ -56,7 +56,7 @@ class Writer {
 
    const std::string strNew;
 
-   std::string getSubstitute (const char ctrl, const YGP::TableWriter* writer,
+   std::string getSubstitute (char ctrl, const YGP::TableWriter* writer,
 			      bool extend = false) const;
 
    static std::string convertToHumanString (unsigned long value);
@@ -89,7 +89,7 @@ class HTMLWriter : public Writer, public YGP::HTMLWriter {
       return new HTMLWriter (format, strNew, age); }
 
  protected:
-   virtual std::string getSubstitute (const char ctrl, bool extend = false) const;
+   virtual std::string getSubstitute (char ctrl, bool extend = false) const;
 };
 
 
@@ -128,7 +128,7 @@ class TextWriter : public Writer, public YGP::TextWriter {
       return new TextWriter (format, strNew, age); }
 
  protected:
-   virtual std::string getSubstitute (const char ctrl, bool extend = false) const;
+   virtual std::string getSubstitute (char ctrl, bool extend = false) const;
 };
 
 
@@ -153,7 +153,7 @@ class LaTeXWriter : public Writer, public YGP::LaTeXWriter {
       return new LaTeXWriter (format, strNew, age); }
 
  protected:
-   virtual std::string getSubstitute (const char ctrl, bool extend = false) const;
+   virtual std::string getSubstitute (char ctrl, bool extend = false) const;
 };
 
 
