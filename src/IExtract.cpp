@@ -222,7 +222,7 @@ bool Application::handleOption (const char option) {
             ageOfNewFiles = time * 24 * 60 * 60;
          pTextForNewFiles = pEnd + 1;
       }
-                                          
+
       break; }
 
    case 'x':
@@ -318,7 +318,8 @@ void Application::handleFiles (Writer& writer, const char* pFile) const {
          processFile (*file, fnc, writer);
       else
          if (options & SHOW_ALL)
-            writer.printMessage (cout, *file, "Unknown file-type");
+            writer.printMessage (cout, *file,
+                                 (options & SHOW_ERRORS) ? "Unknown file-type" : "");
       file = ds.next ();
    } // end-while
 
@@ -368,7 +369,8 @@ void Application::processFile (const File& file, HANDLER fnc, Writer& writer) co
       }
       catch (std::string& err) {
          std::cerr << PACKAGE "-error: " << err.c_str () << '\n';
-         writer.printMessage (cout, file, "Error while processing");
+         writer.printMessage (cout, file,
+                              (options & SHOW_ERRORS) ? "Error while processing" : "");
       } // end-catch
    } // end-else file could be opened
 }
