@@ -1,0 +1,241 @@
+<!-- -*-HTML-*- -->
+<!-- $Id$ -->
+
+<!--
+  Anti-Copyright (A) 2003 Markus Schwab (g17m0@lycos.com)
+
+  This is free software; you can redistribute it and/or
+  modify it under the terms of the GNU General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+ 
+  This is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+//-->
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>IExtract - Extracting information out of documents</title>
+    <meta name="description" content="Documentation of the IExtract-utility">
+    <meta name="keywords" content="documentation, docu, IExtract, iextract, utility">
+
+    <meta name="DC.Creator" content="Markus Schwab">
+    <meta name="DC.Date" content="2003-01-25">
+    <meta name="DC.Rights" content="Anticopyright (A) 2003, distributed under the GNU General Public License">
+  </head>
+
+  <body>
+    <h1>IExtract - Extracting information out of documents</h1>
+
+    <p><code>IExtract</code> is a little utility designed to extract the
+      properites (title, author and comment) out of different documents and
+      present them in a list for further processing.</p>
+
+    <p>The following documents are supported (each of them identified by the
+      extension):</p>
+
+    <dl>
+      <dt><b>HTML</b></dt>
+      <dd><p>Searches for the text between the <code>&lt;title&gt;</code> and
+          <code>&lt;title&gt;</code> tags and the content of the <code>meta</code>
+          tags (both according to HTML 4.0 and Dublin Core).
+
+        <p>Files must have the extensions <code>*.htm</code>, <code>*.html</code>,
+          <code>*.shtm</code>, <code>*.shtml</code> or <code>*.php</code>.</p></dd>
+
+      <dt><b>JPEG</b></dt>
+      <dd><p>Actually I have no idea about the format of JPEG. There
+          seems to be two differnt formats for comments, a simple one (as
+          used by e.g. The GIMP) and more complex ones (as used by Windows
+          XP - and even more complex - by PhotoShop). All of those formats are
+          handled (hopefully correctly).</p>
+
+        <p>Files must have the extensions <code>*.jpg</code> or
+          <code>*.jpeg</code>.</p></dd>
+
+      <dt><b>Microsoft Office documents</b></dt>
+      <dd><p>Searches for the content of the properties dialog.</p></dd>
+
+      <dt><b>MP3</b></dt>
+      <dd><p>Extracts the content of the ID3 (version 1.x). The title of the album
+          is returned in the comment field.</p></dd>
+
+      <dt><b>PDF</b></dt>
+      <dd><p>PDF documents contain a so called <i>Document Information
+            directory</i> with various keys. The content of this directory is
+          extracted (with the "Subject"-key as comment).</p></dd>
+      </dd>
+
+      <dt><b>StarOffice documents</b></dt>
+      <dd><p>Searches for the content of the properties dialog.</p></dd>
+    </dl>
+
+    <p>The output can be in HTML-format (a table), LaTeX (tabular) format or
+      plain text.</p>
+
+    <p>The behaviour of the program is controlled with a INI file (~/.IExtract for
+      UNICES or %HOMEDRIVE%%HOMEPATH%IExtract.ini for Windows). See
+      <a href="IExtract.html.en#INIfile">Format of the INI file</a> for further
+      information.</p>
+
+    <p>This handling can be overridden by specifying either a different INI file
+      or by passing further options to the program.</p>
+
+    <h2>Usage</h2>
+
+    <pre>   IExtract [OPTIONS] &lt;File(s)&gt;</pre>
+
+    <p>with the following meaning of the paramters:</p>
+
+    <table>
+        <tr valign="top"><td><b>&nbsp;&nbsp;&nbsp;-r,&nbsp;--recursive</b></td>
+          <td>Recurse into subdirectories after processing the current directory</td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-o,&nbsp;--output=STYLE</b></td>
+          <td>Sets the style of the output (text, HTML or LaTeX)</td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-f,&nbsp;--format=FORMAT</b></td>
+          <td><p>Format of the output (default: %n&brvbar;-&brvbar;%t&brvbar;%a&brvbar;%c&brvbar;%d)</p>
+
+            <p>The output can be separted in columns; indicated by the pipe character
+              (&brvbar;) in the format string.</p>
+
+            <p>The percent sign (%) indicates that the following character has
+              a special meaning:</p>
+            <ul>
+              <li><b>%a</b> is substituted with the author</li>
+              <li><b>%c</b> is substituted with the comment</li>
+              <li><b>%d</b> is substituted with the modification time of the file</li>
+              <li><b>%D</b> is substituted with the modification time of the file (day only)</li>
+              <li><b>%n</b> is substituted with the name of the file</li>
+              <li><b>%N</b> is substituted with path and name of the file</li>
+              <li><b>%p</b> is substituted with the path of the file</li>
+              <li><b>%P</b> is substituted with the path of the file in UNIX style (the 
+                nodes separated with a slash (/))</li>
+              <li><b>%s</b> is substituted with the size of the file</li>
+              <li><b>%S</b> is substituted with the size of the file (human readable)</li>
+              <li><b>%t</b> is substituted with the title</li>
+              <li><b>%U</b> is substituted with path and name of the file in UNIX style
+                (the nodes separated with a slash (/)</li>
+              <li><b>%(LETTERS)</b> is substituted with first of the above substitutions
+                producing a non-empty string (e.g. %(nt) is the filename if not 
+                empty or else the title.)</li>
+            </ul>
+
+            <p>In every other constellation the '%' is removed!</p></td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-T,&nbsp;--title=TITLE</b></td>
+          <td><p>Title of the output (written even if there's no further output).</p>
+
+            <p>TITLE specifies the headers for the output; separated with (&brvbar;);
+              every columns must contain at least one character.</p></td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-s,&nbsp;--separate=TEXT</b></td>
+          <td><p>Separate subdirectories with TEXT (default: empty);
+            implies recursion into subdirectories (--recursive)</p>
+
+            <p>The percent sign (%) indicates that the following character has
+              a special meaning:</p>
+            <ul>
+              <li><b>%e</b> prints the end-of-output for the specified output style</li>
+              <li><b>%n</b> is substituted with the name of the directory</li>
+              <li><b>%N</b> is substituted with the full path of the directory</li>
+              <li><b>%p</b> is substituted with the path to the directory</li>
+              <li><b>%P</b> is substituted with the path to the directory in UNIX style
+                (separated with a slash (/))</li>
+              <li><b>%s</b> prints the start-of-output for the specified output style</li>
+              <li><b>%U</b> is substituted with the full path of the dir in UNIX style
+                (separated with a slash (/))</li>
+            </ul></td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-e,&nbsp;--show-errors</b></td>
+          <td>Puts error messages (additionally) into the output</td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-a,&nbsp;--all</b></td>
+          <td>Show all files (including unknown types) in the output</td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-n,&nbsp;--new=[DAYS:]TEXT</b></td>
+          <td><p>Show (leading) TEXT (in his own column) for files younger than
+              DAYS days (def: 30)</p>
+
+            <p>DAYS may be omited or may have an multiplier suffix: m for 30.</p></td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-i,&nbsp;--include=LIST</b></td>
+          <td><p>Specifies which files should be inspected; this can be even a
+              list of files; separated with the path-separator of the operating
+              system (the colon (:) for UNICES; the semicolon (;) for Windows).</p>
+
+            <p>E.g. <code>*.html:*[1-9]*.doc</code></p></td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-x,&nbsp;--exclude=LIST</b></td>
+          <td><p>Specifies which files should <b>not</b> be inspected; this can be
+              even a list of files; separated with the path-separator of the operating
+              system (the colon (:) for UNICES; the semicolon (;) for Windows).</p>
+
+            <p>E.g. <code>[[:alpha:]]*.htm?:*.doc</code></p></td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-I,&nbsp;--ini-file=FILE</b></td>
+          <td>Read further options from the specified file</td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-t,&nbsp;--threads=NR</b></td>
+          <td><p>Set the number of threads for examing files. This threads are additional
+              to the main thread which searches for the files to examine.</p>
+
+            <p>This option is only available, if the program has been compiled with
+              <code>--enable-threads</code> (or <code>-DENABLE_THREADS</code>)!</p></td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-V,&nbsp;--version</b></td>
+          <td>Output version information and exit</td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-h, -?,&nbsp;--help</b></td>
+          <td>Displays this help and exit</td></tr>
+        <tr><td>&nbsp;</td></tr>
+
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>File(s)</b></td>
+          <td>Specifies the starting directory and/or the files to inspect.</td></tr>
+    </table>
+
+    <h2><a name="INIfile"></a>Format of the INI file</h2>
+    <p>The format of the INI file is like this (entries can be missing):</p>
+
+
+    <pre>   [Output]
+   Format=FORMAT
+   Title=TEXT
+   TextForNewFiles=TEXT
+   MaxAgeForNewFiles=DAYS
+   DirSeparatorText=TEXT
+   Style=STYLE</pre>
+
+    <p>The same substituations as withhin the options are performed!</p>
+
+
+    <hr>
+    <address><a href="mailto:g17m0@lycos.com">Mail comments</a></address>
+<!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
+<!-- hhmts start -->
+Last modified: Sat Jan 25 11:53:42 PET 2003
+<!-- hhmts end -->
+     - $Revision$
+  </body>
+</html>
