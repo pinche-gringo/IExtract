@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 15.01.2003
-//COPYRIGHT   : Copyright (C) 2003, 2004
+//COPYRIGHT   : Copyright (C) 2003 - 2005
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@
 /// (Default-)Constructor
 //-----------------------------------------------------------------------------
 ParseMP3::ParseMP3 () {
-
 }
 
 //-----------------------------------------------------------------------------
