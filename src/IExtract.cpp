@@ -80,13 +80,16 @@
 #endif
 
 
+#define DEFAULT_FORMAT "%n|-|%t|%a|%c|%d"
+
+
 // Class to run Extract-Application
 class Application : public IVIOApplication {
  public:
    Application (const int argc, const char* argv[])
       : IVIOApplication (argc, argv, lo), options (0), outputStyle (TEXT)
       , ageOfNewFiles (30 * 24 * 60 * 60), pTextForNewFiles (NULL)
-      , pFormat ("%n-%t%a%c%d"), pTitle (NULL)
+      , pFormat (DEFAULT_FORMAT), pTitle (NULL)
 #ifdef ENABLE_THREADS
       , listFiles (), mxListFiles (), aThreads (0), mxThreads (), mxOutput ()
 #endif
@@ -216,7 +219,7 @@ void Application::showHelp () const {
              << PACKAGE " [OPTIONS] <File(s)>\n\n"
                 "  -r, --recursive ....... Recurse into subdirectories\n"
                 "  -o, --output=STYLE .... Sets the output-style (text or HTML)\n"
-                "  -f, --format=FORMAT ... Format of output (default: %n-%t%a%c%d)\n"
+                "  -f, --format=FORMAT ... Format of output (default: " DEFAULT_FORMAT "\n"
                 "  -T, --title=TITLE ..... Title of output\n"
                 "  -e, --show-errors ..... Puts error messages (additionally) into output\n"
                 "  -a, --all ............. Show all files (including unknown types) in output\n"
@@ -231,7 +234,7 @@ void Application::showHelp () const {
                 "  File(s) ... Files to analyze (the last part can contain wildcards)\n\n"
                 "TIME (in option -n) may be omited or may have an multiplier suffix: m for 30.\n\n"
                 "LIST is a list of files; seperated with the path-separator of the operating\n"
-      "     system (':' for UNICES, ';' for Windows). E.g. *.html:*.doc\n\n"
+                "     system (':' for UNICES, ';' for Windows). E.g. *.html:*.doc\n\n"
                 "FORMAT specifies how to print the entries;\n"
                 "       %a is substituted with the author\n"
                 "       %c is substituted with the comment\n"
