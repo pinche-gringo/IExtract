@@ -22,18 +22,47 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE">
 <html>
   <head>
-    <title>IExtract - Auslesen von Informationen aus Dokumenten</title>
+    <title>IExtract - Auslesen der Dokument-Informationen</title>
     <meta name="description" content="Documentation of the IExtract-utility">
     <meta name="keywords" content="documentation, docu, IExtract, iextract, utility, tool">
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
     <meta name="DC.Rights" content="Anticopyright (A) 2003, vertrieben unter den Bedingungen der GNU General Public License">
+
+    <style type="text/css">
+      <!--
+      /* NB-like presentation */
+      td.selected { vertical-align:middle; background-color:#5BAAEA; }
+      td.unselected { vertical-align:middle; background-color:lightgrey; }
+
+      /* Colors for links */
+      a:link { color:darkblue; text-decoration:underline; }
+      a:visited { color:black; text-decoration:underline; }
+      -->
+    </style>
   </head>
 
   <body>
-    <h1>IExtract - Auslesen von Informationen aus Dokumenten</h1>
+    <h1>IExtract - Auslesen der Dokument-Informationen</h1>
     <hr>
+    <table width="100%" order="0" cellpadding="5" cellspacing="0" >
+      <tr valign=top><td class="unselected"><a href="IExtract.html.en">
+            English&nbsp;version</a></td>
+        <td>&nbsp;</td>
+        <td rowspan="3"><p>Dieses Programm wird es unter den Bedingungen
+            der <a href="http://www.gnu.org">GNU</a> General Public License
+            vertrieben; in der Hoffnung, n&uuml;tzlich zu sein, aber OHNE
+            JEGLICHE GEW&Auml;HRLEISTUNG; sogar ohne die implizite
+            Gew&auml;hrleistung der MARKTREIFE oder der EIGNUNG FÜR EINEN
+            BESTIMMTEN ZWECK.</p></tr>
+      <tr><td class="selected">Deutsche&nbsp;Version</td>
+        <td>&nbsp;</td></tr>
+      <tr><td class="unselected"><a href="IExtract.html.es">
+            Versi&oacute;n&nbsp;en&nbsp;castellano</a></td>
+        <td>&nbsp;</td></tr>
+    </table>
+    <hr size=1 noshade>
 
     <p><code>IExtract</code> ist ein kleines Utility, designed die Eigenschaften
       (Titel, Autor und Kommentar) aus verschiedenen Dokumenten auszulesen und
@@ -49,7 +78,8 @@
           tags (sowohl nach HTML 4.0 und "Dublin Core").</p>
 
         <p>Die Dateien m&uuml;ssen die Erweiterung <code>*.htm</code>, <code>*.html</code>,
-          <code>*.shtm</code>, <code>*.shtml</code> oder <code>*.php</code> haben.</p></dd>
+          <code>*.sht</code>, <code>*.shtm</code>, <code>*.shtml</code> oder
+	  <code>*.php</code> haben.</p></dd>
 
       <dt><b>JPEG</b></dt>
       <dd><p>Es gibt zumindest 2 JPEG-Formate f&uuml;r die Kommentare (aber
@@ -65,10 +95,9 @@
       <dt><b>Microsoft Office Dokumente</b></dt>
       <dd><p>Sucht nach dem Inhalt des "Eigenschaften" Dialogs.</p>
 
-        <p>Nat&uuml;rlich ist dieses Format nicht dokumentiert (zumindest nicht
-          &ouml;ffentlich; M$ will da wohl auch Cash machen - oder nur ein
-          l&auml;cherliches Format verschweigen?) und daher gibt es auch hier
-          keine Garantie, da&szlig; alle Dokumente korrekt behandelt werden.</p></dd>
+        <p>Nat&uuml;rlich ist dieses Format nicht dokumentiert und daher gibt es
+          auch hierkeine Garantie, da&szlig; alle Dokumente korrekt behandelt
+          werden.</p></dd>
 
       <dt><b>MP3</b></dt>
       <dd><p>Sucht nach dem ID3 tag (version 1.x) am Ende der Datei. Der Titel des
@@ -77,7 +106,7 @@
       <dt><b>PDF</b></dt>
       <dd><p>PDF-Dokumente beinhalten ein sogenanntes <i>Document Information
             directory</i> mit verschiedenen Eintr&auml;gen. Der Inhalt dieses
-          Verzeichnisses wird ausgelesen (mit dem "Subject"-Schl&uuml; als
+          Verzeichnisses wird ausgelesen (mit dem "Subject"-Schl&uuml;ssel als
           Kommentar).</p></dd>
       </dd>
 
@@ -98,147 +127,177 @@
 
     <h2>Aufruf</h2>
 
-    <pre>   IExtract [OPTIONS] &lt;Datei(en)&gt;</pre>
+    <pre>   IExtract [OPTIONEN] &lt;Datei(en)&gt;</pre>
 
-    <p>mit der folgenden Bedeutung der Paramter:</p>
+    <p><a name="Fileformat"></a>Die gesuchten Dateien können die
+      UNIX-typischen Platzhalter (Stern (*) f&uuml;r eine beliebige
+      Anzahl beliebiger Zeichen,Fragezeichen (?)  f&uuml;r genau ein
+      beliebieges Zeichen sowie explizit angef&uuml;hrte g&uuml;ltige
+      Zeichen innerhalb von eckigen Klammern ([) und (]); entweder
+      einzeln aufgelistet, innerhalb von mit einem Minus (-) getrennten
+      Grenzen oder durch eine Klasse (innerhalb von '[:' und ':]')
+      angegeben werden. Diese Selektion kann durch ein Caret (^) oder
+      ein Rufzeichen (!) negiert werden.) enthalten. Dies gilt auch
+      f&uuml;r die Windows-Version.</p>
+
+    <p>Beispiele daf&uuml;r sind:</p>
+
+    <dl>
+      <dt><b>*.mp3</b></dt>
+      <dd>Untersucht lediglich MP3-Dateien</dd>
+      <dt><b>[^A-Za-z]*</b></dt>
+      <dd>Untersucht Dateien, die nicht mit einem Buchstaben beginnen.</dd>
+      <dt><b>[[:alnum:]]*</b></dt>
+      <dd>Untersucht Dateien, die nicht mit einem Buchstaben oder einer Nummer
+        beginnen.</dd>
+      <dt><b>???.txt</b></dt>
+      <dd>Untersucht Text-Dateien, deren Namen aus 3 Zeichen besteht.</dd>
+    </dl>
+
+    <h3>Optionen</h3>
+    <p>Die folgenden Optionen werden vom Programm unterst&uuml;zt (kurze
+      Optionen k&ouml;nnen verbunden werden; wenn die lange Option ein Argument
+      ben&ouml;tigt, so auch die kurze Variante. Lange Optionen k&ouml;nnen
+      abgek&uuml;rzt werden, solange sie eindeutig sind):</p>
 
     <table>
-        <tr valign="top"><td><b>&nbsp;&nbsp;&nbsp;-r,&nbsp;--recursive</b></td>
-          <td>Durchsuche Unterverzeichnisse nach der Bearbeitung der Dateien des
-            Verzeichnisses.</td></tr>
-        <tr><td>&nbsp;</td></tr>
+      <tr valign="top"><td><b>&nbsp;&nbsp;&nbsp;-r,&nbsp;--recursive</b></td>
+        <td>Durchsuche Unterverzeichnisse nach der Bearbeitung der Dateien des
+          aktuellen Verzeichnisses.</td></tr>
+      <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-o,&nbsp;--output=STIL</b></td>
-          <td>Setzt den Stil der Ausgabe (text, HTML oder LaTeX)</td></tr>
-        <tr><td>&nbsp;</td></tr>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-o,&nbsp;--output=STIL</b></td>
+        <td>Setzt den Stil der Ausgabe (text, HTML oder LaTeX)</td></tr>
+      <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-f,&nbsp;--format=FORMAT</b></td>
-          <td><p>Format der Ausgabe (Default: %n&brvbar;-&brvbar;%t&brvbar;%a&brvbar;%c&brvbar;%d)</p>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-f,&nbsp;--format=FORMAT</b></td>
+        <td><p>Format der Ausgabe (Default: %n&brvbar;-&brvbar;%t&brvbar;%a&brvbar;%c&brvbar;%d)</p>
 
-            <p>Die Ausgabe kann in Spalten unterteilt werden (sinnvoll for allem
-              f&uuml;r die erzeugten HTML/LaTeX-Tabellen; getrennt wird durch den
-              Schr&auml;gstrich (&brvbar;).</p>
+          <p>Die Ausgabe kann in Spalten unterteilt werden (sinnvoll for allem
+            f&uuml;r die erzeugten HTML/LaTeX-Tabellen; getrennt wird durch den
+            vertikalen Strich (&brvbar;)).</p>
 
-            <p>Das Prozentzeichen (%) &auml;ndert die Bedeutung des n&auml;chsten
-              Zeichens:</p>
-            <ul>
-              <li><b>%a</b> wird durch den Autor ersetzt</li>
-              <li><b>%c</b> wird durch den den Kommentar ersetzt</li>
-              <li><b>%d</b> wird durch das Datum der letzten &Auml;nderung der Datei
-                ersetzt</li>
-              <li><b>%D</b> wird durch den Tag der letzten &Auml;nderung der Datei
-                ersetzt</li>
+          <p>Das Prozentzeichen (%) &auml;ndert die Bedeutung des n&auml;chsten
+            Zeichens:</p>
+          <ul>
+            <li><b>%a</b> wird durch den Autor ersetzt</li>
+            <li><b>%c</b> wird durch den Kommentar ersetzt</li>
+            <li><b>%d</b> wird durch das Datum der letzten &Auml;nderung der Datei
+              ersetzt</li>
+            <li><b>%D</b> wird durch den Tag der letzten &Auml;nderung der Datei
+              ersetzt</li>
               <li><b>%n</b> wird durch den Dateinamen ersetzt</li>
-              <li><b>%N</b> wird durch den Dateinamen inklusive Pfad ersetzt</li>
-              <li><b>%p</b> wird durch den Pfad der Datei ersetzt</li>
-              <li><b>%P</b> wird durch den Pfad der Datei im  UNIX-Format (getrennt
+            <li><b>%N</b> wird durch den Dateinamen inklusive Pfad ersetzt</li>
+            <li><b>%p</b> wird durch den Pfad der Datei ersetzt</li>
+            <li><b>%P</b> wird durch den Pfad der Datei im  UNIX-Format (getrennt
                 durch den Schr&auml;gstrich (/)) ersetzt</li>
-              <li><b>%s</b> wird durch die Dateigr&ouml;&szlig;e ersetzt</li>
-              <li><b>%S</b> wird durch die Dateigr&ouml;&szlig;e (in einem f&uuml;r
-                den Menschen (besser) lesbaren Format) ersetzt</li>
-              <li><b>%t</b> wird durch den Titel ersetzt</li>
-              <li><b>%P</b> wird durch den Dateinamen inklusive Pfad im  UNIX-Format
+            <li><b>%s</b> wird durch die Dateigr&ouml;&szlig;e ersetzt</li>
+            <li><b>%S</b> wird durch die Dateigr&ouml;&szlig;e (in einem f&uuml;r
+              den Menschen (besser) lesbaren Format) ersetzt</li>
+            <li><b>%t</b> wird durch den Titel ersetzt</li>
+            <li><b>%P</b> wird durch den Dateinamen inklusive Pfad im  UNIX-Format
                 (getrennt durch den Schr&auml;gstrich (/)) ersetzt</li>
-              <li><b>%(BUCHSTABEN)</b> wird ersetzt durch die erste (der obigen)
-                Ersetzung, die einen nicht-leeren String liefert (z.B.:. %(tn) entweder
-                der Titel (wenn vorhanden), sonst der Dateiname).</li>
-            </ul>
+            <li><b>%(BUCHSTABEN)</b> wird ersetzt durch die erste (der obigen)
+              Ersetzung, die einen nicht-leeren String liefert (z.B.:. %(tn) entweder
+              der Titel (wenn vorhanden), sonst der Dateiname).</li>
+          </ul>
 
-            <p>In jeder anderen Zusammenstellung wird das '%' einfach entfernt!</p></td></tr>
-        <tr><td>&nbsp;</td></tr>
+          <p>In jeder anderen Zusammenstellung wird das '%' einfach entfernt!</p></td></tr>
+      <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-T,&nbsp;--title=TITEL</b></td>
-          <td><p>Titel/&Uuml;berschrift der Ausgabe (wird auch ausgegeben, wenn
-              gar keine Datei behandelt wurde).</p>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-T,&nbsp;--title=TITEL</b></td>
+        <td><p>Titel/&Uuml;berschrift der Ausgabe (wird auch ausgegeben, wenn
+            gar keine Datei behandelt wurde).</p>
 
-            <p>TITEL gibt die Spalten der Ausgaben an; getrennt mit dem Schr&auml;gstrich
-              (&brvbar;); jede Spalte mu&szlig; zumindest ein Zeichen enthalten.</p></td></tr>
-        <tr><td>&nbsp;</td></tr>
+          <p>TITEL gibt die Spalten der Ausgaben an; getrennt mit dem vertikalen Strich
+            (&brvbar;); jede Spalte mu&szlig; zumindest ein Zeichen enthalten.</p></td></tr>
+      <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-s,&nbsp;--separate=TEXT</b></td>
-          <td><p>Trenne Unterverzeichnisse mit TEXT (default: leer);
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-s,&nbsp;--separate=TEXT</b></td>
+        <td><p>Trenne Unterverzeichnisse mit TEXT (default: leer);
             impliziert das Durchsuchen der Unterverzeichnisse (--recursive).</p>
 
-            <p>Das Prozentzeichen (%) &auml;ndert die Bedeutung des n&auml;chsten
-              Zeichens:</p>
-            <ul>
-              <li><b>%e</b> wird ersetzt durch das Ende-der-Ausgabe f&uuml;r den
-                jeweiligen Ausgabe-Stil</li>
-              <li><b>%n</b> wird durch den Verzeichnisnamen ersetzt</li>
-              <li><b>%N</b> wird durch den Verzeichnisnamen inklusive Pfad ersetzt</li>
-              <li><b>%p</b> wird durch den Pfad bis zum Verzeichnis ersetzt</li>
-              <li><b>%P</b> wird durch den Pfad bis zum Verzeichnis im UNIX-Format
-                (getrennt durch den Schr&auml;gstrich (/)) ersetzt</li>
-              <li><b>%s</b> wird ersetzt durch den Beginn-der-Ausgabe f&uuml;r den
-                jeweiligen Ausgabe-Stil</li>
-              <li><b>%U</b> wird durch den Verzeichnisnamein inklusive Pfad im
-                UNIX-Format (getrennt durch den Schr&auml;gstrich (/)) ersetzt</li>
-            </ul></td></tr>
-        <tr><td>&nbsp;</td></tr>
+          <p>Das Prozentzeichen (%) &auml;ndert die Bedeutung des n&auml;chsten
+            Zeichens:</p>
+          <ul>
+            <li><b>%e</b> wird ersetzt durch das Ende-der-Ausgabe f&uuml;r den
+              jeweiligen Ausgabe-Stil</li>
+            <li><b>%n</b> wird durch den Verzeichnisnamen ersetzt</li>
+            <li><b>%N</b> wird durch den Verzeichnisnamen inklusive Pfad ersetzt</li>
+            <li><b>%p</b> wird durch den Pfad bis zum Verzeichnis ersetzt</li>
+            <li><b>%P</b> wird durch den Pfad bis zum Verzeichnis im UNIX-Format
+              (getrennt durch den Schr&auml;gstrich (/)) ersetzt</li>
+            <li><b>%s</b> wird ersetzt durch den Beginn-der-Ausgabe f&uuml;r den
+              jeweiligen Ausgabe-Stil</li>
+            <li><b>%U</b> wird durch den Verzeichnisnamein inklusive Pfad im
+              UNIX-Format (getrennt durch den Schr&auml;gstrich (/)) ersetzt</li>
+          </ul></td></tr>
+      <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-e,&nbsp;--show-errors</b></td>
-          <td>Liefert eine Fehlermeldung (in der Ausgabe), wenn das Untersuchen
-            der Datei scheitern sollte.</td></tr>
-        <tr><td>&nbsp;</td></tr>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-e,&nbsp;--show-errors</b></td>
+        <td>Liefert eine Fehlermeldung (in der Ausgabe), wenn das Untersuchen
+          der Datei scheitern sollte.</td></tr>
+      <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-a,&nbsp;--all</b></td>
-          <td>Zeige alle Dateien (auch die nicht unterst&uuml;tzten) in der
-            Ausgabe.</td></tr>
-        <tr><td>&nbsp;</td></tr>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-a,&nbsp;--all</b></td>
+        <td>Zeige alle Dateien (auch die nicht unterst&uuml;tzten) in der
+          Ausgabe.</td></tr>
+      <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-n,&nbsp;--new=[TAGE:]TEXT</b></td>
-          <td><p>Zeige TEXT (in einer eigenen Spalte) f&uuml;r Dateien, die j&uuml;nger
-              als TAGE (default: 30) Tage sind. Diese Spalte ist immer die erste
-              Spalte in der Ausgabe.</p>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-n,&nbsp;--new=[TAGE:]TEXT</b></td>
+        <td><p>Zeige TEXT (in einer eigenen Spalte) f&uuml;r Dateien, die j&uuml;nger
+            als TAGE (default: 30) Tage sind. Diese Spalte ist immer die erste
+            Spalte in der Ausgabe.</p>
 
-            <p>TAGE kann entweder ausgelassen werden oder einen Anhang aufweisen.
-              Bei 'm' wird die Anzahl der Tage mit 30 multipliziert.</p></td></tr>
-        <tr><td>&nbsp;</td></tr>
+          <p>TAGE kann entweder ausgelassen werden oder einen Anhang aufweisen.
+            Bei 'm' wird die Anzahl der Tage mit 30 multipliziert.</p></td></tr>
+      <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-i,&nbsp;--include=LISTE</b></td>
-          <td><p>Spezifiziert, welche Dateien untersucht werden sollen; dies kann
-              auch eine Liste von Dateiein sein, wobei jeder Eintrag mit dem Trennzeichen
-              des Betriebssystem (der Doppelpunkt (:) f&uuml;r UNICES; der Strichpunk
-              (;) f&uuml;r Windows) getrennt wird.</p>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-i,&nbsp;--include=LISTE</b></td>
+        <td><p>Spezifiziert, welche Dateien untersucht werden sollen; dies kann
+            auch eine Liste von Dateiein sein, wobei jeder Eintrag mit dem Trennzeichen
+            des Betriebssystem (der Doppelpunkt (:) f&uuml;r UNICES; der Strichpunkt
+            (;) f&uuml;r Windows) getrennt wird.</p>
 
-            <p>Z.B. <code>*.html:*[1-9]*.doc</code></p></td></tr>
-        <tr><td>&nbsp;</td></tr>
+          <p>Die Dateiangaben k&ouml;nnen die UNIX-typischen Platzhaltern
+            enthalten. <a href="IExtract.html.de#Fileformat">Details</a>
+            finden sie weiter oben im Dokument.</p></td></tr>
+      <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-x,&nbsp;--exclude=LISTE</b></td>
-          <td><p>Spezifiziert, welche Dateien <b>nicht</b> untersucht werden sollen; dies kann
-              auch eine Liste von Dateiein sein, wobei jeder Eintrag mit dem Trennzeichen
-              des Betriebssystem (der Doppelpunkt (:) f&uuml;r UNICES; der Strichpunk
-              (;) f&uuml;r Windows) getrennt wird.</p>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-x,&nbsp;--exclude=LISTE</b></td>
+        <td><p>Spezifiziert, welche Dateien <b>nicht</b> untersucht werden sollen; dies kann
+            auch eine Liste von Dateiein sein, wobei jeder Eintrag mit dem Trennzeichen
+            des Betriebssystem (der Doppelpunkt (:) f&uuml;r UNICES; der Strichpunk
+            (;) f&uuml;r Windows) getrennt wird.</p>
 
-            <p>Z.B. <code>[[:alpha:]]*.htm?:*.doc</code></p></td></tr>
-        <tr><td>&nbsp;</td></tr>
+          <p>Die Dateiangaben k&ouml;nnen die UNIX-typischen Platzhaltern
+            enthalten. <a href="IExtract.html.de#Fileformat">Details</a>
+            finden sie weiter oben im Dokument.</p></td></tr>
+      <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-I,&nbsp;--ini-file=FILE</b></td>
-          <td>Lies weitere Optionen aus der angegebenen Datei. Das
-            <a href="IExtract.html.de#INIfile">Format des INI-Files</a> ist
-            sp&auml;ter im Dokument beschrieben.</p></td></tr>
-        <tr><td>&nbsp;</td></tr>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-I,&nbsp;--ini-file=FILE</b></td>
+        <td>Lies weitere Optionen aus der angegebenen Datei. Das
+          <a href="IExtract.html.de#INIfile">Format des INI-Files</a> ist
+          sp&auml;ter im Dokument beschrieben.</p></td></tr>
+      <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-t,&nbsp;--threads=NR</b></td>
-          <td><p>Setzt die Nummer der Threads (Hintergrundprozesse) zum Untersuchen
-              der Dateien. Diese Nummer ist zus&auml;tzlich zum Haupt-Thread, der
-              nach den zu behandelnden Dateien sucht.</p>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-t,&nbsp;--threads=NR</b></td>
+        <td><p>Setzt die Nummer der Threads (Hintergrundprozesse) zum Untersuchen
+            der Dateien. Diese Nummer ist zus&auml;tzlich zum Haupt-Thread, der
+            nach den zu behandelnden Dateien sucht.</p>
 
-            <p>Diese Option ist nur vorhanden, wenn das Programm mit
-              <code>--enable-threads</code> (oder <code>-DENABLE_THREADS</code>)
-              konfiguriert (beziehungsweise &uuml;bersetzt) wurde!</p></td></tr>
-        <tr><td>&nbsp;</td></tr>
+          <p>Diese Option ist nur vorhanden, wenn das Programm mit
+            <code>--enable-threads</code> (oder <code>-DENABLE_THREADS</code>)
+            konfiguriert (beziehungsweise &uuml;bersetzt) wurde!</p></td></tr>
+      <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-V,&nbsp;--version</b></td>
-          <td>Ausgabe der Versionsinformation und beenden</td></tr>
-        <tr><td>&nbsp;</td></tr>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-V,&nbsp;--version</b></td>
+        <td>Ausgabe der Versionsinformation und beenden</td></tr>
+      <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-h, -?,&nbsp;--help</b></td>
-          <td>Ausgeben der Hilfe und beenden</td></tr>
-        <tr><td>&nbsp;</td></tr>
-
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>File(s)</b></td>
-          <td>Das Verzeichnis und/oder die Dateien zu Untersuchen.</td></tr>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-h, -?,&nbsp;--help</b></td>
+        <td>Ausgeben der Hilfe und beenden</td></tr>
+      <tr><td>&nbsp;</td></tr>
     </table>
 
     <h2><a name="INIfile"></a>Format des INI-Files</h2>
@@ -259,7 +318,7 @@
     <address><a href="mailto:g17m0@lycos.com">Sende etwaige Kommentare</a></address>
 <!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
 <!-- hhmts start -->
-Last modified: Sat Jan 25 20:18:26 PET 2003
+Last modified: Sat Feb  1 01:17:09 PET 2003
 <!-- hhmts end -->
      - $Revision$
   </body>

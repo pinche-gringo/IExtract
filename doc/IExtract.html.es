@@ -22,24 +22,56 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//ES">
 <html>
   <head>
-    <title>IExtract - Extractaer informaci&oacute;n desde documentos</title>
+    <title>IExtract - Extraer informaciones desde documentos</title>
     <meta name="description" content="Documentation of the IExtract-utility">
     <meta name="keywords" content="documentacion, docu, IExtract, iextract, utility, utilidad">
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
     <meta name="DC.Rights" content="Anticopyright (A) 2003, distributado bajo los condiciones de la GNU Licensia Público">
+
+    <style type="text/css">
+      <!--
+      /* NB-like presentation */
+      td.selected { vertical-align:middle; background-color:#5BAAEA; }
+      td.unselected { vertical-align:middle; background-color:lightgrey; }
+
+      /* Colors for links */
+      a:link { color:darkblue; text-decoration:underline; }
+      a:visited { color:black; text-decoration:underline; }
+      -->
+    </style>
   </head>
 
   <body>
-    <h1>IExtract - Extractaer informaci&oacute;n desde documentos</h1>
+    <h1>IExtract - Extraer informaciones desde documentos</h1>
     <hr>
 
-    <p><code>IExtract</code> es una utilidad para extraer los propiedades
-      (titulo, autor y commentario) desde varios documentos y presenta los
-      en una lista para elaboraci&oacute;n posterior.</p>
+    <table width="100%" order="0" cellpadding="5" cellspacing="0" >
+      <tr valign=top><td class="unselected"><a href="IExtract.html.en">
+            English&nbsp;version</a></td>
+        <td>&nbsp;</td>
+        <td rowspan="3">
+          <p>Este programa se distribuye bajo los condicones de la
+            <a href="http://www.gnu.org">GNU</a> Licensia General
+            P&uacute;blico; con la esperanza de que sea &uacute;til,
+            pero SIN NINGUNA GARANT&Iacute;A, ni siquiera la
+            garant&iacute;a impl&iacute;cita de COMERCIABILIDAD o
+            CONVENIENCIA PARA UN PROP&Oacute;SITO
+            PARTICULAR.</p></tr>
+      <tr><td class="unselected"><a href="IExtract.html.de">Deutsche&nbsp;Version</a></td>
+        <td>&nbsp;</td></tr>
+      <tr><td class="selected">Versi&oacute;n&nbsp;en&nbsp;castellano</td>
+        <td>&nbsp;</td></tr>
+    </table>
+    <hr size=1 noshade>
 
-    <p>Los documentos siguentes est&aacute;n procesado (distinguido de la
+    <p><code>IExtract</code> es una utilidad para extraer
+            los propiedades (t&iacute;tulo, autor y comentario) desde varios
+            tipos de documentos y presenta los en una lista para elaboraci&oacute;n
+            posterior.</p>
+
+    <p>Los documentos siguentes est&aacute;n procesados (distinguido de la
       extensi&oacute;n):</p>
 
     <dl>
@@ -49,63 +81,90 @@
           (tanto en formato HTML 4.0 como "Dublin Core").</p>
 
         <p>Archivos tienen que tener la extensi&oacute;n <code>*.htm</code>, <code>*.html</code>,
-          <code>*.shtm</code>, <code>*.shtml</code> o <code>*.php</code>.</p></dd>
+          <code>*.sht</code>, <code>*.shtm</code>, <code>*.shtml</code> o
+	  <code>*.php</code>.</p></dd>
 
       <dt><b>JPEG</b></dt>
       <dd><p>De hecho no conosco ese formato; pero parece que hay dos formatos por
           los comentarios: Lo simple (como usado de por ejemplo The GIMP) y un
           m&aacute;s complejo (como usado de por ejemplo Windows XP - y todav&iacute;a
-          m&aacute;s complejo - de PhotoShop). Ambos formatos est&aacute;n procesado
+          m&aacute;s complejo - de PhotoShop). Ambos formatos est&aacute;n procesados
           (ojal&aacute; correctamente).</p>
 
         <p>Archivos tiene que tener la extensi&oacute;n <code>*.jpg</code> o
           <code>*.jpeg</code>.</p></dd>
 
       <dt><b>Documentos de Microsoft Office</b></dt>
-      <dd><p>Busca para el contento de la ventana "propiedades".</p>
+      <dd><p>Busca para el contenido de la ventana "propiedades".</p>
 
-        <p>Por supuesto ese formato no es documentado (al menos no p&uacute;blico;
-          parece que M$ quisiera sacar plata de la documentaci&oacute; tambi&eacute;n
-          - o tal vez &iquest;ese formato es tan patetico?) y por eso no puedo
-          garantizar que todos los documentos est&aacute;n procesado correctamente.</p>
+        <p>Por supuesto ese formato no es documentado (al menos no p&uacute;blico)
+          y por eso no puedo garantizar que todos los documentos est&aacute;n
+          procesado correctamente.</p>
       </dd>
 
       <dt><b>MP3</b></dt>
-      <dd><p>Extrae el contento of the tag ID3 (versi&oacute;n 1.x). El titulo del
-          &aacute;lbum se pone en el campo comentario.</p></dd>
+      <dd><p>Extrae el contento of the tag ID3 (versi&oacute;n 1.x). El
+          t&iacute;tulo del &aacute;lbum se pone en el campo comentario.</p></dd>
 
       <dt><b>PDF</b></dt>
       <dd><p>Documentos de PDF contienen un llamado <i>Document Information
-            directory</i> (Directorio de informaciones del documento) con varios
-          llaves. El contento de aquell directorio est&aacute; extraido (con el
-          contento del llave "Subject" (sujecto) como comentario).</p></dd>
+            directory</i> (Directorio de informaciones del documento) con varias
+          llaves. El contento de aquel directorio est&aacute; extraido (con el
+          contenido de la llave "Subject" (sujecto) como comentario).</p></dd>
       </dd>
 
       <dt><b>Documentos de StarOffice</b></dt>
-      <dd><p>Busca para el contento de la ventana "propiedades".</p>
+      <dd><p>Busca para el contenido de la ventana "propiedades".</p>
     </dl>
 
-    <p>La salida puede ser in el formato HTML (una tabla), LaTeX (tabular) o simple
+    <p>La salida puede ser en el formato HTML (una tabla), LaTeX (tabular) o simple
       texto.</p>
 
-    <p>El comportamiento del programa est&aacute; controlado con un archive de
-      inicializaci&oacute;n (~/.IExtract para UNICES o %HOMEDRIVE%%HOMEPATH%IExtract.ini
+    <p>El comportamiento del programa est&aacute; controlado con un archivo de
+      iniciaci&oacute;n (~/.IExtract para UNICES o %HOMEDRIVE%%HOMEPATH%IExtract.ini
       para Windows). Mira
-      <a href="IExtract.html.es#INIfile">Formato de archivos por initializar</a> por
+      <a href="IExtract.html.es#INIfile">Formato de archivos por iniciar</a> por
       por m&aacute;s informaci&oacute;n.</p>
 
-    <p>Aquell comportamiento se puede cambiar con especificar un otro archivo o
+    <p>Aquel comportamiento se puede cambiar con especificar un otro archivo o
       opciones al programa.</p>
 
     <h2>Modo de empleo</h2>
 
     <pre>   IExtract [OPCIONES] &lt;Archivo(s)&gt;</pre>
 
-    <p>con sentido siguente de los par&aacute;mtros:</p>
+    <p><a name="Fileformat"></a>Los archivos busqueados pueden
+      contener los comodines tipicales de UNIX (estrella (*) por cada
+      numero de todas las letras y, el signo de interrogación (?) por
+      cualquiera letra sola y letras especificas en chorchetes ([) y
+      (]), o detalladolos, especifacadolos por sus l&iacute;mites
+      (separado por un gui&oacute;n) o sus clases (entre '[:' y
+      ':]'. Por invertir esa selecci&oacute;n usa la caret (^) o el
+      signo de exclamaci&oacute;n (!) en la primera posici&oacute;). Eso
+      tambi&eacute;n vale por la versi&oacute;n de Windows.</p>
+
+    <p>Por ejemplo:</p>
+
+    <dl>
+      <dt><b>*.mp3</b></dt>
+      <dd>Inspecta solamente archivos MP3</dd>
+      <dt><b>[^A-Za-z]*</b></dt>
+      <dd>Inspecta ficheros que comienzan con una letra.</dd>
+      <dt><b>[[:alnum:]]*</b></dt>
+      <dd>Inspecta ficheros que comienzan con una letra o un n&uacute;mero.</dd>
+      <dt><b>???.txt</b></dt>
+      <dd>Inspecta ficheros de texto que tienen 3 letras.</dd>
+    </dl>
+
+    <h3>Opciones</h3>
+    <p>Las opciones siguentes est&acute;n reconocido del programa (opciones cortes
+      se puede combinar juntos, si la opci&oacute;n larga necesita un argumento,
+      tambi&eacute;n lo necesito su correspondencia larga. Opciones larges pueden
+      estar acortado hasta est&aacute;n unique):</p>
 
     <table>
       <tr valign="top"><td><b>&nbsp;&nbsp;&nbsp;-r,&nbsp;--recursive</b></td>
-        <td>Inspectar tambi&eacute; directorios bajos despu&eacute; procesar el
+        <td>Investigar tambi&eacute;n directorios bajos despu&eacute;s procesar el
           directorio actual</td></tr>
       <tr><td>&nbsp;</td></tr>
 
@@ -114,16 +173,16 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-f,&nbsp;--format=FORMATO</b></td>
-        <td><p>Formato de la salida (default: %n&brvbar;-&brvbar;%t&brvbar;%a&brvbar;%c&brvbar;%d)</p>
+        <td><p>Formato de la salida (por defecto: %n&brvbar;-&brvbar;%t&brvbar;%a&brvbar;%c&brvbar;%d)</p>
 
           <p>La salida se puede estar en columnas; indicado por un rayo
             (&brvbar;) en el formato.</p>
 
-          <p>El signo del percento (%) indica que la letra siguente tiene significada
+          <p>El signo del porciento (%) indica que la letra siguente tiene significado
               especial:</p>
             <ul>
             <li><b>%a</b> est&aacute; cambiado por el autor</li>
-            <li><b>%c</b> est&aacute; cambiado por el commentario</li>
+            <li><b>%c</b> est&aacute; cambiado por el comentario</li>
             <li><b>%d</b> est&aacute; cambiado por la fecha y la hora del &uacute;ltimo
               cambio del archivo</li>
             <li><b>%D</b> est&aacute; cambiado por la fecha del &uacute;ltimo
@@ -132,33 +191,33 @@
             <li><b>%N</b> est&aacute; cambiado por el nombre y el camino del archivo</li>
             <li><b>%p</b> est&aacute; cambiado por el camino del archivo</li>
             <li><b>%P</b> est&aacute; cambiado por el camino del archivo en
-              estilo UNIX (separado con un slash (/)).</li>
+              estilo UNIX (separado por un slash (/)).</li>
             <li><b>%s</b> est&aacute; cambiado por el tama&ntilde;o del archivo</li>
             <li><b>%S</b> est&aacute; cambiado por el tama&ntilde;o del archivo en
               estilo para seres humanos</li>
-            <li><b>%t</b> est&aacute; cambiado por el titulo</li>
+            <li><b>%t</b> est&aacute; cambiado por el t&iacute;tulo</li>
             <li><b>%U</b> est&aacute; cambiado por el nombre y camino del archivo en
-              estilo UNIX (separado con un slash (/)).</li>
-            <li><b>%(LETRAS)</b> est&aacute; cambiado con el primer cambio (de las
+              estilo UNIX (separado por un slash (/)).</li>
+            <li><b>%(LETRAS)</b> est&aacute; cambiado por el primer cambio (de las
               reglas anteriores) que produce un text no vacio (p.e. %(tn) ser&aacute;
-              el titulo (si hay) o el nombre del archivo)</li>
+              el t&iacute;tulo (si hay) o el nombre del archivo)</li>
           </ul>
 
-          <p>En todos los otros formas el  '%' est&aacute; borrado!</p></td></tr>
+          <p>En todas las otras formas el  '%' est&aacute; borrado!</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
-      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-T,&nbsp;--title=TITULO</b></td>
-        <td><p>Titulo de la salida (escrito tambi&eacute;n si no hay mas salida).</p>
+      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-T,&nbsp;--title=T&Iacute;TULO</b></td>
+        <td><p>T&iacute;tulo de la salida (escrito tambi&eacute;n si no hay mas salida).</p>
 
-          <p>TITULO especifica los campos de la salida; separada por la raya (&brvbar;);
+          <p>T&Iacute;TULO especifica los campos de la salida; separada por la raya (&brvbar;);
             cada campo tiene que contener al menos una letra.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-s,&nbsp;--separate=TEXTO</b></td>
-        <td><p>Separar subcarpetas con TEXTO (default: vacio);
+        <td><p>Separar subcarpetas por TEXTO (por defecto: vacio);
             implica recursar por subcarpetas (--recursive)</p>
 
-          <p>El signo del percento (%) indica que la letra siguente tiene significada
+          <p>El signo del porciento (%) indica que la letra siguente tiene significado
               especial:</p>
           <ul>
             <li><b>%e</b> imprima el fin-de-salida por el estilo especifado</li>
@@ -166,50 +225,54 @@
             <li><b>%N</b> est&aacute; cambiado por el nombre y el camino de la carpeta</li>
             <li><b>%p</b> est&aacute; cambiado por el camino hasta la carpeta</li>
             <li><b>%P</b> est&aacute; cambiado por el camino hasta la carpeta en
-              estilo UNIX (separado con un slash (/)).</li>
+              estilo UNIX (separado por un slash (/)).</li>
             <li><b>%s</b> imprima la empieza-de-salida por el estilo especifado</li>
             <li><b>%U</b> est&aacute; cambiado por el nombre y el camino de la carpeta
-              en estilo UNIX (separado con un slash (/)).</li>
+              en estilo UNIX (separado por un slash (/)).</li>
           </ul></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-e,&nbsp;--show-errors</b></td>
-        <td>Incluye mesages de error en la salida.</td></tr>
+        <td>Incluye mensajes de error en la salida.</td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-a,&nbsp;--all</b></td>
-        <td>Mostra todos los archivos (incluyendo los inconocidos) en la salida.</td></tr>
+        <td>Muestra todos los archivos (incluyendo los inconocidos) en la salida.</td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-n,&nbsp;--new=[D&Iacute;AS:]TEXTO</b></td>
-        <td><p>Mostra TEXTO en el primer campo por archivos m&aacute;s joven que 
-            D&Iacute;AS d&iacute;as (default: 30)</p>
+        <td><p>Muestra TEXTO en el primer campo por archivos m&aacute;s joven que 
+            D&Iacute;AS d&iacute;as (por defecto: 30)</p>
 
           <p>D&Iacute;AS puede faltar o tener un ap&eacute;ndice de multiplicaci&oacute;n:
             m por 30.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-i,&nbsp;--include=LISTA</b></td>
-        <td><p>Especifica cu&aacute;l archivos deben que est&aacute; inspectado; eso
-            puede ser una lista tambi&eacute;; separado por la la letra seperado del
+        <td><p>Especifica cu&aacute;les archivos deben que est&aacute; investigado; eso
+            puede ser una lista tambi&eacute;n; separado por la la letra separado del
             camino del sistema operativo (dos puntos (:) en Unices; punto y coma (;)
             en Windoze).</p>
 
-          <p>P.e. <code>*.html:*[1-9]*.doc</code></p></td></tr>
+          <p>Los archivos pueden contener los comodines tipicales de UNIX.
+            <a href="IExtract.html.de#Fileformat">Detalles</a> se encuentra
+            m&aacute;s arriba en el documento.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-x,&nbsp;--exclude=LISTA</b></td>
-        <td><p>Especifica cu&aacute;l archivos deben que <b>no</b> est&aacute; inspectado; eso
-            puede ser una lista tambi&eacute;; separado por la la letra seperado del
-            camino del sistema operativo (dos puntos (:) en Unices; punto y coma (;)
-            en Windoze).</p>
+        <td><p>Especifica cu&aacute;les archivos <b>no</b> deben que est&aacute;
+            investigado; eso puede ser una lista tambi&eacute;n; separado por la la
+            letra separado del camino del sistema operativo (dos puntos (:) en Unices;
+            punto y coma (;) en Windoze).</p>
 
-          <p>E.g. <code>[[:alpha:]]*.htm?:*.doc</code></p></td></tr>
+          <p>Los archivos pueden contener los comodines tipicales de UNIX.
+            <a href="IExtract.html.de#Fileformat">Detalles</a> se encuentra
+            m&aacute;s arriba en el documento.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-I,&nbsp;--ini-file=ARCHIVO</b></td>
         <td>Lee m&aacute;s opciones del archivo especifado. Mira
-          <a href="IExtract.html.es#INIfile">Formato de archivos por initializar</a> por
+          <a href="IExtract.html.es#INIfile">Formato de archivos por iniciar</a> por
           por m&aacute;s informaci&oacute;n.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
@@ -217,32 +280,32 @@
         <td><p>Pone el n&uacute;mero por los proceses del fondo (threads) para exerminar
             los archivos (adicional al proceso por la busqueada).</p>
 
-          <p>Aquell opci&oacute;n solamente est&aacute; existente, si el programa
-            estaba configurado (compilada) con <code>--enable-threads</code> (o
+          <p>Aquel opci&oacute;n solamente est&aacute; existente, si el programa
+            estaba configurado (compilado) con <code>--enable-threads</code> (o
             <code>-DENABLE_THREADS</code>)!</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-V,&nbsp;--version</b></td>
-        <td>Mostra informaci&oacute;n sobre la versi&acute;n y termina.</td></tr>
+        <td>Muestra informaci&oacute;n sobre la versi&oacute;n y termina.</td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-h, -?,&nbsp;--help</b></td>
-        <td>Mostra el ayuda y termina.</td></tr>
+        <td>Muestra la ayuda y termina.</td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>File(s)</b></td>
-        <td>Especifica la carpeta y/o los archivos para inspectar..</td></tr>
+        <td>Especifica la carpeta y/o los archivos para investigar.</td></tr>
     </table>
 
-    <h2><a name="INIfile"></a>Formato de archivos por initializar</h2>
-    <p>Archivos por initializar tienen el siguente formato (entradas pueden faltar):</p>
+    <h2><a name="INIfile"></a>Formato de archivos por iniciar</h2>
+    <p>Archivos por iniciar tienen el siguente formato (entradas pueden faltar):</p>
 
     <pre>   [Output]
    Format=FORMATO
    Title=TEXTO
    TextForNewFiles=TEXTO
    MaxAgeForNewFiles=D&Iacute;AS
-   DirSeparatorText=TEXTO
+   DirSeparatorText=T&Iacute;TULO
    Style=ESTILO</pre>
 
     <p>Pasan los mismos cambias como con las opciones!</p>
@@ -251,7 +314,7 @@
     <address><a href="mailto:g17m0@lycos.com">Envia comentarios</a></address>
 <!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
 <!-- hhmts start -->
-Last modified: Sat Jan 25 20:18:44 PET 2003
+Last modified: Sat Feb  1 01:15:34 PET 2003
 <!-- hhmts end -->
      - $Revision$
   </body>

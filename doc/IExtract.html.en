@@ -29,15 +29,44 @@
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
     <meta name="DC.Rights" content="Anticopyright (A) 2003, distributed under the GNU General Public License">
+
+    <style type="text/css">
+      <!--
+      /* NB-like presentation */
+      td.selected { vertical-align:middle; background-color:#5BAAEA; }
+      td.unselected { vertical-align:middle; background-color:lightgrey; }
+
+      /* Colors for links */
+      a:link { color:darkblue; text-decoration:underline; }
+      a:visited { color:black; text-decoration:underline; }
+      -->
+    </style>
   </head>
 
   <body>
     <h1>IExtract - Extracting information out of documents</h1>
     <hr>
 
-    <p><code>IExtract</code> is a little utility designed to extract the
-      properites (title, author and comment) out of different documents and
-      present them in a list for further processing.</p>
+    <table width="100%" order="0" cellpadding="5" cellspacing="0" >
+        <tr valign=top><td class="selected">English&nbsp;version</td>
+          <td>&nbsp;</td>
+          <td rowspan="3">
+            <p>This program is distributed under the terms of the
+              <a href="http://www.gnu.org">GNU</a> General Public License;
+              in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+              without even the implied warranty of MERCHANTABILITY or FITNESS
+              FOR A PARTICULAR PURPOSE.</p></tr>
+        <tr><td class="unselected"><a href="IExtract.html.de">Deutsche&nbsp;Version</a></td>
+          <td>&nbsp;</td></tr>
+        <tr><td class="unselected"><a href="IExtract.html.es">
+              Versi&oacute;n&nbsp;en&nbsp;castellano</a></td>
+          <td>&nbsp;</td></tr>
+    </table>
+    <hr size=1 noshade>
+
+    <p><code>IExtract</code> is a little utility designed to extract
+    the properites (title, author and comment) out of different
+    documents and present them in a list for further processing.</p>
 
     <p>The following documents are supported (each of them identified by the
       extension):</p>
@@ -49,7 +78,8 @@
           tags (both according to HTML 4.0 and Dublin Core).</p>
 
         <p>The files must have the extensions <code>*.htm</code>, <code>*.html</code>,
-          <code>*.shtm</code>, <code>*.shtml</code> or <code>*.php</code>.</p></dd>
+          <code>*.sht</code>, <code>*.shtm</code>, <code>*.shtml</code> or
+	  <code>*.php</code>.</p></dd>
 
       <dt><b>JPEG</b></dt>
       <dd><p>Actually I have no idea about the format of JPEG. There
@@ -64,10 +94,8 @@
       <dt><b>Microsoft Office documents</b></dt>
       <dd><p>Searches for the content of the properties dialog.</p>
 
-        <p>The same applies as for JPEGs: The format is not documented (as if M$
-          would document anything, if they can't suck out money from it - or is it,
-          because their format is just too pathetic?) and so I can only hope to
-          handle all of their documents correctly.</p></dd>
+        <p>It applies the same as for JPEGs: The format is not documented and so I
+          can only hope to handle all of their documents correctly.</p></dd>
 
       <dt><b>MP3</b></dt>
       <dd><p>Extracts the content of the ID3 tag (version 1.x). The title of
@@ -94,11 +122,37 @@
     <p>This handling can be overridden by specifying either a different INI file
       or by passing further options to the program.</p>
 
+    <p><a name="Fileformat"></a>The files searched for can contain the
+      UNIX-typical wildcards (an asterisk (*) for any number of any
+      characters, the question-mark (?)  for any single character and a
+      range of valid characters in brackets ([) and (]), either by
+      listening all of, by specifying the borders separated with a minus
+      (-) or by specifying its class (in '[:' and ':]') To invert this
+      selection a leading caret (^) or an exclaimation mark (!)  can be
+      used). This is also true for the Windows version.</p>
+
+    <p>Examples are:</p>
+
+    <dl>
+      <dt><b>*.mp3</b></dt>
+      <dd>Inspect only MP3 files.</dd>
+      <dt><b>[^A-Za-z]*</b></dt>
+      <dd>Inspect files which don't start with a letter.</dd>
+      <dt><b>[[:alnum:]]*</b></dt>
+      <dd>Inspect files which don't start with a letter or a number.</dd>
+      <dt><b>???.txt</b></dt>
+      <dd>Inspect text-files having a name with exactly 3 characters.</dd>
+    </dl>
+
     <h2>Usage</h2>
 
     <pre>   IExtract [OPTIONS] &lt;File(s)&gt;</pre>
 
-    <p>with the following meaning of the paramters:</p>
+    <h3>Options</h3>
+    <p>The following options are recognized by the program (short options can
+      be combined together; if the long option needs an argument, so does its
+      short counterpart. Long options can be abbreviated as long as they stay
+      unique):</p>
 
     <table>
         <tr valign="top"><td><b>&nbsp;&nbsp;&nbsp;-r,&nbsp;--recursive</b></td>
@@ -187,7 +241,9 @@
               list of files; separated with the path-separator of the operating
               system (the colon (:) for UNICES; the semicolon (;) for Windows).</p>
 
-            <p>E.g. <code>*.html:*[1-9]*.doc</code></p></td></tr>
+            <p>File specifications can contain the UNIX-typical wildcards.
+            <a href="IExtract.html.en#Fileformat">Details</a> can be found
+              in the top of the document.</p></td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-x,&nbsp;--exclude=LIST</b></td>
@@ -195,7 +251,9 @@
               even a list of files; separated with the path-separator of the operating
               system (the colon (:) for UNICES; the semicolon (;) for Windows).</p>
 
-            <p>E.g. <code>[[:alpha:]]*.htm?:*.doc</code></p></td></tr>
+            <p>File specifications can contain the UNIX-typical wildcards.
+            <a href="IExtract.html.en#Fileformat">Details</a> can be found
+              in the top of the document.</p></td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-I,&nbsp;--ini-file=FILE</b></td>
@@ -242,7 +300,7 @@
     <address><a href="mailto:g17m0@lycos.com">Mail comments</a></address>
 <!-- Created: Sat Jan 25 11:45:08 PET 2003 -->
 <!-- hhmts start -->
-Last modified: Sat Jan 25 16:16:36 PET 2003
+Last modified: Sat Feb  1 01:16:30 PET 2003
 <!-- hhmts end -->
      - $Revision$
   </body>
