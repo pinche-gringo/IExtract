@@ -37,9 +37,10 @@ class Options : public YGP::Entity {
    std::string  format;        // %attrib%; Format
    std::string  title;         // %attrib%; Title
    std::string  newText;       // %attrib%; TextForNewFiles
-   unsigned int ageOfNewFiles; // %attrib%; MaxAgeForNewFiles
+   unsigned int ageOfNewFiles; // %attrib%; MaxAgeForNewFiles; 0
    std::string  style;         // %attrib%; Style
    std::string  separate;      // %attrib%; DirSeparatorText
+   unsigned int sort;          // %attrib%; SortFiles; 0
 };
 
 

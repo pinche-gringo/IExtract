@@ -64,11 +64,12 @@
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 #include <YGP/XStream.h>
+#include <YGP/INIFile.h>
 #include <YGP/DirSrch.h>
 #include <YGP/XDirSrch.h>
 #include <YGP/PathSrch.h>
 #include <YGP/IVIOAppl.h>
-#include <YGP/INIFile.h>
+#include <YGP/SortDirSrch.h>
 
 #include "Writer.h"
 #include "Options.h"
@@ -215,6 +216,7 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
    { "app-file", 'A' },
    { "prepend", 'p' },
    { "pre-file", 'P' },
+   { "sort", 'S' },
    { NULL, '\0' } };
 
 
@@ -293,6 +295,7 @@ void Application::showHelp () const {
       << "\n  -i, --include=LIST .... " << _("Files to inspect")
       << "\n  -x, --exclude=LIST .... " << _("Files not to inspect")
       << "\n  -f, --ini-file=FILE ... " << _("Read further options from specified file")
+      << "\n  -S, --sort ..... ...... " << _("Sort found files according to ORDER (default: none)")
       << "\n  -V, --version ......... " << _("Output version information and exit")
       << "\n  -h, -?, --help ........ " << _("Displays this help and exit\n")
       << _("  File(s) ... Files to analyze (the last part can contain wildcards)\n\n")
@@ -532,6 +535,10 @@ bool Application::handleOption (const char option) {
       }
       break; }
 
+   case 'S':
+      iniOpts.sort = true;
+      break;
+
    case 'V': std::cout << description () << '\n'; exit (0);
 
    default: {
@@ -605,7 +612,10 @@ void Application::handleFiles (const char* pFile) const {
    Check3 (pFile);
    TRACE5 ("Application::handleFiles (const char*) const - " << pFile);
 
-   YGP::ExtDirectorySearch ds (pFile);
+   YGP::ExtDirectorySearch& ds
+      (iniOpts.sort
+       ? *new YGP::SortedDirSearch<YGP::ExtDirectorySearch> (pFile)
+       : *new YGP::ExtDirectorySearch (pFile));
    std::string node;
    YGP::PathSearch list (filelist);
    while (!(node = list.getNextNode ()).empty ()) {
@@ -689,6 +699,8 @@ void Application::handleFiles (const char* pFile) const {
          file = ds.next ();
       }
    }
+
+   delete &ds;
 }
 
 #ifdef ENABLE_THREADS
