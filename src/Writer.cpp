@@ -77,11 +77,14 @@ unsigned int Writer::columns () const {
 
 //-----------------------------------------------------------------------------
 /// Prints a separating text between directories. The following characters are
-/// substituted: 'e': With the end-of-data as defined by the writer class 's':
-/// With the start-of-data as defined by the writer class 'n': With the name
-/// of the file 'N': With path and name of the file 'p': With the path of the
-/// file 'P': With the path of the file in UNIX style (separated by /) 'U':
-/// With path and name of the file in UNIX style (separated by /)
+/// substituted:
+///   - 'e': With the end-of-data as defined by the writer class
+///   - 's': With the start-of-data as defined by the writer class
+///   - 'n': With the name of the file
+///   - 'N': With path and name of the file
+///   - 'p': With the path of the file
+///   - 'P': With the path of the file in UNIX style (separated by /)
+///   - 'U': With path and name of the file in UNIX style (separated by /)
 /// \param out: Stream where to put the output
 /// \param file: File specifying directory
 /// \param data: Text to print for separation
@@ -126,36 +129,69 @@ void Writer::printSeparator (std::ostream& out, const YGP::File& file,
    out << data.substr (oldPos, pos - oldPos);
 }
 
+
 //-----------------------------------------------------------------------------
-/// Returns the substitute for a control character Substitutes: 'a': With the
-/// author (of the properties) 'c': With the comment (of the properties) 'd':
-/// With the timestamp of the file 'D': With the date of the file 'n': With
-/// the name of the file 'N': With path and name of the file 'p': With the
-/// path of the file 'P': With the path of the file in UNIX style (separated
-/// by /) 's': With the size of the file in bytes 'S': With the size of the
-/// file (human readable) 't': With the title (of the properties) 'U': With
-/// path and name of the file in UNIX style (separated by /) Other chars: With
-/// the character itself
+/// Returns the passed string with special characters changed.
+/// \returns \c std::string: String with changed special characters
+/// \remarks: To be implemented by derived classes
+//-----------------------------------------------------------------------------
+std::string Writer::changeSpecialChars (const std::string& val) const {
+   return val;
+ }
+
+//-----------------------------------------------------------------------------
+/// Returns the passed string with special filename characters changed.
+/// \returns \c std::string: String with changed special characters
+/// \remarks: To be implemented by derived classes
+//-----------------------------------------------------------------------------
+std::string Writer::changeSpecialFileChars (const std::string& val) const { 
+   return changeSpecialChars (val);
+}
+
+//-----------------------------------------------------------------------------
+/// Returns the substitute for a control character Substitutes:
+///   - 'a': With the author (of the properties)
+///   - 'c': With the comment (of the properties)
+///   - 'd': With the timestamp of the file
+///   - 'D': With the date of the file
+///   - 'e': With the extension of the file
+///   - 'E': With the name of the file without extension
+///   - 'n': With the name of the file
+///   - 'N': With path and name of the file
+///   - 'p': With the path of the file
+///   - 'P': With the path of the file in UNIX style (separated by /)
+///   - 's': With the size of the file in bytes
+///   - 'S': With the size of the file (human readable)
+///   - 't': With the title (of the properties)
+///   - 'U': With path and name of the file in UNIX style (separated by /)
+///   - Other chars: With the character itself
 /// \param ctrl: Control character
 /// \param subst: String with which to replace the character
 /// \param file: File subsituting various placeholders
 /// \param prop: Properties subsituting various placeholders
+/// \param extend: Flag, if special formatting of substitute is wanted
 //-----------------------------------------------------------------------------
 void Writer::getSubstitute (const char ctrl, std::string& subst, const YGP::File& file,
-                            const Properties& prop) const {
+                            const Properties& prop, bool extend) const {
    switch (ctrl) {
-   case 'a': subst = changeSpecialChars (prop.strAuthor); break;
+   case 'a':
+      subst = extend ? prop.strAuthor : changeSpecialChars (prop.strAuthor);
+      break;
 
-   case 'c': subst = changeSpecialChars (prop.strComment); break;
+   case 'c':
+      subst = extend ? prop.strAuthor : changeSpecialChars (prop.strComment);
+      break;
 
    case 'D':
    case 'd': {
       YGP::ATimestamp stamp (file.time ());
-      subst = (ctrl == 'D') ? stamp.ADate::toString () : stamp.toString (); break; }
+      subst = (ctrl == 'D') ? stamp.ADate::toString () : stamp.toString ();
+      break; }
 
    case 'e': {
       const char* ext (strrchr (file.name (), '.'));
-      subst = changeSpecialChars (ext ? ext + 1 : "");
+      ext = ext ? ext + 1 : "";
+      subst = extend ? changeSpecialFileChars (ext) : ext;
       break;
    }
 
@@ -169,24 +205,28 @@ void Writer::getSubstitute (const char ctrl, std::string& subst, const YGP::File
       }
       else
          ext = file.name ();
-      subst = changeSpecialChars (ext ? ext : "");
+      subst = extend ? changeSpecialFileChars (ext) : ext;
       break;
    }
 
-   case 'n': subst = changeSpecialChars (file.name ()); break;
+   case 'n': subst = changeSpecialFileChars (file.name ()); break;
 
    case 'N':
-      subst = changeSpecialChars (file.path ());
-      subst += changeSpecialChars (file.name ());
+      subst = extend ? changeSpecialFileChars (file.path ()) : file.path ();
+      subst += extend ? changeSpecialFileChars (file.name ()) : file.name ();
       break;
 
-   case 'p': subst = changeSpecialChars (file.path ()); break;
+   case 'p':
+      subst = extend ? changeSpecialFileChars (file.path ()) : file.path ();
+      break;
 
-   case 't': subst = changeSpecialChars (prop.strTitle); break;
+   case 't':
+      subst = extend ? prop.strTitle : changeSpecialChars (prop.strTitle);
+      break;
 
    case 'P':
    case 'U': {
-      subst = changeSpecialChars (file.path ());
+      subst = extend ? changeSpecialFileChars (file.path ()) : file.path ();
 #if SYSTEM != UNIX
       unsigned int pos (0);
       while ((pos = subst.find (YGP::File::DIRSEPARATOR, pos)) != std::string::npos)
@@ -194,7 +234,7 @@ void Writer::getSubstitute (const char ctrl, std::string& subst, const YGP::File
 #endif
 
       if (ctrl == 'U')
-         subst += changeSpecialChars (file.name ());
+         subst += extend ? changeSpecialFileChars (file.name ()) : file.name ();
          break; }
 
    case 's':
@@ -263,7 +303,12 @@ std::string Writer::getNextNode (const YGP::File& file, const Properties& prop) 
    unsigned int nPos (0);
    while (((pos = token.find ('%', nPos)) != std::string::npos)
           && (pos < token.size ())) {
-      if (token[pos + 1] != '(')
+      if (token[pos + 1] == '*') {
+         substitute = "";
+         if ((pos + 1) < token.size ())
+            getSubstitute (token[nPos = pos + 2], substitute, file, prop, true);
+      }
+      else if (token[pos + 1] != '(')
          getSubstitute (token[nPos = pos + 1], substitute, file, prop);
       else {
          nPos = pos + 1;
@@ -280,7 +325,7 @@ std::string Writer::getNextNode (const YGP::File& file, const Properties& prop) 
       } // end-else '(' found
 
       token.replace (pos, nPos - pos + 1, substitute);
-      ++pos;
+      nPos = pos + substitute.length ();
    }
    return token.empty () ? " " : token;
 }
@@ -359,6 +404,21 @@ std::string HTMLWriter::changeSpecialChars (const std::string& value) const {
             chg.replace (i, 1, changeTo[j]);
             i += strlen (changeTo[j]);
          }
+   return chg;
+}
+
+//-----------------------------------------------------------------------------
+/// Changes the blank in filenames to %20
+/// \param value: String to change
+/// \returns \c Changed string
+//-----------------------------------------------------------------------------
+std::string HTMLWriter::changeSpecialFileChars (const std::string& value) const {
+   std::string chg (value);
+   for (unsigned int i (0); i < chg.size (); ++i)
+      if (chg[i] == ' ') {
+         chg.replace (i, 1, "\%20");
+         i += 3;
+      }
    return chg;
 }
 
