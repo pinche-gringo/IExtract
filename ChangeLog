@@ -1,3 +1,35 @@
+2002-12-17  Markus Schwab  <g17m0@lycos.com>
+
+	* NEWS, ChangeLog: Changes in Version 0.2.03 documented
+
+	* configure.in: Version to 0.2.03
+
+	* src/ParseHTML.cpp: End-of-head tag can also be written /HEADER
+
+	* src/Writer.cpp:
+	  New path subtitutes (to UNIX-style); printMessages changed
+
+	* src/IExtract.cpp:
+	  Age of new files read from INI-file; Helptext++; New substitutes commented
+
+	* src/Options.h: Age of new files also read from INI-file
+
+2002-11-28  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseHTML.cpp: Added callback to /HEAD to speed up parsing
+
+	* src/ParseHTML.h: Added callback to /HEAD to spead up parsing
+
+2002-11-22  Markus Schwab  <g17m0@lycos.com>
+
+	* src/IExtract.cpp:
+	  Printing version info corrected; Option to print text separate directories added
+
+	* src/Writer.cpp, src/Writer.h:
+	  Added possibility to print a separating text between directories
+
+	* src/Options.h: Separate-text added
+
 2002-11-21  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.2.02 commented
@@ -35,8 +67,8 @@
 
 2002-11-14  Markus Schwab  <g17m0@lycos.com>
 
-	* src/ParsePDF.cpp, src/ParsePDF.h:
-	Works for not-linearized files and text values
+	* src/ParsePDF.cpp, src/ParsePDF.h: 
+	  Works for not-linearized files and text values
 
 	* src/ParsePDF.cpp, src/ParsePDF.h: Parsing /Info object added
 

@@ -1,3 +1,12 @@
+Overview of changes in version 0.2.03
+
+  - Added option to print text for every new subdirectory
+  - Sanity checks for option processing
+  - Output of version info corrected
+  - Made HTML search more error tolerant
+  - Output of paths can be in UNIX-style (mainly important for web pages)
+  - Fixed handling of TextForNewFiles read from INI-file
+
 Overview of changes in version 0.2.02
 
   - Added support for PDF files
