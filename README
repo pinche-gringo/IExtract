@@ -22,6 +22,7 @@ to the extension - so don't cheat ;) ):
           properties dialog is extracted
   - MS office documents (*.doc, *.xls, *.ppt); the comment of the properties
 	  dialog is extracted.
+  - MP3 files: Extracts the contents of the ID3 tag.
 
 The found results can be written either in text, HTML (table) or LaTeX
 (tabular) format. Note that there is no extra formatting of the text (like
@@ -42,6 +43,12 @@ Is supported (principally), though because of missing standards not that easy
 (at least, if you have a different setup than me). See the (end of the) file
 INSTALL. Note that the General library is linked statically (and not used as
 a DLL).
+
+
+Documentation
+-------------
+
+Can be found in the doc subdirectory (in HTML-format).
 
 
 How to report bugs and/or send patches
