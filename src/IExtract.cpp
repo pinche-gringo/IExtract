@@ -515,7 +515,7 @@ bool Application::handleOption (const char option) {
             std::cerr << PACKAGE << error;
          }
          else {
-            std::string& target ((option == 'P') ? prepend : append);
+            std::string& target = (option == 'P') ? prepend : append;
 
             static const unsigned int bufLen (512);
             char buffer[bufLen];
