@@ -26,6 +26,7 @@
 
 #include <gzo-cfg.h>
 
+#include <ctype.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -125,6 +126,8 @@ class Application : public IVIOApplication {
 
    static const FILEHANDLERS handlers[];
 
+   static void convertFromUnicode (Properties& prop);
+
    void handleFiles (const char* pFile) const;
    void processFile (const File& file, HANDLER fnc) const;
 #ifdef ENABLE_THREADS
@@ -214,21 +217,21 @@ void Application::showHelp () const {
                 "  -r, --recursive ....... Recurse into subdirectories\n"
                 "  -o, --output=STYLE .... Sets the output-style (text or HTML)\n"
                 "  -f, --format=FORMAT ... Format of output (default: %n-%t%a%c%d)\n"
-                "  -T, --title=TITLE ..... Title of output"
+                "  -T, --title=TITLE ..... Title of output\n"
                 "  -e, --show-errors ..... Puts error messages (additionally) into output\n"
                 "  -a, --all ............. Show all files (including unknown types) in output\n"
 #ifdef ENABLE_THREADS
-                "  -t, --threads=NR ...... Number of threads for examining files (default: 0)\n"
+                "  -t, --threads=NR ...... Number of threads for examining files (default: 1)\n"
 #endif
                 "  -n, --new=TIME:TEXT ... Show TEXT for files younger than TIME days (def: 30)\n"
-                "  -i, --include=NODES ... Node of files to inspect\n"
-                "  -x, --exclude=NODES ... Node of files to not inspect\n"
+                "  -i, --include=LIST .... Files to inspect\n"
+                "  -x, --exclude=LIST .... Files to not inspect\n"
                 "  -V, --version ......... Output version information and exit\n"
                 "  -h, -?, --help ........ Displays this help and exit\n"
-                "  File(s) ... File to analyze (the last part can contain wildcards)\n\n"
+                "  File(s) ... Files to analyze (the last part can contain wildcards)\n\n"
                 "TIME (in option -n) may be omited or may have an multiplier suffix: m for 30.\n\n"
-                "NODES is a list of files; seperated with the path-separator of the operating\n"
-                "      system (':' for UNICES, ';' for Windows)\n\n"
+                "LIST is a list of files; seperated with the path-separator of the operating\n"
+      "     system (':' for UNICES, ';' for Windows). E.g. *.html:*.doc\n\n"
                 "FORMAT specifies how to print the entries;\n"
                 "       %a is substituted with the author\n"
                 "       %c is substituted with the comment\n"
@@ -517,6 +520,7 @@ void Application::processFile (const File& file, HANDLER fnc) const {
       try {
          Properties prop;
          (this->*fnc) ((Xistream&)ifile, prop);
+         convertFromUnicode (prop);
          LOCKOUTPUT
          writer->printFile (cout, file, prop);
          UNLOCKOUTPUT
@@ -578,6 +582,24 @@ Application::HANDLER Application::getFileTypeHandler (const char* pExt) const {
    }
 
    return NULL;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Converts Unicode characters to normal strings
+//Parameters: prop: Properties to convert
+/*--------------------------------------------------------------------------*/
+void Application::convertFromUnicode (Properties& prop) {
+   static string Properties::* values[] = { &Properties::strTitle,
+                                            &Properties::strComment,
+                                            &Properties::strAuthor};
+
+   for (unsigned int i (0); i < (sizeof (values) / sizeof (values[0])); ++i)
+      if (iscntrl ((prop.*values[i])[1]) && (!((prop.*values[i]).size () & 1))) {
+         for (unsigned int j (1); j < ((prop.*values[i]).size () >> 1); ++j)
+            (prop.*values[i])[j] = (prop.*values[i])[j << 1];
+         (prop.*values [i]).replace ((prop.*values [i]).size () >> 1,
+                                     (prop.*values [i]).size (), 0, '\0');
+      }
 }
 
 
