@@ -31,6 +31,10 @@
 #include "ParseJPG.h"
 #include "Properties.h"
 
+#ifdef _MSC_VER
+#pragma warning(disable:4355) // disable warning about this in initlist
+#endif
+
 
 #define TYPE_TITLE    0x019c9b
 #define TYPE_COMMENT  0x019c9c
@@ -45,7 +49,6 @@ unsigned int ParseJPEG::aSupportedTypes[] = { TYPE_TITLE, TYPE_COMMENT };
 ParseJPEG::ParseJPEG ()
    : idJPEG ("\xff\xd8", "JPEG-ID", false)
    , idFormat1 ("\xff\xe0", "ID of format 1", 2, 2, false)
-   , idFormat2 ("\xff\xe1", "ID of format 2", 2, 2, false)
    , idComment1 ("\xff\xfe", "ID of short comments", false)
    , idComment2 ("\xff\xe1", "ID of long comments", false)
    , title ("\\*", "Comment", *this, &ParseJPEG::foundTitle, 1, 1, false)
@@ -56,7 +59,7 @@ ParseJPEG::ParseJPEG ()
    , offset ("\\*", "Offset", *this, &ParseJPEG::foundOffset, 4, 4, false)
    , skip ("\\*", "Skipping chars", 16, false, false)
    , ignore ("\xff", "Ignore til special", 512, true, false)
-   , selFormat (_selFormat, "Possible comments", 1, 1, false)
+   , selFormat (_selFormat, "Possible comments", 1, 0, false)
    , seqFormat1 (_seqFormat1, "Format style 1", 1, 1, false)
    , seqFormat2 (_seqFormat2, "Format style 2", 1, 1, false)
    , selProperties (_selProperties, "Properties", 1, 0, false)
@@ -146,7 +149,7 @@ int ParseJPEG::foundLength (const char* length, unsigned int) {
    TRACE8 ("ParseJPEG::foundLength (const char*, unsigned int): " << lengths[1]);
    if (lengths[1])
       title.setMaxCard (lengths[1]);
-   
+
    skip.setMinCard (14);
    skip.setMaxCard (14);
    return ParseObject::PARSE_OK;
