@@ -252,7 +252,7 @@ msgstr ""
 "          vorhanden, sonst der Dateiname)\n"
 
 #: src/IExtract.cpp:322
-#, no-c-format
+#, fuzzy, c-format
 msgid ""
 "       %*LETTER changes the substitution slightly. For file names it causes "
 "a\n"
