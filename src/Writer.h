@@ -33,6 +33,8 @@ class Writer {
    virtual void printStart (std::ostream& out) const { };
    virtual void printFile (std::ostream& out, const File& file,
                            const Properties& prop) const = 0;
+   virtual void printMessage (std::ostream& out, const File& file,
+                              const char* msg) const = 0;
    virtual void printEnd (std::ostream& out) const { };
 
    typedef enum { SHOW_PATH = 0x1 } showOptions;
@@ -60,6 +62,8 @@ class HTMLWriter : public Writer {
    virtual void printStart (std::ostream& out) const;
    virtual void printFile (std::ostream& out, const File& file,
                            const Properties& prop) const;
+   virtual void printMessage (std::ostream& out, const File& file,
+                              const char* msg) const;
    virtual void printEnd (std::ostream& out) const;
 
    static HTMLWriter* create (unsigned int options, unsigned long age = 0,
@@ -78,6 +82,8 @@ class TextWriter : public Writer {
 
    virtual void printFile (std::ostream& out, const File& file,
                            const Properties& prop) const;
+   virtual void printMessage (std::ostream& out, const File& file,
+                              const char* msg) const;
 
    static TextWriter* create (unsigned int options, unsigned long age = 0,
                               const char* pNew = NULL) {

@@ -71,7 +71,7 @@ void HTMLWriter::printStart (std::ostream& out) const {
 }
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Prints the start for an HTML-table
+//Purpose   : Prints a file entry in HTML format
 //Parameters: out: Stream where to put the output
 //            file: File whose data should be printed
 //            prop: Properties of the file
@@ -85,9 +85,28 @@ void HTMLWriter::printFile (std::ostream& out, const File& file,
        << file.name () << "\">";
    if (options & SHOW_PATH)
       out << file.path ();
-   out << file.name () << "</td><td valign=top>-</td><td valign=top>"
+   out << file.name () << "</td><td>-</td><td>"
        << (prop.strComment.empty () ? prop.strTitle : prop.strComment)
        << "</td></tr>\n";
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Prints a message in HTML-format (inside the table)
+//Parameters: out: Stream where to put the output
+//            file: File to which the message should be print
+//            msg: Message to print (not NULL)
+/*--------------------------------------------------------------------------*/
+void HTMLWriter::printMessage (std::ostream& out, const File& file,
+                               const char* msg) const {
+   assert (msg);
+
+   out << "<tr valign=top><td>";
+   if (pStrNew && isNew (file))
+      out << pStrNew;
+   if (options & SHOW_PATH)
+      out << file.path ();
+   out << file.name () << "</td><td>-</td><td>" << msg
+       << "</td><td>-</td><td><</td></tr>\n";
 }
 
 /*--------------------------------------------------------------------------*/
@@ -107,17 +126,33 @@ TextWriter::~TextWriter () {
 
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Prints the start for an Text-table
+//Purpose   : Prints a file entry in text-format
 //Parameters: out: Stream where to put the output
 //            file: File whose data should be printed
 //            prop: Properties of the file
 /*--------------------------------------------------------------------------*/
 void TextWriter::printFile (std::ostream& out, const File& file,
                             const Properties& prop) const {
-   if (options & SHOW_PATH)
-      out << file.path ();
    if (pStrNew && isNew (file))
       out << pStrNew << ": ";
+   if (options & SHOW_PATH)
+      out << file.path ();
    out << file.name () << " - "
        << (prop.strComment.empty () ? prop.strTitle : prop.strComment) << '\n';
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Prints a message
+//Parameters: out: Stream where to put the output
+//            file: File to which the message should be print
+//            msg: Message to print (not NULL)
+/*--------------------------------------------------------------------------*/
+void TextWriter::printMessage (std::ostream& out, const File& file,
+                               const char* msg) const {
+   assert (msg);
+   if (pStrNew && isNew (file))
+      out << pStrNew << ": ";
+   if (options & SHOW_PATH)
+      out << file.path ();
+   out << file.name () << " - " << msg << '\n';
 }
