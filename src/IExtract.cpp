@@ -68,6 +68,7 @@
 #include "ParseJPG.h"
 #include "ParseHTML.h"
 #include "ParseWord.h"
+#include "ParseSOffice.h"
 #include "Properties.h"
 
 #if SYSTEM == UNIX
@@ -143,6 +144,8 @@ class Application : public IVIOApplication {
    void processHTML (Xistream& hFile, Properties& result) const throw (std::string);
    void processOffice (Xistream& hFile, Properties& result) const
       throw (std::string);
+   void processStarOffice (Xistream& hFile, Properties& result) const
+      throw (std::string);
 
    enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4 };
    unsigned long ageOfNewFiles;
@@ -185,12 +188,15 @@ class Application : public IVIOApplication {
 
 
 const Application::FILEHANDLERS Application::handlers[] = {
-   { "jpg", &Application::processJPG },
-   { "jpeg", &Application::processJPG },
    { "htm", &Application::processHTML },
    { "html", &Application::processHTML },
    { "shtm", &Application::processHTML },
    { "shtml", &Application::processHTML },
+   { "sdw", &Application::processStarOffice },
+   { "sdc", &Application::processStarOffice },
+   { "sdd", &Application::processStarOffice },
+   { "jpg", &Application::processJPG },
+   { "jpeg", &Application::processJPG },
    { "doc", &Application::processOffice },
    { "xls", &Application::processOffice },
    { "ppt", &Application::processOffice } };
@@ -560,6 +566,17 @@ void Application::processFile (const File& file, HANDLER fnc) const {
 void Application::processHTML (Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseHTML obj;
+   obj.parse (hFile, result);
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Tries to extract the properties of a StarOffice document
+//Parameters: hFile: File to processs
+//            result: Result of parsing
+/*--------------------------------------------------------------------------*/
+void Application::processStarOffice (Xistream& hFile, Properties& result) const
+   throw (std::string) {
+   ParseStarOffice obj;
    obj.parse (hFile, result);
 }
 
