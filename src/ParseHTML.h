@@ -19,9 +19,6 @@
 
 #include <string>
 
-#ifdef ENABLE_THREADS
-#  define MULTIBUFFER
-#endif
 #include <Parse.h>
 
 struct Properties;
@@ -46,6 +43,7 @@ class ParseHTML  {
    ParseExact      startTag;
    ParseExact      endTag;
    ParseUpperExact tagTitle;
+   ParseUpperExact tagEndTitle;
    OMParseText     title;
    ParseText       otherTag;
    ParseText       ignore;
@@ -55,7 +53,7 @@ class ParseHTML  {
    ParseSelection selCmd;
    ParseSelection htmlDoc;                                    // Startsequence
 
-   ParseObject* _seqTitle[4];
+   ParseObject* _seqTitle[6];
    ParseObject* _selCmd[3];
    ParseObject* _seqTag[4];
    ParseObject* _htmlDoc[3];
