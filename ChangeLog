@@ -1,3 +1,18 @@
+2003-11-16  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Commented changes in V0.4.01
+
+	* configure.in: Also generating distribution in bzip2-format
+
+	* src/Makefile.am: Setting libintl library flags
+
+	* src/IExtract.cpp, src/Options.h, src/ParseHTML.cpp, src/ParseHTML.h, src/ParseJPG.cpp, src/ParseJPG.h, src/ParseMP3.cpp, src/ParseMP3.h, src/ParseOOffice.cpp, src/ParseOOffice.h, src/ParsePDF.cpp, src/ParsePDF.h, src/ParseSOffice.cpp, src/ParseSOffice.h, src/ParseWord.cpp, src/ParseWord.h, src/Writer.cpp, src/Writer.h:
+	Using new libYGP style (namespaces)
+
+2003-10-11  Markus Schwab  <g17m0@lycos.com>
+
+	* configure.in: Version to 0.4.01
+
 2003-08-12  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Commented changes in V0.4.00

@@ -1,3 +1,8 @@
+Overview of changes in version 0.4.01:
+
+  - Linking with available libintl
+  - Adapted to new libYGP style (with namespaces)
+
 Overview of changes in version 0.4.00:
 
   - Handling OpenOffice documents
