@@ -71,7 +71,7 @@ ParseHTML::ParseHTML ()
      , selMetaCmds (_selMetaCmds, _("Meta entries"))
      , selCmd (_selCmd, _("Valid HTML command"))
      , seqTag (_seqTag, _("Valid HTML tag"))
-     , htmlDoc (_htmlDoc, _("HTML document"), -1, 1) {
+     , htmlDoc (_htmlDoc, _("HTML document"), -1U, 1) {
 
    _seqMetaCmd[0] = &tagMeta;
    _seqMetaCmd[1] = &selMetaCmds;

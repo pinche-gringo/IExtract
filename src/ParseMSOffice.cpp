@@ -93,12 +93,12 @@ ParseWord::ParseWord()
    , title ("\0", _("Title of document"), *this, &ParseWord::foundTitle, 1, 1, false)
    , skipIDStart (ID1, _("Other command"), 16, 1)
    , ignore (ID1, _("Content"), LEN_CONTENT, 1, false, false)
-   , selValueStart (_selValueStart, _("Start of value ID"), -1, 0)
+   , selValueStart (_selValueStart, _("Start of value ID"), -1U, 0)
    , seqTitle (_seqTitle, _("Title entry"), 1, 0, false)
    , seqEntries (_seqEntries, _("Entry description"), *this,
                  &ParseWord::foundPropertiesHeader, 1, 1, false)
    , seqProperties (_seqProperties, _("Properties"), 1, 1, false)
-   , wordDoc (_wordDoc, _("Word document"), -1, 1) {
+   , wordDoc (_wordDoc, _("Word document"), -1U, 1) {
 
    _seqProperties[0] = &id;
    _seqProperties[1] = &skip;

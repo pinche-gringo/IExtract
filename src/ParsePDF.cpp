@@ -32,10 +32,10 @@
 #pragma warning(disable:4786) // disable warning about truncating debug info
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
-#include <strstream>
+#include <sstream>
 
 #include <Check.h>
 #include <Trace_.h>
@@ -78,16 +78,16 @@ ParsePDF::ParsePDF ()
      , tagAuthor ("/Author", _("Tag for author"), *this, &ParsePDF::foundAuthor)
      , tagComment ("/Subject", _("Tag for comment (subject)"), *this, &ParsePDF::foundComment)
      , value (")>", _("Value of entry"), *this, &ParsePDF::foundValue, 512)
-     , selXRef (_selXRef, _("Pointer to position of cross reference table"), -1, 0)
+     , selXRef (_selXRef, _("Pointer to position of cross reference table"), -1U, 0)
      , seqXRef (_seqXRef, _("Position of cross reference table"))
      , seqXRefTable (_seqXRefTable, _("Cross reference table"))
      , seqXRefTableEntries (_seqXRefTableEntries, _("Entries in cross reference table"), 0, 0)
      , seqTrailer (_seqTrailer, _("Trailer"))
-     , selValues (_selValues, _("Trailer values"), -1, 0)
+     , selValues (_selValues, _("Trailer values"), -1U, 0)
      , seqInfo (_seqInfo, _("Info entry"))
      , seqPrev (_seqPrev, _("Prev entry"))
      , seqInfoObj (_seqInfoObj, _("Info object"))
-     , seqInfoValue (_seqInfoValue, _("Info values"), -1, 0)
+     , seqInfoValue (_seqInfoValue, _("Info values"), -1U, 0)
      , selStartOfValue (_selStartOfValue, _("Start of values"))
      , selType (_selType, _("Valid type")) {
    _selXRef[0] = &seqXRef;
@@ -244,11 +244,11 @@ void ParsePDF::parseInfoObject () {
 
    file->seekg (aOffsets[infoObject], std::ios::beg);
 
-   std::ostrstream str;
+   std::ostringstream str;
    str << infoObject;
-   idObj.setValue (str.str ());
-   idObj.setMaxCard (str.pcount ());
-   idObj.setMinCard (str.pcount ());
+   idObj.setValue (str.str ().c_str ());
+   idObj.setMaxCard (str.str ().size ());
+   idObj.setMinCard (str.str ().size ());
    skip.setValue ("\\ ");
 
    Check3 (file);

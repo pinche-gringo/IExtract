@@ -67,7 +67,7 @@ ParseStarOffice::ParseStarOffice ()
      , value ("\\*", _("Property-entry"), *this, &ParseStarOffice::foundValue, 1, 0, false)
      , seqProperties (_seqProperties, _("Properties"), 1, 1, false)
      , seqEntries (_seqEntries, _("Entries of properties"), *this, &ParseStarOffice::foundProps, 4, 4, false)
-     , selDocument (_selDocument, _("StarOffice document"), -1) {
+     , selDocument (_selDocument, _("StarOffice document"), -1U) {
 
    _selDocument[0] = &seqProperties;
    _selDocument[1] = &skipIDStart;
