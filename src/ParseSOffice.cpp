@@ -98,7 +98,7 @@ int ParseStarOffice::foundValue (const char* pTitle, unsigned int len) {
    Check3 (actEntry != NONE);
 
    static struct {
-      string Properties::* value;
+      std::string Properties::* value;
       unsigned int offset;
    } entries[] = { { &Properties::strAuthor, 39 },
                    { &Properties::strAuthor, 80 },

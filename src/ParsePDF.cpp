@@ -55,7 +55,7 @@ ParsePDF::ParsePDF ()
    :  infoObject (-1U), actEntry (NONE), actObject (0), offPrev (0)
      , startXRef (ID, _("Tag for offset of cross reference table"))
      , offXRef ("\\9", _("Offset of cross reference table"), *this, &ParsePDF::foundOffset, 10, 1)
-     , skipS (ID1, _("Start of startxref-tag"), 20)
+     , skipS (ID1, _("Start of startxref-tag"), 20, 1, true)
      , skip (ID1, _("Unused data"), 256, 1, true, false)
      , idXRef ("xref", _("Tag for cross reference table"))
      , nrStart ("\\9", _("Number of cross reference entries"), *this, &ParsePDF::foundStartNumber, 10)
@@ -184,7 +184,7 @@ int ParsePDF::foundOffset (const char* pOffset, unsigned int) {
    TRACE9 ("ParsePDF::foundOffset (const char*, unsigned int) - " << pOffset);
    Check3 (pOffset); Check3 (file);
 
-   file->seekg (atoi (pOffset), ios::beg);
+   file->seekg (atoi (pOffset), std::ios::beg);
    selXRef.setMaxCard (0);
    return ParseObject::PARSE_OK;
 }
@@ -242,9 +242,9 @@ void ParsePDF::parseInfoObject () {
    TRACE5 ("ParsePDF::parseInfoObject () - Going to pos " << aOffsets[infoObject]
            << "; searching for " << infoObject);
 
-   file->seekg (aOffsets[infoObject], ios::beg);
+   file->seekg (aOffsets[infoObject], std::ios::beg);
 
-   ostrstream str;
+   std::ostrstream str;
    str << infoObject;
    idObj.setValue (str.str ());
    idObj.setMaxCard (str.pcount ());
@@ -351,7 +351,7 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
       TRACE9 ("ParsePDF::foundValue (const char*, unsigned int) - Assigning: "
               << pValue + 1);
 
-      static string Properties::* values[] =
+      static std::string Properties::* values[] =
          { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
 
       Check3 (prop);
@@ -389,7 +389,7 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
 /*--------------------------------------------------------------------------*/
 void ParsePDF::parse (Xistream& stream, Properties& result) throw (std::string) {
    ParsePDF obj;
-   stream.seekg (-40, ios::end);
+   stream.seekg (-40, std::ios::end);
    obj.prop = &result;
    obj.file = &stream;
 
@@ -400,7 +400,7 @@ void ParsePDF::parse (Xistream& stream, Properties& result) throw (std::string) 
          throw (std::string (_("Document does not contain neither an /Info"
                                " nor a /Prev entry")));
 
-      stream.seekg (obj.offPrev, ios::beg);
+      stream.seekg (obj.offPrev, std::ios::beg);
       obj.offPrev = 0;
       rc = obj.seqXRefTable.parse (stream);
    }

@@ -178,11 +178,11 @@ ParseJPEG::ParseJPEG ()
 int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
    Check3 (prop); Check3 (pTitle);
    TRACE9 ("ParseJPEG::foundTitle (const char*, unsigned int) - Title: "
-          << string (pTitle, len) << " -> " << len << " chars");
+          << std::string (pTitle, len) << " -> " << len << " chars");
 
-   static string Properties::* values[] = { &Properties::strTitle,
-                                            &Properties::strComment,
-                                            &Properties::strAuthor };
+   static std::string Properties::* values[] = { &Properties::strTitle,
+                                                 &Properties::strComment,
+                                                 &Properties::strAuthor };
    for (unsigned int i (0);
         i < (sizeof (values) / sizeof (values[0])); ++i)
       if (lengths[i]) {
@@ -205,7 +205,7 @@ int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
 int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
    Check3 (prop); Check3 (pTitle);
    TRACE9 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Title: "
-           << string (pTitle, len) << " -> " << len << " chars");
+           << std::string (pTitle, len) << " -> " << len << " chars");
 
    const char* pAct = pTitle + strlen (pTitle) + 1;    // Skip leading comment
    pTitle += len;
@@ -227,9 +227,9 @@ int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
             TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Type: *"
                     << hex << (unsigned int)pAct << " = " << get4BytesLSB (pAct) << dec);
 
-            static string Properties::* values[] = { &Properties::strTitle,
-                                                     &Properties::strComment,
-                                                     &Properties::strAuthor };
+            static std::string Properties::* values[] = { &Properties::strTitle,
+                                                          &Properties::strComment,
+                                                          &Properties::strAuthor };
             static unsigned int aSupportedTypes[] = { TYPE_TITLE2, TYPE_COMMENT2,
                                                       TYPE_AUTHOR2 };
 

@@ -205,7 +205,7 @@ int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
    TRACE1 ("ParseWord::foundTitle (const char*, unsigned int): " << pTitle
            << " (" << len << " bytes); Entries: " << seqTitle.getMaxCard ());
 
-   static string Properties::* values[] =
+   static std::string Properties::* values[] =
       { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
 
    Check3 (prop);

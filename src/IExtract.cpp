@@ -186,7 +186,7 @@ class Application : public IVIOApplication {
    queue<FILEFNC>  listFiles;
 #endif
 
-   string filelist;
+   std::string filelist;
 
    enum { TEXT = 0, HTML, LATEX } outputStyle;
 
@@ -206,7 +206,7 @@ const Application::FILEHANDLERS Application::handlers[] = {
    { "php", &Application::processHTML },
    { "ppt", &Application::processOffice },
    { "sda", &Application::processStarOffice },
-   { "sdc", &Application::processStarOffice }, 
+   { "sdc", &Application::processStarOffice },
    { "sdd", &Application::processStarOffice },
    { "sdw", &Application::processStarOffice },
    { "sht", &Application::processHTML },
@@ -239,7 +239,7 @@ const IVIOApplication::longOptions Application::lo[] = {
 //Purpose   : Displays the help
 /*--------------------------------------------------------------------------*/
 void Application::showHelp () const {
-   cout << _("Extracts a description out of files (depending on the file-type)\n\nUsage:")
+   std::cout << _("Extracts a description out of files (depending on the file-type)\n\nUsage:")
         << " " PACKAGE " " << _("[OPTIONS] <File(s)>")
         << "\n\n  -r, --recursive ....... " << _("Recurse into subdirectories")
         << "\n  -o, --output=STYLE .... " << _("Sets the output-style (text, HTML or LaTeX)")
@@ -320,15 +320,15 @@ bool Application::handleOption (const char option) {
    switch (option) {
    case 's': {
       const char* pSep = getOptionValue ();
-      if (pSep) 
+      if (pSep)
          iniOpts.separate = pSep;
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
          error.replace (error.find ("%1"), 2, 1, 's');
-         cerr << PACKAGE << error;
+         std::cerr << PACKAGE << error;
          break; } }
       // Don't add a break in OK case, as -s implies -r!
-      
+
    case 'r': options |= RECURSIVE; break;
 
    case 'o': {
@@ -340,7 +340,7 @@ bool Application::handleOption (const char option) {
          outputStyle = TEXT;
          std::string error (_("-warning: Style of output `%1' is not valid! Using text\n"));
          error.replace (error.find ("%1"), 2, pType);
-         cerr << PACKAGE << error;
+         std::cerr << PACKAGE << error;
       }
       break; }
 
@@ -352,7 +352,7 @@ bool Application::handleOption (const char option) {
       if (!pThreads
           || (!(cThreads = strtoul (pThreads, &pEnd, 10)))
           || (!pEnd || *pEnd)) {
-         cerr << PACKAGE << _("-warning: Invalid number of threads!\n");
+         std::cerr << PACKAGE << _("-warning: Invalid number of threads!\n");
       }
       else
          aThreads.reserve (cThreads);
@@ -363,23 +363,23 @@ bool Application::handleOption (const char option) {
 
    case 'F': {
       const char* pFormat = getOptionValue ();
-      if (pFormat) 
+      if (pFormat)
          iniOpts.format = pFormat;
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
          error.replace (error.find ("%1"), 2, 1, 'F');
-         cerr << PACKAGE << error;
+         std::cerr << PACKAGE << error;
       }
       break; }
 
    case 'T': {
       const char* pTitle = getOptionValue ();
-      if (pTitle) 
+      if (pTitle)
          iniOpts.title = pTitle;
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
          error.replace (error.find ("%1"), 2, 1, 'T');
-         cerr << PACKAGE << error;
+         std::cerr << PACKAGE << error;
       }
       break; }
 
@@ -390,13 +390,13 @@ bool Application::handleOption (const char option) {
       if (!pNew) {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
          error.replace (error.find ("%1"), 2, 1, 'n');
-         cerr << PACKAGE << error;
+         std::cerr << PACKAGE << error;
       }
       else if ((time = strtoul (pNew, &pEnd, 10)),
                (!pEnd || ((*pEnd != ':') && (*pEnd != 'm')))) {
          std::string error (_("-warning: Argument for new files `%1' is not valid! Ignoring option `n'\n"));
          error.replace (error.find ("%1"), 2, pNew);
-         cerr << PACKAGE << error;
+         std::cerr << PACKAGE << error;
       }
       else {
          if (*pEnd == 'm') {
@@ -420,7 +420,7 @@ bool Application::handleOption (const char option) {
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
          error.replace (error.find ("%1"), 2, 1, 'x');
-         cerr << PACKAGE << error;
+         std::cerr << PACKAGE << error;
       }
       break; }
 
@@ -433,7 +433,7 @@ bool Application::handleOption (const char option) {
       else {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
          error.replace (error.find ("%1"), 2, 1, 'f');
-         cerr << PACKAGE << error;
+         std::cerr << PACKAGE << error;
       }
       break; }
 
@@ -442,7 +442,7 @@ bool Application::handleOption (const char option) {
    default: {
       std::string error (_("-warning: Ignoring invalid option `%1'\n"));
       error.replace (error.find ("%1"), 2, 1, option);
-      cerr << PACKAGE << error;
+      std::cerr << PACKAGE << error;
    }
    }
    return true;
@@ -476,7 +476,7 @@ int Application::perform (int argc, const char* argv[]) {
          writer = t[i].fnc (iniOpts.format, iniOpts.newText, iniOpts.ageOfNewFiles);
    Check3 (writer);
 
-   writer->printStart (cout, iniOpts.title);
+   writer->printStart (std::cout, iniOpts.title);
 
    std::string file;
    for (unsigned int j (0); j < argc; ++j) {
@@ -489,7 +489,7 @@ int Application::perform (int argc, const char* argv[]) {
       handleFiles (file.c_str ());
    }
 
-   writer->printEnd (cout);
+   writer->printEnd (std::cout);
    return 0;
 }
 
@@ -503,7 +503,7 @@ void Application::handleFiles (const char* pFile) const {
    TRACE5 ("Application::handleFiles (const char*) const - " << pFile);
 
    ExtDirectorySearch ds (pFile);
-   string node;
+   std::string node;
    PathSearch list (filelist);
    while (!(node = list.getNextNode ()).empty ()) {
       bool include (node[0] == 'i');
@@ -534,7 +534,7 @@ void Application::handleFiles (const char* pFile) const {
                                                  &Application::processThread, NULL));
             }
             catch (std::string& err) {
-               cerr << PACKAGE << _("-error: ") << err << '\n';
+               std::cerr << PACKAGE << _("-error: ") << err << '\n';
             }
          UNLOCKTHREADS
 #else
@@ -544,7 +544,7 @@ void Application::handleFiles (const char* pFile) const {
       else
          if (options & SHOW_ALL) {
             LOCKOUTPUT
-            writer->printMessage (cout, *file,
+            writer->printMessage (std::cout, *file,
                                  (options & SHOW_ERRORS) ? _("Unknown file-type") : "");
             UNLOCKOUTPUT
          }
@@ -575,7 +575,7 @@ void Application::handleFiles (const char* pFile) const {
       while (file) {
          if (!IDirectorySearch::isSpecial (file->name ())) {
             LOCKOUTPUT
-            writer->printSeparator (cout, *file, iniOpts.separate, iniOpts.title);
+            writer->printSeparator (std::cout, *file, iniOpts.separate, iniOpts.title);
             UNLOCKOUTPUT
             std::string strFile (file->path ());
             strFile += file->name ();
@@ -636,7 +636,7 @@ void Application::processFile (const File& file, HANDLER fnc) const {
    strFile += file.name ();
 
    Xifstream ifile;
-   ifile.open (strFile.c_str (), ios::in | ios::binary);
+   ifile.open (strFile.c_str (), std::ios::in | std::ios::binary);
    if (!ifile) {
       LOCKOUTPUT;
       std::string error (_("-error: File `%1' can't be opened!\nReason: "));
@@ -653,7 +653,7 @@ void Application::processFile (const File& file, HANDLER fnc) const {
          (this->*fnc) ((Xistream&)ifile, prop);
          convertFromUnicode (prop);
          LOCKOUTPUT
-         writer->printFile (cout, file, prop);
+         writer->printFile (std::cout, file, prop);
          UNLOCKOUTPUT
       }
       catch (std::string& err) {
@@ -662,7 +662,7 @@ void Application::processFile (const File& file, HANDLER fnc) const {
          err = ((options & SHOW_ERRORS)
                 ? std::string (_("Error while processing: ")) + err
                 : "");
-         writer->printMessage (cout, file, err);
+         writer->printMessage (std::cout, file, err);
          UNLOCKOUTPUT
       } // end-catch
    } // end-else file could be opened
@@ -753,9 +753,9 @@ Application::HANDLER Application::getFileTypeHandler (const char* pExt) const {
 //Parameters: prop: Properties to convert
 /*--------------------------------------------------------------------------*/
 void Application::convertFromUnicode (Properties& prop) {
-   static string Properties::* values[] = { &Properties::strTitle,
-                                            &Properties::strComment,
-                                            &Properties::strAuthor};
+   static std::string Properties::* values[] = { &Properties::strTitle,
+                                                 &Properties::strComment,
+                                                 &Properties::strAuthor};
 
    for (unsigned int i (0); i < (sizeof (values) / sizeof (values[0])); ++i)
       if (iscntrl ((prop.*values[i])[1]) && (!((prop.*values[i]).size () & 1))) {
@@ -782,8 +782,8 @@ void Application::readINIFile (const char* pFile) {
 
       unsigned int rc (INIFILE_READ ());
    }
-   catch (std::string& error) {
-      TRACE1 (error);
+   catch (std::string& err) {
+      TRACE1 (err);
    }
 
    if (iniOpts.style.size ()) {
@@ -797,7 +797,7 @@ void Application::readINIFile (const char* pFile) {
             std::string error (_("-warning: The INI-file `%1' contains an invalid entry for the output style (`%2')! Using text\n"));
             error.replace (error.find ("%1"), 2, pFile);
             error.replace (error.find ("%2"), 2, iniOpts.style);
-            cerr << PACKAGE << error;
+            std::cerr << PACKAGE << error;
          }
       }
    }

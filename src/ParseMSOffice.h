@@ -82,7 +82,7 @@ class ParseWord  {
    ParseObject* _selValueStart[5];
 
    // Map for offsets to supported type. 1st: Offset, 2nd: Type
-   map<unsigned int, unsigned int> aOffsets;
+   std::map<unsigned int, unsigned int> aOffsets;
 
    unsigned int cRead;
    unsigned int cEntries;
