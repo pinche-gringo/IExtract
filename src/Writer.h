@@ -50,7 +50,8 @@ class Writer {
                         const std::string& sep, const std::string& title = "") const;
 
  protected:
-   virtual std::string changeSpecialChars (const std::string& val) const { return val; }
+   virtual std::string changeSpecialChars (const std::string& val) const;
+   virtual std::string changeSpecialFileChars (const std::string& val) const;
 
    bool isNew (const YGP::File& file) const {
       return file.time () > limit; }
@@ -62,7 +63,7 @@ class Writer {
 
    std::string getNextNode (const YGP::File& file, const Properties& prop) const;
    void getSubstitute (const char ctrl, std::string& substitute, const YGP::File& file,
-                       const Properties& prop) const;
+                       const Properties& prop, bool extend = false) const;
 
    static std::string convertToHumanString (unsigned long value);
 
@@ -91,6 +92,7 @@ class HTMLWriter : public Writer {
       return new HTMLWriter (format, strNew, age); }
 
    virtual std::string changeSpecialChars (const std::string& value) const;
+   virtual std::string changeSpecialFileChars (const std::string& val) const;
 };
 
 
