@@ -141,6 +141,8 @@ class Application : public IVIOApplication {
    void processHTML (Xistream& hFile, Properties& result) const throw (std::string);
    void processOffice (Xistream& hFile, Properties& result) const
       throw (std::string);
+   void processOpenOffice (Xistream& hFile, Properties& result) const
+      throw (std::string);
    void processStarOffice (Xistream& hFile, Properties& result) const
       throw (std::string);
 
@@ -234,9 +236,10 @@ Application::Application (const int argc, const char* argv[])
    handlers["sdc"] = &Application::processStarOffice;
    handlers["sdd"] = &Application::processStarOffice;
    handlers["sdw"] = &Application::processStarOffice;
-   handlers["sxa"] = &Application::processOpenOffice;
    handlers["sxc"] = &Application::processOpenOffice;
    handlers["sxd"] = &Application::processOpenOffice;
+   handlers["sxi"] = &Application::processOpenOffice;
+   handlers["sxm"] = &Application::processOpenOffice;
    handlers["sxw"] = &Application::processOpenOffice;
    handlers["sht"] = &Application::processHTML;
    handlers["shtm"] = &Application::processHTML;
