@@ -27,9 +27,12 @@
 
 #include <stdlib.h>
 
+#define CHECK 9
 #define TRACELEVEL 9
 #include <Check.h>
 #include <Trace_.h>
+
+#include "Properties.h"
 
 #include "ParsePDF.h"
 
@@ -41,7 +44,7 @@
 //Purpose   : (Default-)Constructor
 /*--------------------------------------------------------------------------*/
 ParsePDF::ParsePDF () 
-   : startObject (0)
+   : startObject (0), actEntry (NONE)
      , startXRef (ID, "Tag for offset of cross reference table")
      , offXRef ("\\9", "Offset of cross reference table", *this, &ParsePDF::foundOffset, 10)
      , skipS (ID1, "Start of startxref-tag", 20)
@@ -50,15 +53,23 @@ ParsePDF::ParsePDF ()
      , nrStart ("\\9", "Number of cross reference entries", *this, &ParsePDF::foundStartNumber, 10)
      , count ("\\9", "Number of cross reference entries", *this, &ParsePDF::foundNumber, 10)
      , offObject ("\\9", "Offset of object", *this, &ParsePDF::foundObjOffset, 10)
-     , tagTitle ("/Title (", "Tag for title", *this, &ParsePDF::foundTitle)
-     , tagAuthor ("/Author (", "Tag for author", *this, &ParsePDF::foundAuthor)
+     , tagTrailer ("trailer", "Tag for trailer")
+     , startObj ("<<", "Start of object")
+     , objInfo ("/Info", "Reference to info object")
+     , endObj (">>", "End of object", *this, &ParsePDF::foundEndObj)
+     , tagTitle ("/Title", "Tag for title", *this, &ParsePDF::foundTitle)
+     , tagAuthor ("/Author", "Tag for author", *this, &ParsePDF::foundAuthor)
      , tagComment ("/Subject", "Tag for comment (subject)", *this, &ParsePDF::foundComment)
-     , value (")", "Value of entry", *this, &ParsePDF::foundTitle, 512)
-     , selXRef (_selXRef, "Pointer to position of cross reference table", -1, 1)
-     , seqXRef (_seqXRef, "Position of cross reference table", 1, 1)
-     , seqXRefTable (_seqXRefTable, "Cross reference table", 1, 1)
+     , value (")>", "Value of entry", *this, &ParsePDF::foundValue, 512)
+     , selXRef (_selXRef, "Pointer to position of cross reference table", -1, 0)
+     , seqXRef (_seqXRef, "Position of cross reference table")
+     , seqXRefTable (_seqXRefTable, "Cross reference table")
      , seqXRefTableEntries (_seqXRefTableEntries, "Entries in cross reference table", 0, 0)
-{
+     , seqTrailer (_seqTrailer, "Trailer")
+     , selValues (_selValues, "Trailer values", -1, 0)
+     , seqInfo (_seqInfo, "Info entry")
+     , seqInfoValue (_seqInfoValue, "Info values", -1, 0)
+     , selType (_selType, "Valid type") {
    _selXRef[0] = &seqXRef;
    _selXRef[1] = &skipS;
    _selXRef[2] = &skip;
@@ -73,11 +84,38 @@ ParsePDF::ParsePDF ()
    _seqXRefTable[1] = &nrStart;
    _seqXRefTable[2] = &count;
    _seqXRefTable[3] = &seqXRefTableEntries;
-   _seqXRefTable[4] = NULL;
+   _seqXRefTable[4] = &seqTrailer;
+   _seqXRefTable[5] = NULL;
 
    _seqXRefTableEntries[0] = &offObject;
    _seqXRefTableEntries[1] = &skip;
    _seqXRefTableEntries[2] = NULL;
+
+   _seqTrailer[0] = &tagTrailer;
+   _seqTrailer[1] = &startObj;
+   _seqTrailer[2] = &selValues;
+   _seqTrailer[3] = NULL;
+
+   _selValues[0] = &seqInfo;
+   _selValues[1] = &endObj;
+   _selValues[2] = &skip;
+   _selValues[3] = NULL;
+
+   _seqInfo[0] = &objInfo;
+   _seqInfo[1] = &offXRef;
+   _seqInfo[2] = &startObj;
+   _seqInfo[3] = &seqInfoValue;
+   _seqInfo[4] = NULL;
+
+   _seqInfoValue[0] = &selType;
+   _seqInfoValue[1] = &value;
+   _seqInfoValue[2] = NULL;
+
+   _selType[0] = &tagTitle;
+   _selType[1] = &tagAuthor;
+   _selType[2] = &tagComment;
+   _selType[3] = &skip;
+   _selType[4] = NULL;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -96,8 +134,9 @@ int ParsePDF::foundOffset (const char* pOffset, unsigned int) {
    TRACE5 ("ParsePDF::foundOffset (const char*, unsigned int) - " << pOffset);
    Check3 (pOffset); Check3 (file);
 
-   file->seekg (atoi (pOffset));
-   selXRef.setMaxCard (1);
+   file->seekg (atoi (pOffset), ios::beg); Check9 (file->tellg () == atoi (pOffset));
+   selXRef.setMaxCard (0);
+   selValues.setMaxCard (0);
    return ParseObject::PARSE_OK;
 }
 
@@ -144,13 +183,26 @@ int ParsePDF::foundObjOffset (const char* pOffset, unsigned int) {
 }
 
 /*--------------------------------------------------------------------------*/
+//Purpose   : Callback after an end-of-object tag was read
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParsePDF::foundEndObj (const char*, unsigned int) {
+   TRACE9 ("ParsePDF::foundEndObj (const char*, unsigned int)");
+   selValues.setMaxCard (0);
+   skip.setValue ("(<");
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
 //Purpose   : Callback after the title was read
 //Parameters: pLength: Pointer to offset
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundTitle (const char* pTitle, unsigned int) {
    TRACE5 ("ParsePDF::foundTitle (const char*, unsigned int) - " << pTitle);
-   Check3 (pTitle); Check3 (file);
+   Check3 (pTitle);
+
+   actEntry = TITLE;
    return ParseObject::PARSE_OK;
 }
 
@@ -161,7 +213,9 @@ int ParsePDF::foundTitle (const char* pTitle, unsigned int) {
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundAuthor (const char* pAuthor, unsigned int) {
    TRACE5 ("ParsePDF::foundAuthor (const char*, unsigned int) - " << pAuthor);
-   Check3 (pAuthor); Check3 (file);
+   Check3 (pAuthor);
+
+   actEntry = AUTHOR;
    return ParseObject::PARSE_OK;
 }
 
@@ -172,6 +226,29 @@ int ParsePDF::foundAuthor (const char* pAuthor, unsigned int) {
 /*--------------------------------------------------------------------------*/
 int ParsePDF::foundComment (const char* pComment, unsigned int) {
    TRACE5 ("ParsePDF::foundComment (const char*, unsigned int) - " << pComment);
-   Check3 (pComment); Check3 (file);
+   Check3 (pComment);
+
+   actEntry = COMMENT;
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after the value for an entry was read
+//Parameters: pLength: Pointer to value
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParsePDF::foundValue (const char* pValue, unsigned int len) {
+   TRACE5 ("ParsePDF::foundComment (const char*, unsigned int) - " << pValue);
+   Check3 (pValue);
+
+   if (actEntry != NONE) {
+      static string Properties::* values[] =
+         { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
+
+      assert (prop);
+      assert ((sizeof (values) / sizeof (values[0])) > actEntry);
+      (prop->*(values[actEntry])).assign (pValue, len);
+      actEntry = NONE;
+   }
    return ParseObject::PARSE_OK;
 }

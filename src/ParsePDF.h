@@ -52,9 +52,10 @@ class ParsePDF {
    int foundNumber (const char*, unsigned int);
    int foundStartNumber (const char*, unsigned int);
    int foundObjOffset (const char*, unsigned int);
+   int foundEndObj (const char*, unsigned int);
 
-   typedef OFParseText<ParsePDF>    OMParseText;
    typedef OFParseExact<ParsePDF>   OMParseExact;
+   typedef OFParseTextEsc<ParsePDF> OMParseTextEsc;
    typedef OFParseAttomic<ParsePDF> OMParseAttomic;
 
    ParseExact      startXRef;
@@ -67,23 +68,39 @@ class ParsePDF {
    OMParseAttomic  count;
    OMParseAttomic  offObject;
 
-   OMParseExact tagTitle;
-   OMParseExact tagAuthor;
-   OMParseExact tagComment;
-   OMParseText  value;
+   ParseExact      tagTrailer;
+   ParseExact      startObj;
+   ParseExact      objInfo;
+   OMParseExact    endObj;
+
+   OMParseExact    tagTitle;
+   OMParseExact    tagAuthor;
+   OMParseExact    tagComment;
+   OMParseTextEsc  value;
 
    ParseSelection selXRef;
    ParseSequence  seqXRef;
    ParseSequence  seqXRefTable;
    ParseSequence  seqXRefTableEntries;
+   ParseSequence  seqTrailer;
+   ParseSelection selValues;
+   ParseSequence  seqInfo;
+   ParseSelection seqInfoValue;
+   ParseSelection selType;
 
    ParseObject* _selXRef[4];
    ParseObject* _seqXRef[4];
-   ParseObject* _seqXRefTable[5];
+   ParseObject* _seqXRefTable[6];
    ParseObject* _seqXRefTableEntries[3];
+   ParseObject* _seqTrailer[4];
+   ParseObject* _selValues[4];
+   ParseObject* _seqInfo[5];
+   ParseObject* _seqInfoValue[3];
+   ParseObject* _selType[5];
 
    Properties* prop;
 
+   enum { NONE = -1, TITLE = 0, AUTHOR, COMMENT } actEntry;
    Xistream* file;
    unsigned int startObject;
    vector<unsigned int> aOffsets;
