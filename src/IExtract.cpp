@@ -47,14 +47,15 @@
 class Application : public IVIOApplication {
  public:
    Application (const int argc, const char* argv[])
-      : IVIOApplication (argc, argv, lo), options (0), outputStyle (TEXT) { }
+      : IVIOApplication (argc, argv, lo), options (0), outputStyle (TEXT)
+      , showOptions (0) { }
   ~Application () { }
 
  protected:
    virtual bool handleOption (const char option);
 
    // Program-handling
-   virtual bool shallShowInfo () const { return true; }
+   virtual bool shallShowInfo () const { return false; }
    virtual int         perform (int argc, const char* argv[]);
    virtual const char* name () const { return PACKAGE; }
    virtual const char* description () const
@@ -75,8 +76,8 @@ class Application : public IVIOApplication {
 
    void handleFiles (Writer& writer, const char* pFile) const;
 
-   char* processHTML (Xistream& hFile) const throw (std::string);
-   char* processOffice (Xistream& hFile) const throw (std::string);
+   std::string processHTML (Xistream& hFile) const throw (std::string);
+   std::string processOffice (Xistream& hFile) const throw (std::string);
 
    enum { RECURSIVE = 0x1, VERBOSE = 0x2, SHOW_ALL = 0x4, SHOW_ERRORS = 0x8 };
    unsigned int showOptions;
@@ -84,7 +85,7 @@ class Application : public IVIOApplication {
 
    enum { TEXT = 0, HTML } outputStyle;
 
-   typedef char* (Application::*HANDLER) (Xistream& hFile) const;
+   typedef std::string (Application::*HANDLER) (Xistream& hFile) const;
    typedef struct {
       const char* pExt;
       HANDLER     pFnc; } FILEHANDLERS;
@@ -108,7 +109,7 @@ const Application::FILEHANDLERS Application::handlers[] = {
 
 const IVIOApplication::longOptions Application::lo[] = {
    { "help", 'h' },
-   { "recursive", 's' },
+   { "recursive", 'r' },
    { "show-errors", 'e' },
    { "show-path", 'p' },
    { "all", 'a' },
@@ -125,7 +126,7 @@ void Application::showHelp () const {
    std::cout << "Extracts (depending on the file-type) a description out of files"
                 "\n\nUsage: "
              << PACKAGE " [OPTIONS] <File(s)>\n\n"
-                "  -s, --recursive ...... Recurse into subdirectories\n"
+                "  -r, --recursive ...... Recurse into subdirectories\n"
                 "  -o, --output=STYLE ... Sets the output-style (text or HTML)\n"
                 "  -e, --show-errors .... Puts error messages (additionally) into output\n"
                 "  -p, --show-path ...... Print path for files in output\n"
@@ -255,10 +256,7 @@ void Application::handleFiles (Writer& writer, const char* pFile) const {
                ifile.init ();
 
                try {
-                  char* pDescription = (this->*fnc) ((Xistream&)ifile);
-                  writer.printFile (cout, *file, pDescription);
-                  if (pDescription)
-                     free (pDescription);
+                  writer.printFile (cout, *file, (this->*fnc) ((Xistream&)ifile));
                }
                catch (std::string& err) {
                   std::cerr << PACKAGE "-error: " << err.c_str ();
@@ -282,29 +280,27 @@ void Application::handleFiles (Writer& writer, const char* pFile) const {
 /*--------------------------------------------------------------------------*/
 //Purpose   : Tries to extract to title of a HTML-document
 //Parameters: hFile: File to processs
-//Returns   : char*: Description; NULL in case of error
+//Returns   : std::string: Description
 /*--------------------------------------------------------------------------*/
-char* Application::processHTML (Xistream& hFile) const throw (std::string) {
+std::string Application::processHTML (Xistream& hFile) const throw (std::string) {
    if (options & VERBOSE)
       std::cout << "Processing HTML-file\n";
 
    ParseHTML obj;
-   const char* p = obj.parse (hFile);
-   return p ? strdup (p) : NULL;
+   return obj.parse (hFile);
 }
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Tries to extract to title of a MS-office document
 //Parameters: hFile: File to processs
-//Returns   : char*: Description; NULL in case of error
+//Returns   : std::string: Description
 /*--------------------------------------------------------------------------*/
-char* Application::processOffice (Xistream& hFile) const throw (std::string) {
+std::string Application::processOffice (Xistream& hFile) const throw (std::string) {
    if (options & VERBOSE)
       std::cout << "Processing MS Office document\n";
 
    ParseWord obj;
-   const char* p = obj.parse (hFile);
-   return p ? strdup (p) : NULL;
+   return obj.parse (hFile);
 }
 
 /*--------------------------------------------------------------------------*/
