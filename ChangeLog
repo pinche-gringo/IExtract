@@ -1,6 +1,43 @@
-2004-01-22  Markus Schwab  <g17m0@lycos.com>
+2004-01-31  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.5.12 commented
+
+	* po/de.po, po/en.po, po/es.po:
+	  Added translation of new Parser-objects in ParseHTML and ParsePDF
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es, src/IExtract.cpp, src/ParseHTML.cpp, src/ParseJPG.cpp, src/ParseMP3.cpp, src/ParseOOffice.cpp, src/ParsePDF.cpp, src/ParseRTF.cpp, src/ParseSOffice.cpp, src/ParseWord.cpp, src/Writer.cpp:
+	  Changed copyright; including 2004
+
+	* src/Writer.cpp: Fixed substituting %(LETTERS)
+
+2004-01-29  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseHTML.cpp, src/ParseHTML.h: Fixed parsing other META tags
+
+	* configure.in: Version to 0.5.12
+
+	* README: Note on encrypted PDF files
+
+	* Windows/IExtract-cfg.h: Version to 0.5.12
+
+2004-01-28  Markus Schwab  <g17m0@lycos.com>
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Mentioning that encrypted PDF files are not decrypted
+
+	* src/ParsePDF.h, src/ParsePDF.cpp:
+	  Fixed parsing PDF files having a cross reference table with subsections
+
+	* src/ParseHTML.cpp, src/ParseHTML.h:
+	  Handling more than one script section
+
+	* src/ParseHTML.cpp, src/ParseHTML.h: Skipping over scripts
+
+2004-01-23  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.5.11 commented
+
+2004-01-22  Markus Schwab  <g17m0@lycos.com>
 
 	* INSTALL: Actualized build-process for Windows
 
@@ -214,7 +251,7 @@
 	  Features of 0.3.01 docommented
 
 	* Windows/IExtract-cfg.h, configure.in:
-	  Vesion to 0.3.01
+	  Version to 0.3.01
 
 	* src/Writer.cpp, src/Writer.h:
 	  Removed OutIterator; Changing special characters
@@ -399,7 +436,6 @@
 
 2002-11-07  Markus Schwab  <g17m0@lycos.com>
 
-
 	* ChangeLog, NEWS: Changes of V0.2.01 commented
 
 	* src/Writer.cpp, src/Writer.h:
@@ -473,7 +509,7 @@
 	* src/IExtract.cpp: Adapted to new style to format entries of Writer
 
 	* src/Writer.cpp, src/Writer.h:
-	  Style of format similar to tile with '|' as separator
+	  Style of format similar to title with '|' as separator
 
 	* src/ParseHTML.cpp, src/ParseHTML.h: Ignoring other Meta tags (as http-equiv, ...)
 

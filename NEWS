@@ -1,3 +1,9 @@
+Overview of changes in version 0.5.12:
+
+  - Skipping over scripts in HTML headers
+  - Fixed parsing PDF files having a cross reference table with subsections
+  - Fixed substituting %(LETTERS)
+
 Overview of changes in version 0.5.11:
 
   - Actualized info files (README, INSTALL)
