@@ -32,7 +32,7 @@
 #include "Properties.h"
 
 
-#define TYPE_TITLE    0x019b9c
+#define TYPE_TITLE    0x019c9b
 #define TYPE_COMMENT  0x019c9c
 
 unsigned int ParseJPEG::aSupportedTypes[] = { TYPE_TITLE, TYPE_COMMENT };
@@ -90,6 +90,10 @@ ParseJPEG::ParseJPEG ()
    _seqEntries[1] = &length2;
    _seqEntries[2] = &offset;
    _seqEntries[3] = NULL;
+
+   for (unsigned int i (0);
+        i < (sizeof (aSupportedTypes) / sizeof (aSupportedTypes[0])); ++i)
+      offsets[i] = lengths[i] = 0;
 }
 
 
@@ -101,7 +105,20 @@ ParseJPEG::ParseJPEG ()
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
    assert (prop); assert (pTitle);
-   prop->strComment.assign (pTitle, len - 2);
+   TRACE1 ("ParseJPEG::foundTitle (const char*, unsigned int) - Title: "
+          << string (pTitle, len) << " -> " << len << " chars");
+
+   static string Properties::* values[] = { &Properties::strTitle,
+                                            &Properties::strComment };
+   for (unsigned int i (0);
+        i < (sizeof (aSupportedTypes) / sizeof (aSupportedTypes[0])); ++i)
+      if (lengths[i]) {
+         TRACE8 ("ParseJPEG::foundTitle (const char*, unsigned int) - " << i
+                 << ": Assigning from " << (offsets[i] - cRead) << ' '
+                 << lengths[i] << " chars");
+         (prop->*(values[i])).assign (pTitle + offsets[i] - cRead, lengths[i] - 2);
+      }
+
    jpegImage.setMaxCard (1);
    return ParseObject::PARSE_OK;
 }
@@ -113,10 +130,10 @@ int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundLength (const char* length, unsigned int) {
    assert (length);
-   unsigned int len (((unsigned char)(*length) << 8) + (unsigned char)length[1]);
-   if (len)
-      title.setMaxCard (len);
-   TRACE8 ("ParseJPEG::foundLength (const char*, unsigned int): " << len);
+   lengths[1] = ((unsigned char)(*length) << 8) + (unsigned char)length[1];
+   if (lengths[1])
+      title.setMaxCard (lengths[1]);
+   TRACE8 ("ParseJPEG::foundLength (const char*, unsigned int): " << lengths[1]);
    return ParseObject::PARSE_OK;
 }
 
@@ -127,7 +144,7 @@ int ParseJPEG::foundLength (const char* length, unsigned int) {
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundLength2 (const char* length, unsigned int) {
    assert (length);
-   unsigned int offset (getTypeIndex (actEntry));
+   int offset (getTypeIndex (actEntry));
    if (offset != -1) {
       lengths[offset] = *(unsigned int*)length;
       TRACE9 ("ParseWord::foundLength2 (const char*) - " << lengths[offset]
@@ -146,6 +163,7 @@ int ParseJPEG::foundNumber (const char* nr, unsigned int) {
    seqEntries.setMaxCard (cEntries = (*(unsigned int*)nr));
    length2.setMaxCard (4);
    TRACE8 ("ParseJPEG::foundNumber (const char*, unsigned int): " << cEntries);
+   lengths[1] = 0;
    return ParseObject::PARSE_OK;
 }
 
@@ -158,7 +176,7 @@ int ParseJPEG::foundType (const char* pType, unsigned int) {
    assert (pType);
    actEntry = *(unsigned int*)pType;
    TRACE9 ("ParseWord::foundType (const char*) - " << hex << actEntry << dec);
-   cRead += 10;
+   cRead += 12;
    return ParseObject::PARSE_OK;
 }
 
@@ -171,7 +189,7 @@ int ParseJPEG::foundType (const char* pType, unsigned int) {
 /*--------------------------------------------------------------------------*/
 int ParseJPEG::foundOffset (const char* pOffset, unsigned int len) {
    assert (pOffset);
-   unsigned int offset (getTypeIndex (actEntry));
+   int offset (getTypeIndex (actEntry));
    if (offset != -1) {
       offsets[offset] = *(unsigned int*)pOffset;
       TRACE9 ("ParseWord::foundOffset (const char*) - " << offsets[offset]
@@ -190,11 +208,12 @@ int ParseJPEG::foundPropertiesHeader (const char*, unsigned int) {
 
    ignore.setMinCard (4);
    ignore.setMaxCard (4);
+   cRead += 14;
 
    TRACE8 ("ParseJPEG::foundPropertiesHeader (const char*) - Setting title length to "
-           << title.getMaxCard () - cRead - 32);
+           << title.getMaxCard () - cRead - 8);
    assert (title.getMaxCard () > cRead);
-   title.setMaxCard (title.getMaxCard () - cRead - 32);
+   title.setMaxCard (title.getMaxCard () - cRead - 8);
    return ParseObject::PARSE_OK;
 }
 
