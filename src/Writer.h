@@ -31,15 +31,18 @@ struct Properties;
 // Baseclass of output classes
 class Writer {
  public:
-   Writer (const char* format, unsigned long age = 0, const char* pNew = NULL);
+   Writer (const std::string& format, const std::string& New, unsigned long age = 0);
    virtual ~Writer ();
 
-   virtual void printStart (std::ostream& out, const char* title = NULL) const { };
+   virtual void printStart (std::ostream& out, const std::string& title) const { };
    virtual void printFile (std::ostream& out, const File& file,
                            const Properties& prop) const = 0;
    virtual void printMessage (std::ostream& out, const File& file,
-                              const char* msg) const = 0;
+                              const std::string& msg) const = 0;
    virtual void printEnd (std::ostream& out) const { };
+
+   void printSeparator (std::ostream& out, const File& file,
+                        const std::string& sep, const std::string& title = "") const;
 
  protected:
    bool isNew (const File& file) const {
@@ -47,17 +50,17 @@ class Writer {
 
    unsigned int columns () const;
 
-   unsigned int  options;
-   const char*   pStrNew;
-   const char*   pFormat;
+   unsigned int      options;
+   const std::string strNew;
+   const std::string format;
 
    class OutIterator {
       friend class Writer;
 
     public:
-      OutIterator (const char* format, const File& outfile)
+      OutIterator (const std::string& format, const File& outfile)
          : file (&outfile), p (NULL), columns_ (format) { columns_.getNextNode ('|'); }
-      OutIterator (const char* format, const File& outfile, 
+      OutIterator (const std::string&  format, const File& outfile, 
                    const struct Properties& prop)
          : file (&outfile), p (&prop), columns_ (format) { columns_.getNextNode ('|'); }
       ~OutIterator () { }
@@ -79,7 +82,7 @@ class Writer {
       bool isAtName () const;
 
     private:
-      OutIterator (const char* format) : columns_ (format), p (NULL), file (NULL) {
+      OutIterator (const std::string& format) : columns_ (format), p (NULL), file (NULL) {
          columns_.getNextNode ('|'); }
 
       void getSubstitute (const char ctrl, std::string& substitute) const;
@@ -101,39 +104,39 @@ class Writer {
 // Class to write fileinfo in HTML format
 class HTMLWriter : public Writer {
  public:
-   HTMLWriter (const char* format, unsigned long age = 0, const char* pNew = NULL)
-      : Writer (format, age, pNew) { }
+   HTMLWriter (const std::string& format, const std::string& strNew, unsigned long age = 0)
+      : Writer (format, strNew, age) { }
    virtual ~HTMLWriter ();
 
-   virtual void printStart (std::ostream& out, const char* title = NULL) const;
+   virtual void printStart (std::ostream& out, const std::string& title) const;
    virtual void printFile (std::ostream& out, const File& file,
                            const Properties& prop) const;
    virtual void printMessage (std::ostream& out, const File& file,
-                              const char* msg) const;
+                              const std::string& msg) const;
    virtual void printEnd (std::ostream& out) const;
 
-   static HTMLWriter* create (const char* format, unsigned long age = 0,
-                              const char* pNew = NULL) {
-      return new HTMLWriter (format, age, pNew); }
+   static HTMLWriter* create (const std::string& format, const std::string& strNew,
+                              unsigned long age = 0) {
+      return new HTMLWriter (format, strNew, age); }
 };
 
 
 // Class to write fileinfo in text format
 class TextWriter : public Writer {
  public:
-   TextWriter (const char* format, unsigned long age = 0, const char* pNew = NULL)
-      : Writer (format, age, pNew) { }
+   TextWriter (const std::string& format, const std::string& strNew, unsigned long age = 0)
+      : Writer (format, strNew, age) { }
    virtual ~TextWriter ();
 
-   virtual void printStart (std::ostream& out, const char* title = NULL) const;
+   virtual void printStart (std::ostream& out, const std::string& title) const;
    virtual void printFile (std::ostream& out, const File& file,
                            const Properties& prop) const;
    virtual void printMessage (std::ostream& out, const File& file,
-                              const char* msg) const;
+                              const std::string& msg) const;
 
-   static TextWriter* create (const char* format, unsigned long age = 0,
-                              const char* pNew = NULL) {
-      return new TextWriter (format, age, pNew); }
+   static TextWriter* create (const std::string& format, const std::string& strNew,
+                              unsigned long age = 0) {
+      return new TextWriter (format, strNew, age); }
 };
 
 
@@ -141,20 +144,20 @@ class TextWriter : public Writer {
 // Class to write fileinfo in LaTeX format
 class LaTeXWriter : public Writer {
  public:
-   LaTeXWriter (const char* format, unsigned long age = 0, const char* pNew = NULL)
-      : Writer (format, age, pNew) { }
+   LaTeXWriter (const std::string& format, const std::string& strNew, unsigned long age = 0)
+      : Writer (format, strNew, age) { }
    virtual ~LaTeXWriter ();
 
-   virtual void printStart (std::ostream& out, const char* title = NULL) const;
+   virtual void printStart (std::ostream& out, const std::string& title) const;
    virtual void printFile (std::ostream& out, const File& file,
                            const Properties& prop) const;
    virtual void printMessage (std::ostream& out, const File& file,
-                              const char* msg) const;
+                              const std::string& msg) const;
    virtual void printEnd (std::ostream& out) const;
 
-   static LaTeXWriter* create (const char* format, unsigned long age = 0,
-                              const char* pNew = NULL) {
-      return new LaTeXWriter (format, age, pNew); }
+   static LaTeXWriter* create (const std::string& format, const std::string& strNew,
+                               unsigned long age = 0) {
+      return new LaTeXWriter (format, strNew, age); }
 };
 
 

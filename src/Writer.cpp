@@ -42,13 +42,13 @@
 /*--------------------------------------------------------------------------*/
 //Purpose   : Konstructor
 //Parameters: format: Format how to display entries
+//            New: Text to display for new files
 //            age: Maximal age for new files
-//            pNew: Text to display for new files
 /*--------------------------------------------------------------------------*/
-Writer::Writer (const char* format, unsigned long age, const char* pNew)
-   : pStrNew (pNew), pFormat (format) {
-   Check3 (pNew ? age : 1);
-   Check3 (pFormat);
+Writer::Writer (const std::string& format, const std::string& New,
+                unsigned long age)
+   : strNew (New), format (format) {
+   Check3 (strNew.size () ? age : 1);
 
    limit = time (NULL) - age;
 }
@@ -66,7 +66,7 @@ Writer::~Writer () {
 /*--------------------------------------------------------------------------*/
 unsigned int Writer::columns () const {
    unsigned int cols (0);
-   OutIterator i (pFormat);
+   OutIterator i (format);
    while (i) {
       ++i;
       ++cols;
@@ -74,6 +74,38 @@ unsigned int Writer::columns () const {
    return cols;
 }
 
+/*--------------------------------------------------------------------------*/
+//Purpose   : Prints a separating text between directories
+//Parameters: out: Stream where to put the output
+//            file: File specifying directory
+//            data: Text to print for separation
+//            title: Text to print as header for every new dir
+/*--------------------------------------------------------------------------*/
+void Writer::printSeparator (std::ostream& out, const File& file,
+                             const std::string& data, const std::string& title) const {
+   unsigned int pos (0);
+   unsigned int oldPos (0);
+   while ((pos < data.size ())
+          && ((pos = data.find ('%', oldPos)) != std::string::npos)) {
+      TRACE9 ("printSeparator (ostream&, const File, const string&) - Inspecting "
+             << data[pos + 1]);
+      out << data.substr (oldPos, pos - oldPos );
+
+      switch (data[++pos]) {
+      case 'e': printEnd (out); break;
+
+      case 's': printStart (out, title); break;
+
+      case 'n': out << file.name (); break;
+
+      case 'N': out << file.path () << file.name (); break;
+
+      case 'p': out << file.path (); break;
+      }
+      oldPos = pos + 1;
+   }
+   out << data.substr (oldPos, pos - oldPos);
+}
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : Checks if the iterator is on a name entry (%n or %N)
@@ -98,18 +130,16 @@ bool Writer::OutIterator::isAtName () const {
 //              'a': With the author (of the properties)
 //              'c': With the comment (of the properties)
 //              'd': With the timestamp of the file
-//              'd': With the date of the file
+//              'D': With the date of the file
 //              'n': With the name of the file
 //              'N': With path and name of the file
-//              'p': With the paht of the file
+//              'p': With the path of the file
 //              't': With the title (of the properties)
-//              '%': With a '%'
+//              Other chars: With the character itself
 //Parameters: ctrl: Control character
 //            subst: String with which to replace the character
 /*--------------------------------------------------------------------------*/
 void Writer::OutIterator::getSubstitute (const char ctrl, std::string& subst) const {
-   subst = "";
-
    switch (ctrl) {
    case 'a': if (p) subst = p->strAuthor; break;
 
@@ -133,8 +163,12 @@ void Writer::OutIterator::getSubstitute (const char ctrl, std::string& subst) co
 
    case 't': subst = p->strTitle; break;
 
-   case '%': subst = '%'; break;
+   default:
+      subst = ctrl;
    }
+
+   TRACE9 ("Writer::OutIterator::getSubstitute (const char, std::string&) - Replacing '"
+           << ctrl << "' with " << subst);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -170,6 +204,7 @@ std::string Writer::OutIterator::operator* () const {
       } // end-else '(' found
 
       token.replace (pos, nPos - pos + 1, substitute);
+      ++pos;
    }
    return token;
 }
@@ -187,12 +222,12 @@ HTMLWriter::~HTMLWriter () {
 //Parameters: out: Stream where to put the output
 //            title: Title information
 /*--------------------------------------------------------------------------*/
-void HTMLWriter::printStart (std::ostream& out, const char* title) const {
+void HTMLWriter::printStart (std::ostream& out, const std::string& title) const {
    out << "<table>\n";
 
-   if (title) {
+   if (title.size ()) {
       out << "<thead><tr>";
-      if (pStrNew)
+      if (strNew.size ())
          out << "<td></td>";
 
       Tokenize titles (title);
@@ -213,14 +248,14 @@ void HTMLWriter::printStart (std::ostream& out, const char* title) const {
 void HTMLWriter::printFile (std::ostream& out, const File& file,
                             const Properties& prop) const {
    out << "<tr valign=top>";
-   if (pStrNew) {
+   if (strNew.size ()) {
       out << "<td>";
       if (isNew (file))
-         out << pStrNew;
+         out << strNew;
       out << "</td>";
    }
 
-   OutIterator i (pFormat, file, prop);
+   OutIterator i (format, file, prop);
    while (i) {
       out << "<td>" << *i << "</a></td>";
       ++i;
@@ -235,21 +270,21 @@ void HTMLWriter::printFile (std::ostream& out, const File& file,
 //            msg: Message to print (not NULL)
 /*--------------------------------------------------------------------------*/
 void HTMLWriter::printMessage (std::ostream& out, const File& file,
-                               const char* msg) const {
+                               const std::string& msg) const {
    Check3 (msg);
 
    out << "<tr valign=top>";
-   if (pStrNew) {
+   if (strNew.size ()) {
       out << "<td>";
       if (isNew (file))
-         out << pStrNew;
+         out << strNew;
       out << "</td>";
    }
 
    unsigned int cols (columns ());
-   TRACE9 ("HTMLWriter::printMessage (ostream&, const File&, const char*) - "
+   TRACE9 ("HTMLWriter::printMessage (ostream&, const File&, const std::string&) - "
            << cols << " Columns");
-   OutIterator i (pFormat, file);
+   OutIterator i (format, file);
    while (i) {
       out << "<td>";
       if (i.isAtName ())
@@ -262,7 +297,7 @@ void HTMLWriter::printMessage (std::ostream& out, const File& file,
       ++i;
    }
 
-   TRACE5 ("HTMLWriter::printMessage (ostream&, const File&, const char*) - "
+   TRACE5 ("HTMLWriter::printMessage (ostream&, const File&, const std::string&) - "
            << msg << " for " << cols << " Columns");
    out << "<td colspan=" << cols << '>' << msg << "</td></tr>\n";
 }
@@ -288,8 +323,8 @@ TextWriter::~TextWriter () {
 //Parameters: out: Stream where to put the output
 //            title: Title information
 /*--------------------------------------------------------------------------*/
-void TextWriter::printStart (std::ostream& out, const char* title) const {
-   if (title) {
+void TextWriter::printStart (std::ostream& out, const std::string& title) const {
+   if (title.size ()) {
       Tokenize titles (title);
       std::string node;
       while ((node = titles.getNextNode ('|')).size ())
@@ -306,10 +341,10 @@ void TextWriter::printStart (std::ostream& out, const char* title) const {
 /*--------------------------------------------------------------------------*/
 void TextWriter::printFile (std::ostream& out, const File& file,
                             const Properties& prop) const {
-   if (pStrNew && isNew (file))
-      out << pStrNew << ": ";
+   if (strNew.size () && isNew (file))
+      out << strNew << ": ";
 
-   OutIterator i (pFormat, file, prop);
+   OutIterator i (format, file, prop);
    std::string result;
    while (i) {
       result = *i;
@@ -328,10 +363,10 @@ void TextWriter::printFile (std::ostream& out, const File& file,
 //            msg: Message to print (not NULL)
 /*--------------------------------------------------------------------------*/
 void TextWriter::printMessage (std::ostream& out, const File& file,
-                               const char* msg) const {
+                               const std::string& msg) const {
    Check3 (msg);
-   if (pStrNew && isNew (file))
-      out << pStrNew << ": ";
+   if (strNew.size () && isNew (file))
+      out << strNew << ": ";
    out << file.name () << " - " << msg << '\n';
 }
 
@@ -348,14 +383,14 @@ LaTeXWriter::~LaTeXWriter () {
 //Parameters: out: Stream where to put the output
 //            title: Title information
 /*--------------------------------------------------------------------------*/
-void LaTeXWriter::printStart (std::ostream& out, const char* title) const {
+void LaTeXWriter::printStart (std::ostream& out, const std::string& title) const {
    out << "\\begin{tabular}{";
    for (unsigned int i (0); i < columns (); ++i)
       out << 'l';
    out << "}\n";
 
-   if (title) {
-      if (pStrNew)
+   if (title.size ()) {
+      if (strNew.size ())
          out << "&";
 
       Tokenize titles (title);
@@ -377,13 +412,13 @@ void LaTeXWriter::printStart (std::ostream& out, const char* title) const {
 /*--------------------------------------------------------------------------*/
 void LaTeXWriter::printFile (std::ostream& out, const File& file,
                              const Properties& prop) const {
-   if (pStrNew) {
+   if (strNew.size ()) {
       if (isNew (file))
-         out << pStrNew;
+         out << strNew;
       out << '&';
    }
 
-   OutIterator i (pFormat, file, prop);
+   OutIterator i (format, file, prop);
    while (i) {
       out << *i;
       ++i;
@@ -400,19 +435,19 @@ void LaTeXWriter::printFile (std::ostream& out, const File& file,
 //            msg: Message to print (not NULL)
 /*--------------------------------------------------------------------------*/
 void LaTeXWriter::printMessage (std::ostream& out, const File& file,
-                                const char* msg) const {
+                                const std::string& msg) const {
    Check3 (msg);
 
-   if (pStrNew) {
+   if (strNew.size ()) {
       if (isNew (file))
-         out << pStrNew;
+         out << strNew;
       out << '&';
    }
 
    unsigned int cols (columns ());
-   TRACE9 ("LaTeXWriter::printMessage (ostream&, const File&, const char*) - "
+   TRACE9 ("LaTeXWriter::printMessage (ostream&, const File&, const std::string&) - "
            << cols << " Columns");
-   OutIterator i (pFormat, file);
+   OutIterator i (format, file);
    while (i) {
       if (i.isAtName ())
          out << *i;
@@ -423,7 +458,7 @@ void LaTeXWriter::printMessage (std::ostream& out, const File& file,
       ++i;
    }
 
-   TRACE5 ("LaTeXWriter::printMessage (ostream&, const File&, const char*) - "
+   TRACE5 ("LaTeXWriter::printMessage (ostream&, const File&, const std::string&) - "
            << msg << " for " << cols << " Columns");
    out << "{\\multicolumn{" << cols << "}l{" << msg << "}\\\\\n";
 }
