@@ -36,7 +36,7 @@
 
 
 /* Version number of package */
-#define RELEASE "0.4"
+#define RELEASE "0.5"
 #define VERSION RELEASE ".00"
 
 

@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.52)
 AC_REVISION($Revision$)
-AC_INIT(IExtract, 0.4.02, [g17m0@lycos.com], IExtract)
+AC_INIT(IExtract, 0.5.00, [g17m0@lycos.com], IExtract)
 
 RELEASE=${PACKAGE_VERSION%.*}
 VERSION=AC_PACKAGE_VERSION
