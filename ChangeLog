@@ -1,3 +1,8 @@
+2003-11-17  Markus Schwab  <g17m0@lycos.com>
+
+	* src/IExtract.cpp, src/Options.h, src/ParseHTML.h, src/ParseJPG.cpp, src/ParseJPG.h, src/ParseMP3.cpp, src/ParseMP3.h, src/ParseOOffice.cpp, src/ParseOOffice.h, src/ParsePDF.cpp, src/ParsePDF.h, src/ParseSOffice.cpp, src/ParseSOffice.h, src/ParseWord.cpp, src/ParseWord.h, src/Properties.h, src/Writer.cpp, src/Writer.h:
+	Including Trace.h (instead of Trace_.h)
+
 2003-11-16  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Commented changes in V0.4.01
