@@ -51,7 +51,7 @@
             English&nbsp;version</a></td>
         <td>&nbsp;</td>
         <td rowspan="3">
-          <p>Este programa se distribuye bajo los condicones de la
+          <p>&Eacute;ste programa se distribuye bajo los condiciones de la
             <a href="http://www.gnu.org">GNU</a> Licensia General
             P&uacute;blico; con la esperanza de que sea &uacute;til,
             pero SIN NINGUNA GARANT&Iacute;A, ni siquiera la
