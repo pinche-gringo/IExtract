@@ -1,6 +1,165 @@
+2002-11-04  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog: V0.2.00 documented
+
+	* Windows/IExtract.dsp, Windows/VCExtract.mak:
+	  New classes added
+
+	* src/IExtract.cpp: Using more safe Thread::waitForThread-method
+
+	* configure.in: Type in helpstrings corected
+
+2002-11-03  Markus Schwab  <g17m0@lycos.com>
+
+	* src/Writer.cpp:
+	  TextWriter starts a new line after printing title
+
+	* src/ParseJPG.cpp, src/ParseJPG.h:
+	  Extracting also PhotoShop-style comments
+
+	* src/IExtract.cpp: Fixed trap when INI-file is missing
+
+	* README: Changes in V0.2.00 documented
+
+	* NEWS: V0.2.00 documented
+
+2002-11-01  Markus Schwab  <g17m0@lycos.com>
+
+	* src/IExtract.cpp: Reading of INI files added
+
+2002-10-28  Markus Schwab  <g17m0@lycos.com>
+
+	* src/IExtract.cpp: Adapted to new style to format entries of Writer
+
+	* src/Writer.cpp, src/Writer.h:
+	  Style of format similar to tile with '|' as separator
+
+	* src/ParseHTML.cpp, src/ParseHTML.h: Ignoring other Meta tags (as http-equiv, ...)
+
+	* src/ParseWord.cpp:
+	  - Corrected identifier for title; seems to be 2 and not 1
+	  - Values are assigned with operator= and not assign as some documents have
+	    wrong length-entries
+
+	* src/ParseWord.h: Pragmas to suppress VC-warnings added
+
+	* src/ParseHTML.cpp, src/ParseHTML.h: Parsing of author and description added
+
+2002-10-25  Markus Schwab  <g17m0@lycos.com>
+
+	* src/IExtract.cpp:
+	  Unicode strings are converted to normal strings; Helptext fixed
+
+	* src/Writer.cpp, src/Writer.h: Title and format of output can be specified
+
+	* src/IExtract.cpp: Format and title of output are changeable (via options)
+
+2002-10-24  Markus Schwab  <g17m0@lycos.com>
+
+	* src/Properties.h: Author added
+
+	* src/ParseWord.cpp, src/ParseWord.h: Extracting title, author and comment
+
+	* src/ParseJPG.h: Unused idFormat2 removed
+
+	* src/ParseJPG.cpp:
+	  Accept files without comments; disabled VC-warning about cutting identifiers
+
+	* src/IExtract.cpp: Only known filetypes are passed to thread
+
+	* src/ParseHTML.h, src/ParseHTML.cpp: Fixed sequence of title-tag
+
+2002-10-22  Markus Schwab  <g17m0@lycos.com>
+
+	* configure.in: --enable-{debug|checks|threads} added
+
+	* src/ParseWord.h: Definition of ENABLE_THREADS removed
+
+	* src/ParseJPG.h: Size of format2-sequence reduced to 2
+
+	* src/IExtract.cpp: Waiting for threads before parsing files in subdirs
+
+	* src/ParseJPG.cpp: Fixed handling of extended properties
+
+	* src/Writer.cpp: Fixed printMessage in HTML-writer
+
+	* src/ParseWord.h: Using new Parse*Ignore classes
+
+	* src/ParseWord.cpp: Gracefully handling missing properties
+
+	* src/ParseJPG.cpp, src/ParseJPG.h:
+	  Changed to parse both JPEG-formats (works for format 1 (as before))
+
+2002-10-21  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseHTML.cpp: Including property-header
+
+	* src/ParseHTML.h, src/ParseJPG.h, src/ParseWord.h:
+	  Using multiple buffers when compiled for threads
+
+	* src/IExtract.cpp: Verbose-option removed; Threads started
+
+2002-10-20  Markus Schwab  <g17m0@lycos.com>
+
+	* Windows/IExtract.dsp, Windows/VCExtract.mak: New sources added
+
+	* src/IExtract.cpp: Fixed output of errors only when specified
+
+	* src/Writer.cpp, src/Writer.h: Methods to print file with infotext added
+
+	* src/IExtract.cpp: In/excluding of files added; prepared for threads
+
+2002-10-19  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseJPG.cpp: Assigning property-values; Fixes
+
+	* src/ParseJPG.cpp, src/ParseJPG.h:
+	  Actual parsing of properties (style 2) added
+
+	* src/ParseJPG.cpp, src/ParseJPG.h:
+	  Enhanced to parse simple and extented properties
+
 2002-10-17  Markus Schwab  <g17m0@lycos.com>
 
+	* src/IExtract.cpp:
+	  Fixed option-handling (--new) and help screen
+
+	* src/IExtract.cpp, src/Writer.cpp, src/Writer.h:
+	  Handling of new files added
+
 	* ChangeLog: Actualized for V0.1.00
+
+	* configure.in: New file.
+
+	* README: Minor changes; Handling of JPEGs added
+
+	* Makefile.am: Added project files for VC to distribution
+
+	* Make.bat: New file.
+
+	* NEWS: Features of V0.1.00 explained
+
+	* src/Writer.cpp, src/Writer.h:
+	  Prepared to print more information
+
+	* src/ParseHTML.cpp, src/ParseHTML.h, src/ParseWord.cpp, src/ParseWord.h:
+	  Prepared to parse more information
+
+	* src/Makefile.am: ParseJPG and Properties.h added
+
+	* src/Properties.h: New file.
+
+	* src/IExtract.cpp: Handling JPEG images; Prepared to parse more information
+
+	* src/ParseJPG.cpp, src/ParseJPG.h: New file.
+
+	* src/IExtract.cpp:
+	  Handling of subdirectories corrected (search all with passed filespecification)
+
+	* src/Writer.cpp, src/Writer.h:
+	  const char* for descriptions changed to std::string
+
+2002-10-17  Markus Schwab  <g17m0@lycos.com>
 
 	* configure.in: New file.
 
