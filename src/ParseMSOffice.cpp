@@ -29,30 +29,60 @@
 #include <iomanip>
 #include <iostream>
 
+#define TRACELEVEL 9
+#include <Trace_.h>
+
 #include "ParseWord.h"
 
 static const unsigned LEN_CONTENT     = 1024;
+
+#define ID1 "\xF9"
+static const char* ID = ID1 "\x4F\x68\x10\xAB\x91\x08\x00\x2B\x27\xB3\xD9\x30\x00\x00\x00";
+
+static const unsigned int TYPE_TITLE   = 1;
+static const unsigned int TYPE_COMMENT = 6;
 
 
 /*--------------------------------------------------------------------------*/
 //Purpose   : (Default-)Constructor
 //Parameters: pClassname: Name of class containing parser-data
 /*--------------------------------------------------------------------------*/
-ParseWord::ParseWord() : len (0), pTitle (NULL)
-   , id ("\x02\x00\x00\x00\xe4\x04\x00\x00\x1e\x00\x00\x00", "ID for title", 12, 12, false)
+ParseWord::ParseWord()
+   : len (0), cEntries (0), actEntry (-1U), offTitle (-1U), offComment (-1U), cRead (0)
+   , id (ID, "ID for title", 16, 16, false)
+   , skip ("\\*", "Unused information", 4, 4, false)
+   , nrEntries ("\\*", "Number of entries", *this, &ParseWord::foundNrEntries, 4, 4, false)
+   , type ("\\*", "Type of entry", *this, &ParseWord::foundType, 4, 4, false)
+   , offset ("\\*", "Offset of Comment", *this, &ParseWord::foundOffset, 4, 4, false)
    , length ("\\*", "Length of title", *this, &ParseWord::foundLength, 4, 4, false)
    , title ("\0", "Title of document", *this, &ParseWord::foundTitle, 1, 1, false)
-   , skipIDStart ("\x02", "Other command", 1, 1)
-   , ignore ("\x02", "Content", LEN_CONTENT)
+   , skipIDStart (ID1, "Other command", 1, 1)
+   , ignore (ID1, "Content", LEN_CONTENT)
    , seqTitle (_seqTitle, "Title entry", 1, 1)
+   , seqEntries (_seqEntries, "Entry description", *this,
+                 &ParseWord::foundPropertiesHeader, 1, 1)
+   , seqProperties (_seqProperties, "Properties", 1, 1)
    , wordDoc (_wordDoc, "Word document", -1, 1) {
 
-   _seqTitle[0] = &id;
-   _seqTitle[1] = &length;
-   _seqTitle[2] = &title;
-   _seqTitle[3] = NULL;
+   _seqProperties[0] = &id;
+   _seqProperties[1] = &skip;
+   _seqProperties[2] = &nrEntries;
+   _seqProperties[3] = &seqEntries;
+   _seqProperties[4] = &skip;
+   _seqProperties[5] = &seqTitle;
+   _seqProperties[6] = &skip;
+   _seqProperties[7] = &seqTitle;
+   _seqProperties[8] = NULL;
 
-   _wordDoc[0] = &seqTitle;
+   _seqEntries[0] = &type;
+   _seqEntries[1] = &skip;
+   _seqEntries[2] = NULL;
+
+   _seqTitle[0] = &length;
+   _seqTitle[1] = &title;
+   _seqTitle[2] = NULL;
+
+   _wordDoc[0] = &seqProperties;
    _wordDoc[1] = &skipIDStart;
    _wordDoc[2] = &ignore;
    _wordDoc[3] = NULL;
@@ -60,23 +90,121 @@ ParseWord::ParseWord() : len (0), pTitle (NULL)
 
 
 /*--------------------------------------------------------------------------*/
-//Purpose   : Callback after the length of the title was read
+//Purpose   : Callback after the number of entries has been parsed
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
-int ParseWord::foundLength (const char* length) {
-   if (len = *(int*)length)
-      title.setMaxCard (len);
+int ParseWord::foundNrEntries (const char* pEntries, unsigned int) {
+   assert (pEntries);
+   cEntries = *(unsigned int*)pEntries;
+   TRACE4 ("ParseWord::foundNrEntries (const char*) - Entries: " << cEntries);
+
+   seqEntries.setMinCard (cEntries);
+   seqEntries.setMaxCard (cEntries);
    return ParseObject::PARSE_OK;
 }
 
 /*--------------------------------------------------------------------------*/
-//purpose   : callback after a title was read
+//Purpose   : Callback after the number of entries has been parsed
 //Returns   : int: Status: ParseObject::PARSE_OK
 /*--------------------------------------------------------------------------*/
-int ParseWord::foundTitle (const char* ptitle) {
-   if (len) {
-      pTitle = strdup (ptitle);
+int ParseWord::foundType (const char* pType, unsigned int) {
+   assert (pType);
+   actEntry = *(unsigned int*)pType;
+   TRACE9 ("ParseWord::foundType (const char*) - Type: " << actEntry);
+
+   _seqEntries[1] =
+      (((actEntry == TYPE_TITLE) || (actEntry == TYPE_COMMENT))
+       ? &offset : &skip);
+
+   cRead += 8;
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after the offset of the comment-entry was found
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseWord::foundOffset (const char* offset, unsigned int) {
+   assert (offset);
+   assert ((actEntry == TYPE_TITLE) || (actEntry == TYPE_COMMENT));
+
+   unsigned int off (*(unsigned int*)offset);
+   TRACE9 ("ParseWord::foundType (const char*) - Offset: " << off << " (0x"
+           << hex << off << dec << ')');
+
+   ((actEntry == TYPE_TITLE) ? offTitle : offComment) = off;
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after the length of the title was read
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseWord::foundLength (const char* length, unsigned int) {
+   assert (length);
+   if (len = *(int*)length)
+      title.setMaxCard (len);
+   TRACE8 ("ParseWord::foundLength (const char*, unsigned int): " << len);
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after a title was read
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseWord::foundTitle (const char* pTitle, unsigned int len) {
+   assert (pTitle);
+   assert ((actEntry == TYPE_TITLE) || (actEntry == TYPE_COMMENT));
+   TRACE1 ("ParseWord::foundTitle (const char*, unsigned int): " << pTitle
+           << " (" << len << " bytes)");
+
+   if (actEntry == TYPE_TITLE) {
+      strTitle.assign (pTitle, len);
+      if (offComment != -1U) {
+         actEntry = TYPE_COMMENT;
+         skip.setMinCard (offComment -= (len & 0x3) + len + 9);
+         skip.setMaxCard (offComment);
+         TRACE7 ("ParseWord::foundTitle (const char*) - Skipping " << offComment
+                 << " bytes for comment");
+      }
+   }
+   else {
+      strComment.assign (pTitle, len);
+      offComment = -1U;
+   }
+
+   if (offComment == -1U) {
+      _seqProperties[6] = NULL;
       wordDoc.setMaxCard (1);
    }
+      
+   return ParseObject::PARSE_OK;
+}
+
+/*--------------------------------------------------------------------------*/
+//Purpose   : Callback after the header of the properthies has been read
+//Returns   : int: Status: ParseObject::PARSE_OK
+/*--------------------------------------------------------------------------*/
+int ParseWord::foundPropertiesHeader (const char*, unsigned int) {
+   TRACE1 ("ParseWord::foundPropertiesHeader (const char*) - Bytes read: "
+           << cRead << " (0x" << hex << cRead << dec << ')');
+   if (offComment != -1U)
+      offComment -= offTitle;
+
+   if (offTitle != -1U) {
+      skip.setMinCard (offTitle -= cRead - 4);
+      skip.setMaxCard (offTitle);
+      TRACE7 ("ParseWord::foundPropertiesHeader (const char*) - Skipping "
+              << offTitle << " bytes for title");
+      actEntry = TYPE_TITLE;
+   }
+   else
+      if (offComment != -1U) {
+         skip.setMinCard (offComment);
+         skip.setMaxCard (offComment);
+         TRACE7 ("ParseWord::foundPropertiesHeader (const char*) - Skipping "
+                 << offComment << " bytes for comment");
+         actEntry = TYPE_COMMENT;
+      }
    return ParseObject::PARSE_OK;
 }

@@ -17,6 +17,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+#include <string>
+
 #include <Parse.h>
 
 
@@ -24,34 +26,55 @@
 class ParseWord  {
  public:
    ParseWord ();
-   ~ParseWord () { if (pTitle) free (pTitle); }
+   ~ParseWord () { }
 
-   const char* parse (Xistream& stream) throw (std::string) {
+   std::string parse (Xistream& stream) throw (std::string) {
       wordDoc.parse (stream);
-      return pTitle; }
+      return strComment.empty () ? strTitle : strComment; }
 
  private:
    // Callback-methods for type of parsed elementes
-   int foundLength (const char*);
-   int foundTitle (const char*);
+   int foundNrEntries (const char*, unsigned int);
+   int foundType (const char*, unsigned int);
+   int foundOffset (const char*, unsigned int);
+   int foundLength (const char*, unsigned int);
+   int foundTitle (const char*, unsigned int);
 
-   typedef OFParseText<ParseWord> OMParseText;
-   typedef OFParseAttomic<ParseWord> OMParseAttomic;
+   int foundPropertiesHeader (const char*, unsigned int);
+
+   typedef OFParseText<ParseWord>     OMParseText;
+   typedef OFParseAttomic<ParseWord>  OMParseAttomic;
+   typedef OFParseSequence<ParseWord> OMParseSequence;
 
    ParseExact     id;
+   ParseAttomic   skip;
+   OMParseAttomic nrEntries;
+   OMParseAttomic type;
+   OMParseAttomic offset;
    OMParseAttomic length;
    OMParseText    title;
    ParseAttomic   skipIDStart;
    ParseText      ignore;
 
-   ParseSequence  seqTitle;
-   ParseSelection wordDoc;                                   // Startsequence
+   ParseSequence   seqTitle;
+   OMParseSequence seqEntries;
+   ParseSequence   seqProperties;
+   ParseSelection  wordDoc;                                    // Startsequence
 
    ParseObject* _wordDoc[4];
-   ParseObject* _seqTitle[4];
+   ParseObject* _seqProperties[9];
+   ParseObject* _seqTitle[3];
+   ParseObject* _seqEntries[3];
 
+   unsigned int offTitle;
+   unsigned int offComment;
+
+   unsigned int cRead;
+   unsigned int cEntries;
+   unsigned int actEntry;
    unsigned int len;
-   char*  pTitle;
+   std::string  strTitle;
+   std::string  strComment;
 };
 
 #endif
