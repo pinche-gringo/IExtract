@@ -26,8 +26,6 @@
 
 #include <gzo-cfg.h>
 
-#include <mcheck.h>
-
 #include <ctype.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -664,7 +662,6 @@ void Application::readINIFile (const char* pFile) {
 //Returns   : int: Status
 /*--------------------------------------------------------------------------*/
 int main (int argc, const char* argv[]) {
-   mtrace ();
    Application::initI18n ();
    Application appl (argc, argv);
    return appl.run ();
