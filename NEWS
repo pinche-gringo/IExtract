@@ -1,5 +1,13 @@
-Utility to extract a description for certain file-types
+Overview of changes in version 0.2.00
+  - Option to pass a text for new entries
+  - Options to select files (in/exclude them)
+  - Using threads
+  - configure got options --enable-debug, --enable-check, --enable-threads
+  - Extracting Title, Comment, Author and print with date of last change
+  - Unicode strings are converted to normal strings
+  - Reading format options from INI-file
+  - Reading comment styles as created by PhotoShop (another JPEG format?!)
+
 
 Overview of changes in version 0.1.00
-
   - Handling JPG, HTML & M$ office documents
