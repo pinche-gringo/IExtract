@@ -6,10 +6,9 @@ AC_INIT()
 
 MAJOR_VERSION=0
 MINOR_VERSION=3
-MICRO_VERSION=01
+MICRO_VERSION=02
 RELEASE=$MAJOR_VERSION.$MINOR_VERSION
 VERSION=$RELEASE.$MICRO_VERSION
-AC_DEFINE_UNQUOTED(MICRO_VERSION, "$MICRO_VERSION")
 AC_SUBST(VERSION)
 AC_SUBST(RELEASE)
 
@@ -38,8 +37,8 @@ dnl Checks for programs.
 
 dnl Checks for libraries.
 AC_CHECK_LIB(stdc++, main)
-AC_CHECK_LIB(gmp, main)
-AC_CHECK_LIB(Attr, main)
+PKG_CHECK_MODULES(ATTR, Attr >= 0.6.10, [],
+                  [AC_MSG_ERROR(Need libAttr to make); exit])
 
 dnl Checks for header files.
 
@@ -75,4 +74,22 @@ if test "$enable_threads" == "yes"; then
     CXXFLAGS="$CXXFLAGS -DENABLE_THREADS"; GTKLIBS="-lgthread $GTKLIBS"
 fi
 
-AC_OUTPUT([Makefile src/Makefile doc/Makefile intl/Makefile po/Makefile.in])
+AC_OUTPUT([Makefile src/Makefile doc/Makefile intl/Makefile po/Makefile.in m4/Makefile ])
+
+dnl Settings for autoheader
+AH_TOP([#ifndef IEXTRACT_CFG_H
+#define IEXTRACT_CFG_H])
+AH_BOTTOM([#if defined (HAVE_GETTEXT) && defined (ENABLE_NLS)
+#  include <libintl.h>
+#  define _(String)                           gettext (String)
+#  define N_(String)                          gettext_noop (String)
+#  define gettext_noop(String)                (String)
+#else
+#  define _(String)                           (String)
+#  define N_(String)                          (String)
+#  define ngettext(Str1, Str2, flag)          (((flag) == 1) ? (Str1) : (Str2))
+#  define  binddomain(Domain)
+#  define bindtextdomain(Package, Directory)
+#endif
+
+#endif])
