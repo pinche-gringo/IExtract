@@ -223,7 +223,7 @@ Application::Application (const int argc, const char* argv[])
    aThreads.reserve (1);
 #endif
 
-   handlers[std::string ("doc")] = &Application::processOffice;
+   handlers["doc"] = &Application::processOffice;
    handlers["htm"] = &Application::processHTML;
    handlers["html"] = &Application::processHTML;
    handlers["jpeg"] = &Application::processJPG;
