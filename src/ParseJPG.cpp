@@ -43,48 +43,60 @@ unsigned int ParseJPEG::aSupportedTypes[] = { TYPE_TITLE, TYPE_COMMENT };
 //Parameters: pClassname: Name of class containing parser-data
 /*--------------------------------------------------------------------------*/
 ParseJPEG::ParseJPEG ()
-   : idJPEG ("\xff\xd8\xff\xe0\x00\x10\x4a\x46\x49\x46\x00\x01", "JPEG-ID", 12, 12, false)
-   , idComment2 ("Exif\0\0", "Tag of comment style 2", 6, 6, false)
-   , tagComment1 ("\xff\xfe", "ID of comment style 1", 2, 2, false)
-   , tagComment2 ("\xff\xe1", "ID of comment style 2", 2, 2, false)
+   : idJPEG ("\xff\xd8", "JPEG-ID", false)
+   , idFormat1 ("\xff\xe0", "ID of format 1", 2, 2, false)
+   , idFormat2 ("\xff\xe1", "ID of format 2", 2, 2, false)
+   , idComment1 ("\xff\xfe", "ID of short comments", false)
+   , idComment2 ("\xff\xe1", "ID of long comments", false)
+   , title ("\\*", "Comment", *this, &ParseJPEG::foundTitle, 1, 1, false)
+   , type ("\\*", "Type of entry", *this, &ParseJPEG::foundType, 4, 4, false)
    , number ("\\*", "Number of records", *this, &ParseJPEG::foundNumber, 2, 2, false)
    , length1 ("\\*", "Length", *this, &ParseJPEG::foundLength, 2, 2, false)
    , length2 ("\\*", "Length", *this, &ParseJPEG::foundLength2, 2, 2, false)
-   , type ("\\*", "Type of entry", *this, &ParseJPEG::foundType, 4, 4, false)
-   , title ("\\*", "Comment", *this, &ParseJPEG::foundTitle, 1, 1, false)
-   , offset("\\*", "Offset", *this, &ParseJPEG::foundOffset, 4, 4, false)
-   , ignore ("\\*", "Unused information", 8, 8, false)
-   , selComment (_selComment, "Possible comments", 1, 0, false)
-   , seqComment1 (_seqComment1, "Comment style 1", 1, 1, false)
-   , seqComment2 (_seqComment2, "Comment style 2", 1, 1, false)
+   , offset ("\\*", "Offset", *this, &ParseJPEG::foundOffset, 4, 4, false)
+   , skip ("\\*", "Skipping chars", 16, false, false)
+   , ignore ("\xff", "Ignore til special", 512, true, false)
+   , selFormat (_selFormat, "Possible comments", 1, 1, false)
+   , seqFormat1 (_seqFormat1, "Format style 1", 1, 1, false)
+   , seqFormat2 (_seqFormat2, "Format style 2", 1, 1, false)
+   , selProperties (_selProperties, "Properties", 1, 1, false)
+   , seqPropShort (_seqPropShort, "Short properties", 1, 1, false)
+   , seqPropLong (_seqPropLong, "Long properties", 1, 1, false)
    , seqEntries (_seqEntries, "List of property entries", *this,
                  &ParseJPEG::foundPropertiesHeader, 1, 1, false)
    , jpegImage (_jpegImage, "JPEG image", 1, 1)
    , cRead (0), actEntry (TYPE_TITLE), cEntries (0) {
 
    _jpegImage[0] = &idJPEG;
-   _jpegImage[1] = &ignore;
-   _jpegImage[2] = &selComment;
-   _jpegImage[3] = NULL;
+   _jpegImage[1] = &selFormat;
+   _jpegImage[2] = NULL;
 
-   _selComment[0] = &seqComment1;
-   _selComment[1] = &seqComment2;
-   _selComment[2] = NULL;
+   _selFormat[0] = &seqFormat1;
+   _selFormat[1] = &seqFormat2;
+   _selFormat[2] = NULL;
 
-   _seqComment1[0] = &tagComment1;
-   _seqComment1[1] = &length1;
-   _seqComment1[2] = &title;
-   _seqComment1[3] = NULL;
+   _seqFormat1[0] = &idFormat1;
+   _seqFormat1[1] = &skip;
+   _seqFormat1[2] = &selProperties;
+   _seqFormat1[3] = NULL;
 
-   _seqComment2[0] = &tagComment2;
-   _seqComment2[1] = &length1;
-   _seqComment2[2] = &idComment2;
-   _seqComment2[3] = &ignore;
-   _seqComment2[4] = &number;
-   _seqComment2[5] = &seqEntries;
-   _seqComment2[6] = &ignore;
-   _seqComment2[7] = &title;
-   _seqComment2[8] = NULL;
+   _selProperties[0] = &seqPropShort;
+   _selProperties[1] = &seqPropLong;
+   _selProperties[2] = NULL;
+
+   _seqPropShort[0] = &idComment1;
+   _seqPropShort[1] = &length1;
+   _seqPropShort[2] = &title;
+   _seqPropShort[3] = NULL;
+
+   _seqPropLong[0] = &idComment2;
+   _seqPropLong[1] = &length1;
+   _seqPropLong[2] = &skip;
+   _seqPropLong[3] = &number;
+   _seqPropLong[4] = &seqEntries;
+   _seqPropLong[5] = &skip;
+   _seqPropLong[6] = &title;
+   _seqPropLong[7] = NULL;
 
    _seqEntries[0] = &type;
    _seqEntries[1] = &length2;
@@ -133,6 +145,9 @@ int ParseJPEG::foundLength (const char* length, unsigned int) {
    lengths[1] = ((unsigned char)(*length) << 8) + (unsigned char)length[1];
    if (lengths[1])
       title.setMaxCard (lengths[1]);
+   
+   skip.setMinCard (14);
+   skip.setMaxCard (14);
    TRACE8 ("ParseJPEG::foundLength (const char*, unsigned int): " << lengths[1]);
    return ParseObject::PARSE_OK;
 }
@@ -206,8 +221,8 @@ int ParseJPEG::foundPropertiesHeader (const char*, unsigned int) {
    TRACE1 ("ParseJPEG::foundPropertiesHeader (const char*) - Bytes read: "
            << cRead << " (0x" << hex << cRead << dec << ')');
 
-   ignore.setMinCard (4);
-   ignore.setMaxCard (4);
+   skip.setMinCard (4);
+   skip.setMaxCard (4);
    cRead += 14;
 
    TRACE8 ("ParseJPEG::foundPropertiesHeader (const char*) - Setting title length to "

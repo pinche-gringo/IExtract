@@ -18,6 +18,8 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
+//#define ENABLE_THREADS
+#undef ENABLE_THREADS
 #ifdef ENABLE_THREADS
 #  define MULTIBUFFER
 #endif
@@ -52,29 +54,38 @@ class ParseJPEG  {
    typedef OFParseAttomic<ParseJPEG>  OMParseAttomic;
    typedef OFParseSequence<ParseJPEG> OMParseSequence;
 
-   ParseExact     idJPEG;
-   ParseExact     idComment2;
-   ParseExact     tagComment1;
-   ParseExact     tagComment2;
-   OMParseAttomic title;
-   OMParseAttomic type;
-   OMParseAttomic number;
-   OMParseAttomic length1;
-   OMParseAttomic length2;
-   OMParseAttomic offset;
-   ParseAttomic   ignore;
+   ParseExact      idJPEG;
+   ParseExact      idFormat1;
+   ParseExact      idFormat2;
+   ParseExact      idComment1;
+   ParseExact      idComment2;
+   OMParseAttomic  title;
+   OMParseAttomic  type;
+   OMParseAttomic  number;
+   OMParseAttomic  length1;
+   OMParseAttomic  length2;
+   OMParseAttomic  offset;
+   ParseIgnore     skip;
+   ParseTextIgnore ignore;
 
-   ParseSelection  selComment;
-   ParseSequence   seqComment1;
-   ParseSequence   seqComment2;
+   ParseSelection  selFormat;
+   ParseSequence   seqFormat1;
+   ParseSequence   seqFormat2;
+   ParseSelection  selProperties;
+   ParseSequence   seqPropShort;
+   ParseSequence   seqPropLong;
+
    OMParseSequence seqEntries;
    ParseSequence   jpegImage;                                 // Startsequence
 
-   ParseObject*   _selComment[3];
+   ParseObject*   _jpegImage[3];
+   ParseObject*   _selFormat[3];
+   ParseObject*   _seqFormat1[4];
+   ParseObject*   _seqFormat2[4];
+   ParseObject*   _selProperties[3];
+   ParseObject*   _seqPropShort[4];
+   ParseObject*   _seqPropLong[8];
    ParseObject*   _seqEntries[4];
-   ParseObject*   _seqComment1[4];
-   ParseObject*   _seqComment2[9];
-   ParseObject*   _jpegImage[4];
 
    static int getTypeIndex (unsigned int type);
 
