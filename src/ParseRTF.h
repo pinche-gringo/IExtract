@@ -74,7 +74,7 @@ class ParseRTF  {
    YGP::ParseObject* _seqValue[3];
    YGP::ParseObject* _selEntry[5];
    YGP::ParseObject* _selCmd[4];
-   YGP::ParseObject* _block[4];
+   YGP::ParseObject* _block[5];
 
    Properties*  prop;
    enum { NONE = -1, TITLE = 0, AUTHOR, COMMENT } actEntry;

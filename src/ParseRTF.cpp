@@ -100,7 +100,8 @@ ParseRTF::ParseRTF ()
    _block[0] = &startBlock;
    _block[1] = &selCmd;
    _block[2] = &endBlock;
-   _block[3] = NULL;
+   _block[3] = &seqValue;
+   _block[4] = NULL;
 }
 
 
