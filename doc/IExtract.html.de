@@ -2,7 +2,7 @@
 <!-- $Id$ -->
 
 <!--
-  Anti-Copyright (A) 2003 Markus Schwab (g17m0@lycos.com)
+  Copyright (C) 2003, 2004 Markus Schwab (g17m0@lycos.com)
 
   This is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
@@ -28,7 +28,7 @@
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Anticopyright (A) 2003, vertrieben unter den Bedingungen der GNU General Public License">
+    <meta name="DC.Rights" content="Copyright (C) 2003, 2004; vertrieben unter den Bedingungen der GNU General Public License">
 
     <style type="text/css">
       <!--
