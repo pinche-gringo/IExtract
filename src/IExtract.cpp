@@ -74,6 +74,7 @@
 #include "Writer.h"
 #include "Options.h"
 #include "ParseMP3.h"
+#include "ParseOGG.h"
 #include "ParsePDF.h"
 #include "ParseJPG.h"
 #include "ParseRTF.h"
@@ -145,6 +146,7 @@ class Application : public YGP::IVIOApplication {
 #endif
 
    void processMP3 (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processOGG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processPDF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processJPG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processHTML (YGP::Xistream& hFile, Properties& result) const throw (std::string);
@@ -246,6 +248,7 @@ Application::Application (const int argc, const char* argv[])
    handlers.insert (handlers.end (), handlerValue ("jpeg", &Application::processJPG));
    handlers.insert (handlers.end (), handlerValue ("jpg", &Application::processJPG));
    handlers.insert (handlers.end (), handlerValue ("mp3", &Application::processMP3));
+   handlers.insert (handlers.end (), handlerValue ("ogg", &Application::processOGG));
    handlers.insert (handlers.end (), handlerValue ("pdf", &Application::processPDF));
    handlers.insert (handlers.end (), handlerValue ("php", &Application::processHTML));
    handlers.insert (handlers.end (), handlerValue ("ppt", &Application::processOffice));
@@ -351,6 +354,7 @@ void Application::showHelp () const {
       << "\n  - HTML (*.html, *.htm, *.shtml, *.shtm, *.sht, *.php)\n"
       "  - JPEG (*.jpeg, *.jpg)\n"
       "  - MP3 (*.mp3)\n"
+      "  - OGG (*.ogg)\n"
       "  - PDF (*.pdf)\n"
       "  - OpenOffice (Write (*.sxw), Calc (*.sxc), Impress (*.sxi), Math (*.sxm)"
           " &\n    Draw (*.sxd))\n"
@@ -827,6 +831,16 @@ void Application::processPDF (YGP::Xistream& hFile, Properties& result) const
 void Application::processMP3 (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseMP3::parse (hFile, result);
+}
+
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties out of a OGG file
+/// \param hFile: File to processs
+/// \param result: Result of parsing
+//-----------------------------------------------------------------------------
+void Application::processOGG (YGP::Xistream& hFile, Properties& result) const
+   throw (std::string) {
+   ParseOGG::parse (hFile, result);
 }
 
 //-----------------------------------------------------------------------------
