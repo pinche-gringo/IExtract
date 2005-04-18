@@ -158,7 +158,7 @@ class Application : public YGP::IVIOApplication {
    void processStarOffice (YGP::Xistream& hFile, Properties& result) const
       throw (std::string);
 
-   enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4, TRUNC_EXTENSION };
+   enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4, TRUNC_EXTENSION = 0x8, TERMINATE = 0x10 };
 
    unsigned int options;
 
@@ -181,7 +181,7 @@ class Application : public YGP::IVIOApplication {
    typedef struct FileFunction : public YGP::File {
       HANDLER fnc;
       FileFunction () : YGP::File (), fnc (NULL) { }
-      FileFunction (const YGP::File& file) : YGP::File (file) { }
+      FileFunction (const YGP::File& file) : YGP::File (file), fnc (NULL) { }
       FileFunction (const struct FileFunction& ffnc) : YGP::File (ffnc)
          , fnc (ffnc.fnc) { }
 
@@ -603,6 +603,22 @@ int Application::perform (int argc, const char* argv[]) {
       handleFiles (file.c_str ());
    }
 
+#ifdef ENABLE_THREADS
+   ((Application*)this)->options |= TERMINATE;
+
+   // Wait for threads to terminate
+   LOCKTHREADS
+   while (aThreads.size ()) {
+      TRACE9 ("Application::handleFiles (const char*) - Wait for thread "
+              << aThreads[0]->getID ());
+      unsigned long id (aThreads[0]->getID ());
+      UNLOCKTHREADS
+      YGP::Thread::waitForThread (id);
+      LOCKTHREADS
+   }
+   UNLOCKTHREADS
+#endif
+
    writer->printEnd (std::cout);
 
    if (append.size ())
@@ -684,19 +700,14 @@ void Application::handleFiles (const char* pFile) const {
    } // end-while
 
 #ifdef ENABLE_THREADS
-   // Wait for threads to terminte
-   while (true) {
-      LOCKTHREADS
-      if (aThreads.empty ()) {
-         UNLOCKTHREADS
-         break;
-      }
-      TRACE9 ("Application::handleFiles (const char*) - Wait for thread "
-              << aThreads[0]->getID ());
-      unsigned long id (aThreads[0]->getID ());
-      UNLOCKTHREADS
-      YGP::Thread::waitForThread (id);
+   // Wait for threads to handle all pending files
+   LOCKFILES
+   while (listFiles.size ()) {
+      UNLOCKFILES
+      sleep (0);
+      LOCKFILES
    }
+   UNLOCKFILES
 #endif
 
    // Now handle subdirectories (if specified)
@@ -739,12 +750,15 @@ void* Application::processThread (void* pThread) {
          TRACE1 ("Application::processThread (void*) - File " << file.name ()
                   << "; Remaining: " << listFiles.size ());
          Check3 (file.fnc);
-         Check3 (file.fnc == getFileTypeHandler (strrchr (file.name (), '.')));
+         Check3 (file.fnc == getFileTypeHandler (strrchr (file.name (), '.') + 1));
          processFile (file, file.fnc);
       }
       else {
          UNLOCKFILES
-         break;
+	 if (options & TERMINATE)
+	    break;
+	 else
+	    sleep (1);
       }
    } // end-while
 
