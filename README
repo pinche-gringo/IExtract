@@ -7,7 +7,7 @@ Copyright (C) 2002 - 2005 Markus Schwab <g17m0@lycos.com>
 -----------------------------------------------------------------------
 
 
-At the moment only the following documents are supported (identified by the
+At the moment the following documents are supported (identified by the
 extension - so don't cheat ;) ):
 
   - JPEG: Extracts the properties according two styles; either one simple
@@ -26,11 +26,17 @@ extension - so don't cheat ;) ):
   - MS office documents (*.doc, *.xls, *.ppt); the comment of the properties
 	  dialog is extracted.
   - MP3 files: Extracts the contents of the ID3 tag.
+  - OGG vorbis files: Extracts the contents of the comment header
   - RTF documents: Extracts the contents of the \info section
 
 The found results can be written either in text, HTML (table), XML (defaults to
 XHTML) or LaTeX (tabular) format. Note that some extra formatting of the text
 is done (like checking for LaTeX or HTML special characters).
+
+The extraction of the description can be performed with threads. Note that this
+can actually cause the program to be slower, if the thread searching for files
+doesn't find enough files to be processed. And it does definitely *not* speed
+things up on single-processor systems!
 
 
 Installation
