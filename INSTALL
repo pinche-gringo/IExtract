@@ -18,6 +18,9 @@ make [options - see below]
   --help=short                  # Reduces the output of configure --help
   --prefix=<path>               # default: /usr/local
   --disable-nls                 # Disable national language support
+  --enable-threads              # Enable thread support - Note that this
+                                # can actually even slow down the search.
+				# Use only on multi-processor systems
 
 If you're using `csh' on an old version of System V, you might need to type
 `sh ./configure' instead to prevent `csh' from trying to execute `configure'
