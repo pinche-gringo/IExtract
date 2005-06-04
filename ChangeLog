@@ -1,3 +1,38 @@
+2005-06-04  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.6.10 commented
+
+	* README: Mentioning Abiword documents
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Added handling of Abiword documents
+
+	* po/de.po, po/en.po, po/es.po: Added Abiword messages
+
+	* po/POTFILES.in: Added ParseAbiWord
+
+	* configure.in: Version to 0.6.10
+
+	* src/IExtract.cpp: Handling Abiword documents
+
+	* src/ParseOOffice.cpp, src/ParseOOffice.h: Formatting changed
+
+	* src/Makefile.am: Added ParseAbiword
+
+	* src/ParseAbiword.cpp, src/ParseAbiword.h: New file.
+
+2005-04-18  Markus Schwab  <g17m0@lycos.com>
+
+	* src/IExtract.cpp:
+	  Remove threads before program exits, not if nothing is to extract
+
+	* configure.in: Version to 0.6.01
+
+	* INSTALL: Added configure-option --enable-threads
+
+	* README:
+	  Mentioning compiling with threads; Added extracting of OGG-files
+
 2005-03-21  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.6.00 commented

@@ -1,3 +1,10 @@
+Overview of changes in version 0.6.10:
+
+  - Handling OpenOffice2 and Abiword documents
+  - Only remove threads at end of search; not if there's no more data
+  - Updated README
+
+
 Overview of changes in version 0.6.00:
 
   - Handling OGG audio files
@@ -6,10 +13,12 @@ Overview of changes in version 0.6.00:
   - HTML-titles can be empty
   - Needing libYGP 0.7.10
 
+
 Overview of changes in version 0.5.21:
 
   - Moved general Writer-methods to libYGP
   - Needing libYGP 0.7.00
+
 
 Overview of changes in version 0.5.20:
 
@@ -17,11 +26,13 @@ Overview of changes in version 0.5.20:
   - Option -a (--all) renamed to -u (--add-unknown)
   - Minor fixes in the help files
 
+
 Overview of changes in version 0.5.12:
 
   - Skipping over scripts in HTML headers
   - Fixed parsing PDF files having a cross reference table with subsections
   - Fixed substituting %(LETTERS)
+
 
 Overview of changes in version 0.5.11:
 
@@ -29,15 +40,18 @@ Overview of changes in version 0.5.11:
   - Linking with static libYGP (Windows version)
   - Changes for MSVC
 
+
 Overview of changes in version 0.5.10:
 
   - Fixed in/exluding of files (how could I miss that?)
   - Added option to include only the name (without extension) of file to output
   - Conversion of special characters can be switched on or off in output
 
+
 Overview of changes in version 0.5.00:
 
  - Handling RTF documents
+
 
 Overview of changes in version 0.4.02:
 
@@ -45,10 +59,12 @@ Overview of changes in version 0.4.02:
   - Fixed a bug in the HTML parser (data declaration was wrong)
   - Changed comment style to doxygen format
 
+
 Overview of changes in version 0.4.01:
 
   - Linking with available libintl
   - Adapted to new libYGP style (with namespaces)
+
 
 Overview of changes in version 0.4.00:
 
@@ -56,15 +72,18 @@ Overview of changes in version 0.4.00:
   - Using libYGP
   - Re-formatted the files in UNIX-style (only LF to separate lines)
 
+
 Overview of changes in version 0.3.02:
 
   - Using automake 1.7 (so acconfig.h is now included in configure.in)
+
 
 Overview of changes in version 0.3.01:
 
   - Change special characters for LaTeX, HTML and XML documents.
   - Removed warnings when compiling with -Wall
   - Added possibility to print XML output
+
 
 Overview of changes in version 0.3.00:
 
@@ -77,6 +96,7 @@ Overview of changes in version 0.3.00:
   - Options to in/exclude directories in search
   - Option to read options from a file changed to 'f' and format to 'F'
 
+
 Overview of changes in version 0.2.03:
 
   - Added option to print text for every new subdirectory
@@ -86,6 +106,7 @@ Overview of changes in version 0.2.03:
   - Output of paths can be in UNIX-style (mainly important for web pages)
   - Fixed handling of TextForNewFiles read from INI-file
 
+
 Overview of changes in version 0.2.02:
 
   - Added support for PDF files
@@ -93,6 +114,7 @@ Overview of changes in version 0.2.02:
   - Asserts replaced with Checks, so internal errors (might) show as MsgBox
   - Handling also MS Office docs having OLE (?) objects between property header
     and the actual properties (whyever they are doing that?!)
+
 
 Overview of changes in version 0.2.01:
 
@@ -103,6 +125,7 @@ Overview of changes in version 0.2.01:
   - New ouput placeholders %D and %(...) added
   - Also read text for new files from INI file
   - Help text improved
+
 
 Overview of changes in version 0.2.00:
 
