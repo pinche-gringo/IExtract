@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 17.06.2003
-//COPYRIGHT   : Copyright (C) 2003, 2004
+//COPYRIGHT   : Copyright (C) 2003 - 2005
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ ParseOpenOffice::ParseOpenOffice ()
       , skipUnused (ID_METASTART, _("Unused contents"), 1024, 1, true, true)
       , skipLine ("\n\r", _("Skip to end of line"), 1024, 1, true, true)
       , tag ('<', _("Tag"), *this, &ParseOpenOffice::foundTag, 1024)
-             , value ("<", _("Value"), *this, &ParseOpenOffice::foundValue, 1024, 0)
+      , value ("<", _("Value"), *this, &ParseOpenOffice::foundValue, 1024, 0)
       , seqMetadata (_seqMetadata, _("Metadata"), 1, 1, true)
       , seqEntry (_seqEntry, _("Entries"), -1U, 1, true  )
       , selDocument (_selDocument, _("OpenOffice document"), -1U, 1, true)

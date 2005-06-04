@@ -35,7 +35,7 @@ class ParseOpenOffice {
       prop = &result;
       selDocument.parse (stream);
    }
-      
+
  private:
    // Prohibted manager functions
    ParseOpenOffice (const ParseOpenOffice& other);
