@@ -28,6 +28,7 @@ extension - so don't cheat ;) ):
   - MP3 files: Extracts the contents of the ID3 tag.
   - OGG vorbis files: Extracts the contents of the comment header
   - RTF documents: Extracts the contents of the \info section
+  - Abiword documents (*.abw): Extracts the contents of the property dialog
 
 The found results can be written either in text, HTML (table), XML (defaults to
 XHTML) or LaTeX (tabular) format. Note that some extra formatting of the text
