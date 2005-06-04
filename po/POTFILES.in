@@ -13,3 +13,4 @@ src/ParseWord.cpp
 src/ParseJPG.cpp
 src/ParseRTF.cpp
 src/ParseOGG.cpp
+src/ParseAbiword.cpp
