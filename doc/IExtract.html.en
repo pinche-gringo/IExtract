@@ -112,13 +112,15 @@
           extracted (with the "Subject"-key as comment).</p>
 
         <p>Encrypted documents are not decrypted!</p></dd>
-      </dd>
 
       <dt><b>StarOffice documents</b></dt>
       <dd><p>Searches for the content of the properties dialog.</p></dd>
 
       <dt><b>OpenOffice documents</b></dt>
       <dd><p>Searches for the content of the properties dialog.</p></dd>
+
+      <dt><b>Abiword documents</b></dt>
+      <dd><p>Searches for theOpenOffice content of the properties dialog.</p></dd>
 
       <dt><b>RTF documents</b></dt>
       <dd><p>Searches for the content of the "info" block.</p></dd>

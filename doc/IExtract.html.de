@@ -113,13 +113,16 @@
           Verzeichnisses wird ausgelesen (mit dem "Subject"-Schl&uuml;ssel als
           Kommentar).</p>
 
-        <p>Verschl&uuml;esselte Dokumente werden nicht entschl&uuml;sselt!</p></dd>
+        <p>Verschl&uuml;sselte Dokumente werden nicht entschl&uuml;sselt!</p></dd>
       </dd>
 
       <dt><b>StarOffice Dokumente</b></dt>
       <dd><p>Liest die Eintr&auml;ge des "Eigenschaften"-Dialogs.</p></dd>
 
       <dt><b>OpenOffice Dokumente</b></dt>
+      <dd><p>Liest die Eintr&auml;ge des "Eigenschaften"-Dialogs.</p></dd>
+
+      <dt><b>Abiword Dokumente</b></dt>
       <dd><p>Liest die Eintr&auml;ge des "Eigenschaften"-Dialogs.</p></dd>
 
       <dt><b>RTF Dokumente</b></dt>

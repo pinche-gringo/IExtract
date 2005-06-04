@@ -28,7 +28,7 @@
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Copyright (C) 2003, 2004; distributado bajo los condiciones de la GNU Licensia Público">
+    <meta name="DC.Rights" content="Copyright (C) 2003, 2004; distributado bajo las condiciones de la GNU Licensia Público">
 
     <style type="text/css">
       <!--
@@ -51,7 +51,7 @@
             English&nbsp;version</a></td>
         <td>&nbsp;</td>
         <td rowspan="3">
-          <p>&Eacute;ste programa se distribuye bajo los condiciones de la
+          <p>&Eacute;ste programa se distribuye bajo las condiciones de la
             <a href="http://www.gnu.org">GNU</a> Licensia General
             P&uacute;blico; con la esperanza de que sea &uacute;til,
             pero SIN NINGUNA GARANT&Iacute;A, ni siquiera la
@@ -115,13 +115,16 @@
           llaves. El contenido de aquel directorio est&aacute; extraido (con el
           contenido de la llave "Subject" (sujecto) como comentario).</p>
 
-        <p>&iexcl;Datos codificados no est&aacute;n decifrados!</p></dd>
+        <p>&iexcl;Datos codificados no est&aacute;n decifrados!</p>
       </dd>
 
       <dt><b>Documentos de StarOffice</b></dt>
       <dd><p>Busca para el contenido de la ventana "propiedades".</p>
 
       <dt><b>Documentos de OpenOffice</b></dt>
+      <dd><p>Busca para el contenido de la ventana "propiedades".</p>
+
+      <dt><b>Documentos de Abiword</b></dt>
       <dd><p>Busca para el contenido de la ventana "propiedades".</p>
 
       <dt><b>Documentos en formato RTF (Rich Text Format)</b></dt>
@@ -169,7 +172,7 @@
     </dl>
 
     <h3>Opciones</h3>
-    <p>Las opciones siguentes est&acute;n reconocido del programa (opciones cortes
+    <p>Las opciones siguentes est&aacute;n reconocido del programa (opciones cortes
       se puede combinar juntos, si la opci&oacute;n larga necesita un argumento,
       tambi&eacute;n lo necesito su correspondencia larga. Opciones larges pueden
       estar acortado hasta est&aacute;n unique):</p>
@@ -363,7 +366,7 @@
    Style=ESTILO
    SortFiles=1</pre>
 
-    <p>Pasan los mismos cambios como con las opciones!</p>
+    <p>&iexcl;Pasan los mismos cambios como con las opciones!</p>
 
     <hr>
     <address><a href="mailto:g17m0@lycos.com">Envia comentarios</a></address>
