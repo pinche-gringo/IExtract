@@ -73,6 +73,8 @@
 
 #include "Writer.h"
 #include "Options.h"
+#include "Properties.h"
+
 #include "ParseMP3.h"
 #include "ParseOGG.h"
 #include "ParsePDF.h"
@@ -80,9 +82,9 @@
 #include "ParseRTF.h"
 #include "ParseHTML.h"
 #include "ParseWord.h"
+#include "ParseAbiword.h"
 #include "ParseOOffice.h"
 #include "ParseSOffice.h"
-#include "Properties.h"
 
 #if SYSTEM == UNIX
 #  include <unistd.h>
@@ -156,6 +158,8 @@ class Application : public YGP::IVIOApplication {
    void processOpenOffice (YGP::Xistream& hFile, Properties& result) const
       throw (std::string);
    void processStarOffice (YGP::Xistream& hFile, Properties& result) const
+      throw (std::string);
+   void processAbiword (YGP::Xistream& hFile, Properties& result) const
       throw (std::string);
 
    enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4, TRUNC_EXTENSION = 0x8, TERMINATE = 0x10 };
@@ -242,12 +246,17 @@ Application::Application (const int argc, const char* argv[])
    aThreads.reserve (1);
 #endif
 
+   handlers.insert (handlers.end (), handlerValue ("abw", &Application::processAbiword));
    handlers.insert (handlers.end (), handlerValue ("doc", &Application::processOffice));
    handlers.insert (handlers.end (), handlerValue ("htm", &Application::processHTML));
    handlers.insert (handlers.end (), handlerValue ("html", &Application::processHTML));
    handlers.insert (handlers.end (), handlerValue ("jpeg", &Application::processJPG));
    handlers.insert (handlers.end (), handlerValue ("jpg", &Application::processJPG));
    handlers.insert (handlers.end (), handlerValue ("mp3", &Application::processMP3));
+   handlers.insert (handlers.end (), handlerValue ("odg", &Application::processOpenOffice));
+   handlers.insert (handlers.end (), handlerValue ("odp", &Application::processOpenOffice));
+   handlers.insert (handlers.end (), handlerValue ("ods", &Application::processOpenOffice));
+   handlers.insert (handlers.end (), handlerValue ("odt", &Application::processOpenOffice));
    handlers.insert (handlers.end (), handlerValue ("ogg", &Application::processOGG));
    handlers.insert (handlers.end (), handlerValue ("pdf", &Application::processPDF));
    handlers.insert (handlers.end (), handlerValue ("php", &Application::processHTML));
@@ -358,7 +367,9 @@ void Application::showHelp () const {
       "  - PDF (*.pdf)\n"
       "  - OpenOffice (Write (*.sxw), Calc (*.sxc), Impress (*.sxi), Math (*.sxm)"
           " &\n    Draw (*.sxd))\n"
+      "  - OpenOffice 2 (Write (*.odt), Calc (*.ods), Impress (*.odp) & Draw (*.odg))\n"
       "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
+      "  - Abiword (*.abw)\n"
       "  - RTF (*.rtf)\n"
       "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n";
 }
@@ -823,8 +834,7 @@ void Application::processFile (const YGP::File& file, HANDLER fnc) const {
 //-----------------------------------------------------------------------------
 void Application::processHTML (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
-   ParseHTML obj;
-   obj.parse (hFile, result);
+   ParseHTML ().parse (hFile, result);
 }
 
 //-----------------------------------------------------------------------------
@@ -864,19 +874,27 @@ void Application::processOGG (YGP::Xistream& hFile, Properties& result) const
 //-----------------------------------------------------------------------------
 void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
-   ParseStarOffice obj;
-   obj.parse (hFile, result);
+   ParseStarOffice ().parse (hFile, result);
 }
 
 //-----------------------------------------------------------------------------
-/// Tries to extract the properties of a OpenOffice document
+/// Tries to extract the properties of an OpenOffice document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
 //-----------------------------------------------------------------------------
 void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
-   ParseOpenOffice obj;
-   obj.parse (hFile, result);
+   ParseOpenOffice ().parse (hFile, result);
+}
+
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of an Abiword document
+/// \param hFile: File to processs
+/// \param result: Result of parsing
+//-----------------------------------------------------------------------------
+void Application::processAbiword (YGP::Xistream& hFile, Properties& result) const
+   throw (std::string) {
+   ParseAbiword ().parse (hFile, result);
 }
 
 //-----------------------------------------------------------------------------
@@ -887,8 +905,7 @@ void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) c
 void Application::processRTF (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    TRACE9 ("Parsing RTF");
-   ParseRTF obj;
-   obj.parse (hFile, result);
+   ParseRTF ().parse (hFile, result);
 }
 
 //-----------------------------------------------------------------------------
@@ -898,8 +915,7 @@ void Application::processRTF (YGP::Xistream& hFile, Properties& result) const
 //-----------------------------------------------------------------------------
 void Application::processOffice (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
-   ParseWord obj;
-   obj.parse (hFile, result);
+   ParseWord ().parse (hFile, result);
 }
 
 //-----------------------------------------------------------------------------
@@ -909,8 +925,7 @@ void Application::processOffice (YGP::Xistream& hFile, Properties& result) const
 //-----------------------------------------------------------------------------
 void Application::processJPG (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
-   ParseJPEG obj;
-   obj.parse (hFile, result);
+   ParseJPEG ().parse (hFile, result);
 }
 
 //-----------------------------------------------------------------------------
