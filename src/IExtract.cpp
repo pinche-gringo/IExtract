@@ -79,6 +79,7 @@
 #include "ParseOGG.h"
 #include "ParsePDF.h"
 #include "ParseJPG.h"
+#include "ParsePNG.h"
 #include "ParseRTF.h"
 #include "ParseHTML.h"
 #include "ParseWord.h"
@@ -151,6 +152,7 @@ class Application : public YGP::IVIOApplication {
    void processOGG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processPDF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processJPG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processPNG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processHTML (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processRTF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processOffice (YGP::Xistream& hFile, Properties& result) const
@@ -260,6 +262,7 @@ Application::Application (const int argc, const char* argv[])
    handlers.insert (handlers.end (), handlerValue ("ogg", &Application::processOGG));
    handlers.insert (handlers.end (), handlerValue ("pdf", &Application::processPDF));
    handlers.insert (handlers.end (), handlerValue ("php", &Application::processHTML));
+   handlers.insert (handlers.end (), handlerValue ("png", &Application::processPNG));
    handlers.insert (handlers.end (), handlerValue ("ppt", &Application::processOffice));
    handlers.insert (handlers.end (), handlerValue ("rtf", &Application::processRTF));
    handlers.insert (handlers.end (), handlerValue ("sda", &Application::processStarOffice));
@@ -362,6 +365,7 @@ void Application::showHelp () const {
       << _("Currently supported files are:")
       << "\n  - HTML (*.html, *.htm, *.shtml, *.shtm, *.sht, *.php)\n"
       "  - JPEG (*.jpeg, *.jpg)\n"
+      "  - PNG (*.png)\n"
       "  - MP3 (*.mp3)\n"
       "  - OGG (*.ogg)\n"
       "  - PDF (*.pdf)\n"
@@ -371,7 +375,7 @@ void Application::showHelp () const {
       "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
       "  - Abiword (*.abw)\n"
       "  - RTF (*.rtf)\n"
-      "  - Microsoft Office (WinWord (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n";
+      "  - Microsoft Office (Word (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n";
 }
 
 //-----------------------------------------------------------------------------
@@ -926,6 +930,16 @@ void Application::processOffice (YGP::Xistream& hFile, Properties& result) const
 void Application::processJPG (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseJPEG ().parse (hFile, result);
+}
+
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of a PNG image
+/// \param hFile: File to processs
+/// \param result: Result of parsing
+//-----------------------------------------------------------------------------
+void Application::processPNG (YGP::Xistream& hFile, Properties& result) const
+   throw (std::string) {
+   ParsePNG (result).parse (hFile);
 }
 
 //-----------------------------------------------------------------------------
