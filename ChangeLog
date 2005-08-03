@@ -1,3 +1,22 @@
+2005-08-03  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.6.20 commented
+
+	* po/de.po, po/en.po, po/es.po: Added ParsePNG messages
+
+	* po/POTFILES.in: Added ParsePNG
+
+	* configure.in: Version to 0.6.20
+
+	* README, doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Added handling of PNG-images
+
+	* src/IExtract.cpp: Added handling of PNG images
+
+	* src/Makefile.am: Added ParsePNG
+
+	* src/ParsePNG.cpp, src/ParsePNG.h: New file.
+
 2005-06-04  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.6.10 commented
