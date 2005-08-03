@@ -80,6 +80,13 @@
           <code>*.sht</code>, <code>*.shtm</code>, <code>*.shtml</code> or
 	  <code>*.php</code>.</p></dd>
 
+      <dt><b>PNG</b></dt>
+      <dd><p>PNG-images can contain text-chunks with <em>keyword</em>
+          - <em>value</em> pairs.<p>
+
+        <p> The (uncompressed) content of the keywords <em>Title</em>,
+          <em>Author</em> and <em>Description</em> is extracted.</p></dd>
+
       <dt><b>JPEG</b></dt>
       <dd><p>Actually I have no idea about the format of JPEG. There
           seems to be two differnt formats for comments, a simple one (as
@@ -120,7 +127,7 @@
       <dd><p>Searches for the content of the properties dialog.</p></dd>
 
       <dt><b>Abiword documents</b></dt>
-      <dd><p>Searches for theOpenOffice content of the properties dialog.</p></dd>
+      <dd><p>Searches for the content of the properties dialog.</p></dd>
 
       <dt><b>RTF documents</b></dt>
       <dd><p>Searches for the content of the "info" block.</p></dd>

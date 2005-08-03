@@ -10,25 +10,39 @@ Copyright (C) 2002 - 2005 Markus Schwab <g17m0@lycos.com>
 At the moment the following documents are supported (identified by the
 extension - so don't cheat ;) ):
 
+  - PNG: PNG images can contain text-chunks with keyword-value pairs. The
+         content of the keywords "Title", "Author" and "Description" is
+         extracted.
+
   - JPEG: Extracts the properties according two styles; either one simple
  	  comment (as written by e.g. The GIMP) or a more complex versions
 	  (as created by Windows XP or - even more complex - PhotoShop).
+
   - HTML: The text in between <title> and </title> and/or the contents of
 	  the meta tags (supported are the tags according HTML 4.0 and
 	  Dublin Core) is extracted.
+
   - PDF: The content of the "document information dictionary" is extracted
           (the content of the "Subject" key is returned as comment).
           Note that encrypted information is not decrypted!
+
   - OpenOffice documents (*.sxw, *.sxc, *.sxd, *.sdi, *.sxm); the comments of
           the properties dialog is extracted
+
   - StarOffice documents (*.sdw, *.sdc, *.sdd, *.sda); the comments of the
           properties dialog is extracted
+
   - MS office documents (*.doc, *.xls, *.ppt); the comment of the properties
 	  dialog is extracted.
+
   - MP3 files: Extracts the contents of the ID3 tag.
+
   - OGG vorbis files: Extracts the contents of the comment header
+
   - RTF documents: Extracts the contents of the \info section
+
   - Abiword documents (*.abw): Extracts the contents of the property dialog
+
 
 The found results can be written either in text, HTML (table), XML (defaults to
 XHTML) or LaTeX (tabular) format. Note that some extra formatting of the text

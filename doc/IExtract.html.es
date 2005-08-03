@@ -83,6 +83,14 @@
           <code>*.sht</code>, <code>*.shtm</code>, <code>*.shtml</code> o
 	  <code>*.php</code>.</p></dd>
 
+      <dt><b>PNG</b></dt>
+      <dd><p>Imagenes del formato PNG pueden contener entradas de texto
+          en el formato <em>identificador</em> - <em>valor</em>.</p>
+
+	<p>El contenido (incomprimido) de los identificadores
+	  <em>Title</em>, <em>Author</em> y <em>Description</em>
+	  est&aacute; extraido.</p></dd>
+
       <dt><b>JPEG</b></dt>
       <dd><p>De hecho no conosco ese formato; pero parece que hay dos formatos por
           los comentarios: Lo simple (como usado de por ejemplo The GIMP) y un

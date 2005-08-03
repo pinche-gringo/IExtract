@@ -80,6 +80,13 @@
           <code>*.sht</code>, <code>*.shtm</code>, <code>*.shtml</code> oder
 	  <code>*.php</code> haben.</p></dd>
 
+      <dt><b>PNG</b></dt>
+      <dd><p>PNG-Bilder k&ouml;nnen Text-Eintr&auml;ge mit Werten im Format
+          <em>Schl&uuml;sselwort</em> - <em>Wert</em> enthalten.</p>
+
+	<p>Die (unkomprimierten) Werte der Eintr&auml;ge <em>Title</em>,
+	  <em>Author</em> und <em>Description</em> werden ausgelesen.</p></dd>
+
       <dt><b>JPEG</b></dt>
       <dd><p>Es gibt zumindest 2 JPEG-Formate f&uuml;r die Kommentare (aber
           eigentlich habe ich keine Ahnung von diesem Format): Ein einfaches, wie
