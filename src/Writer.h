@@ -99,6 +99,8 @@ class QuotedTextWriter : public Writer {
 
    virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const;
 
+   virtual std::string changeSpecialChars (const std::string& value) const;
+
    /// Creates a text writer
    /// \param format: Format how to display entries
    static QuotedTextWriter* create (const std::string& format, const std::string& strNew,

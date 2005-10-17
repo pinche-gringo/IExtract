@@ -372,6 +372,15 @@ QuotedTextWriter::~QuotedTextWriter () {
 
 
 //-----------------------------------------------------------------------------
+/// Change characters with special meanings to ones understood by the writer
+/// \param value: Value to change
+/// \returns std::string: Changed valaue
+//-----------------------------------------------------------------------------
+std::string QuotedTextWriter::changeSpecialChars (const std::string& value) const {
+   return YGP::TableWriter::changeQuotedSpecialChars (value);
+}
+
+//-----------------------------------------------------------------------------
 /// Prints a message
 /// \param out: Stream where to put the output
 /// \param file: File to which the message should be print
