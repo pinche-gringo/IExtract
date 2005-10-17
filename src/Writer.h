@@ -90,6 +90,23 @@ class TextWriter : public Writer {
 };
 
 
+/**Class to write fileinfo in text format
+ */
+class QuotedTextWriter : public Writer {
+ public:
+   QuotedTextWriter (const std::string& format, const std::string& strNew, unsigned long age = 0);
+   virtual ~QuotedTextWriter ();
+
+   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const;
+
+   /// Creates a text writer
+   /// \param format: Format how to display entries
+   static QuotedTextWriter* create (const std::string& format, const std::string& strNew,
+				    unsigned long age = 0) {
+      return new QuotedTextWriter (format, strNew, age); }
+};
+
+
 /**Class to write fileinfo in HTML format
  */
 class HTMLWriter : public Writer {

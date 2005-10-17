@@ -360,6 +360,38 @@ void TextWriter::printMessage (std::ostream& out, const YGP::File& file,
 /// \param strNew: String to display for new entries
 /// \param age: Maximal age (in days) for entries to be considered as new
 //-----------------------------------------------------------------------------
+QuotedTextWriter::QuotedTextWriter (const std::string& format, const std::string& strNew, unsigned long age)
+   : Writer (format, strNew, age, TBLW_QUOTEDTEXT_PARAMS) {
+ }
+
+//-----------------------------------------------------------------------------
+/// Destructor
+//-----------------------------------------------------------------------------
+QuotedTextWriter::~QuotedTextWriter () {
+}
+
+
+//-----------------------------------------------------------------------------
+/// Prints a message
+/// \param out: Stream where to put the output
+/// \param file: File to which the message should be print
+/// \param msg: Message to print (not NULL)
+//-----------------------------------------------------------------------------
+void QuotedTextWriter::printMessage (std::ostream& out, const YGP::File& file,
+				     const std::string& msg) const {
+   Check3 (!msg.empty ());
+   if (strNew.size () && isNew (file))
+      out << "\"!!\"" << ": ";
+   out << file.name () << ", \"" << msg << "\"\n";
+}
+
+
+//-----------------------------------------------------------------------------
+/// Constructor
+/// \param format: Format how to display entries
+/// \param strNew: String to display for new entries
+/// \param age: Maximal age (in days) for entries to be considered as new
+//-----------------------------------------------------------------------------
 HTMLWriter::HTMLWriter (const std::string& format, const std::string& strNew, unsigned long age)
    : Writer (format, strNew, age, TBLW_HTML_PARAMS) {
  }
