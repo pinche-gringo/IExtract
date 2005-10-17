@@ -34,126 +34,117 @@ struct Properties;
 #include <YGP/Tokenize.h>
 
 
-// Baseclass of output classes
-class Writer {
+/**Baseclass of output classes
+ */
+class Writer : public YGP::TableWriter {
  public:
-   Writer (const std::string& New, unsigned long age = 0);
+   typedef std::string (*CHANGECHARS)(const std::string&);
+
+   Writer (const std::string& format, const std::string& New, unsigned long age = 0,
+	   const char* startRow = "", const char* endRow = "", const char* sepColumn = " ",
+	   const char* startTab = "", const char* endTab = "", const char* sepTab = " ",
+	   const char* rowStartHdr = NULL, const char* rowEndHdr = NULL,
+	   const char* sepHdrCol = NULL, const char* defColumns = NULL);
    virtual ~Writer ();
 
-   virtual void printStart (std::ostream& out, const std::string& title) const = 0;
-   virtual void printEnd (std::ostream& out) const = 0;
-   virtual void printFile (std::ostream& out, const YGP::File& file,
-                           const Properties& prop) = 0;
-   virtual void printMessage (std::ostream& out, const YGP::File& file,
-                              const std::string& msg) const = 0;
+   virtual std::string getSubstitute (char ctrl, bool extend = false) const;
 
+   void printFile (std::ostream& out, const YGP::File& file, const Properties& prop);
    void printSeparator (std::ostream& out, const YGP::File& file,
 			const std::string& data, const std::string& title) const;
+
+   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const = 0;
+   virtual void printHeaderTail (std::ostream& out) const;
+
+   virtual std::string changeSpecialChars (const std::string& value) const;
+   virtual std::string changeSpecialFileChars (const std::string& value) const;
 
  protected:
    bool isNew (const YGP::File& file) const {
       return file.time () > limit; }
 
    const std::string strNew;
-
-   std::string getSubstitute (char ctrl, const YGP::TableWriter* writer,
-			      bool extend = false) const;
+   long limit;
 
    static std::string convertToHumanString (unsigned long value);
 
    const YGP::File* file_;
    const Properties* prop_;
-
- private:
-   long limit;
 };
 
 
-// Class to write fileinfo in HTML format
-class HTMLWriter : public Writer, public YGP::HTMLWriter {
+/**Class to write fileinfo in text format
+ */
+class TextWriter : public Writer {
  public:
-   HTMLWriter (const std::string& format, const std::string& strNew, unsigned long age = 0)
-      : YGP::HTMLWriter (format), Writer (strNew, age) { }
+   TextWriter (const std::string& format, const std::string& strNew, unsigned long age = 0);
+   virtual ~TextWriter ();
+
+   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const;
+
+   /// Creates a text writer
+   /// \param format: Format how to display entries
+   static TextWriter* create (const std::string& format, const std::string& strNew,
+                              unsigned long age = 0) {
+      return new TextWriter (format, strNew, age); }
+};
+
+
+/**Class to write fileinfo in HTML format
+ */
+class HTMLWriter : public Writer {
+ public:
+   HTMLWriter (const std::string& format, const std::string& strNew, unsigned long age = 0);
    virtual ~HTMLWriter ();
 
-   virtual void printStart (std::ostream& out, const std::string& title) const;
-   virtual void printEnd (std::ostream& out) const;
-   virtual void printFile (std::ostream& out, const YGP::File& file,
-                           const Properties& prop);
-   virtual void printMessage (std::ostream& out, const YGP::File& file,
-                              const std::string& msg) const;
-   virtual void printHeaderTail (std::ostream& out) const;
+   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const;
 
+   virtual std::string changeSpecialChars (const std::string& value) const;
+   virtual std::string changeSpecialFileChars (const std::string& value) const;
+
+   /// Creates an HTML writer
+   /// \param format: Format how to display entries
    static HTMLWriter* create (const std::string& format, const std::string& strNew,
                               unsigned long age = 0) {
       return new HTMLWriter (format, strNew, age); }
-
- protected:
-   virtual std::string getSubstitute (char ctrl, bool extend = false) const;
 };
 
 
-// Class to write fileinfo in XML format
+/**Class to write fileinfo in XML format
+ */
 class XMLWriter : public HTMLWriter {
  public:
    XMLWriter (const std::string& format, const std::string& strNew,
-                 unsigned long age = 0) : HTMLWriter (format, strNew, age) { }
+	      unsigned long age = 0) : HTMLWriter (format, strNew, age) { }
    virtual ~XMLWriter ();
 
-   virtual void printMessage (std::ostream& out, const YGP::File& file,
-                              const std::string& msg) const;
+   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const;
 
+   /// Creates an XML writer
+   /// \param format: Format how to display entries
    static XMLWriter* create (const std::string& format, const std::string& strNew,
                               unsigned long age = 0) {
       return new XMLWriter (format, strNew, age); }
 };
 
 
-// Class to write fileinfo in text format
-class TextWriter : public Writer, public YGP::TextWriter {
+/**Class to write fileinfo in LaTeX format
+ */
+class LaTeXWriter : public Writer {
  public:
-   TextWriter (const std::string& format, const std::string& strNew, unsigned long age = 0)
-      : YGP::TextWriter (format), Writer (strNew, age) { }
-   virtual ~TextWriter ();
-
-   virtual void printStart (std::ostream& out, const std::string& title) const;
-   virtual void printEnd (std::ostream& out) const;
-   virtual void printFile (std::ostream& out, const YGP::File& file,
-                           const Properties& prop);
-   virtual void printMessage (std::ostream& out, const YGP::File& file,
-                              const std::string& msg) const;
-
-   static TextWriter* create (const std::string& format, const std::string& strNew,
-                              unsigned long age = 0) {
-      return new TextWriter (format, strNew, age); }
-
- protected:
-   virtual std::string getSubstitute (char ctrl, bool extend = false) const;
-};
-
-
-
-// Class to write fileinfo in LaTeX format
-class LaTeXWriter : public Writer, public YGP::LaTeXWriter {
- public:
-   LaTeXWriter (const std::string& format, const std::string& strNew, unsigned long age = 0)
-      : YGP::LaTeXWriter (format), Writer (strNew, age) { }
+   LaTeXWriter (const std::string& format, const std::string& strNew, unsigned long age = 0);
    virtual ~LaTeXWriter ();
 
-   virtual void printStart (std::ostream& out, const std::string& title) const;
-   virtual void printEnd (std::ostream& out) const;
-   virtual void printFile (std::ostream& out, const YGP::File& file,
-                           const Properties& prop);
-   virtual void printMessage (std::ostream& out, const YGP::File& file,
-                              const std::string& msg) const;
-   virtual void printHeaderTail (std::ostream& out) const;
+   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const;
+   virtual void printHeaderLead (std::ostream& out) const;
 
+   virtual std::string changeSpecialChars (const std::string& value) const;
+
+   /// Creates a LaTeX writer
+   /// \param format: Format how to display entries
    static LaTeXWriter* create (const std::string& format, const std::string& strNew,
                                unsigned long age = 0) {
       return new LaTeXWriter (format, strNew, age); }
-
- protected:
-   virtual std::string getSubstitute (char ctrl, bool extend = false) const;
 };
 
 
