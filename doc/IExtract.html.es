@@ -79,7 +79,7 @@
           <code>&lt;/title&gt;</code> y el contenido de los tags <code>meta</code>
           (tanto en formato HTML 4.0 como "Dublin Core").</p>
 
-        <p>Archivos tienen que tener la extensi&oacute;n <code>*.htm</code>, <code>*.html</code>,
+        <p>Los archivos necesitan tener la extensi&oacute;n <code>*.htm</code>, <code>*.html</code>,
           <code>*.sht</code>, <code>*.shtm</code>, <code>*.shtml</code> o
 	  <code>*.php</code>.</p></dd>
 
@@ -98,7 +98,7 @@
           m&aacute;s complejo - de PhotoShop). Ambos formatos est&aacute;n procesados
           (ojal&aacute; correctamente).</p>
 
-        <p>Archivos tiene que tener la extensi&oacute;n <code>*.jpg</code> o
+        <p>Los archivos necesitan tener la extensi&oacute;n <code>*.jpg</code> o
           <code>*.jpeg</code>.</p></dd>
 
       <dt><b>Documentos de Microsoft Office</b></dt>
@@ -140,8 +140,10 @@
     </dl>
 
     <p>La salida puede ser en el formato HTML (una tabla), XML (XHTML por
-      defecto), LaTeX (tabular) o simple texto. Nota que letras especiales en
-      la informaci&oacute;n extraido est&aacute; cambiado.</p>
+      defecto), LaTeX (tabular) o simple texto (o legible (separado por
+      espacio) o legible por m&aacute;quinas (en cuotas, separado por comas)).
+      Nota que letras especiales en la informaci&oacute;n extraido est&aacute;
+      cambiado.</p>
 
     <p>El comportamiento del programa est&aacute; controlado con un archivo de
       iniciaci&oacute;n (~/.IExtract para UNICES o %HOMEDRIVE%%HOMEPATH%IExtract.ini
@@ -192,7 +194,7 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-o,&nbsp;--output=ESTILO</b></td>
-        <td>Especifica el estilo de la salida (text, HTML o LaTeX).</td></tr>
+        <td>Especifica el estilo de la salida (text, quoted, HTML o LaTeX).</td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-f,&nbsp;--format=FORMATO</b></td>
@@ -363,7 +365,7 @@
       opci&oacute;n nuevo a&ntilde;ade su texto a los anteriores.</p>
 
     <h2><a name="INIfile"></a>Formato de archivos por iniciar</h2>
-    <p>Archivos por iniciar tienen el siguente formato (entradas pueden faltar):</p>
+    <p>Los archivos por iniciar tienen el siguente formato (entradas pueden faltar):</p>
 
     <pre>   [Output]
    Format=FORMATO

@@ -137,8 +137,11 @@
     </dl>
 
     <p>Die Ausgabe kann sowohl in HTML-format (table), XML (default XHTML),
-      LaTeX (tabular) Format oder als Klartext erfolgen. Beachte, da&szlig;
-      etwaige Sonderzeichen in den ausgelesenen Daten konvertiert werden.</p>
+      LaTeX (tabular) Format oder als Klartext (sowohl lesbar (durch
+      Leerzeichen getrennt) oder bearbeitbar durch Machinen (unter
+      Anf&uuml;hrungszeichen, getrennt durch Beistriche)) erfolgen. Beachte,
+      da&szlig; etwaige Sonderzeichen in den ausgelesenen Daten konvertiert
+      werden.</p>
 
     <p>Das Verhalten des Programms wird von einem INI-File (~/.IExtract f&uuml;r
       UNICES oder %HOMEDRIVE%%HOMEPATH%IExtract.ini f&uuml;r Windows) gesteuert.
@@ -190,7 +193,7 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-o,&nbsp;--output=STIL</b></td>
-        <td>Setzt den Stil der Ausgabe (text, HTML oder LaTeX).</td></tr>
+        <td>Setzt den Stil der Ausgabe (text, quoted, HTML oder LaTeX).</td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-f,&nbsp;--format=FORMAT</b></td>

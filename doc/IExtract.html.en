@@ -84,7 +84,7 @@
       <dd><p>PNG-images can contain text-chunks with <em>keyword</em>
           - <em>value</em> pairs.<p>
 
-        <p> The (uncompressed) content of the keywords <em>Title</em>,
+        <p>The (uncompressed) content of the keywords <em>Title</em>,
           <em>Author</em> and <em>Description</em> is extracted.</p></dd>
 
       <dt><b>JPEG</b></dt>
@@ -134,8 +134,9 @@
     </dl>
 
     <p>The output can be in HTML-format (a table), XML (default XHTML), LaTeX
-      (tabular) format or plain text. Note that special characters are
-      converted in the exctracted information.</p>
+      (tabular) format or plain text (both human-readable (separated by
+      spaces) or easily parseable (quoted, separated by quotes)). Note that
+      special characters are converted in the exctracted information.</p>
 
     <p>The behaviour of the program is controlled with a INI file (~/.IExtract for
       UNICES or %HOMEDRIVE%%HOMEPATH%IExtract.ini for Windows). See
@@ -183,7 +184,7 @@
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-o,&nbsp;--output=STYLE</b></td>
-          <td>Sets the style of the output (text, HTML or LaTeX.)</td></tr>
+          <td>Sets the style of the output (text, quoted, HTML or LaTeX.)</td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-f,&nbsp;--format=FORMAT</b></td>
