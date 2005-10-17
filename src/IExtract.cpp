@@ -294,7 +294,7 @@ void Application::showHelp () const {
    std::cout << _("Extracts a description out of files (depending on the file-type)\n\nUsage:")
       << " " PACKAGE " " << _("[OPTIONS] <File(s)>")
       << "\n\n  -r, --recursive ....... " << _("Recurse into subdirectories")
-      << "\n  -o, --output=STYLE .... " << _("Sets the output-style (text, quoted, HTML, XML or LaTeX)")
+      << "\n  -o, --output=STYLE .... " << _("Sets the output-style (default: text;\n\t\t\t  other Values are: quoted, HTML, XML or LaTeX)")
       << "\n  -F, --format=FORMAT ... " << _("Format of output; default: ") << DEFAULT_FORMAT
       << "\n  -T, --title=TITLE ..... " << _("Title of output")
       << "\n  -s, --separate=TEXT ... " << _("Separate subdirectories with TEXT (default: empty);\n\t\t\t  implies recursion into subdirectories (--recursive)")
