@@ -175,7 +175,7 @@ class Application : public YGP::IVIOApplication {
    std::string filelist;
    std::string append, prepend;
 
-   enum { TEXT = 0, HTML, LATEX, XML } outputStyle;
+   enum { TEXT = 0, QUOTED, HTML, LATEX, XML } outputStyle;
 
    static const longOptions lo[];
 
@@ -294,7 +294,7 @@ void Application::showHelp () const {
    std::cout << _("Extracts a description out of files (depending on the file-type)\n\nUsage:")
       << " " PACKAGE " " << _("[OPTIONS] <File(s)>")
       << "\n\n  -r, --recursive ....... " << _("Recurse into subdirectories")
-      << "\n  -o, --output=STYLE .... " << _("Sets the output-style (text, HTML XML or LaTeX)")
+      << "\n  -o, --output=STYLE .... " << _("Sets the output-style (text, quoted, HTML, XML or LaTeX)")
       << "\n  -F, --format=FORMAT ... " << _("Format of output; default: ") << DEFAULT_FORMAT
       << "\n  -T, --title=TITLE ..... " << _("Title of output")
       << "\n  -s, --separate=TEXT ... " << _("Separate subdirectories with TEXT (default: empty);\n\t\t\t  implies recursion into subdirectories (--recursive)")
@@ -406,6 +406,7 @@ bool Application::handleOption (const char option) {
       if (!pType
           || ((outputStyle = HTML, strcmp (pType, "HTML"))
               && (outputStyle = TEXT, strcmp (pType, "text"))
+              && (outputStyle = QUOTED, strcmp (pType, "quoted"))
               && (outputStyle = XML, strcmp (pType, "XML"))
               && (outputStyle = LATEX, strcmp (pType, "LaTeX")))) {
          outputStyle = TEXT;
@@ -594,6 +595,7 @@ int Application::perform (int argc, const char* argv[]) {
 
    // This declaration must be in the same order as the outputStyle enum
    CREATEWRITER fnc[] = { (CREATEWRITER)&TextWriter::create,
+                          (CREATEWRITER)&QuotedTextWriter::create,
                           (CREATEWRITER)&HTMLWriter::create,
                           (CREATEWRITER)&LaTeXWriter::create,
                           (CREATEWRITER)&XMLWriter::create };
@@ -635,6 +637,7 @@ int Application::perform (int argc, const char* argv[]) {
 #endif
 
    writer->printEnd (std::cout);
+   delete writer;
 
    if (append.size ())
       std::cout << append;
@@ -708,7 +711,7 @@ void Application::handleFiles (const char* pFile) const {
          if (options & SHOW_ALL) {
             LOCKOUTPUT
             writer->printMessage (std::cout, *file,
-                                 (options & SHOW_ERRORS) ? _("Unknown file-type") : "");
+				  (options & SHOW_ERRORS) ? _("Unknown file-type") : "");
             UNLOCKOUTPUT
          }
       file = ds.next ();
@@ -998,6 +1001,8 @@ void Application::readINIFile (const char* pFile) {
          outputStyle = LATEX;
       else if (iniOpts.style == "XML")
          outputStyle = XML;
+      else if (iniOpts.style == "quoted")
+         outputStyle = QUOTED;
       else {
          outputStyle = TEXT;
          if (iniOpts.style != "text") {
