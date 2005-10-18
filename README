@@ -44,9 +44,11 @@ extension - so don't cheat ;) ):
   - Abiword documents (*.abw): Extracts the contents of the property dialog
 
 
-The found results can be written either in text, HTML (table), XML (defaults to
-XHTML) or LaTeX (tabular) format. Note that some extra formatting of the text
-is done (like checking for LaTeX or HTML special characters).
+The found results can be written either in (human-readable) text (separated by
+spaces), quoted comma-separated text (to be machine-interpreted, like imported
+into a database or a spreadsheet), HTML (table), XML (defaults to XHTML) or
+LaTeX (tabular) format. Note that some extra formatting of the text might be
+done (like checking for LaTeX or HTML special characters).
 
 The extraction of the description can be performed with threads. Note that this
 can actually cause the program to be slower, if the thread searching for files
