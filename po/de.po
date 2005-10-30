@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.6 ($Revision$)\n"
 "Report-Msgid-Bugs-To: g17m0@lycos.com\n"
-"POT-Creation-Date: 2005-08-02 23:27-0400\n"
+"POT-Creation-Date: 2005-10-30 11:39-0400\n"
 "PO-Revision-Date: 2005-06-04 13:22-0400\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: Aleman <g17m0@lycos.com>\n"
@@ -46,8 +46,12 @@ msgid "Recurse into subdirectories"
 msgstr "Rekursiver Vergleich von Unterverzeichnissen"
 
 #: src/IExtract.cpp:297
-msgid "Sets the output-style (text, HTML XML or LaTeX)"
-msgstr "Setzt den Ausgabestil (text, HTML, XML oder LaTeX)"
+msgid ""
+"Sets the output-style (default: text;\n"
+"\t\t\t  other Values are: quoted, HTML, XML or LaTeX)"
+msgstr ""
+"Setzt den Ausgabestil (default: text;\n"
+"\t\t\t  andere Werte sind quoted, HTML, XML oder LaTeX)"
 
 #: src/IExtract.cpp:298
 msgid "Format of output; default: "
@@ -376,44 +380,44 @@ msgstr ""
 msgid "Currently supported files are:"
 msgstr "Unterstützte Dateientypen sind:"
 
-#: src/IExtract.cpp:396 src/IExtract.cpp:442 src/IExtract.cpp:453
-#: src/IExtract.cpp:464 src/IExtract.cpp:498 src/IExtract.cpp:511
-#: src/IExtract.cpp:523 src/IExtract.cpp:552
+#: src/IExtract.cpp:396 src/IExtract.cpp:443 src/IExtract.cpp:454
+#: src/IExtract.cpp:465 src/IExtract.cpp:499 src/IExtract.cpp:512
+#: src/IExtract.cpp:524 src/IExtract.cpp:553
 msgid "-warning: Option `%1' needs an argument! Ignoring option!\n"
 msgstr "-Warnung: Option \"%1\" benötigt ein Argument! Ignoriere Option!\n"
 
-#: src/IExtract.cpp:412
+#: src/IExtract.cpp:413
 msgid "-warning: Style of output `%1' is not valid! Using text\n"
 msgstr "-Warning: \"%1\" ist kein gültiger Ausgabestil! Verwende text\n"
 
-#: src/IExtract.cpp:426
+#: src/IExtract.cpp:427
 msgid "-warning: Invalid number of threads!\n"
 msgstr "-Warnung: Ungültige Anzahl von Threads (Hintergrundprozessen)!\n"
 
-#: src/IExtract.cpp:470
+#: src/IExtract.cpp:471
 msgid ""
 "-warning: Argument for new files `%1' is not valid! Ignoring option `n'\n"
 msgstr ""
 "-Warnung: \"%1\" ist kein gültiges Argument für neue Datein!\n"
 "Ignoriere Option \"n\"\n"
 
-#: src/IExtract.cpp:535
+#: src/IExtract.cpp:536
 msgid "-error: `%1' is not a (readable) file! Ignoring option `%2'!\n"
 msgstr "-Fehler: \"%1\" ist keine (lesbare) Datei! Ignoriere Option \"%2\"!\n"
 
-#: src/IExtract.cpp:567
+#: src/IExtract.cpp:568
 msgid "-warning: Ignoring invalid option `%1'\n"
 msgstr "-Warnung: Ignoriere unbekannte Option \"%1\"\n"
 
-#: src/IExtract.cpp:700 src/IExtract.cpp:824
+#: src/IExtract.cpp:703 src/IExtract.cpp:827
 msgid "-error: "
 msgstr "-Fehler: "
 
-#: src/IExtract.cpp:711
+#: src/IExtract.cpp:714
 msgid "Unknown file-type"
 msgstr "Unbekannter Dateityp"
 
-#: src/IExtract.cpp:805
+#: src/IExtract.cpp:808
 msgid ""
 "-error: File `%1' can't be opened!\n"
 "Reason: "
@@ -421,11 +425,11 @@ msgstr ""
 "Datei \"%1\" kann nicht geöffnet werden!\n"
 "Ursache: "
 
-#: src/IExtract.cpp:826
+#: src/IExtract.cpp:829
 msgid "Error while processing: "
 msgstr "Error beim Bearbeiten: "
 
-#: src/IExtract.cpp:1004
+#: src/IExtract.cpp:1009
 msgid ""
 "-warning: The INI-file `%1' contains an invalid entry for the output style (`"
 "%2')! Using text\n"
