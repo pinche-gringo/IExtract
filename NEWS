@@ -1,3 +1,9 @@
+Overview of changes in version 0.6.30:
+
+  - Using new version of YGP::TableWriter (hence needing libYGP 0.7.30)
+  - Added comma-separated, quoted output (for import into DBs, sheets, ...)
+
+
 Overview of changes in version 0.6.20:
 
   - Handling PNG images
