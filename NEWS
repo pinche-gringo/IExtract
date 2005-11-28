@@ -1,3 +1,8 @@
+Overview of changes in version 0.6.40:
+
+  - Handling GIF images
+
+
 Overview of changes in version 0.6.30:
 
   - Using new version of YGP::TableWriter (hence needing libYGP 0.7.30)

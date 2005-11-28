@@ -1,3 +1,31 @@
+2005-11-28  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.6.40 commented
+
+2005-11-27  Markus Schwab  <g17m0@lycos.com>
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Added handling of GIF images
+
+	* configure.in: Version to 0.6.40
+
+	* README: Added handling of GIF images
+
+	* src/IExtract.cpp: Changed copyright-info
+
+	* po/de.po, po/en.po, po/es.po: Added messages of GIF-parser
+
+	* po/POTFILES.in: Added ParseGIF
+
+	* src/IExtract.cpp: Added handling of GIF images
+
+	* src/Makefile.am: Added ParseGIF
+
+	* src/ParseGIF.cpp, src/ParseGIF.h:
+	  Generalized reading of extensions; Fixed reading blocks longer than 128 bytes
+
+	* src/ParseGIF.cpp, src/ParseGIF.h: New file.
+
 2005-10-30  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.6.30 commented
