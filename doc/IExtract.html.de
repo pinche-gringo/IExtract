@@ -19,7 +19,8 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -->
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//DE">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//DE"
+"http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
     <title>IExtract - Auslesen der Dokument-Informationen</title>
@@ -28,7 +29,7 @@
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Copyright (C) 2003, 2004; vertrieben unter den Bedingungen der GNU General Public License">
+    <meta name="DC.Rights" content="Copyright (C) 2003 - 2005; vertrieben unter den Bedingungen der GNU General Public License">
 
     <style type="text/css">
       <!--
@@ -86,6 +87,11 @@
 
 	<p>Die (unkomprimierten) Werte der Eintr&auml;ge <em>Title</em>,
 	  <em>Author</em> und <em>Description</em> werden ausgelesen.</p></dd>
+
+      <dt><b>GIF</b></dt>
+      <dd><p>GIF-Bilder k&ouml;nnen Kommentar-Eintr&auml;ge (in sogenannten
+          "Kommentar-Erweiterungen") enthalten. Die Werte für Titel
+          und Author werden (mangels Verfügbarkeit) nicht gesetzt.</p></dd>
 
       <dt><b>JPEG</b></dt>
       <dd><p>Es gibt zumindest 2 JPEG-Formate f&uuml;r die Kommentare (aber
@@ -333,7 +339,7 @@
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-I,&nbsp;--ini-file=FILE</b></td>
         <td>Lies weitere Optionen aus der angegebenen Datei. Das
           <a href="IExtract.html.de#INIfile">Format des INI-Files</a> ist
-          sp&auml;ter im Dokument beschrieben.</p></td></tr>
+          sp&auml;ter im Dokument beschrieben.</td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-t,&nbsp;--threads=NR</b></td>

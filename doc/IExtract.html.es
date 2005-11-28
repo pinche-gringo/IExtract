@@ -19,16 +19,17 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -->
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//ES">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//ES"
+"http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
-    <title>IExtract - Extraer informaciones desde documentos</title>
+    <title>IExtract - Extraer informaciones de documentos</title>
     <meta name="description" content="Documentation of the IExtract-utility">
     <meta name="keywords" content="documentacion, docu, IExtract, iextract, utility, utilidad">
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Copyright (C) 2003, 2004; distributado bajo las condiciones de la GNU Licensia Público">
+    <meta name="DC.Rights" content="Copyright (C) 2003 - 2005; distribuido bajo las condiciones de la GNU Licensia Público">
 
     <style type="text/css">
       <!--
@@ -46,7 +47,7 @@
     <h1>IExtract - Extraer informaciones desde documentos</h1>
     <hr>
 
-    <table width="100%" order="0" cellpadding="5" cellspacing="0" >
+    <table width="100%" cellpadding="5" cellspacing="0" >
       <tr valign=top><td class="unselected"><a href="IExtract.html.en">
             English&nbsp;version</a></td>
         <td>&nbsp;</td>
@@ -66,11 +67,11 @@
     <hr size=1 noshade>
 
     <p><code>IExtract</code> es una utilidad para extraer
-            los propiedades (t&iacute;tulo, autor y comentario) desde varios
-            tipos de documentos y presenta los en una lista para elaboraci&oacute;n
+            los propiedades (t&iacute;tulo, autor y comentario) de varios
+            tipos de documentos y pres&eacute;ntarlos en una lista para elaboraci&oacute;n
             posterior.</p>
 
-    <p>Los documentos siguentes est&aacute;n procesados (distinguido de la
+    <p>Los documentos siguentes est&aacute;n procesados (distinguido por la
       extensi&oacute;n):</p>
 
     <dl>
@@ -91,8 +92,14 @@
 	  <em>Title</em>, <em>Author</em> y <em>Description</em>
 	  est&aacute; extraido.</p></dd>
 
+      <dt><b>GIF</b></dt>
+      <dd><p>Imagenes del formato GIF pueden contener entradas de comentarios.
+          Esos entradas est&aacute;n extraidos en el campo
+	  "comentario". Las entradas por el autor y el t&iacute;tulo
+	  hacen falta.</p></dd>
+
       <dt><b>JPEG</b></dt>
-      <dd><p>De hecho no conosco ese formato; pero parece que hay dos formatos por
+      <dd><p>De hecho no conozco ese formato; pero parece que hay dos formatos por
           los comentarios: Lo simple (como usado de por ejemplo The GIMP) y un
           m&aacute;s complejo (como usado de por ejemplo Windows XP - y todav&iacute;a
           m&aacute;s complejo - de PhotoShop). Ambos formatos est&aacute;n procesados

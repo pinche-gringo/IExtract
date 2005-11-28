@@ -19,7 +19,8 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -->
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
     <title>IExtract - Extracting information out of documents</title>
@@ -28,7 +29,7 @@
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Copyright (C) 2003, 2004; distributed under the GNU General Public License">
+    <meta name="DC.Rights" content="Copyright (C) 2003 - 2005; distributed under the GNU General Public License">
 
     <style type="text/css">
       <!--
@@ -86,6 +87,11 @@
 
         <p>The (uncompressed) content of the keywords <em>Title</em>,
           <em>Author</em> and <em>Description</em> is extracted.</p></dd>
+
+      <dt><b>GIF</b></dt>
+      <dd><p>GIF-images can contain "Comment extensions". The content of
+          these entries is returned in the comment-field. Author and title
+	  are left empty (for lack of availability.)<p></dd>
 
       <dt><b>JPEG</b></dt>
       <dd><p>Actually I have no idea about the format of JPEG. There
