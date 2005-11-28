@@ -46,15 +46,17 @@ ParseGIF::ParseGIF (Properties& result)
      , skip (7)
      , skip2 (2)
      , colourTable ("\\*", _("Info about colour table"), *this, &ParseGIF::skipColourTable, 1, 1, false)
+     , idEndGIF ("\x3b", _("End of GIF image"), *this,  &ParseGIF::foundEndGIF, false)
      , idCommentExt ("\x21\xfe", _("Comment extension"), false)
-     , idImage ("\x2c",  _("Image separator"), false)
-     , idGrafCtlExt ("\x21\xf9", _("Graphic control extension ID"))
+     , idImage ("\x2c",  _("Image separator"), *this,  &ParseGIF::foundImage, false)
+     , idExtension ("\x21", _("Extension ID"))
+     , idTypeExtension ("\\*", _("Type of extension"), 1, 1, false)
      , comment ("\\*", _("Comment"), *this, &ParseGIF::foundComment, 0, 0, false)
      , lenBlock ("\\*", _("Length of sub-block"), *this, &ParseGIF::foundLength, 1, 1, false)
-     , blocks (_blocks, _("Blocks"), -1U, 1, false)
+     , blocks (_blocks, _("Blocks"), -1U, -1U, false)
      , commentExt (_commentExt, _("Comment extension"), 1, 1, false)
      , imageDesc (_imageDesc, _("Image description"))
-     , grafCtlExt (_grafCtlExt, _("Graphic control extension"),1, 1, false)
+     , extension (_extension, _("Extension"),1, 1, false)
      , commentBlocks (_commentBlocks, _("Comment blocks"), *this, &ParseGIF::foundSubblock, -1U, 0, false)
      , subblocks (_subblocks, _("Subblocks"), *this, &ParseGIF::foundSubblock, -1U, 0, false)
      , gifImage (_gifImage, _("GIF image"), 1, 1, false)
@@ -63,16 +65,18 @@ ParseGIF::ParseGIF (Properties& result)
 
    _blocks[0] = &commentExt;
    _blocks[1] = &imageDesc;
-   _blocks[2] = &grafCtlExt;
-   _blocks[3] = NULL;
+   _blocks[2] = &extension;
+   _blocks[3] = &idEndGIF;
+   _blocks[4] = NULL;
 
    _subblocks[0] = &lenBlock;
    _subblocks[1] = &skip;
    _subblocks[2] = NULL;
 
-   _grafCtlExt[0] = &idGrafCtlExt;
-   _grafCtlExt[1] = &subblocks;
-   _grafCtlExt[2] = NULL;
+   _extension[0] = &idExtension;
+   _extension[1] = &idTypeExtension;
+   _extension[2] = &subblocks;
+   _extension[3] = NULL;
 
    _commentBlocks[0] = &lenBlock;
    _commentBlocks[1] = &comment;
@@ -152,9 +156,9 @@ int ParseGIF::foundImage (const char*, unsigned int) {
 int ParseGIF::foundLength (const char* length, unsigned int) {
    TRACE8 ("ParseGIF::foundLength (const char*, unsigned int) - " << (unsigned int)(*length & 0xff)
 	   << " = 0x" << std::hex << (unsigned int)(*length & 0xff) << std::dec);
-   skip.setOffset ((unsigned int)*length);
-   comment.setMinCard ((unsigned int)*length);
-   comment.setMaxCard ((unsigned int)*length);
+   skip.setOffset ((unsigned int)(*length & 0xff));
+   comment.setMinCard ((unsigned int)(*length & 0xff));
+   comment.setMaxCard ((unsigned int)(*length & 0xff));
    if (!*length) {
       subblocks.setMaxCard (1);
       commentBlocks.setMaxCard (1);
@@ -167,7 +171,20 @@ int ParseGIF::foundLength (const char* length, unsigned int) {
 /// \returns \c int: Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
 int ParseGIF::foundSubblock (const char*, unsigned int) {
+   TRACE9 ("ParseGIF::foundSubblock (const char*, unsigned int)");
    subblocks.setMaxCard (-1U);
    commentBlocks.setMaxCard (-1U);
+   return YGP::ParseObject::PARSE_OK;
+}
+
+
+//-----------------------------------------------------------------------------
+/// Callback after the end-of-image ID was found
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+int ParseGIF::foundEndGIF (const char*, unsigned int) {
+   TRACE9 ("ParseGIF::foundEndGIF (const char*, unsigned int)");
+   blocks.setMaxCard (1);
+   blocks.setMinCard (1);
    return YGP::ParseObject::PARSE_OK;
 }

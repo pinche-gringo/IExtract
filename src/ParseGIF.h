@@ -44,6 +44,7 @@ class ParseGIF {
    int skipColourTable (const char*, unsigned int);
    int foundImage (const char*, unsigned int);
    int foundLength (const char*, unsigned int);
+   int foundEndGIF (const char*, unsigned int);
 
    int foundSubblock (const char*, unsigned int);
 
@@ -55,23 +56,25 @@ class ParseGIF {
    YGP::ParseSkip    skip;
    YGP::ParseSkip    skip2;
    OMParseAttomic    colourTable;
+   OMParseExact      idEndGIF;
 
    YGP::ParseExact   idCommentExt;
-   YGP::ParseExact   idImage;
-   YGP::ParseExact   idGrafCtlExt;
+   OMParseExact      idImage;
+   YGP::ParseExact   idExtension;
+   YGP::ParseAttomic idTypeExtension;
    OMParseAttomic    comment;
    OMParseAttomic    lenBlock;
 
    YGP::ParseSelection blocks;
-   YGP::ParseObject*   _blocks[4];
+   YGP::ParseObject*   _blocks[5];
 
    YGP::ParseSequence commentExt;
    YGP::ParseObject*  _commentExt[3];
 
    YGP::ParseSequence imageDesc;
    YGP::ParseObject*  _imageDesc[7];
-   YGP::ParseSequence grafCtlExt;
-   YGP::ParseObject*  _grafCtlExt[3];
+   YGP::ParseSequence extension;
+   YGP::ParseObject*  _extension[4];
 
    OMParseSequence    commentBlocks;
    YGP::ParseObject*  _commentBlocks[3];
