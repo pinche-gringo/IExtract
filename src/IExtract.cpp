@@ -120,7 +120,7 @@ class Application : public YGP::IVIOApplication {
    virtual const char* name () const { return PACKAGE; }
    virtual const char* description () const {
       static std::string version (PACKAGE " V" VERSION " - ");
-      version += (_("Compiled on %1 at %2\n\nAuthor: Markus Schwab; email: g17m0@lycos.com\nDistributed under the terms of the GNU General Public License"));
+      version += (_("Compiled on %1 at %2\n\nCopyright (C) 2002 - 2005 Markus Schwab; email: g17m0@lycos.com\nDistributed under the terms of the GNU General Public License"));
       version.replace (version.find ("%1"), 2, __DATE__);
       version.replace (version.find ("%2"), 2, __TIME__);
       return version.c_str (); }
