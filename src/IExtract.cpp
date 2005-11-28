@@ -80,6 +80,7 @@
 #include "ParsePDF.h"
 #include "ParseJPG.h"
 #include "ParsePNG.h"
+#include "ParseGIF.h"
 #include "ParseRTF.h"
 #include "ParseHTML.h"
 #include "ParseWord.h"
@@ -153,6 +154,7 @@ class Application : public YGP::IVIOApplication {
    void processPDF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processJPG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processPNG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processGIF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processHTML (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processRTF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processOffice (YGP::Xistream& hFile, Properties& result) const
@@ -250,6 +252,7 @@ Application::Application (const int argc, const char* argv[])
 
    handlers.insert (handlers.end (), handlerValue ("abw", &Application::processAbiword));
    handlers.insert (handlers.end (), handlerValue ("doc", &Application::processOffice));
+   handlers.insert (handlers.end (), handlerValue ("gif", &Application::processGIF));
    handlers.insert (handlers.end (), handlerValue ("htm", &Application::processHTML));
    handlers.insert (handlers.end (), handlerValue ("html", &Application::processHTML));
    handlers.insert (handlers.end (), handlerValue ("jpeg", &Application::processJPG));
@@ -366,6 +369,7 @@ void Application::showHelp () const {
       << "\n  - HTML (*.html, *.htm, *.shtml, *.shtm, *.sht, *.php)\n"
       "  - JPEG (*.jpeg, *.jpg)\n"
       "  - PNG (*.png)\n"
+      "  - GIF (*.gif)\n"
       "  - MP3 (*.mp3)\n"
       "  - OGG (*.ogg)\n"
       "  - PDF (*.pdf)\n"
@@ -943,6 +947,16 @@ void Application::processJPG (YGP::Xistream& hFile, Properties& result) const
 void Application::processPNG (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParsePNG (result).parse (hFile);
+}
+
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of a GIF image
+/// \param hFile: File to processs
+/// \param result: Result of parsing
+//-----------------------------------------------------------------------------
+void Application::processGIF (YGP::Xistream& hFile, Properties& result) const
+   throw (std::string) {
+   ParseGIF (result).parse (hFile);
 }
 
 //-----------------------------------------------------------------------------
