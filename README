@@ -8,11 +8,14 @@ Copyright (C) 2002 - 2005 Markus Schwab <g17m0@lycos.com>
 
 
 At the moment the following documents are supported (identified by the
-extension - so don't cheat ;) ):
+extension):
 
   - PNG: PNG images can contain text-chunks with keyword-value pairs. The
          content of the keywords "Title", "Author" and "Description" is
          extracted.
+
+  - GIF: GIF images can contain a "comment extension". The contents of this
+         block(s) is extracted. There are no title or author entries.
 
   - JPEG: Extracts the properties according two styles; either one simple
  	  comment (as written by e.g. The GIMP) or a more complex versions
@@ -85,7 +88,7 @@ Bug reports and patches should be send to the e-mail address of the author
 If you report a bug, please be sure to add anything which might be of use! Like
 
   - The version of the utility.
-  - The version of the used General library.
+  - The version of the used libYGP library.
   - How to reproduce the bug; a file provocing it would be great.
   - In case of a crash there should also be a stackdump in your systemlog which
     might help in localizing the bug.
