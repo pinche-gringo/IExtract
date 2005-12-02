@@ -39,11 +39,21 @@ class ParseJPEG  {
    int foundType (const char*, unsigned int);
    int foundNumber (const char*, unsigned int);
    int foundTitle (const char*, unsigned int);
-   int foundTitle3 (const char*, unsigned int);
-   int foundLength (const char*, unsigned int);
-   int foundLength2 (const char*, unsigned int);
+   int foundTitlePhotoshop (const char*, unsigned int);
+   int foundCommentPhotoShop (const char*, unsigned int);
+   int foundLengthLSB (const char*, unsigned int);
+   int foundLengthMSB (const char*, unsigned int);
+   int foundLengthLSB4 (const char*, unsigned int);
+   int foundLengthMSB4 (const char*, unsigned int);
    int foundOffset (const char*, unsigned int);
-   int foundPropertiesHeader (const char*, unsigned int);
+   int foundByteOrder (const char*, unsigned int);
+   int foundEndOfJPEG (const char*, unsigned int);
+   int foundAPP1 (const char*, unsigned int);
+   int foundAPP1Exif (const char*, unsigned int);
+   int foundImage (const char*, unsigned int);
+
+   unsigned long foundLength (unsigned int length);
+   bool supportedLength4 (unsigned int length);
 
    typedef YGP::OFParseText<ParseJPEG>     OMParseText;
    typedef YGP::OFParseExact<ParseJPEG>    OMParseExact;
@@ -51,37 +61,44 @@ class ParseJPEG  {
    typedef YGP::OFParseSequence<ParseJPEG> OMParseSequence;
 
    YGP::ParseExact idJPEG;
-   YGP::ParseExact idFormat1;
-   YGP::ParseExact idComment1;
-   YGP::ParseExact idComment2;
-   YGP::ParseExact idComment3;
+   OMParseExact    idEndJPEG;
+   OMParseExact    idAPP1;
+   YGP::ParseExact idAPPD;
+   YGP::ParseExact idComment;
+
+   YGP::ParseAttomic idMarker;
+   OMParseAttomic    image;
+
    OMParseAttomic  title;
-   OMParseAttomic  title3;
+   OMParseAttomic  titlePhotoshop;
    OMParseAttomic  type;
    OMParseAttomic  number;
-   OMParseAttomic  length1;
-   OMParseAttomic  length2;
+   OMParseAttomic  lengthLSB;
+   OMParseAttomic  lengthMSB;
+   OMParseAttomic  lengthLSB4;
+   OMParseAttomic  lengthMSB4;
    OMParseAttomic  offset;
-   YGP::ParseSkip  skip;
+   OMParseAttomic  byteOrder;
+   YGP::ParseSkip  skip6;
+   YGP::ParseSkip  skipLen;
 
-   YGP::ParseSelection  selFormat;
-   YGP::ParseSequence   seqFormat1;
-   YGP::ParseSelection  selProperties;
-   YGP::ParseSequence   seqPropShort;
-   YGP::ParseSequence   seqPropLong;
-   YGP::ParseSequence   seqPropXXL;
+   YGP::ParseSelection  selMarker;
+   YGP::ParseSequence   seqComment;
+   OMParseSequence      seqEXIF;
+   YGP::ParseSequence   seqAPPD;
+   YGP::ParseSequence   seqOther;
 
-   OMParseSequence    seqEntries;
+   YGP::ParseSequence seqIFD;
    YGP::ParseSequence jpegImage;                              // Startsequence
 
    YGP::ParseObject*   _jpegImage[3];
-   YGP::ParseObject*   _selFormat[3];
-   YGP::ParseObject*   _seqFormat1[4];
-   YGP::ParseObject*   _selProperties[4];
-   YGP::ParseObject*   _seqPropShort[4];
-   YGP::ParseObject*   _seqPropLong[8];
-   YGP::ParseObject*   _seqPropXXL[4];
-   YGP::ParseObject*   _seqEntries[4];
+   YGP::ParseObject*   _selMarker[7];
+   YGP::ParseObject*   _seqComment[4];
+   YGP::ParseObject*   _seqEXIF[10];
+   YGP::ParseObject*   _seqAPPD[4];
+   YGP::ParseObject*   _seqOther[4];
+
+   YGP::ParseObject*   _seqIFD[4];
 
    unsigned int offsets[3];
    unsigned int lengths[3];

@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 17.10.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2004
+//COPYRIGHT   : Copyright (C) 2002 - 2005
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -59,9 +59,13 @@ inline unsigned short get2BytesMSB (const char* pAddr) {
    return *(unsigned short*)pAddr;
 }
 
-inline unsigned int get4BytesLSB (const char* pAddr) {
+inline unsigned long get4BytesLSB (const char* pAddr) {
    return (((unsigned char)(*pAddr) << 24) + ((unsigned char)pAddr[1] << 16)
            + ((unsigned char)pAddr[2] << 8) + ((unsigned char)pAddr[3]));
+}
+
+inline unsigned long get4BytesMSB (const char* pAddr) {
+   return *(unsigned char*)pAddr;
 }
 
 #else
@@ -84,8 +88,13 @@ inline unsigned short get2BytesMSB (const char* pAddr) {
    return ((unsigned char)(*pAddr) << 8) + (unsigned char)pAddr[1];
 }
 
-inline unsigned int get4BytesLSB (const char* pAddr) {
+inline unsigned long get4BytesLSB (const char* pAddr) {
    return *(unsigned int*)pAddr;
+}
+
+inline unsigned long get4BytesMSB (const char* pAddr) {
+   return (((unsigned char)(*pAddr) << 24) + ((unsigned char)pAddr[1] << 16)
+           + ((unsigned char)pAddr[2] << 8) + ((unsigned char)pAddr[3]));
 }
 
 #endif
@@ -95,71 +104,79 @@ inline unsigned int get4BytesLSB (const char* pAddr) {
 /// (Default-)Constructor
 //-----------------------------------------------------------------------------
 ParseJPEG::ParseJPEG ()
-   : idJPEG ("\xff\xd8", _("JPEG-ID"), false)
-   , idFormat1 ("\xff\xe0", _("ID of format 1"), 2, 2, false)
-   , idComment1 ("\xff\xfe", _("ID of short comments"), false)
-   , idComment2 ("\xff\xe1", _("ID of long comments"), false)
-   , idComment3 ("\xff\xed", _("ID of XXL comments"), false)
-   , title ("\\*", _("Comment"), *this, &ParseJPEG::foundTitle, 1, 1, false)
-   , title3 ("\\*", _("Comment values"), *this, &ParseJPEG::foundTitle3, 1, 1, false)
-   , type ("\\*", _("Type of entry"), *this, &ParseJPEG::foundType, 4, 4, false)
-   , number ("\\*", _("Number of records"), *this, &ParseJPEG::foundNumber, 2, 2, false)
-   , length1 ("\\*", _("Length (MSB first)"), *this, &ParseJPEG::foundLength, 2, 2, false)
-   , length2 ("\\*", _("Length (LSB first)"), *this, &ParseJPEG::foundLength2, 2, 2, false)
-   , offset ("\\*", _("Offset"), *this, &ParseJPEG::foundOffset, 4, 4, false)
-   , skip (16)
-   , selFormat (_selFormat, _("Possible comments"), 1, 0, false)
-   , seqFormat1 (_seqFormat1, _("Format style 1"), 1, 1, false)
-   , selProperties (_selProperties, _("Properties"), 1, 0, false)
-   , seqPropShort (_seqPropShort, _("Short properties"), 1, 1, false)
-   , seqPropLong (_seqPropLong, _("Long properties"), 1, 1, false)
-   , seqPropXXL (_seqPropXXL, _("XXL properties"), 1, 1, false)
-   , seqEntries (_seqEntries, _("List of property entries"), *this,
-                 &ParseJPEG::foundPropertiesHeader, 1, 1, false)
-   , jpegImage (_jpegImage, _("JPEG image"), 1, 1)
-   , cRead (0), actEntry (TYPE_TITLE), cEntries (0) {
+   : idJPEG ("\xff\xd8", _("JPEG-ID"), false),
+     idEndJPEG ("\xff\xd9", _("JPEG-Terminator"), *this, &ParseJPEG::foundEndOfJPEG, false),
+     idAPP1 ("\xff\xe1", _("APP1 marker"), *this, &ParseJPEG::foundAPP1, false),
+     idAPPD ("\xff\xed", _("APPD maker"), false),
+     idComment ("\xff\xfe", _("Comment marker"), false),
+     idMarker ("\xff\\*", _("Other marker"), 2, 2, false),
+     image ("\\*", _("Image information"), *this, &ParseJPEG::foundImage, 1, 1, false),
+
+     title ("\\*", _("Comment"), *this, &ParseJPEG::foundTitle, 1, 1, false),
+     titlePhotoshop ("\\*", _("Comment values (Photoshop style)"), *this, &ParseJPEG::foundCommentPhotoShop, 1, 1, false),
+     type ("\\*", _("Type of entry"), *this, &ParseJPEG::foundType, 4, 4, false),
+     number ("\\*", _("Number of records"), *this, &ParseJPEG::foundNumber, 2, 2, false),
+     lengthLSB ("\\*", _("Length (LSB first)"), *this, &ParseJPEG::foundLengthLSB, 2, 2, false),
+     lengthMSB ("\\*", _("Length (MSB first)"), *this, &ParseJPEG::foundLengthMSB, 2, 2, false),
+     lengthLSB4 ("\\*", _("Length (long - LSB first)"), *this, &ParseJPEG::foundLengthLSB4, 4, 4, false),
+     lengthMSB4 ("\\*", _("Length (long - MSB first)"), *this, &ParseJPEG::foundLengthMSB4, 4, 4, false),
+     offset ("\\*", _("Offset"), *this, &ParseJPEG::foundOffset, 4, 4, false),
+     byteOrder ("\\*", _("Byte order"), *this, &ParseJPEG::foundByteOrder, 2, 2, false),
+     skip6 (6),
+     skipLen (0),
+
+     selMarker (_selMarker, _("Marker"), -1U, 1, false),
+     seqComment (_seqComment, _("Comment entry 1"), 1, 1, false),
+     seqEXIF (_seqEXIF, _("APP1 (EXIF)"), *this, &ParseJPEG::foundAPP1Exif, 1, 1, false),
+     seqAPPD (_seqAPPD, _("APPD entry"), 1, 1, false),
+     seqOther (_seqOther, _("Other entry"), 1, 1, false),
+
+     seqIFD (_seqIFD, _("Image file directory"), 1, 1, false),
+     jpegImage (_jpegImage, _("JPEG image"), 1, 1),
+     cRead (0), actEntry (TYPE_TITLE), cEntries (0) {
 
    _jpegImage[0] = &idJPEG;
-   _jpegImage[1] = &selFormat;
+   _jpegImage[1] = &selMarker;
    _jpegImage[2] = NULL;
 
-   _selFormat[0] = &seqFormat1;
-   _selFormat[1] = &seqPropLong;
-   _selFormat[2] = NULL;
+   _selMarker[0] = &seqComment;
+   _selMarker[1] = &seqEXIF;
+   _selMarker[2] = &seqAPPD;
+   _selMarker[3] = &seqOther;
+   _selMarker[4] = &idEndJPEG;
+   _selMarker[5] = &image;
+   _selMarker[6] = NULL;
 
-   _seqFormat1[0] = &idFormat1;
-   _seqFormat1[1] = &skip;
-   _seqFormat1[2] = &selProperties;
-   _seqFormat1[3] = NULL;
+   _seqComment[0] = &idComment;
+   _seqComment[1] = &lengthMSB;
+   _seqComment[2] = &title;
+   _seqComment[3] = NULL;
 
-   _selProperties[0] = &seqPropShort;
-   _selProperties[1] = &seqPropLong;
-   _selProperties[2] = &seqPropXXL;
-   _selProperties[3] = NULL;
+   _seqEXIF[0] = &idAPP1;
+   _seqEXIF[1] = &lengthMSB;
+   _seqEXIF[2] = &skip6;
+   _seqEXIF[3] = &byteOrder;
+   _seqEXIF[4] = &skip6;
+   _seqEXIF[5] = &number;
+   _seqEXIF[6] = &seqIFD;
+   _seqEXIF[7] = &title;
+   _seqEXIF[8] = &skipLen;
+   _seqEXIF[9] = NULL;
 
-   _seqPropShort[0] = &idComment1;
-   _seqPropShort[1] = &length1;
-   _seqPropShort[2] = &title;
-   _seqPropShort[3] = NULL;
+   _seqAPPD[0] = &idAPPD;
+   _seqAPPD[1] = &lengthLSB;
+   _seqAPPD[2] = &titlePhotoshop;
+   _seqAPPD[3] = NULL;
 
-   _seqPropLong[0] = &idComment2;
-   _seqPropLong[1] = &length1;
-   _seqPropLong[2] = &skip;
-   _seqPropLong[3] = &number;
-   _seqPropLong[4] = &seqEntries;
-   _seqPropLong[5] = &skip;
-   _seqPropLong[6] = &title;
-   _seqPropLong[7] = NULL;
+   _seqOther[0] = &idMarker;
+   _seqOther[1] = &lengthMSB;
+   _seqOther[2] = &skipLen;
+   _seqOther[3] = NULL;
 
-   _seqPropXXL[0] = &idComment3;
-   _seqPropXXL[1] = &length1;
-   _seqPropXXL[2] = &title3;
-   _seqPropXXL[3] = NULL;
-
-   _seqEntries[0] = &type;
-   _seqEntries[1] = &length2;
-   _seqEntries[2] = &offset;
-   _seqEntries[3] = NULL;
+   _seqIFD[0] = &type;
+   _seqIFD[1] = &lengthLSB4;
+   _seqIFD[2] = &offset;
+   _seqIFD[3] = NULL;
 
    Check3 ((sizeof (offsets) / sizeof (offsets[0]))
            == (sizeof (lengths) / sizeof (lengths[0])));
@@ -179,20 +196,21 @@ int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
    Check3 (prop); Check3 (pTitle);
    TRACE9 ("ParseJPEG::foundTitle (const char*, unsigned int) - Title: "
           << std::string (pTitle, len) << " -> " << len << " chars");
-
-   static std::string Properties::* values[] = { &Properties::strTitle,
-                                                 &Properties::strComment,
-                                                 &Properties::strAuthor };
-   for (unsigned int i (0);
-        i < (sizeof (values) / sizeof (values[0])); ++i)
-      if (lengths[i]) {
-         TRACE8 ("ParseJPEG::foundTitle (const char*, unsigned int) - " << i
-                 << ": Assigning from " << (offsets[i] - cRead) << ' '
-                 << lengths[i] << " chars");
-         (prop->*(values[i])).assign (pTitle + offsets[i] - cRead, lengths[i] - 2);
-      }
-
-   TRACE9 ("ParseJPEG::foundTitle (const char*, unsigned int) - Out");
+   if (len) {
+      TRACE8 ("ParseJPEG::foundTitle (const char*, unsigned int) - Skipping " << cRead);
+      static std::string Properties::* values[] = { &Properties::strTitle,
+						    &Properties::strComment,
+						    &Properties::strAuthor };
+      for (unsigned int i (0);
+	   i < (sizeof (values) / sizeof (values[0])); ++i)
+	 if (lengths[i]) {
+	    TRACE7 ("ParseJPEG::foundTitle (const char*, unsigned int) - " << i
+		    << ": Assigning " << offsets[i] - cRead << " - "
+		    << offsets[i] - cRead + lengths[i]);
+	    (prop->*(values[i])).assign (pTitle + offsets[i] - cRead, lengths[i]);
+	 }
+      selMarker.setMaxCard (1);
+   }
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -202,30 +220,30 @@ int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
 /// \param len: Length of title
 /// \returns \c int: Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
-int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
+int ParseJPEG::foundCommentPhotoShop (const char* pTitle, unsigned int len) {
    Check3 (prop); Check3 (pTitle);
-   TRACE9 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Title: "
+   TRACE9 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Title: "
            << std::string (pTitle, len) << " -> " << len << " chars");
 
    const char* pAct = pTitle + strlen (pTitle) + 1;    // Skip leading comment
    pTitle += len;
 
-   TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Header: *"
-           << hex << (unsigned int)pAct << " = " << (*(unsigned int*)pAct) << dec);
+   TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Header: *"
+           << std::hex << (unsigned int)pAct << " = " << (*(unsigned int*)pAct) << std::dec);
 
    if (*(unsigned int*)pAct == ENTRY_BLOCK) {
       pAct += 6;
       pAct += (unsigned int)*pAct;
 
-      TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Entry: *"
-              << hex << (unsigned int)pAct << " = " << (*(unsigned int*)pAct) << dec);
+      TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Entry: *"
+              << std::hex << (unsigned int)pAct << " = " << (*(unsigned int*)pAct) << std::dec);
 
       if (*(unsigned int*)pAct == ENTRY_TYPE) {
          pAct += 4;
-         pTitle = pAct + (unsigned int)*pAct++;
+         pTitle = (unsigned int)(*pAct & 0xff) + pAct++;
          do {
-            TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Type: *"
-                    << hex << (unsigned int)pAct << " = " << get4BytesLSB (pAct) << dec);
+            TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Type: *"
+                    << std::hex << (unsigned int)pAct << " = " << get4BytesLSB (pAct) << std::dec);
 
             static std::string Properties::* values[] = { &Properties::strTitle,
                                                           &Properties::strComment,
@@ -237,7 +255,7 @@ int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
                  i < (sizeof (aSupportedTypes) / sizeof (aSupportedTypes[0])); ++i) {
                if (*(unsigned int*)pAct == aSupportedTypes[i]) {
                   pAct += 4;
-                  TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - " << i
+                  TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - " << i
                           << ": Assigning " << (unsigned int)(*pAct) << " chars = "
                           << pAct + 1);
                   (prop->*(values[i])).assign (pAct + 1, (unsigned int)*pAct);
@@ -247,7 +265,7 @@ int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
             } // end-for
 
             pAct += 4;
-            TRACE8 ("ParseJPEG::foundTitle3 (const char*, unsigned int) - Skipping "
+            TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Skipping "
                     << ((unsigned int)*pAct) << " bytes");
             pAct += (unsigned int)*pAct + 1;
          } while (pAct < pTitle);
@@ -257,43 +275,93 @@ int ParseJPEG::foundTitle3 (const char* pTitle, unsigned int len) {
 }
 
 //-----------------------------------------------------------------------------
-/// Callback after the length of the title was read
+/// Callback after the length of the title was read (in LSB format)
 /// \param length: Pointer to length
 /// \returns \c int: Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
-int ParseJPEG::foundLength (const char* length, unsigned int) {
+int ParseJPEG::foundLengthLSB (const char* length, unsigned int) {
    Check3 (length);
-   lengths[1] = get2BytesMSB (length);
-   TRACE8 ("ParseJPEG::foundLength (const char*, unsigned int): " << lengths[1]);
-   if (lengths[1]) {
-      title.setMaxCard (lengths[1]);
-      title3.setMaxCard (lengths[1]);
-   }
-
-   skip.setOffset (14);
+   TRACE8 ("ParseJPEG::foundLengthLSB (const char*, unsigned int): " << lengths[1]
+	   << " = 0x" << std::hex << get2BytesLSB (length) << std::dec);
+   foundLength (get2BytesLSB (length) - 2);
    return YGP::ParseObject::PARSE_OK;
 }
 
 //-----------------------------------------------------------------------------
-/// Callback after the length of the title was read
+/// Sets the length of the title to read
+/// \param length: Length of title
+/// \returns \c unsigned long: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+unsigned long ParseJPEG::foundLength (unsigned int length) {
+   skipLen.setOffset (lengths[1] = length);
+   TRACE8 ("ParseJPEG::foundLength (unsigned int): " << length << " = 0x" << std::hex << length << std::dec);
+   if (length) {
+      title.setMaxCard (length);
+      titlePhotoshop.setMaxCard (length);
+   }
+}
+
+//-----------------------------------------------------------------------------
+/// Callback after the length of the title was read (in MSB format)
 /// \param length: Pointer to length
 /// \returns \c int: Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
-int ParseJPEG::foundLength2 (const char* length, unsigned int) {
+int ParseJPEG::foundLengthMSB (const char* length, unsigned int) {
    Check3 (length);
+   TRACE8 ("ParseJPEG::foundLengthMSB (const char*, unsigned int): " << lengths[1]
+	   << " = 0x" << std::hex << get2BytesMSB (length) << std::dec);
+   foundLength (get2BytesMSB (length) - 2);
+   return YGP::ParseObject::PARSE_OK;
+}
 
+//-----------------------------------------------------------------------------
+/// Checks if a supported type has been read and sets the length, if so
+/// \param length: Pointer to length
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+/// \pre: actEnty must have been set before
+//-----------------------------------------------------------------------------
+bool ParseJPEG::supportedLength4 (unsigned int length) {
+   TRACE8 ("ParseJPEG::supportedLength4 (unsigned int) - " << length);
    static unsigned int aSupportedTypes[] = { TYPE_TITLE, TYPE_COMMENT, TYPE_AUTHOR };
+
    for (unsigned int i (0);
         i < (sizeof (aSupportedTypes) / sizeof (aSupportedTypes[0])); ++i)
       if (actEntry == aSupportedTypes[i]) {
-         lengths[i] = get2BytesLSB (length);
-         TRACE8 ("ParseJPEG::foundLength2 (const char*) - " << lengths[i]
-                 << " (0x" << hex << lengths[i] << dec << ')');
+         lengths[i] = length;
          actEntry = i;
-         return YGP::ParseObject::PARSE_OK;
+         TRACE8 ("ParseJPEG::foundLength4 (unsigned int) - " << lengths[i]
+                 << " (0x" << std::hex << lengths[i] << std::dec << ')');
+	 return true;
       }
-
    actEntry = -1U;
+   return false;
+}
+
+//-----------------------------------------------------------------------------
+/// Callback after the length of the title was read (in LSB format)
+/// \param length: Pointer to length
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+int ParseJPEG::foundLengthLSB4 (const char* length, unsigned int) {
+   Check3 (length);
+   TRACE8 ("ParseJPEG::foundLengthLSB4 (const char*, unsigned int): " << get4BytesLSB (length)
+	   << " = 0x" << std::hex << get4BytesLSB (length) << std::dec);
+
+   supportedLength4 (get4BytesLSB (length));
+   return YGP::ParseObject::PARSE_OK;
+}
+
+//-----------------------------------------------------------------------------
+/// Callback after the length of the title was read (in MSB format)
+/// \param length: Pointer to length
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+int ParseJPEG::foundLengthMSB4 (const char* length, unsigned int) {
+   Check3 (length);
+   TRACE8 ("ParseJPEG::foundLengthMSB4 (const char*, unsigned int): " << lengths[1]
+	   << " = 0x" << std::hex << get4BytesMSB (length) << std::dec);
+
+   supportedLength4 (get4BytesMSB (length));
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -304,11 +372,22 @@ int ParseJPEG::foundLength2 (const char* length, unsigned int) {
 //-----------------------------------------------------------------------------
 int ParseJPEG::foundNumber (const char* nr, unsigned int) {
    Check3 (nr);
-   seqEntries.setMaxCard (cEntries = (get2BytesLSB (nr)));
-   seqEntries.setMinCard (cEntries);
-   length2.setMaxCard (4);
+   cEntries = ((_seqIFD[1] == &lengthMSB4) ? get2BytesMSB (nr) : get2BytesLSB (nr));
    TRACE8 ("ParseJPEG::foundNumber (const char*, unsigned int): " << cEntries);
-   lengths[1] = 0;
+
+   skipLen.setOffset (4);
+   seqIFD.setMaxCard (cEntries);
+   seqIFD.setMinCard (cEntries);
+
+   if (cEntries) {
+      cRead = 10 + cEntries * 12;
+      title.setMaxCard (title.getMaxCard () - cRead);
+   }
+   else {
+      title.setMinCard (0);
+      title.setMaxCard (0);
+   }
+
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -320,8 +399,7 @@ int ParseJPEG::foundNumber (const char* nr, unsigned int) {
 int ParseJPEG::foundType (const char* pType, unsigned int) {
    Check3 (pType);
    actEntry = *(unsigned int*)pType;
-   TRACE8 ("ParseJPEG::foundType (const char*) - " << hex << actEntry << dec);
-   cRead += 12;
+   TRACE8 ("ParseJPEG::foundType (const char*, unsigned int) - " << std::hex << actEntry << std::dec);
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -335,30 +413,61 @@ int ParseJPEG::foundOffset (const char* pOffset, unsigned int len) {
    Check3 (pOffset);
    if (actEntry != -1U) {
       offsets[actEntry] = get4BytesLSB (pOffset);
-      TRACE8 ("ParseJPEG::foundOffset (const char*) - " << offsets[actEntry]
-              << " (0x" << hex << offsets[actEntry] << dec << ')');
+      TRACE8 ("ParseJPEG::foundOffset (const char*, unsigned int) - " << offsets[actEntry]
+              << " (0x" << std::hex << offsets[actEntry] << std::dec << ')');
    }
    return YGP::ParseObject::PARSE_OK;
 }
 
 //-----------------------------------------------------------------------------
-/// Callback after the header of the properthies has been read
+/// Callback after an end-of-JPEG marker has been parsed
 /// \returns \c int: Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
-int ParseJPEG::foundPropertiesHeader (const char*, unsigned int) {
-   TRACE1 ("ParseJPEG::foundPropertiesHeader (const char*) - Bytes read: "
-           << cRead << " (0x" << hex << cRead << dec << ')');
+int ParseJPEG::foundEndOfJPEG (const char*, unsigned int) {
+   TRACE8 ("ParseJPEG::foundEndOfJPEG (const char*, unsigned int)");
+   selMarker.setMaxCard (1);
+   return YGP::ParseObject::PARSE_OK;
+}
 
-   skip.setOffset (4);
-   cRead += 14;
+//-----------------------------------------------------------------------------
+/// Callback after an APP1 marker has been found
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+int ParseJPEG::foundAPP1 (const char*, unsigned int) {
+   TRACE8 ("ParseJPEG::foundAPP1 (const char*, unsigned int)");
+   skipLen.setOffset (0);
+   return YGP::ParseObject::PARSE_OK;
+}
 
-   TRACE8 ("ParseJPEG::foundPropertiesHeader (const char*) - Title length: "
-           << title.getMaxCard () - cRead - 8);
-   if (title.getMaxCard () <= (cRead + 8))
-      _seqPropLong[6] = NULL;
-   else {
-      Check3 (title.getMaxCard () > (cRead + 8));
-      title.setMaxCard (title.getMaxCard () - cRead - 8);
-   }
+//-----------------------------------------------------------------------------
+/// Callback after an APP1 marker has been found
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+int ParseJPEG::foundImage (const char*, unsigned int) {
+   TRACE8 ("ParseJPEG::foundImage (const char*, unsigned int)");
+   selMarker.setMaxCard (1);
+   return YGP::ParseObject::PARSE_OK;
+}
+
+//-----------------------------------------------------------------------------
+/// Callback after an APP1 marker has been found
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+int ParseJPEG::foundByteOrder (const char* order, unsigned int) {
+   TRACE8 ("ParseJPEG::foundByteOrder (const char*, unsigned int) - " << *order << order[1]);
+   if ((*order == 'M') && (order[1] == 'M'))
+      _seqIFD[1] = &lengthMSB4;
+   else if ((*order != 'I') || (order[1] != 'I'))
+      return YGP::ParseObject::PARSE_CB_ABORT;
+   return YGP::ParseObject::PARSE_OK;
+}
+
+//-----------------------------------------------------------------------------
+/// Callback after an APP1 marker has been found
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+int ParseJPEG::foundAPP1Exif (const char*, unsigned int) {
+   TRACE8 ("ParseJPEG::foundApp1Exif (const char*, unsigned int)");
+   _seqIFD[1] = &lengthLSB4;
    return YGP::ParseObject::PARSE_OK;
 }
