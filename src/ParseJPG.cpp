@@ -40,9 +40,9 @@
 #endif
 
 #ifdef WORDS_BIGENDIAN
-#  define TYPE_TITLE     0x9b9c0100
-#  define TYPE_COMMENT   0x9c9c0100
-#  define TYPE_AUTHOR    0x9d9c0100
+#  define TYPE_TITLE     0x9b9c0001
+#  define TYPE_COMMENT   0x9c9c0001
+#  define TYPE_AUTHOR    0x9d9c0001
 
 #  define TYPE_TITLE2    0x1c026900
 #  define TYPE_COMMENT2  0x1c027800
@@ -380,6 +380,7 @@ int ParseJPEG::foundNumber (const char* nr, unsigned int) {
    seqIFD.setMinCard (cEntries);
 
    if (cEntries) {
+      lengths[1] = 0;
       cRead = 10 + cEntries * 12;
       title.setMaxCard (title.getMaxCard () - cRead);
    }
