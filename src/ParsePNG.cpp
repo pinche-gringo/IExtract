@@ -32,27 +32,21 @@
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 
-#include "Properties.h"
-
+#include "Utility.h"
 #include "ParsePNG.h"
+#include "Properties.h"
 
 
 #ifdef WORDS_BIGENDIAN
+
 #define TYPE_TEXT 0x74584574
 
-inline unsigned int get4BytesMSB (const char* pAddr) {
-   return *(unsigned int*)pAddr;
-}
-
 #else
+
 #define TYPE_TEXT 0x74455874
 
-inline unsigned int get4BytesMSB (const char* pAddr) {
-   return (((unsigned char)(*pAddr) << 24) + ((unsigned char)pAddr[1] << 16)
-           + ((unsigned char)pAddr[2] << 8) + ((unsigned char)pAddr[3]));
-}
-
 #endif
+
 
 //-----------------------------------------------------------------------------
 /// Constructor

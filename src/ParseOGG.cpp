@@ -31,23 +31,9 @@
 
 #include <YGP/Trace.h>
 
-#include "Properties.h"
-
+#include "Utility.h"
 #include "ParseOGG.h"
-
-
-#ifdef WORDS_BIGENDIAN
-inline unsigned int get4BytesLSB (const char* pAddr) {
-   return (((unsigned char)(*pAddr) << 24) + ((unsigned char)pAddr[1] << 16)
-           + ((unsigned char)pAddr[2] << 8) + ((unsigned char)pAddr[3]));
-}
-
-#else
-inline unsigned int get4BytesLSB (const char* pAddr) {
-   return *(unsigned int*)pAddr;
-}
-
-#endif
+#include "Properties.h"
 
 
 //-----------------------------------------------------------------------------

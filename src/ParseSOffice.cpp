@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 04.11.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2004
+//COPYRIGHT   : Copyright (C) 2002 - 2005
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,23 +30,13 @@
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 
+#include "Utility.h"
 #include "Properties.h"
 #include "ParseSOffice.h"
 
 
 #ifdef _MSC_VER
 #pragma warning(disable:4355) // disable warning about this in initlist
-#endif
-
-
-#ifdef WORDS_BIGENDIAN
-inline unsigned short get2BytesLSB (const char* pAddr) {
-   return ((unsigned char)(*pAddr) << 8) + (unsigned char)pAddr[1];
-}
-#else
-inline unsigned short get2BytesLSB (const char* pAddr) {
-   return *(unsigned short*)pAddr;
-}
 #endif
 
 

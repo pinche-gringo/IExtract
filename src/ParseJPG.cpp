@@ -32,6 +32,7 @@
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 
+#include "Utility.h"
 #include "ParseJPG.h"
 #include "Properties.h"
 
@@ -51,23 +52,6 @@
 #  define ENTRY_BLOCK    0x3842494d
 #  define ENTRY_TYPE     0x6e000000
 
-inline unsigned short get2BytesLSB (const char* pAddr) {
-   return ((unsigned char)(*pAddr) << 8) + (unsigned char)pAddr[1];
-}
-
-inline unsigned short get2BytesMSB (const char* pAddr) {
-   return *(unsigned short*)pAddr;
-}
-
-inline unsigned long get4BytesLSB (const char* pAddr) {
-   return (((unsigned char)(*pAddr) << 24) + ((unsigned char)pAddr[1] << 16)
-           + ((unsigned char)pAddr[2] << 8) + ((unsigned char)pAddr[3]));
-}
-
-inline unsigned long get4BytesMSB (const char* pAddr) {
-   return *(unsigned char*)pAddr;
-}
-
 #else
 #  define TYPE_TITLE     0x019c9b
 #  define TYPE_COMMENT   0x019c9c
@@ -79,23 +63,6 @@ inline unsigned long get4BytesMSB (const char* pAddr) {
 
 #  define ENTRY_BLOCK    0x4d494238
 #  define ENTRY_TYPE     0x6e
-
-inline unsigned short get2BytesLSB (const char* pAddr) {
-   return *(unsigned short*)pAddr;
-}
-
-inline unsigned short get2BytesMSB (const char* pAddr) {
-   return ((unsigned char)(*pAddr) << 8) + (unsigned char)pAddr[1];
-}
-
-inline unsigned long get4BytesLSB (const char* pAddr) {
-   return *(unsigned int*)pAddr;
-}
-
-inline unsigned long get4BytesMSB (const char* pAddr) {
-   return (((unsigned char)(*pAddr) << 24) + ((unsigned char)pAddr[1] << 16)
-           + ((unsigned char)pAddr[2] << 8) + ((unsigned char)pAddr[3]));
-}
 
 #endif
 
