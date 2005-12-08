@@ -42,12 +42,18 @@ class ParseWord  {
 
  private:
    // Callback-methods for type of parsed elementes
+   int foundBlockSize (const char*, unsigned int);
+   int foundBlockIndex (const char*, unsigned int);
+   int foundNameProperty (const char*, unsigned int);
+   int foundLenNameProperty (const char*, unsigned int);
+   int foundNextProperty (const char*, unsigned int);
+   int foundSectionOffset (const char*, unsigned int);
+
    int foundNrEntries (const char*, unsigned int);
    int foundType (const char*, unsigned int);
    int foundOffset (const char*, unsigned int);
    int foundLength (const char*, unsigned int);
-   int foundTitle (const char*, unsigned int);
-   int foundValueStart (const char*, unsigned int);
+   int foundInformation (const char*, unsigned int);
    int foundPropertiesHeader (const char*, unsigned int);
 
    static int getTypeIndex (unsigned int type);
@@ -57,29 +63,35 @@ class ParseWord  {
    typedef YGP::OFParseAttomic<ParseWord>  OMParseAttomic;
    typedef YGP::OFParseSequence<ParseWord> OMParseSequence;
 
-   YGP::ParseExact   id;
-   OMParseExact      idValue1;
-   OMParseExact      idValue2;
+   YGP::ParseExact   poifsID;
+   YGP::ParseSkip    skipBeg;
    YGP::ParseSkip    skip;
+   OMParseAttomic    sizeBlock;
+   OMParseAttomic    blockIndex;
+   OMParseAttomic    nameProperty;
+   OMParseAttomic    lenNameProperty;
+   YGP::ParseExact   idPropStream;
+   YGP::ParseExact   idClass;
+   OMParseAttomic    sectionOffset;
+   OMParseAttomic    length;
    OMParseAttomic    nrEntries;
    OMParseAttomic    type;
    OMParseAttomic    offset;
-   OMParseAttomic    length;
-   OMParseText       title;
-   YGP::ParseAttomic skipIDStart;
-   YGP::ParseText    ignore;
+   OMParseText       information;
 
-   YGP::ParseSelection selValueStart;
-   YGP::ParseSequence  seqTitle;
-   OMParseSequence     seqEntries;
+   YGP::ParseSequence  wordDoc;                                // Startsequence
    YGP::ParseSequence  seqProperties;
-   YGP::ParseSelection wordDoc;                                // Startsequence
+   YGP::ParseSequence  seqInformation;
 
-   YGP::ParseObject* _wordDoc[4];
-   YGP::ParseObject* _seqProperties[7];
-   YGP::ParseObject* _seqTitle[4];
+   YGP::ParseObject* _wordDoc[19];
+   YGP::ParseObject* _seqProperties[4];
+   YGP::ParseObject* _seqInformation[4];
+
+
+#if 1
+   OMParseSequence     seqEntries;
+
    YGP::ParseObject* _seqEntries[3];
-   YGP::ParseObject* _selValueStart[5];
 
    // Map for offsets to supported type. 1st: Offset, 2nd: Type
    std::map<unsigned int, unsigned int> aOffsets;
@@ -88,6 +100,10 @@ class ParseWord  {
    unsigned int cEntries;
    unsigned int actEntry;
    unsigned int len;
+#endif
+
+   unsigned int blockSize;
+   char propertyName[0x40];
 
    Properties* prop;
 };
