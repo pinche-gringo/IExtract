@@ -1,5 +1,5 @@
-#ifndef PARSEWORD_H
-#define PARSEWORD_H
+#ifndef PARSEMSOFFICE_H
+#define PARSEMSOFFICE_H
 
 //$Id$
 
@@ -30,15 +30,15 @@
 struct Properties;
 
 
-// Class to extract the title (of the properties) of a Word document
-class ParseWord  {
+// Class to extract the title (of the properties) of a Microsoft office document
+class ParseMSOffice  {
  public:
-   ParseWord ();
-   ~ParseWord () { }
+   ParseMSOffice ();
+   ~ParseMSOffice () { delete [] pBAT; delete [] pSBAT; }
 
    void parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
       prop = &result;
-      wordDoc.parse (stream); }
+      officedoc.parse (stream); }
 
  private:
    // Callback-methods for type of parsed elementes
@@ -46,8 +46,8 @@ class ParseWord  {
    int foundBlockIndex (const char*, unsigned int);
    int foundNameProperty (const char*, unsigned int);
    int foundLenNameProperty (const char*, unsigned int);
-   int foundNextProperty (const char*, unsigned int);
    int foundSectionOffset (const char*, unsigned int);
+   int foundBeginSBA (const char*, unsigned int);
 
    int foundNrEntries (const char*, unsigned int);
    int foundType (const char*, unsigned int);
@@ -55,13 +55,23 @@ class ParseWord  {
    int foundLength (const char*, unsigned int);
    int foundInformation (const char*, unsigned int);
    int foundPropertiesHeader (const char*, unsigned int);
+   int foundBAT (const char*, unsigned int);
+
+   int foundCountBAT (const char*, unsigned int);
+   int foundCountSBAT (const char*, unsigned int);
+   int foundCountXBAT (const char*, unsigned int);
+   int foundBlockBAT (const char*, unsigned int);
+   int foundBlockSBAT (const char*, unsigned int);
+   int foundBlockXBAT (const char*, unsigned int);
+   int foundBlock (const char*, unsigned int);
+   int foundFileSize (const char*, unsigned int);
 
    static int getTypeIndex (unsigned int type);
 
-   typedef YGP::OFParseText<ParseWord>     OMParseText;
-   typedef YGP::OFParseExact<ParseWord>    OMParseExact;
-   typedef YGP::OFParseAttomic<ParseWord>  OMParseAttomic;
-   typedef YGP::OFParseSequence<ParseWord> OMParseSequence;
+   typedef YGP::OFParseText<ParseMSOffice>     OMParseText;
+   typedef YGP::OFParseExact<ParseMSOffice>    OMParseExact;
+   typedef YGP::OFParseAttomic<ParseMSOffice>  OMParseAttomic;
+   typedef YGP::OFParseSequence<ParseMSOffice> OMParseSequence;
 
    YGP::ParseExact   poifsID;
    YGP::ParseSkip    skipBeg;
@@ -78,20 +88,27 @@ class ParseWord  {
    OMParseAttomic    type;
    OMParseAttomic    offset;
    OMParseText       information;
+   OMParseAttomic    beginSBA;
+   OMParseAttomic    countBAT;
+   OMParseAttomic    countSBAT;
+   OMParseAttomic    countXBAT;
+   OMParseAttomic    blockBAT;
+   OMParseAttomic    blockSBAT;
+   OMParseAttomic    blockXBAT;
+   OMParseAttomic    block;
+   OMParseAttomic    sizeFile;
 
-   YGP::ParseSequence  wordDoc;                                // Startsequence
+   YGP::ParseSequence  officedoc;                                // Startsequence
    YGP::ParseSequence  seqProperties;
    YGP::ParseSequence  seqInformation;
-
-   YGP::ParseObject* _wordDoc[19];
-   YGP::ParseObject* _seqProperties[4];
-   YGP::ParseObject* _seqInformation[4];
-
-
-#if 1
    OMParseSequence     seqEntries;
+   OMParseSequence     seqBAT;
 
+   YGP::ParseObject* _officedoc[22];
+   YGP::ParseObject* _seqProperties[7];
+   YGP::ParseObject* _seqInformation[4];
    YGP::ParseObject* _seqEntries[3];
+   YGP::ParseObject* _seqBAT[4];
 
    // Map for offsets to supported type. 1st: Offset, 2nd: Type
    std::map<unsigned int, unsigned int> aOffsets;
@@ -100,10 +117,15 @@ class ParseWord  {
    unsigned int cEntries;
    unsigned int actEntry;
    unsigned int len;
-#endif
 
+   unsigned int indexSBA;
    unsigned int blockSize;
+   unsigned int blockSizeSmall;
    char propertyName[0x40];
+
+   unsigned int* pBAT, cBAT;
+   unsigned int* pSBAT, cSBAT;
+   unsigned int* pXBAT, cXBAT;
 
    Properties* prop;
 };
