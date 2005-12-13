@@ -83,7 +83,7 @@
 #include "ParseGIF.h"
 #include "ParseRTF.h"
 #include "ParseHTML.h"
-#include "ParseWord.h"
+#include "ParseMSOffice.h"
 #include "ParseAbiword.h"
 #include "ParseOOffice.h"
 #include "ParseSOffice.h"
@@ -157,7 +157,7 @@ class Application : public YGP::IVIOApplication {
    void processGIF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processHTML (YGP::Xistream& hFile, Properties& result) const throw (std::string);
    void processRTF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
-   void processOffice (YGP::Xistream& hFile, Properties& result) const
+   void processMSOffice (YGP::Xistream& hFile, Properties& result) const
       throw (std::string);
    void processOpenOffice (YGP::Xistream& hFile, Properties& result) const
       throw (std::string);
@@ -251,7 +251,7 @@ Application::Application (const int argc, const char* argv[])
 #endif
 
    handlers.insert (handlers.end (), handlerValue ("abw", &Application::processAbiword));
-   handlers.insert (handlers.end (), handlerValue ("doc", &Application::processOffice));
+   handlers.insert (handlers.end (), handlerValue ("doc", &Application::processMSOffice));
    handlers.insert (handlers.end (), handlerValue ("gif", &Application::processGIF));
    handlers.insert (handlers.end (), handlerValue ("htm", &Application::processHTML));
    handlers.insert (handlers.end (), handlerValue ("html", &Application::processHTML));
@@ -266,7 +266,7 @@ Application::Application (const int argc, const char* argv[])
    handlers.insert (handlers.end (), handlerValue ("pdf", &Application::processPDF));
    handlers.insert (handlers.end (), handlerValue ("php", &Application::processHTML));
    handlers.insert (handlers.end (), handlerValue ("png", &Application::processPNG));
-   handlers.insert (handlers.end (), handlerValue ("ppt", &Application::processOffice));
+   handlers.insert (handlers.end (), handlerValue ("ppt", &Application::processMSOffice));
    handlers.insert (handlers.end (), handlerValue ("rtf", &Application::processRTF));
    handlers.insert (handlers.end (), handlerValue ("sda", &Application::processStarOffice));
    handlers.insert (handlers.end (), handlerValue ("sdc", &Application::processStarOffice));
@@ -280,7 +280,7 @@ Application::Application (const int argc, const char* argv[])
    handlers.insert (handlers.end (), handlerValue ("sxi", &Application::processOpenOffice));
    handlers.insert (handlers.end (), handlerValue ("sxm", &Application::processOpenOffice));
    handlers.insert (handlers.end (), handlerValue ("sxw", &Application::processOpenOffice));
-   handlers.insert (handlers.end (), handlerValue ("xls", &Application::processOffice));
+   handlers.insert (handlers.end (), handlerValue ("xls", &Application::processMSOffice));
 }
 
 //----------------------------------------------------------------------------
@@ -924,9 +924,9 @@ void Application::processRTF (YGP::Xistream& hFile, Properties& result) const
 /// \param hFile: File to processs
 /// \param result: Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processOffice (YGP::Xistream& hFile, Properties& result) const
+void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
-   ParseWord ().parse (hFile, result);
+   ParseMSOffice ().parse (hFile, result);
 }
 
 //-----------------------------------------------------------------------------
