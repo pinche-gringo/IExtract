@@ -36,8 +36,6 @@
 #include <iomanip>
 #include <iostream>
 
-#define CHECK 9
-#define TRACELEVEL 9
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 
@@ -50,465 +48,223 @@ static const char SUMMARY[] = ("\x05\0\x53\0\x75\0\x6d\0\x6d\0\x61\0\x72\0\x79\0
 			       "\x49\0\x6E\0\x66\0\x6F\0\x72\0\x6D\0\x61\0\x74\0"
 			       "\x69\0\x6F\0\x6E\0\0");
 static const char ROOTENTRY[] = "R\0o\0o\0t\0 \0E\0n\0t\0r\0y\0\0";
-static const char CLASSID[] = { '\x01', '\0', '\0', '\0', '\xE0', '\x85', '\x9F', '\xF2', '\xF9', '\x4F',
-				'\x68', '\x10', '\xAB', '\x91', '\x08', '\0', '\x2B', '\x27', '\xB3', '\xD9' };
+static const char SECTIONID[] = { '\x01', '\0', '\0', '\0', '\xE0', '\x85', '\x9F', '\xF2', '\xF9', '\x4F',
+				  '\x68', '\x10', '\xAB', '\x91', '\x08', '\0', '\x2B', '\x27', '\xB3', '\xD9' };
 
 
-static const unsigned LEN_CONTENT     = 1024;
-
-
-#ifdef MSOFFICES_BIGENDIAN
-   static const unsigned int TYPE_TITLE   = 0x2000000;
-   static const unsigned int TYPE_AUTHOR  = 0x4000000;
-   static const unsigned int TYPE_COMMENT = 0x6000000;
-
-#else
-   static const unsigned int TYPE_TITLE   = 2;
-   static const unsigned int TYPE_AUTHOR  = 4;
-   static const unsigned int TYPE_COMMENT = 6;
-
-#endif
-
-
-static const unsigned int aTypes[] = { TYPE_TITLE, TYPE_AUTHOR, TYPE_COMMENT };
+static const UINT32 TYPE_TITLE   = 2;
+static const UINT32 TYPE_AUTHOR  = 4;
+static const UINT32 TYPE_COMMENT = 6;
 
 
 //-----------------------------------------------------------------------------
 /// (Default-)Constructor
 //-----------------------------------------------------------------------------
-ParseMSOffice::ParseMSOffice()
-   : poifsID ("\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1", _("Magic number")),
-     skipBeg (22, std::ios_base::beg),
-     skip (22),
-     sizeBlock  ("\\*", _("Size of blocks"), *this, &ParseMSOffice::foundBlockSize, 4, 4, false),
-     blockIndex  ("\\*", _("Index of block"), *this, &ParseMSOffice::foundBlockIndex, 4, 4, false),
-     nameProperty ("\\*", _("Name of property"), *this, &ParseMSOffice::foundNameProperty, 0x40, 0x40, false),
-     lenNameProperty ("\\*", _("Length of name of property"), *this, &ParseMSOffice::foundLenNameProperty, 2, 2, false),
-     idPropStream ("\xfe\xff", _("ID of property set stream"), 2, 2, false),
-     idClass (CLASSID, _("Class ID"), sizeof (CLASSID), sizeof (CLASSID), false),
-     sectionOffset  ("\\*", _("Offset of section"), *this, &ParseMSOffice::foundSectionOffset, 4, 4, false),
-     length ("\\*", _("Length"), *this, &ParseMSOffice::foundLength, 4, 4, false),
-     nrEntries ("\\*", _("Number of entries"), *this, &ParseMSOffice::foundNrEntries, 4, 4, false),
-     type ("\\*", _("Type of entry"), *this, &ParseMSOffice::foundType, 4, 4, false),
-     offset  ("\\*", _("Offset"), *this, &ParseMSOffice::foundOffset, 4, 4, false),
-     information ("\0", _("Information"), *this, &ParseMSOffice::foundInformation, 1, 1, false),
-     beginSBA   ("\\*", _("Index of SBA"), *this, &ParseMSOffice::foundBeginSBA, 4, 4, false),
-     countBAT ("\\*", _("Number of elements in BAT array"), *this, &ParseMSOffice::foundCountBAT, 4, 4, false),
-     countSBAT ("\\*", _("Blocks of SBAT array"), *this, &ParseMSOffice::foundCountSBAT, 4, 4, false),
-     countXBAT ("\\*", _("Blocks of XBAT array"), *this, &ParseMSOffice::foundCountXBAT, 4, 4, false),
-     blockBAT  ("\\*", _("Index of of BAT"), *this, &ParseMSOffice::foundBlockBAT, 4, 4, false),
-     blockSBAT  ("\\*", _("Index of of SBAT"), *this, &ParseMSOffice::foundBlockSBAT, 4, 4, false),
-     blockXBAT  ("\\*", _("Index of of XBAT"), *this, &ParseMSOffice::foundBlockXBAT, 4, 4, false),
-     block ("\\*", _("block"), *this, &ParseMSOffice::foundBlock, 512, 512, false),
-     sizeFile ("\\*", _("Filesize"), *this, &ParseMSOffice::foundFileSize, 4, 4, false),
-
-     officedoc (_officedoc, _("Office document"), 1, 1),
-     seqProperties (_seqProperties, _("Properties"), -1U, 1, false),
-     seqInformation (_seqInformation, _("Information summary"), 1, 0, false),
-     seqEntries (_seqEntries, _("Entry description"), *this,
-		 &ParseMSOffice::foundPropertiesHeader, 1, 1, false),
-     seqBAT (_seqBAT, _("BAT"), *this, &ParseMSOffice::foundBAT, 1, 1),
-     cRead (0), cEntries (0), actEntry (-1U), len (0), pBAT (NULL), cBAT (0),
-     pSBAT (NULL), cSBAT (0), pXBAT (NULL), cXBAT (0), prop (NULL) {
-
-   // Property table
-   _seqProperties[0] = &nameProperty;
-   _seqProperties[1] = &lenNameProperty;
-   _seqProperties[2] = &skip;
-   _seqProperties[3] = &blockIndex;
-   _seqProperties[4] = &sizeFile;
-   _seqProperties[5] = &skip;
-   _seqProperties[6] = NULL;
-
-   _seqBAT[0] = &blockIndex;
-   _seqBAT[1] = &skipBeg;
-   _seqBAT[2] = &block;
-   _seqBAT[3] = NULL;
-
-   _seqEntries[0] = &type;
-   _seqEntries[1] = &skip;
-   _seqEntries[2] = NULL;
-
-   _seqInformation[0] = &length;
-   _seqInformation[1] = &information;
-   _seqInformation[2] = &skip;
-   _seqInformation[3] = NULL;
-
-   _officedoc[0] = &poifsID;
-   _officedoc[1] = &skip;
-   _officedoc[2] = &sizeBlock;
-   _officedoc[3] = &skip;
-   _officedoc[4] = &countBAT;
-   _officedoc[5] = &skipBeg;
-   _officedoc[6] = &seqBAT;
-   _officedoc[7] = &skipBeg;
-   _officedoc[8] = &blockIndex;
-   _officedoc[9] = &skipBeg;
-   _officedoc[10] = &seqProperties;
-   _officedoc[11] = &skipBeg;
-   _officedoc[12] = &idPropStream;
-   _officedoc[13] = &skip;
-   _officedoc[14] = &idClass;
-   _officedoc[15] = &sectionOffset;
-   _officedoc[16] = &length;
-   _officedoc[17] = &nrEntries;
-   _officedoc[18] = &seqEntries;
-   _officedoc[19] = &skip;
-   _officedoc[20] = &seqInformation;
-   _officedoc[21] = NULL;
+ParseMSOffice::ParseMSOffice() {
 }
 
 
 //-----------------------------------------------------------------------------
-/// Callback after the sizes of blocks has been parsed
-/// \param pBlockSize: Pointer to sizes
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+/// Tries to parse a Microsoft Office documnent
+/// \param stream: Stream to read from
+/// \param result: Structure to hold the found information
+/// \throw std::string: In case of an error an describing text
 //-----------------------------------------------------------------------------
-int ParseMSOffice::foundBlockSize (const char* pBlockSize, unsigned int) {
-   Check3 (pBlockSize);
-   blockSize = get2BytesLSB (pBlockSize);
-   blockSizeSmall = get2BytesLSB (pBlockSize + 2);
-   TRACE9 ("ParseMSOffice::foundBlockSize (const char*, unsigned int) - " << (1 << blockSize) << '/' << (1 << blockSizeSmall));
-   skip.setOffset (10);
-   return YGP::ParseObject::PARSE_OK;
-}
+void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
+   TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&)");
 
-//-----------------------------------------------------------------------------
-/// Callback after the index of a block has been parsed
-/// \param pBlockID: Pointer to number of entries
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundBlockIndex (const char* pBlockID, unsigned int) {
-   Check3 (pBlockID);
-   skipBeg.setOffset ((get4BytesLSB (pBlockID) + 1) << blockSize);
-   skip.setOffset (0x16);
-   TRACE5 ("ParseMSOffice::foundBlockIndex (const char*, unsigned int) - " << get4BytesLSB (pBlockID) << " -> " << skipBeg.getOffset ());
-   return YGP::ParseObject::PARSE_OK;
-}
+   // Read the header (the first block)
+   char header[512];
+   stream.read (header, 512);
+   if (!stream)
+      throw std::string (_("Can't read document header!"));
 
-//-----------------------------------------------------------------------------
-/// Callback after the begin of the "small block area"  has been parsed
-/// \param pBlockID: Pointer to number of entries
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundBeginSBA (const char* pBlockID, unsigned int) {
-   Check3 (pBlockID);
-   indexSBA = get4BytesLSB (pBlockID);
-   skip.setOffset (4);
-   TRACE5 ("ParseMSOffice::foundBeginSBA (const char*, unsigned int) - "
-	   << std::hex << indexSBA << " -> 0x" << ((indexSBA + 1) << blockSize) << std::dec);
-   return YGP::ParseObject::PARSE_OK;
-}
+   if (memcmp (header, "\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1", 8))
+      throw std::string (_("Office identifier not found!"));
 
-//-----------------------------------------------------------------------------
-/// Callback after the name of a property has been parsed
-/// \param pName: Pointer to number of entries
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundNameProperty (const char* pName, unsigned int len) {
-   Check2 (pName); Check2 (len <= sizeof (propertyName));
-   memcpy (propertyName, pName, sizeof (propertyName));
-   TRACE3 ("ParseMSOffice::foundNameProperty (const char*, unsigned int) - " << pName << pName[2] << pName[4] << pName[6] << pName[8] << pName[10]);
-   return YGP::ParseObject::PARSE_OK;
-}
+   // Blocksizes
+   UINT16 sizeBlock (get2BytesLSB (header + 0x1e));
+   UINT16 sizeBlockSmall (get2BytesLSB (header + 0x20));
+   TRACE8 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Sizes: " << (1 << sizeBlock) << '/' << (1 << sizeBlockSmall));
+   if ((sizeBlockSmall > sizeBlock) || (sizeBlock > 512))
+      throw std::string (_("Values for blocksizes are not plausible!"));
 
-//-----------------------------------------------------------------------------
-/// Callback after the length of the name of a property has been parsed
-/// \param pLen: Pointer to number of entries
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundLenNameProperty (const char* pLen, unsigned int) {
-   unsigned int length (get2BytesLSB (pLen));
-   TRACE7 ("ParseMSOffice::foundLenNameProperty (const char*, unsigned int) - " << length);
+   // Count of BAT blocks and offset of properties
+   UINT32 cBAT (get4BytesLSB (header + 0x2c));
+   if (cBAT > 109)
+      throw std::string (_("Number of blocks for BAT not plausible!"));
 
-   if (length > 0x40)
-      return YGP::ParseObject::PARSE_CB_ABORT;
+   UINT32 offProperties (get4BytesLSB (header + 0x30));
+   TRACE6 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Properties: " << std::hex
+	   << offProperties << " -> " << ((offProperties << sizeBlock) + 512));
 
-   if (!length) {
-      TRACE9 ("ParseMSOffice::foundLenNameProperty (const char*, unsigned int) - End");
-      seqProperties.setMinCard (0);
-      seqProperties.setMaxCard (0);
-      _officedoc[7] = NULL;
+   // Read the property-table
+   char* block (new char [1 << sizeBlock]);
+   readBlock (stream, offProperties, block, sizeBlock);
+
+   // First entry must be the root-entry (which has a pointer to the small block area
+   if ((get2BytesLSB (block + 0x40) != 0x16) || memcmp (block, ROOTENTRY, 0x16)) {
+      delete [] block;
+      snprintf (header, sizeof (header), "%p", (void*)((offProperties << sizeBlock) + 512));
+      std::string error (_("Not a property block at offset %1!"));
+      error.replace (error.find ("%1"), 2, header);
+      throw error;
    }
-   else {
-      Check3 (sizeof (SUMMARY) == 0x28);
-      Check3 (sizeof (ROOTENTRY) == 0x16);
+   UINT32 offSBA (get4BytesLSB (block + 0x74));
 
-      if ((length == 0x28) && !memcmp (propertyName, SUMMARY, 0x28)) {
-	 TRACE9 ("ParseMSOffice::foundLenNameProperty (const char*, unsigned int) - SI");
-	 seqProperties.setMinCard (0);
-	 seqProperties.setMaxCard (0);
-	 skip.setOffset (0x32);
-	 _seqProperties[3] = &blockIndex;
+   // Read the block array table
+   UINT32* pBAT (new UINT32 [(cBAT << sizeBlock) >> 2]);
+   try {
+      readBAT (stream, (char*)pBAT, header + 0x4c, cBAT, sizeBlock);
+   }
+   catch (std::string& e) {
+      delete [] block;
+      delete [] pBAT;
+      throw e;
+   }
+
+   const char* entry (block + 0x80);
+   do {
+      char* infoBlock (NULL);
+      try {
+	 while (entry < (block + (1 << sizeBlock))) {
+	    TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Entry with " << std::hex << get2BytesLSB (entry + 0x40) << " bytes");
+
+	    // Check for InformationSummary-block
+	    if ((get2BytesLSB (entry + 0x40) == 0x28) && !memcmp (entry, SUMMARY, 0x28)) {
+	       INT32 length (get4BytesLSB (entry + 0x78));
+	       char* infoBlock (new char [length]);
+	       UINT32 offBlock (get4BytesLSB (entry + 0x74));
+	       TRACE8 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Info in " << std::hex
+		       << offBlock << std::dec << "; " << length << " bytes");
+
+	       infoBlock = new char [length];
+	       char* actPos (infoBlock);
+	       // Files less than 4K are stored in small blocks
+	       if (length < 4096) {
+		  UINT32* pSBAT (NULL);
+		  UINT32 offSBAT (get4BytesLSB (header + 0x3c));
+	       }
+	       else {
+		  while (length > 0) {
+		     Check3 (offBlock < 0x80000000);
+		     readBlock (stream, offBlock, block, sizeBlock);
+		     memcpy (actPos, block, length < (1 << sizeBlock) ? length : 1 << sizeBlock);
+		     actPos += 1 << sizeBlock;
+		     length -= 1 << sizeBlock;
+		     offBlock = pBAT[offBlock];
+		  } // end-while
+	       }
+
+	       // Check info-block
+	       TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - InfoSummary: " << std::hex << get2BytesLSB (infoBlock) << std::dec);
+	       if ((get2BytesLSB (infoBlock) != 0xfffe)
+		   || memcmp (infoBlock + 0x18, SECTIONID, 0x14))
+		  throw std::string (_("Not an Information-Summary section!"));
+
+	       TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Start section: " << std::hex << get4BytesLSB (infoBlock + 0x2c) << std::dec);
+	       actPos = infoBlock + get4BytesLSB (infoBlock + 0x2c);
+	       unsigned int entries (get4BytesLSB (actPos + 4));
+	       TRACE3 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Entries: " << entries);
+	       if (entries > 50)
+		  throw std::string (_("Number of information entries not plausible!"));
+
+	       entry = actPos + 8;
+	       while (entries--) {
+		  UINT32 offset (get4BytesLSB (entry + 4));
+		  TRACE7 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Entry: " << get4BytesLSB (entry) << ": Offset " << std::hex << offset << std::dec);
+
+		  if ((offset >= get4BytesLSB (actPos))
+		      || ((get4BytesLSB (actPos + offset) == 0x1e)
+			  ? ((get4BytesLSB (actPos + offset + 4) >= get4BytesLSB (actPos))
+			     || (offset < (get4BytesLSB (actPos + 4) << 3)))
+			  : false))
+		     throw std::string (_("Values of entry not plausible!"));
+
+		  switch (get4BytesLSB (entry)) {
+		  case TYPE_TITLE:
+		     Check3 (actPos[offset + 8 + get4BytesLSB (actPos + offset + 4) - 1] == '\0');
+		     result.strTitle.assign (actPos + offset + 8,
+					     get4BytesLSB (actPos + offset + 4) - 1);
+		     break;
+
+		  case TYPE_AUTHOR:
+		     Check3 (actPos[offset + 8 + get4BytesLSB (actPos + offset + 4) - 1] == '\0');
+		     result.strAuthor.assign (actPos + offset + 8,
+					      get4BytesLSB (actPos + offset + 4) - 1);
+		     break;
+
+		  case TYPE_COMMENT:
+		     Check3 (actPos[offset + 8 + get4BytesLSB (actPos + offset + 4) - 1] == '\0');
+		     result.strComment.assign (actPos + offset + 8,
+					       get4BytesLSB (actPos + offset + 4) - 1);
+
+		     break;
+		  } // end-switch
+		  entry += 8;
+	       } // end-while
+	       goto end;
+	    }
+	    entry += 0x80;
+	 } // end-while
+
+	 Check3 (pBAT);
+	 if ((offProperties = pBAT[offProperties]) < 0x80000000)
+	    break;
+
+	 readBlock (stream, offProperties, block, sizeBlock);
+	 entry = block;
       }
-      else if ((length == 0x16) && !memcmp (propertyName, ROOTENTRY, 0x16)) {
-	 TRACE9 ("ParseMSOffice::foundLenNameProperty (const char*, unsigned int) - RE");
-	 skip.setOffset (0x32);
-	 _seqProperties[3] = &beginSBA;
+      catch (std::string& e) {
+	 delete [] block;
+	 delete [] pBAT;
+	 delete [] infoBlock;
+	 throw e;
       }
-      else {
-	 _seqProperties[3] = NULL;
-	 skip.setOffset (0x3e);
-      }
+   } while (true); // end-do
+
+ end:
+   delete [] block;
+   delete [] pBAT;
+}
+
+//-----------------------------------------------------------------------------
+/// Reads the specified block from the stream
+/// \param stream: Stream to read from
+/// \param offBlock: Index of block to read
+/// \param block: Block to read into; On input the first byte contains the length (as
+///              exponent of 2) of the block
+/// \throw std::string: In case of error a describing text
+/// \remarks - The first byte of block needs to be filled with the blocklength
+//-----------------------------------------------------------------------------
+void ParseMSOffice::readBlock (YGP::Xistream& stream, unsigned int offBlock, char* block,
+			       unsigned int sizeBlock) throw (std::string) {
+   TRACE9 ("ParseMSOffice::readBlock (YGP::Xistream&, unsigned int, char*, unsigned int): " << offBlock);
+   stream.seekg ((offBlock << sizeBlock) + 512, std::ios_base::beg);
+   stream.read (block, 1 << sizeBlock);
+   if (!stream) {
+      snprintf (block, 1 << sizeBlock, "%p", (void*)((offBlock << sizeBlock) + 512));
+      std::string error (_("Can't read block at offset %1"));
+      error.replace (error.find ("%1"), 2, block);
+      throw error;
    }
-   return YGP::ParseObject::PARSE_OK;
 }
 
-//-----------------------------------------------------------------------------
-/// Callback after the number of BAT array entries has been parsed
-/// \param count: Pointer to number of entries
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundCountBAT (const char* count, unsigned int) {
-   TRACE8 ("ParseMSOffice::foundCountBAT (const char*, unsigned int) - " << get4BytesLSB (count));
-   if ((cBAT = get4BytesLSB (count)) > 109)
-      return YGP::ParseObject::PARSE_CB_ABORT;
-
-   seqBAT.setMinCard (cBAT);
-   seqBAT.setMaxCard (cBAT);
-   skipBeg.setOffset (0x4c);
-
-   pBAT = new unsigned int [(cBAT << blockSize) >> 2];
-   return YGP::ParseObject::PARSE_OK;
-}
 
 //-----------------------------------------------------------------------------
-/// Callback after the size of the file has been parsed
-/// \param size: Pointer to size
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+/// Reads the BAT
+/// \param stream: Stream to read from
+/// \param pBAT: Pointer to the block array table to fill
+/// \param pBATBlocks: Pointer to the block-indexes of the BAT
+/// \param sizeBlock: Size of the blocks
+/// \param cBlocks: Number of BAT blocks
+/// \throw std::string: In case of error a describing text
 //-----------------------------------------------------------------------------
-int ParseMSOffice::foundFileSize  (const char* size, unsigned int) {
-   TRACE8 ("ParseMSOffice::foundFileSize (const char*, unsigned int) - " << get4BytesLSB (size));
-   if (get4BytesLSB (size) < 4096) {
-      unsigned int cBlocks (1 << (blockSize - blockSizeSmall));
-      unsigned int block ((skipBeg.getOffset () >> blockSize) - 1);
-      unsigned int index (indexSBA);
-      while (block > cBlocks) {
-	 TRACE9  ("ParseMSOffice::foundFileSize (const char*, unsigned int) - Missing blocks " << block);
-	 Check3 (index < cBAT);
-	 TRACE9  ("ParseMSOffice::foundFileSize (const char*, unsigned int) - Block " << index
-		  << " -> " << pBAT[index]);
-	 index = pBAT[index]; Check3 (pBAT[index] > 0);
-	 block -= cBlocks;
-      } // end-while
+void ParseMSOffice::readBAT (YGP::Xistream& stream, char* pBAT, const char* pBATBlocks,
+			     unsigned int cBlocks, unsigned int sizeBlock) throw (std::string) {
+   TRACE9 ("ParseMSOffice::readBAT (YGP::Xistream&, 2x char*, 2x unsigned) - " << cBlocks);
+   Check1 (pBAT);
 
-      skipBeg.setOffset (((index + 1) << blockSize) + (block << blockSizeSmall));
-      TRACE9 ("ParseMSOffice::foundFileSize (const char*, unsigned int) - Skip to " << std::hex << skipBeg.getOffset () << std::dec);
-   }
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the number of SBAT blocks has been parsed
-/// \param cBlocks: Pointer to number of SBAT blocks
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundCountSBAT (const char* cBlocks, unsigned int) {
-   TRACE9 ("ParseMSOffice::foundCountSBAT (const char*, unsigned int) - " << get4BytesLSB (cBlocks));
-   if (get4BytesLSB (cBlocks) > 20000)
-      return YGP::ParseObject::PARSE_CB_ABORT;
-
-   pSBAT = new unsigned int [get4BytesLSB (cBlocks)];
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the number of XBAT blocks has been parsed
-/// \param cBlocks: Pointer to number of SBAT blocks
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundCountXBAT (const char* cBlocks, unsigned int) {
-   TRACE9 ("ParseMSOffice::foundCountXBAT (const char*, unsigned int) - " << get4BytesLSB (cBlocks));
-   if (get4BytesLSB (cBlocks) > 20000)
-      return YGP::ParseObject::PARSE_CB_ABORT;
-   pXBAT = new unsigned int [get4BytesLSB (cBlocks)];
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the BAT has been read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundBAT (const char*, unsigned int) {
-   skipBeg.setOffset (0x30);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-int ParseMSOffice::foundBlockBAT (const char*, unsigned int) {
-   return YGP::ParseObject::PARSE_OK;
-}
-
-int ParseMSOffice::foundBlockSBAT (const char*, unsigned int) {
-   return YGP::ParseObject::PARSE_OK;
-}
-
-int ParseMSOffice::foundBlockXBAT (const char*, unsigned int) {
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after a block was found
-/// \param count: Pointer to block
-/// \param len: Length of block
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundBlock (const char* block, unsigned int len) {
-   TRACE9 ("ParseMSOffice::foundBlock (const char*, unsigned int) - " << len);
-   Check2 (len == 512); Check3 (pBAT);
-
-   for (unsigned int i (0); i < (len >> 2); ++i) {
-      pBAT[i] = get4BytesLSB (block + (i << 2));
-      if (pBAT[i] < 0x80000000)
-	 TRACE9 ("Block " << std::hex << i << ": " << pBAT[i] << std::dec);
-   }
-   cBAT += len >> 2;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the offset of the section-entry was found
-/// \param offset: Pointer to offset
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundSectionOffset (const char* offset, unsigned int) {
-   Check3 (offset);
-
-   // Set offset to section (but substract section-offset)
-   skip.setOffset (get4BytesLSB (offset) - 0x30);
-   TRACE9 ("ParseMSOffice::foundSectionOffset (const char*) - " << skip.getOffset () << " (0x"
-           << std::hex << skip.getOffset () << std::dec << ')');
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the number of entries has been parsed
-/// \param pEntries: Pointer to number of entries
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundNrEntries (const char* pEntries, unsigned int) {
-   Check3 (pEntries);
-   cEntries = get4BytesLSB (pEntries);
-   TRACE4 ("ParseMSOffice::foundNrEntries (const char*) - Entries: " << cEntries);
-
-   seqEntries.setMaxCard (cEntries);
-   skip.setOffset (4);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the number of entries has been parsed
-/// \param pType: Pointer to found type
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundType (const char* pType, unsigned int) {
-   Check3 (pType);
-   actEntry = *(unsigned int*)pType;
-   TRACE9 ("ParseMSOffice::foundType (const char*) - Type: " << actEntry);
-
-   _seqEntries[1] = ((getTypeIndex (actEntry) != -1)
-                     ? static_cast<YGP::ParseObject*> (&offset)
-                     : static_cast<YGP::ParseObject*> (&skip));
-
-   cRead += 8;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the offset of the comment-entry was found
-/// \param offset: Pointer to offset
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundOffset (const char* offset, unsigned int) {
-   Check3 (offset);
-   Check3 (getTypeIndex (actEntry) != -1);
-
-   unsigned int off (get4BytesLSB (offset));
-   TRACE9 ("ParseMSOffice::foundOffset (const char*) - " << off << " (0x"
-           << std::hex << off << std::dec << ')');
-
-   aOffsets[off] = actEntry;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the length of an information was read
-/// \param length: Pointer to length
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundLength (const char* length, unsigned int) {
-   Check3 (length);
-   if ((len = get4BytesLSB (length)))
-      information.setMaxCard (len);
-   TRACE8 ("ParseMSOffice::foundLength (const char*, unsigned int): " << len);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after an information was read
-/// \param pInfo: Pointer to information
-/// \param len: Length of inforamtion
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundInformation (const char* pInfo, unsigned int len) {
-   Check3 (pInfo);
-   Check3 (aOffsets[actEntry] < 1000);
-
-   TRACE1 ("ParseMSOffice::foundInformation (const char*, unsigned int): " << pInfo
-           << " (" << len << " bytes); Entries: " << seqInformation.getMaxCard ());
-
-   static std::string Properties::* values[] =
-      { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
-
-   Check3 (prop);
-   Check3 (aOffsets.size ());
-   Check3 (getTypeIndex (aOffsets[actEntry]) != -1);
-   Check3 ((sizeof (values) / sizeof (values[0]))
-            > (unsigned int)getTypeIndex (aOffsets[actEntry]));
-   (prop->*(values[getTypeIndex (aOffsets[actEntry])])) = pInfo;
-
-   unsigned int off (aOffsets.begin ()->first);
-   aOffsets.erase (aOffsets.begin ());
-
-   if (aOffsets.size ()) {
-      actEntry = aOffsets.begin ()->first;
-      off = aOffsets.begin ()->first - off - len - 4;
-      skip.setOffset (off);
-      TRACE7 ("ParseMSOffice::foundInformation (const char*) - Skipping " << off
-              << " bytes for next entry");
-   }
-
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the header of the properthies has been read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseMSOffice::foundPropertiesHeader (const char*, unsigned int) {
-   TRACE1 ("ParseMSOffice::foundPropertiesHeader (const char*) - Bytes read: "
-           << cRead << " (0x" << std::hex << cRead << std::dec << ')');
-
-   // Check if there are any of the supported types in the document
-   if (aOffsets.size ()) {
-      actEntry = aOffsets.begin ()->first;
-      seqInformation.setMaxCard (aOffsets.size ());
-      skip.setOffset (aOffsets.begin ()->first - cRead - 4); Check3 (skip.getOffset () > 0);
-   }
-   else
-      _officedoc[16] = NULL;
-
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Retrieves the index of the passed type
-/// \param type: Type to inspect
-/// \returns \c unsigned int: Offset; -1 if type is not valid
-//-----------------------------------------------------------------------------
-int ParseMSOffice::getTypeIndex (unsigned int type) {
-   for (unsigned int i (0); i < (sizeof (aTypes) / sizeof (aTypes[0])); ++i)
-      if (type == aTypes[i])
-         return i;
-
-   return -1;
+   for (unsigned int i (0); i < cBlocks; ++i)
+      readBlock (stream, get4BytesLSB (pBATBlocks + (i << 2)), pBAT + (i << sizeBlock), sizeBlock);
 }
