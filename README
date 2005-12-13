@@ -14,38 +14,61 @@ extension):
          content of the keywords "Title", "Author" and "Description" is
          extracted.
 
+
   - GIF: GIF images can contain a "comment extension". The contents of this
          block(s) is extracted. There are no title or author entries.
 
-  - JPEG: Extracts the properties according two styles; either one simple
- 	  comment (as written by e.g. The GIMP) or a more complex versions
-	  (as created by Windows XP or - even more complex - PhotoShop).
+
+  - JPEG: The program recognizes three types of comments:
+ 	    - After an JPEG comment marker (0xfffe)
+            - In an APP1-Exif marker (as used by Windows XP)
+	    - In an APPD marker (as written by PhotoShop)
+
 
   - HTML: The text in between <title> and </title> and/or the contents of
 	  the meta tags (supported are the tags according HTML 4.0 and
-	  Dublin Core) is extracted.
+	  Dublin Core) are extracted.
+
 
   - PDF: The content of the "document information dictionary" is extracted
           (the content of the "Subject" key is returned as comment).
           Note that encrypted information is not decrypted!
 
-  - OpenOffice documents (*.sxw, *.sxc, *.sxd, *.sdi, *.sxm); the comments of
-          the properties dialog is extracted
 
-  - StarOffice documents (*.sdw, *.sdc, *.sdd, *.sda); the comments of the
-          properties dialog is extracted
+  - OpenOffice documents (*.sxw, *.sxc, *.sxd, *.sdi, *.sxm); the entries of
+          the properties dialog are extracted
 
-  - MS office documents (*.doc, *.xls, *.ppt); the comment of the properties
-	  dialog is extracted.
+
+  - OpenOffice 2 documents (*.odt, *.ods, *.odp, *.odg); the entries of the
+          properties dialog are extracted
+
+
+  - StarOffice documents (*.sdw, *.sdc, *.sdd, *.sda); the entries of the
+          properties dialog are extracted
+
+
+  - MS office documents (*.doc, *.xls, *.ppt); the entries of the properties
+	  dialog are extracted.
+
+          Thanks to the Apache Jakarta POI project for publishing their
+	  insights about the MS Office format(s) (see
+	  http://jakarta.apache.org/poi/index.html for details)
+
 
   - MP3 files: Extracts the contents of the ID3 tag.
 
+
   - OGG vorbis files: Extracts the contents of the comment header
+
 
   - RTF documents: Extracts the contents of the \info section
 
+
   - Abiword documents (*.abw): Extracts the contents of the property dialog
 
+
+Feel free to report/send me any not-working documents or suggest other files,
+which you like to be supported.
 
 The found results can be written either in (human-readable) text (separated by
 spaces), quoted comma-separated text (to be machine-interpreted, like imported
