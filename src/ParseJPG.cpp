@@ -266,6 +266,7 @@ unsigned long ParseJPEG::foundLength (unsigned int length) {
       title.setMaxCard (length);
       titlePhotoshop.setMaxCard (length);
    }
+   return YGP::ParseObject::PARSE_OK;
 }
 
 //-----------------------------------------------------------------------------
