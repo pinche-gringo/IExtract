@@ -1,3 +1,9 @@
+Overview of changes in version 0.7.00:
+
+  - Parsing of JPEG images rewritten
+  - Parsing of MS Office files rewritten (basing on the insights of Apache POI)
+
+
 Overview of changes in version 0.6.40:
 
   - Handling GIF images

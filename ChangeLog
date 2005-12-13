@@ -1,3 +1,65 @@
+2005-12-13  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.7.00 commented
+
+	* README:
+	  Actualized JPEG/MS-Office comments; Added OpenOffice 2 documents; Fixes
+
+	* po/de.po, po/en.po, po/es.po: Adapted to new JPEG/MS-Office parser
+
+	* po/POTFILES.in: Renamed ParseWord to ParseMSOffice
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Actualized description for JPEG and MS Office documents
+
+	* configure.in: Version to 0.7.00; checking sizes of short/int/long
+
+2005-12-12  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseMSOffice.cpp:
+	  Fixed bug when reading file with InfoSummary not in 1st property block
+
+	* src/ParseMSOffice.cpp, src/ParseMSOffice.h:
+	  Added parsing of documents with InfoSummary in small blocks
+
+	* src/ParseJPG.cpp: Fixed warnings when compiling with -Wall
+
+	* src/Makefile.am: Renamed ParseWord to ParseMSOffice
+
+	* src/IExtract.cpp: Using new ParseMSOffice (renamed from ParseWord)
+
+	* src/ParseMSOffice.cpp, src/ParseMSOffice.h:
+	  First draft of version without using YGP::Parse*
+
+2005-12-11  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseMSOffice.cpp, src/ParseMSOffice.h:
+	  Starting to parse documents with comments in small blocks (not working)
+
+2005-12-08  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseJPG.cpp, src/ParseOGG.cpp, src/ParsePNG.cpp, src/ParseSOffice.cpp:
+	  Using global utility-functions
+
+	* src/Utility.h: New file.
+
+	* src/Makefile.am: Added Utility.h
+
+	* src/ParseHTML.cpp: Changed year of copyright
+
+2005-12-07  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseMSOffice.cpp, src/ParseMSOffice.h:
+	  Rewritten (basing on information from the Apache Jakarta POI project
+
+2005-12-02  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseJPG.cpp:
+	  Fixed constants on bigendian-systems; Reset length after reading Exif-number
+
+	* src/ParseJPG.cpp, src/ParseJPG.h:
+	  Re-written (after reading description of JPEG-format)
+
 2005-11-28  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.6.40 commented
