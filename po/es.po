@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: IExtract V0.6 ($Revision$)\n"
+"Project-Id-Version: IExtract V0.7 ($Revision$)\n"
 "Report-Msgid-Bugs-To: g17m0@lycos.com\n"
-"POT-Creation-Date: 2005-11-27 21:25-0400\n"
+"POT-Creation-Date: 2005-12-13 00:14-0400\n"
 "PO-Revision-Date: 2005-06-04 13:23-0400\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: ESPAÑOL <g17m0@lycos.com>\n"
@@ -284,9 +284,7 @@ msgstr ""
 msgid ""
 "       In every other constellation the '%' is removed!\n"
 "\n"
-msgstr ""
-"       ¡En todas las demás formas el '%' está borrado!\n"
-"\n"
+msgstr "       ¡En todas las demás formas el '%' está borrado!\n\n"
 
 #: src/IExtract.cpp:347
 msgid ""
@@ -607,7 +605,7 @@ msgstr "Tag \"title\""
 msgid "End of header"
 msgstr "Fin de la cabeza"
 
-#: src/ParseHTML.cpp:54 src/ParseWord.cpp:93
+#: src/ParseHTML.cpp:54
 msgid "Title of document"
 msgstr "Título del documento"
 
@@ -641,7 +639,7 @@ msgstr "Nombre del tag \"meta\""
 
 #: src/ParseHTML.cpp:63
 msgid "Content specifier"
-msgstr "Especificador del contento"
+msgstr "Especificador de contenido"
 
 #: src/ParseHTML.cpp:64
 msgid "Script tag"
@@ -675,7 +673,7 @@ msgstr "Título en el formato \"Dublin Core\""
 msgid "Valid HTML tag"
 msgstr "Tag HTML valido"
 
-#: src/ParseHTML.cpp:72 src/ParseWord.cpp:97
+#: src/ParseHTML.cpp:72
 msgid "Title entry"
 msgstr "Entrada por el título"
 
@@ -747,155 +745,171 @@ msgstr "Entradas"
 msgid "OpenOffice document"
 msgstr "Documento de OpenOffice"
 
-#: src/ParseSOffice.cpp:62
+#: src/ParseSOffice.cpp:52
 msgid "StarOffice ID"
 msgstr "ID de StarOffice"
 
-#: src/ParseSOffice.cpp:63
+#: src/ParseSOffice.cpp:53
 msgid "Start of StarOffice IDs"
 msgstr "Empiezo de la ID de StarOffice"
 
-#: src/ParseSOffice.cpp:65
+#: src/ParseSOffice.cpp:55
 msgid "Unused contents 2"
 msgstr "Contento inusado 2"
 
-#: src/ParseSOffice.cpp:66
+#: src/ParseSOffice.cpp:56
 msgid "Length of data-entry"
 msgstr "Tamaño de la entrada de datos"
 
-#: src/ParseSOffice.cpp:67
+#: src/ParseSOffice.cpp:57
 msgid "Property-entry"
 msgstr "Entrada de los propiedades"
 
-#: src/ParseSOffice.cpp:68
+#: src/ParseSOffice.cpp:58
 msgid "StarOffice document"
 msgstr "Documento de StarOffice"
 
-#: src/ParseSOffice.cpp:69
+#: src/ParseSOffice.cpp:59
 msgid "Entries of properties"
 msgstr "Entradas de los propiedades"
 
-#: src/ParseSOffice.cpp:70 src/ParseWord.cpp:100 src/ParseJPG.cpp:113
+#: src/ParseSOffice.cpp:60
 msgid "Properties"
 msgstr "Propiedades"
 
-#: src/ParseWord.cpp:85
-msgid "ID for title"
-msgstr "ID por el título"
+#: src/ParseMSOffice.cpp:82
+msgid "Can't read document header!"
+msgstr "¡No pude leer la cabeza del documente!"
 
-#: src/ParseWord.cpp:86
-msgid "ID for values (I)"
-msgstr "ID por valores (I)"
+#: src/ParseMSOffice.cpp:85
+msgid "Office identifier not found!"
+msgstr "¡No pude encontrar la identificación!"
 
-#: src/ParseWord.cpp:87
-msgid "ID for values (II)"
-msgstr "ID por valores (II)"
+#: src/ParseMSOffice.cpp:92
+msgid "Values for blocksizes are not plausible!"
+msgstr "¡Los valores para el tamaño de los bloques no está plausible!"
 
-#: src/ParseWord.cpp:89
-msgid "Number of entries"
-msgstr "Número de entradas"
+#: src/ParseMSOffice.cpp:97
+msgid "Number of blocks for BAT not plausible!"
+msgstr "¡El número de bloques del BAT no está plausible!"
 
-#: src/ParseWord.cpp:90 src/ParseJPG.cpp:105 src/ParsePNG.cpp:64
-msgid "Type of entry"
-msgstr "Tipo de la entrada"
+#: src/ParseMSOffice.cpp:111
+msgid "Not a property block at offset %1!"
+msgstr "¡No encontré ningún bloque de propiedad a posición %1!"
 
-#: src/ParseWord.cpp:91
-msgid "Offset of Comment"
-msgstr "Posición del comentario"
+#: src/ParseMSOffice.cpp:202
+msgid "Not an Information-Summary section!"
+msgstr "¡No encontré la sección de información!"
 
-#: src/ParseWord.cpp:92
-msgid "Length of title"
-msgstr "Tamaño del título"
+#: src/ParseMSOffice.cpp:209
+msgid "Number of information entries not plausible!"
+msgstr "¡El número de entradas de información no está plausible!"
 
-#: src/ParseWord.cpp:94 src/ParseRTF.cpp:61
-msgid "Other command"
-msgstr "Otro comando"
+#: src/ParseMSOffice.cpp:221
+msgid "Values of entry not plausible!"
+msgstr "¡Valor de entrada no está plausible!"
 
-#: src/ParseWord.cpp:95
-msgid "Content"
-msgstr "Contenido"
+#: src/ParseMSOffice.cpp:286
+msgid "Can't read block at offset %1"
+msgstr "¡No pude leer el bloque en posición %1!"
 
-#: src/ParseWord.cpp:96
-msgid "Start of value ID"
-msgstr "Empiezo de la ID del valor"
+#: src/ParseMSOffice.cpp:348
+msgid "BAT not valid!"
+msgstr "¡BAT inválida!"
 
-#: src/ParseWord.cpp:98
-msgid "Entry description"
-msgstr "Descripción de la entrada"
-
-#: src/ParseWord.cpp:101
-msgid "Word document"
-msgstr "Document de MS Office"
-
-#: src/ParseJPG.cpp:98
+#: src/ParseJPG.cpp:74
 msgid "JPEG-ID"
 msgstr "ID JPEG"
 
-#: src/ParseJPG.cpp:99
-msgid "ID of format 1"
-msgstr "ID del formato 1"
+#: src/ParseJPG.cpp:75
+msgid "JPEG-Terminator"
+msgstr "Terminator de imágen JPEG"
 
-#: src/ParseJPG.cpp:100
-msgid "ID of short comments"
-msgstr "ID de los comentarios cortos"
+#: src/ParseJPG.cpp:76
+msgid "APP1 marker"
+msgstr "Marcador APP1"
 
-#: src/ParseJPG.cpp:101
-msgid "ID of long comments"
-msgstr "ID de los comentarios largos"
+#: src/ParseJPG.cpp:77
+msgid "APPD maker"
+msgstr "Marcador APPD"
 
-#: src/ParseJPG.cpp:102
-msgid "ID of XXL comments"
-msgstr "ID de los comentarios XXL"
+#: src/ParseJPG.cpp:78
+msgid "Comment marker"
+msgstr "Marcador de comentario"
 
-#: src/ParseJPG.cpp:103 src/ParsePNG.cpp:65 src/ParseGIF.cpp:54
+#: src/ParseJPG.cpp:79
+msgid "Other marker"
+msgstr "Otro marcador"
+
+#: src/ParseJPG.cpp:80
+msgid "Image information"
+msgstr "Información de imágen"
+
+#: src/ParseJPG.cpp:82 src/ParsePNG.cpp:59 src/ParseGIF.cpp:54
 msgid "Comment"
 msgstr "Comentario"
 
-#: src/ParseJPG.cpp:104
-msgid "Comment values"
-msgstr "Valores del comentario"
+#: src/ParseJPG.cpp:83
+msgid "Comment values (Photoshop style)"
+msgstr "Valores de comentario (estilo Photoshop)"
 
-#: src/ParseJPG.cpp:106
+#: src/ParseJPG.cpp:84 src/ParsePNG.cpp:58
+msgid "Type of entry"
+msgstr "Tipo de la entrada"
+
+#: src/ParseJPG.cpp:85
 msgid "Number of records"
 msgstr "Número de las entradas"
 
-#: src/ParseJPG.cpp:107 src/ParsePNG.cpp:63
-msgid "Length (MSB first)"
-msgstr "Tamaño (MSB primero)"
-
-#: src/ParseJPG.cpp:108
+#: src/ParseJPG.cpp:86
 msgid "Length (LSB first)"
 msgstr "Tamaño (LSB primero)"
 
-#: src/ParseJPG.cpp:109
+#: src/ParseJPG.cpp:87 src/ParsePNG.cpp:57
+msgid "Length (MSB first)"
+msgstr "Tamaño (MSB primero)"
+
+#: src/ParseJPG.cpp:88
+msgid "Length (long - LSB first)"
+msgstr "Tamaño (LSB primero)"
+
+#: src/ParseJPG.cpp:89
+msgid "Length (long - MSB first)"
+msgstr "Tamaño (MSB primero)"
+
+#: src/ParseJPG.cpp:90
 msgid "Offset"
 msgstr "Posición"
 
-#: src/ParseJPG.cpp:111
-msgid "Possible comments"
-msgstr "Comentarios posibles"
+#: src/ParseJPG.cpp:91
+msgid "Byte order"
+msgstr "Sorteo de bytes"
 
-#: src/ParseJPG.cpp:112
-msgid "Format style 1"
-msgstr "Formato en estilo 1"
+#: src/ParseJPG.cpp:95
+msgid "Marker"
+msgstr "Marcador"
 
-#: src/ParseJPG.cpp:114
-msgid "Short properties"
-msgstr "Propiedades cortos"
+#: src/ParseJPG.cpp:96
+msgid "Comment entry 1"
+msgstr "Entrada de comentario 1"
 
-#: src/ParseJPG.cpp:115
-msgid "Long properties"
-msgstr "Propiedades largos"
+#: src/ParseJPG.cpp:97
+msgid "APP1 (EXIF)"
+msgstr ""
 
-#: src/ParseJPG.cpp:116
-msgid "XXL properties"
-msgstr "Propiedades XXL"
+#: src/ParseJPG.cpp:98
+msgid "APPD entry"
+msgstr "Entrada \"APPD\""
 
-#: src/ParseJPG.cpp:117
-msgid "List of property entries"
-msgstr "Lista de las entradas de los propietades"
+#: src/ParseJPG.cpp:99
+msgid "Other entry"
+msgstr "Otra entrada"
 
-#: src/ParseJPG.cpp:119
+#: src/ParseJPG.cpp:101
+msgid "Image file directory"
+msgstr "Directorio del imagen"
+
+#: src/ParseJPG.cpp:102
 msgid "JPEG image"
 msgstr "Imagen JPG"
 
@@ -947,6 +961,10 @@ msgstr "Bloque de información"
 msgid "Information block value"
 msgstr "Valor del bloque \"info\""
 
+#: src/ParseRTF.cpp:61
+msgid "Other command"
+msgstr "Otro comando"
+
 #: src/ParseRTF.cpp:62
 msgid "Value of command"
 msgstr "Valor de un Comando"
@@ -963,27 +981,27 @@ msgstr "Comando RTF valido"
 msgid "RTF block"
 msgstr "Bloque RTF"
 
-#: src/ParseOGG.cpp:59
+#: src/ParseOGG.cpp:45
 msgid "OGG-ID"
 msgstr "ID OGG"
 
-#: src/ParseOGG.cpp:61
+#: src/ParseOGG.cpp:47
 msgid "Length of vendor string"
 msgstr "Tamaño de la identificación del vendedor"
 
-#: src/ParseOGG.cpp:62
+#: src/ParseOGG.cpp:48
 msgid "Number of comments"
 msgstr "Número de entradas"
 
-#: src/ParseOGG.cpp:63
+#: src/ParseOGG.cpp:49
 msgid "Length of comment entry"
 msgstr "Tamaño de la entrada de datos"
 
-#: src/ParseOGG.cpp:64 src/ParseOGG.cpp:65
+#: src/ParseOGG.cpp:50 src/ParseOGG.cpp:51
 msgid "Comment entry"
 msgstr "Comentario"
 
-#: src/ParseOGG.cpp:66
+#: src/ParseOGG.cpp:52
 msgid "OGG file"
 msgstr "Archive OGG"
 
@@ -995,19 +1013,19 @@ msgstr "Empiezo de bloque de información (Abiword)"
 msgid "Abiword document"
 msgstr "Document de Abiword"
 
-#: src/ParsePNG.cpp:62
+#: src/ParsePNG.cpp:56
 msgid "PNG-ID"
 msgstr "ID PNG"
 
-#: src/ParsePNG.cpp:67
+#: src/ParsePNG.cpp:61
 msgid "CRC"
 msgstr "Còdige de correcciòn"
 
-#: src/ParsePNG.cpp:68
+#: src/ParsePNG.cpp:62
 msgid "Chunk"
 msgstr "Parte"
 
-#: src/ParsePNG.cpp:69
+#: src/ParsePNG.cpp:63
 msgid "PNG image"
 msgstr "Imagen PNG"
 
