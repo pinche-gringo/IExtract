@@ -9,7 +9,7 @@ src/ParseHTML.cpp
 src/ParseMP3.cpp
 src/ParseOOffice.cpp
 src/ParseSOffice.cpp
-src/ParseWord.cpp
+src/ParseMSOffice.cpp
 src/ParseJPG.cpp
 src/ParseRTF.cpp
 src/ParseOGG.cpp
