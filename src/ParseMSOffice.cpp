@@ -36,6 +36,8 @@
 #include <iomanip>
 #include <iostream>
 
+#include <map>
+
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 
@@ -133,30 +135,67 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (std
 	    // Check for InformationSummary-block
 	    if ((get2BytesLSB (entry + 0x40) == 0x28) && !memcmp (entry, SUMMARY, 0x28)) {
 	       INT32 length (get4BytesLSB (entry + 0x78));
-	       char* infoBlock (new char [length]);
 	       UINT32 offBlock (get4BytesLSB (entry + 0x74));
 	       TRACE8 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Info in " << std::hex
 		       << offBlock << std::dec << "; " << length << " bytes");
 
-	       infoBlock = new char [length];
-	       char* actPos (infoBlock);
+	       char* infoBlock (NULL);
 	       // Files less than 4K are stored in small blocks
 	       if (length < 4096) {
 		  UINT32* pSBAT (NULL);
-		  UINT32 offSBAT (get4BytesLSB (header + 0x3c));
+		  std::map<unsigned int, char*> readBlocksSBA;
+
+		  try {
+		     // Read SBAT table
+		     pSBAT = (UINT32*)readFile (stream, get4BytesLSB (header + 0x3c), pBAT,
+						get4BytesLSB (header + 0x40), sizeBlock);
+
+		     unsigned int cBlocks ((length & ((1 << sizeBlock) - 1))
+					   ? ((((length >> sizeBlock)) + 1))
+					   : length >> sizeBlock);
+		     Check3 ((UINT32)length <= (cBlocks << sizeBlock));
+		     infoBlock = new char[cBlocks << sizeBlock];
+		     char* actPos (infoBlock);
+
+		     // Read the small file
+		     int bigBlock (0);
+		     unsigned int cSmallBlocks (1 << (sizeBlock - sizeBlockSmall));
+		     while (length > 0) {
+			bigBlock = getBlock (pBAT, offSBA, offBlock >> (sizeBlock - sizeBlockSmall));
+			if (readBlocksSBA.find (bigBlock) == readBlocksSBA.end ()) {
+			   readBlocksSBA[bigBlock] = new char[1 << sizeBlock];
+			   readBlock (stream, bigBlock, readBlocksSBA[bigBlock], sizeBlock);
+			}
+			memcpy (actPos, readBlocksSBA[bigBlock] + ((offBlock % cSmallBlocks) << sizeBlockSmall),
+				1 << sizeBlockSmall);
+			actPos += 1 << sizeBlockSmall;
+			length -= 1 << sizeBlockSmall;
+			offBlock = pSBAT[offBlock];
+		     } // end-while
+		  }
+		  catch (std::string& e) {
+		     delete [] pSBAT;
+		     for (std::map<unsigned int, char*>::iterator i (readBlocksSBA.begin ());
+			  i != readBlocksSBA.end (); ++i)
+			delete [] i->second;
+		     throw e;
+		  }
+
+		  // Cleanup
+		  for (std::map<unsigned int, char*>::iterator i (readBlocksSBA.begin ());
+		       i != readBlocksSBA.end (); ++i)
+		     delete [] i->second;
+		  delete [] pSBAT;
 	       }
 	       else {
-		  while (length > 0) {
-		     Check3 (offBlock < 0x80000000);
-		     readBlock (stream, offBlock, block, sizeBlock);
-		     memcpy (actPos, block, length < (1 << sizeBlock) ? length : 1 << sizeBlock);
-		     actPos += 1 << sizeBlock;
-		     length -= 1 << sizeBlock;
-		     offBlock = pBAT[offBlock];
-		  } // end-while
+		  unsigned int cBlocks ((length & ((1 << sizeBlock) - 1))
+					? ((((length >> sizeBlock)) + 1))
+					: length >> sizeBlock);
+		  infoBlock = readFile (stream, offBlock, pBAT, cBlocks, sizeBlock);
 	       }
 
 	       // Check info-block
+	       char* actPos (infoBlock);
 	       TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - InfoSummary: " << std::hex << get2BytesLSB (infoBlock) << std::dec);
 	       if ((get2BytesLSB (infoBlock) != 0xfffe)
 		   || memcmp (infoBlock + 0x18, SECTIONID, 0x14))
@@ -232,8 +271,8 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (std
 /// Reads the specified block from the stream
 /// \param stream: Stream to read from
 /// \param offBlock: Index of block to read
-/// \param block: Block to read into; On input the first byte contains the length (as
-///              exponent of 2) of the block
+/// \param block: Block to read into
+/// \param sizeBlock: Size (as exponent of 2) of the block
 /// \throw std::string: In case of error a describing text
 /// \remarks - The first byte of block needs to be filled with the blocklength
 //-----------------------------------------------------------------------------
@@ -267,4 +306,48 @@ void ParseMSOffice::readBAT (YGP::Xistream& stream, char* pBAT, const char* pBAT
 
    for (unsigned int i (0); i < cBlocks; ++i)
       readBlock (stream, get4BytesLSB (pBATBlocks + (i << 2)), pBAT + (i << sizeBlock), sizeBlock);
+}
+
+//-----------------------------------------------------------------------------
+/// Reads a file starting at the passed block. A buffer holding the
+/// read file is allocted.
+/// \param stream: Stream to read from
+/// \param offBlock: Index of startblock
+/// \param pBAT: Pointer to used block array table
+/// \param blocks: Number of block to read
+/// \param sizeBlock: Size (as exponent of 2) of the block
+/// \returns char*: Allocated buffer with file
+/// \throw std::string: In case of error a describing text
+//-----------------------------------------------------------------------------
+char* ParseMSOffice::readFile (YGP::Xistream& stream, unsigned int offBlock, void* pBAT,
+			       unsigned int blocks, unsigned int sizeBlock) throw (std::string) {
+   char* pFile (new char [blocks << sizeBlock]);
+   char* actPos (pFile);
+   while (blocks--) {
+      Check3 (offBlock < 0x80000000);
+      readBlock (stream, offBlock, actPos, sizeBlock);
+      actPos += 1 << sizeBlock;
+      offBlock = ((UINT32*)pBAT)[offBlock];
+   } // end-while
+   return pFile;
+}
+
+//-----------------------------------------------------------------------------
+/// Gets the nth block from the passed BAT
+/// \param pBAT: Pointer to BAT to use
+/// \param start: Start block
+/// \param nr: Nth block to find
+/// \returns unsigned int: Offset of block
+/// \throw std::string: In case of error a describing text
+//-----------------------------------------------------------------------------
+int ParseMSOffice::getBlock (void* pBAT, unsigned int start, unsigned int nr) throw (std::string) {
+   TRACE9 ("ParseMSOffice::getBlock (void*, 2x unsigned int) - " << start);
+   while (nr--) {
+      start = ((UINT32*)pBAT)[start];
+      if (start > 0x80000000)
+	 throw std::string (_("BAT not valid!"));
+   } // end-while
+
+   TRACE8 ("ParseMSOffice::getBlock (void*, 2x unsigned int) - Result: " << start);
+   return start;
 }

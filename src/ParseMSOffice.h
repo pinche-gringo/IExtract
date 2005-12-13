@@ -43,6 +43,9 @@ class ParseMSOffice  {
 			unsigned int cBlocks, unsigned int sizeBlock) throw (std::string);
    static void readBlock (YGP::Xistream& stream, unsigned int offBlock,
 			  char* block, unsigned int sizeBlock) throw (std::string);
+   static char* readFile (YGP::Xistream& stream, unsigned int offBlock,
+			  void* pBAT, unsigned int blocks, unsigned int sizeBlock) throw (std::string);
+   static int getBlock (void* pBAT, unsigned int start, unsigned int nr) throw (std::string);
 };
 
 #endif
