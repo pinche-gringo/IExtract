@@ -94,12 +94,10 @@
           und Author werden (mangels Verfügbarkeit) nicht gesetzt.</p></dd>
 
       <dt><b>JPEG</b></dt>
-      <dd><p>Es gibt zumindest 2 JPEG-Formate f&uuml;r die Kommentare (aber
-          eigentlich habe ich keine Ahnung von diesem Format): Ein einfaches, wie
-          z.B. von The GIMP verwendet) und ein etwas kompliziertes (wie von Windows
-          XP verwendet - und auch das hat eine noch komplexere Variante, wie
-          verwendet von PhotoShop). Alle diese (ist gleich sämtliche mir bekannte)
-          Formate werden (hoffentlich) korrekt behandelt.</p>
+      <dd><p>Es werden Kommentare nach einem "comment marker" (0xfffe),
+          in einem APP1 Exif marker (wie von Windows XP geschrieben) und
+	  in einem APPD marker (wie sie scheinbar einige Versionen von
+          PhotoShop erzeugen) erkannt)</p>
 
         <p>Die Dateien m&uuml;ssen die Erweiterung <code>*.jpg</code> oder
           <code>*.jpeg</code> haben.</p></dd>
@@ -107,10 +105,11 @@
       <dt><b>Microsoft Office Dokumente</b></dt>
       <dd><p>Sucht nach dem Inhalt des "Eigenschaften" Dialogs.</p>
 
-        <p>Ich habe keine Dokumentation dieses Formats (genausowenig wie Office
-          selbst) und daher gibt es auch hier keine Garantie, da&szlig; alle
-          Dokumente korrekt behandelt werden. Dennoch: Alle meiner mir
-          zug&auml;nglichen Dokumente wurden korrekt verarbeitet.</p></dd>
+        <p>Dank des Apache Jakarta POI Projekts und deren
+          Dokumentation des "OLE2 Compount Document format" (wie es
+          von MS Office verwendet wird), sollten alle Dokumente
+          korrekt bearbeitet werden k&ouml;nnen (ev. mit der Ausname
+          von Dokumenten gr&ouml;&szlig;er als 6,8 MB).</p></dd>
 
       <dt><b>MP3</b></dt>
       <dd><p>Sucht nach dem ID3 tag (version 1.x) am Ende der Datei. Der Titel des

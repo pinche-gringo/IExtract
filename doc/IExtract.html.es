@@ -99,11 +99,10 @@
 	  hacen falta.</p></dd>
 
       <dt><b>JPEG</b></dt>
-      <dd><p>De hecho no conozco ese formato; pero parece que hay dos formatos por
-          los comentarios: Lo simple (como usado de por ejemplo The GIMP) y un
-          m&aacute;s complejo (como usado de por ejemplo Windows XP - y todav&iacute;a
-          m&aacute;s complejo - de PhotoShop). Ambos formatos est&aacute;n procesados
-          (ojal&aacute; correctamente).</p>
+      <dd><p>El programa reconoce comentarios despu&eacute;s de un
+          "marcador de comentarios" (0xfffe), en un "marcador APP1 Exif"
+	  (como le usa Windows XP) y en un "marcador APPD" (como le usan
+	  unas versiones de PhotoShop).</p>
 
         <p>Los archivos necesitan tener la extensi&oacute;n <code>*.jpg</code> o
           <code>*.jpeg</code>.</p></dd>
@@ -111,10 +110,11 @@
       <dt><b>Documentos de Microsoft Office</b></dt>
       <dd><p>Busca para el contenido de la ventana "propiedades".</p>
 
-        <p>No tengo documentaci&oacute;n por ese formato y por eso no puedo
-          garantizar que todos los documentos est&aacute;n procesado
-          correctamente. Dicho ese, lo funciona con todos mis documentos.</p>
-      </dd>
+        <p>Gracias al proyecto de Apache Jakarta POI y su
+	  documentaci&oacute;n del "formato OLE2 Document Compound"
+	  (como lo usa el MS Office) todos los documentos deben estar
+	  le&iacute;ble (tal vez con la excepci&oacute;n de documentos
+	  m&aacute;s grande que 6.8 MB).</p></dd>
 
       <dt><b>MP3</b></dt>
       <dd><p>Extrae el contenido del tag ID3 (versi&oacute;n 1.x). El

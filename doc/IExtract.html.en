@@ -94,11 +94,10 @@
 	  are left empty (for lack of availability.)<p></dd>
 
       <dt><b>JPEG</b></dt>
-      <dd><p>Actually I have no idea about the format of JPEG. There
-          seems to be two differnt formats for comments, a simple one (as
-          used by e.g. The GIMP) and more complex ones (as used by Windows
-          XP - and even more complex - by PhotoShop). All of those formats are
-          handled (hopefully correctly).</p>
+      <dd><p>The application recognices comments stored after a comment
+          marker (0xfffe), in an APP1 Exif marker (as stored by
+	  Microsoft/Windows XP and in an APPD marker (as seem to write
+	  some versions of PhotoShop.)</p>
 
         <p>Files must have the extensions <code>*.jpg</code> or
           <code>*.jpeg</code>.</p></dd>
@@ -106,10 +105,10 @@
       <dt><b>Microsoft Office documents</b></dt>
       <dd><p>Searches for the content of the properties dialog.</p>
 
-        <p>It applies the same as for JPEGs: I have no documentation of that
-          format (nor do I have the programs) and so I can only hope to handle
-          them correctly. That said: All of the documents I have/had access to
-          were processed correctly.</p></dd>
+        <p>Thanks to the Apache Jakarta POI project and their
+	  documentation of the "OLE2 Document compound format" (as it
+	  used by MS Office) all documents should be able to be parsed
+	  (maybe with the exception of documents bigger than 6.8 MB.)</p></dd>
 
       <dt><b>MP3</b></dt>
       <dd><p>Extracts the content of the ID3 tag (version 1.x). The title of
