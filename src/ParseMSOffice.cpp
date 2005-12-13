@@ -248,7 +248,7 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (std
 	 } // end-while
 
 	 Check3 (pBAT);
-	 if ((offProperties = pBAT[offProperties]) < 0x80000000)
+	 if ((offProperties = pBAT[offProperties]) > 0x80000000)
 	    break;
 
 	 readBlock (stream, offProperties, block, sizeBlock);
