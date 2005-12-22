@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.7 ($Revision$)\n"
 "Report-Msgid-Bugs-To: g17m0@lycos.com\n"
-"POT-Creation-Date: 2005-12-13 00:14-0400\n"
+"POT-Creation-Date: 2005-12-22 11:38-0400\n"
 "PO-Revision-Date: 2005-06-04 13:23-0400\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: ESPAÑOL <g17m0@lycos.com>\n"
@@ -29,11 +29,11 @@ msgstr ""
 
 #: src/IExtract.cpp:297
 msgid ""
-"Extracts a description out of files (depending on the file-type)\n"
+"Extracts descriptions/comments out of files (depending on the file-type)\n"
 "\n"
 "Usage:"
 msgstr ""
-"Extrae la descripción desde archivos (dependende del tipo del archivo)\n"
+"Extrae la descripción/el comentario de archivos (dependiendo del tipo)\n"
 "\n"
 "Modo de empleo:"
 
@@ -284,7 +284,9 @@ msgstr ""
 msgid ""
 "       In every other constellation the '%' is removed!\n"
 "\n"
-msgstr "       ¡En todas las demás formas el '%' está borrado!\n\n"
+msgstr ""
+"       ¡En todas las demás formas el '%' está borrado!\n"
+"\n"
 
 #: src/IExtract.cpp:347
 msgid ""
@@ -405,15 +407,15 @@ msgstr "-error: ¡No puedo leer archivo '%1'! ¡Ignoro opción '%2'!\n"
 msgid "-warning: Ignoring invalid option `%1'\n"
 msgstr "-aviso: Ignoro opción invalida '%1'\n"
 
-#: src/IExtract.cpp:707 src/IExtract.cpp:831
+#: src/IExtract.cpp:711 src/IExtract.cpp:835
 msgid "-error: "
 msgstr ""
 
-#: src/IExtract.cpp:718
+#: src/IExtract.cpp:722
 msgid "Unknown file-type"
 msgstr "Tipo del archivo inconocido"
 
-#: src/IExtract.cpp:812
+#: src/IExtract.cpp:816
 msgid ""
 "-error: File `%1' can't be opened!\n"
 "Reason: "
@@ -421,11 +423,11 @@ msgstr ""
 "-error: ¡No se puede abrir archivo '%1'!\n"
 "Causa: "
 
-#: src/IExtract.cpp:833
+#: src/IExtract.cpp:837
 msgid "Error while processing: "
 msgstr "Error procesando: "
 
-#: src/IExtract.cpp:1023
+#: src/IExtract.cpp:1027
 msgid ""
 "-warning: The INI-file `%1' contains an invalid entry for the output style (`"
 "%2')! Using text\n"

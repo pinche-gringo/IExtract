@@ -294,7 +294,7 @@ Application::~Application () {
 /// Displays the help
 //-----------------------------------------------------------------------------
 void Application::showHelp () const {
-   std::cout << _("Extracts a description out of files (depending on the file-type)\n\nUsage:")
+   std::cout << _("Extracts descriptions/comments out of files (depending on the file-type)\n\nUsage:")
       << " " PACKAGE " " << _("[OPTIONS] <File(s)>")
       << "\n\n  -r, --recursive ....... " << _("Recurse into subdirectories")
       << "\n  -o, --output=STYLE .... " << _("Sets the output-style (default: text;\n\t\t\t  other Values are: quoted, HTML, XML or LaTeX)")

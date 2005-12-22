@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.7 ($Revision$)\n"
 "Report-Msgid-Bugs-To: g17m0@lycos.com\n"
-"POT-Creation-Date: 2005-12-13 00:14-0400\n"
+"POT-Creation-Date: 2005-12-22 11:38-0400\n"
 "PO-Revision-Date: 2005-06-04 13:22-0400\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: Aleman <g17m0@lycos.com>\n"
@@ -29,11 +29,11 @@ msgstr ""
 
 #: src/IExtract.cpp:297
 msgid ""
-"Extracts a description out of files (depending on the file-type)\n"
+"Extracts descriptions/comments out of files (depending on the file-type)\n"
 "\n"
 "Usage:"
 msgstr ""
-"Liest die Beschreibung aus verschiedenen Dateien (abhängig vom Filetyp)\n"
+"Liest Beschreibungen/Kommentare aus Dateien (abhängig vom Filetyp)\n"
 "\n"
 "Aufruf:"
 
@@ -409,15 +409,15 @@ msgstr "-Fehler: \"%1\" ist keine (lesbare) Datei! Ignoriere Option \"%2\"!\n"
 msgid "-warning: Ignoring invalid option `%1'\n"
 msgstr "-Warnung: Ignoriere unbekannte Option \"%1\"\n"
 
-#: src/IExtract.cpp:707 src/IExtract.cpp:831
+#: src/IExtract.cpp:711 src/IExtract.cpp:835
 msgid "-error: "
 msgstr "-Fehler: "
 
-#: src/IExtract.cpp:718
+#: src/IExtract.cpp:722
 msgid "Unknown file-type"
 msgstr "Unbekannter Dateityp"
 
-#: src/IExtract.cpp:812
+#: src/IExtract.cpp:816
 msgid ""
 "-error: File `%1' can't be opened!\n"
 "Reason: "
@@ -425,11 +425,11 @@ msgstr ""
 "Datei \"%1\" kann nicht geöffnet werden!\n"
 "Ursache: "
 
-#: src/IExtract.cpp:833
+#: src/IExtract.cpp:837
 msgid "Error while processing: "
 msgstr "Error beim Bearbeiten: "
 
-#: src/IExtract.cpp:1023
+#: src/IExtract.cpp:1027
 msgid ""
 "-warning: The INI-file `%1' contains an invalid entry for the output style (`"
 "%2')! Using text\n"
