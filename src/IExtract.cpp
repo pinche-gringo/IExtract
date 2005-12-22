@@ -672,16 +672,20 @@ void Application::handleFiles (const char* pFile) const {
    const YGP::File* file = ds.find (YGP::IDirectorySearch::FILE_NORMAL);
    std::string name;
    while (file) {
+      // Determine file-type from extension (or second-to-last extension)
       name = file->name ();
       unsigned int pos (name.rfind ('.'));
       HANDLER fnc (NULL);
       if (pos != std::string::npos) {
 	 fnc = getFileTypeHandler (name.substr (pos + 1));
+	 // Unknown type; try second to-last extension (if option passed)
 	 if (!fnc && (options & TRUNC_EXTENSION)) {
 	    unsigned int pos2 (name.rfind ('.', pos - 1));
 	    Check3 ((pos2 != std::string::npos) ? (pos2 < pos) : (pos2 != pos));
-	    if (pos2 != std::string::npos)
-	       fnc = getFileTypeHandler (name.substr (++pos2, pos - pos2));
+	    if (pos2 != std::string::npos) {
+	       ++pos2;
+	       fnc = getFileTypeHandler (name.substr (pos2, pos - pos2));
+	    }
 	 }
       }
       if (fnc) {
