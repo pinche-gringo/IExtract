@@ -106,7 +106,7 @@
       <dd><p>Searches for the content of the properties dialog.</p>
 
         <p>Thanks to the Apache Jakarta POI project and their
-	  documentation of the "OLE2 Document compound format" (as it
+	  documentation of the "OLE2 Document compound format" (as it is
 	  used by MS Office) all documents should be able to be parsed
 	  (maybe with the exception of documents bigger than 6.8 MB.)</p></dd>
 
