@@ -1,3 +1,17 @@
+2005-12-22  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.7.01 commented
+
+	* doc/IExtract.html.en: Fixed typo
+
+	* configure.in: Version to 0.7.01
+
+	* src/IExtract.cpp, po/de.po, po/en.po, po/es.po:
+	  Improved description of program
+
+	* src/IExtract.cpp:
+	  Avoid statement which depends on order of execution of its parts
+
 2005-12-13  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.7.00 commented

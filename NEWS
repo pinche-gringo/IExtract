@@ -1,3 +1,9 @@
+Overview of changes in version 0.7.01:
+
+  - Fixed error getting second-to-last extension (for certain compilers/flags)
+  - Improved description of program (sligthly)
+
+
 Overview of changes in version 0.7.00:
 
   - Parsing of JPEG images rewritten
