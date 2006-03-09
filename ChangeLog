@@ -1,3 +1,18 @@
+2006-03-09  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.7.10 commented
+
+	* po/de.po, po/en.po, po/es.po: Actualized copyright-message
+
+	* README: Mentioning configurability of supported file-types
+
+	* INSTALL: Mentioning --disable-<filetype>
+
+	* src/IExtract.cpp, src/Makefile.am:
+	  Conditionally compiling supported file-types
+
+	* configure.in: Version to 0.7.10; Can disable file-types to support
+
 2005-12-22  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.7.01 commented

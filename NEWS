@@ -1,3 +1,8 @@
+Overview of changes in version 0.7.10:
+
+  - File-types to be supported can be specified at the configure-process
+
+
 Overview of changes in version 0.7.01:
 
   - Fixed error getting second-to-last extension (for certain compilers/flags)
