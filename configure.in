@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.52)
 AC_REVISION($Revision$)
-AC_INIT(IExtract, 0.7.01, [g17m0@lycos.com], IExtract)
+AC_INIT(IExtract, 0.7.10, [g17m0@lycos.com], IExtract)
 
 RELEASE=${PACKAGE_VERSION%.*}
 AC_SUBST(PACKAGE_VERSION)
@@ -62,13 +62,99 @@ AC_ARG_ENABLE(checks,
                   CXXFLAGS="$CXXFLAGS -DNDEBUG -UCHECK"; fi)
 AC_ARG_ENABLE(threads,
               [AC_HELP_STRING([--enable-threads],
-                              [Enables threads for parsing])]
-              ,,
-              [enable_threads=no])
-
+                              [Enables threads for parsing])])
 if test "$enable_threads" == "yes"; then
     CXXFLAGS="$CXXFLAGS -DENABLE_THREADS"
 fi
+
+AC_ARG_ENABLE(html,
+              AC_HELP_STRING([--disable-html],
+                             [Disables handling of HTML-files]))
+if test "$enable_html" != "no"; then
+   AC_DEFINE_UNQUOTED(SUPPORT_HTML, 1, [Define if HTML-files are handled])
+fi
+AM_CONDITIONAL(SUPPORT_HTML, test "$enable_html" != "no")
+
+AC_ARG_ENABLE(jpeg,
+              AC_HELP_STRING([--disable-jpeg],
+                             [Disables handling of JPEG-images]))
+if test "$enable_jpeg" != "no"; then
+   AC_DEFINE_UNQUOTED(SUPPORT_JPEG, 1, [Define if JPEG-images are handled])
+fi
+AM_CONDITIONAL(SUPPORT_JPEG, test "$enable_jpeg" != "no")
+
+AC_ARG_ENABLE(png,
+              AC_HELP_STRING([--disable-png],
+                             [Disables handling of PNG-images]))
+if test "$enable_png" != "no"; then
+   AC_DEFINE_UNQUOTED(SUPPORT_PNG, 1, [Define if PNG-images are handled])
+fi
+AM_CONDITIONAL(SUPPORT_PNG, test "$enable_png" != "no")
+
+AC_ARG_ENABLE(gif,
+              AC_HELP_STRING([--disable-gif],
+                             [Disables handling of GIF-images]))
+if test "$enable_gif" != "no"; then
+   AC_DEFINE_UNQUOTED(SUPPORT_GIF, 1, [Define if GIF-images are handled])
+fi
+AM_CONDITIONAL(SUPPORT_GIF, test "$enable_gif" != "no")
+
+AC_ARG_ENABLE(mp3,
+              AC_HELP_STRING([--disable-mp3],
+                             [Disables handling of MP3-audio files]))
+if test "$enable_mp3" != "no"; then
+   AC_DEFINE_UNQUOTED(SUPPORT_MP3, 1, [Define if MP3-audio files are handled])
+fi
+AM_CONDITIONAL(SUPPORT_MP3, test "$enable_mp3" != "no")
+
+AC_ARG_ENABLE(ogg,
+              AC_HELP_STRING([--disable-ogg],
+                             [Disables handling of OGG-audio files]))
+if test "$enable_ogg" != "no"; then
+   AC_DEFINE_UNQUOTED(SUPPORT_OGG, 1, [Define if OGG-audio files are handled])
+fi
+AM_CONDITIONAL(SUPPORT_OGG, test "$enable_ogg" != "no")
+
+AC_ARG_ENABLE(pdf,
+              AC_HELP_STRING([--disable-pdf],
+                             [Disables handling of PDF-documents]))
+if test "$enable_pdf" != "no"; then
+   AC_DEFINE_UNQUOTED(SUPPORT_PDF, 1, [Define if PDF-documents are handled])
+fi
+AM_CONDITIONAL(SUPPORT_PDF, test "$enable_pdf" != "no")
+
+AC_ARG_ENABLE(oo,
+              AC_HELP_STRING([--disable-oo],
+                             [Disables handling of OpenOffice.org-documents]))
+if test "$enable_oo" != "no"; then
+   AC_DEFINE_UNQUOTED(SUPPORT_OO, 1, [Define if OpenOffice.org documents are handled])
+fi
+AM_CONDITIONAL(SUPPORT_OO, test "$enable_oo" != "no")
+
+AC_ARG_ENABLE(abiword,
+              AC_HELP_STRING([--disable-abiword],
+                             [Disables handling of AbiWord-documents]))
+if test "$enable_abiword" != "no"; then
+   AC_DEFINE_UNQUOTED(SUPPORT_ABIWORD, 1, [Define if AbiWord-documents are handled])
+fi
+AM_CONDITIONAL(SUPPORT_ABIWORD, test "$enable_abiword" != "no")
+
+AC_ARG_ENABLE(rtf,
+              AC_HELP_STRING([--disable-rtf],
+                             [Disables handling of RTF-documents]))
+if test "$enable_rtf" != "no"; then
+   AC_DEFINE_UNQUOTED(SUPPORT_RTF, 1, [Define if RTF-documents are handled])
+fi
+AM_CONDITIONAL(SUPPORT_RTF, test "$enable_rtf" != "no")
+
+AC_ARG_ENABLE(msoffice,
+              AC_HELP_STRING([--disable-msoffice],
+                             [Disables handling of MS-Office-documents]))
+if test "$enable_msoffice" != "no"; then
+   AC_DEFINE_UNQUOTED(SUPPORT_MSOFFICE, 1, [Define if MS-Office documents are handled])
+fi
+AM_CONDITIONAL(SUPPORT_MSOFFICE, test "$enable_msoffice" != "no")
+
 
 AC_OUTPUT([Makefile src/Makefile doc/Makefile intl/Makefile po/Makefile.in m4/Makefile ])
 
