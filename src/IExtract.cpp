@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 10.08.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2005
+//COPYRIGHT   : Copyright (C) 2002 - 2006
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -75,18 +75,40 @@
 #include "Options.h"
 #include "Properties.h"
 
-#include "ParseMP3.h"
-#include "ParseOGG.h"
-#include "ParsePDF.h"
-#include "ParseJPG.h"
-#include "ParsePNG.h"
-#include "ParseGIF.h"
-#include "ParseRTF.h"
-#include "ParseHTML.h"
-#include "ParseMSOffice.h"
-#include "ParseAbiword.h"
-#include "ParseOOffice.h"
-#include "ParseSOffice.h"
+#ifdef SUPPORT_MP3
+#  include "ParseMP3.h"
+#endif
+#ifdef SUPPORT_OGG
+#  include "ParseOGG.h"
+#endif
+#ifdef SUPPORT_PDF
+#  include "ParsePDF.h"
+#endif
+#ifdef SUPPORT_JPEG
+#  include "ParseJPG.h"
+#endif
+#ifdef SUPPORT_PNG
+#  include "ParsePNG.h"
+#endif
+#ifdef SUPPORT_GIF
+#  include "ParseGIF.h"
+#endif
+#ifdef SUPPORT_RTF
+#  include "ParseRTF.h"
+#endif
+#ifdef SUPPORT_HTML
+#  include "ParseHTML.h"
+#endif
+#ifdef SUPPORT_MSOFFICE
+#  include "ParseMSOffice.h"
+#endif
+#ifdef SUPPORT_ABIWORD
+#  include "ParseAbiword.h"
+#endif
+#ifdef SUPPORT_OO
+#  include "ParseOOffice.h"
+#  include "ParseSOffice.h"
+#endif
 
 #if SYSTEM == UNIX
 #  include <unistd.h>
@@ -120,7 +142,7 @@ class Application : public YGP::IVIOApplication {
    virtual const char* name () const { return PACKAGE; }
    virtual const char* description () const {
       static std::string version (PACKAGE " V" VERSION " - ");
-      version += (_("Compiled on %1 at %2\n\nCopyright (C) 2002 - 2005 Markus Schwab; email: g17m0@lycos.com\nDistributed under the terms of the GNU General Public License"));
+      version += (_("Compiled on %1 at %2\n\nCopyright (C) 2002 - 2006 Markus Schwab; email: g17m0@lycos.com\nDistributed under the terms of the GNU General Public License"));
       version.replace (version.find ("%1"), 2, __DATE__);
       version.replace (version.find ("%2"), 2, __TIME__);
       return version.c_str (); }
@@ -149,22 +171,40 @@ class Application : public YGP::IVIOApplication {
    void* processThread (void*);
 #endif
 
+#ifdef SUPPORT_MP3
    void processMP3 (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+#endif
+#ifdef SUPPORT_OGG
    void processOGG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+#endif
+#ifdef SUPPORT_PDF
    void processPDF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+#endif
+#ifdef SUPPORT_JPEG
    void processJPG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+#endif
+#ifdef SUPPORT_PNG
    void processPNG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+#endif
+#ifdef SUPPORT_GIF
    void processGIF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+#endif
+#ifdef SUPPORT_HTML
    void processHTML (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+#endif
+#ifdef SUPPORT_RTF
    void processRTF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
-   void processMSOffice (YGP::Xistream& hFile, Properties& result) const
-      throw (std::string);
-   void processOpenOffice (YGP::Xistream& hFile, Properties& result) const
-      throw (std::string);
-   void processStarOffice (YGP::Xistream& hFile, Properties& result) const
-      throw (std::string);
-   void processAbiword (YGP::Xistream& hFile, Properties& result) const
-      throw (std::string);
+#endif
+#ifdef SUPPORT_MSOFFICE
+   void processMSOffice (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+#endif
+#ifdef SUPPORT_OO
+   void processOpenOffice (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processStarOffice (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+#endif
+#ifdef SUPPORT_ABIWORD
+   void processAbiword (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+#endif
 
    enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4, TRUNC_EXTENSION = 0x8, TERMINATE = 0x10 };
 
@@ -250,37 +290,71 @@ Application::Application (const int argc, const char* argv[])
    aThreads.reserve (1);
 #endif
 
+#ifdef SUPPORT_ABIWORD
    handlers.insert (handlers.end (), handlerValue ("abw", &Application::processAbiword));
+#endif
+#ifdef SUPPORT_MSOFFICE
    handlers.insert (handlers.end (), handlerValue ("doc", &Application::processMSOffice));
+#endif
+#ifdef SUPPORT_GIF
+#endif
    handlers.insert (handlers.end (), handlerValue ("gif", &Application::processGIF));
+#ifdef SUPPORT_HTML
    handlers.insert (handlers.end (), handlerValue ("htm", &Application::processHTML));
    handlers.insert (handlers.end (), handlerValue ("html", &Application::processHTML));
+#endif
+#ifdef SUPPORT_JPEG
    handlers.insert (handlers.end (), handlerValue ("jpeg", &Application::processJPG));
    handlers.insert (handlers.end (), handlerValue ("jpg", &Application::processJPG));
+#endif
+#ifdef SUPPORT_MP3
    handlers.insert (handlers.end (), handlerValue ("mp3", &Application::processMP3));
+#endif
+#ifdef SUPPORT_OO
    handlers.insert (handlers.end (), handlerValue ("odg", &Application::processOpenOffice));
    handlers.insert (handlers.end (), handlerValue ("odp", &Application::processOpenOffice));
    handlers.insert (handlers.end (), handlerValue ("ods", &Application::processOpenOffice));
    handlers.insert (handlers.end (), handlerValue ("odt", &Application::processOpenOffice));
+#endif
+#ifdef SUPPORT_OGG
    handlers.insert (handlers.end (), handlerValue ("ogg", &Application::processOGG));
+#endif
+#ifdef SUPPORT_PDF
    handlers.insert (handlers.end (), handlerValue ("pdf", &Application::processPDF));
+#endif
+#ifdef SUPPORT_HTML
    handlers.insert (handlers.end (), handlerValue ("php", &Application::processHTML));
+#endif
+#ifdef SUPPORT_PNG
    handlers.insert (handlers.end (), handlerValue ("png", &Application::processPNG));
+#endif
+#ifdef SUPPORT_MSOFFICE
    handlers.insert (handlers.end (), handlerValue ("ppt", &Application::processMSOffice));
+#endif
+#ifdef SUPPORT_RTF
    handlers.insert (handlers.end (), handlerValue ("rtf", &Application::processRTF));
+#endif
+#ifdef SUPPORT_OO
    handlers.insert (handlers.end (), handlerValue ("sda", &Application::processStarOffice));
    handlers.insert (handlers.end (), handlerValue ("sdc", &Application::processStarOffice));
    handlers.insert (handlers.end (), handlerValue ("sdd", &Application::processStarOffice));
    handlers.insert (handlers.end (), handlerValue ("sdw", &Application::processStarOffice));
+#endif
+#ifdef SUPPORT_HTML
    handlers.insert (handlers.end (), handlerValue ("sht", &Application::processHTML));
    handlers.insert (handlers.end (), handlerValue ("shtm", &Application::processHTML));
    handlers.insert (handlers.end (), handlerValue ("shtml", &Application::processHTML));
+#endif
+#ifdef SUPPORT_OO
    handlers.insert (handlers.end (), handlerValue ("sxc", &Application::processOpenOffice));
    handlers.insert (handlers.end (), handlerValue ("sxd", &Application::processOpenOffice));
    handlers.insert (handlers.end (), handlerValue ("sxi", &Application::processOpenOffice));
    handlers.insert (handlers.end (), handlerValue ("sxm", &Application::processOpenOffice));
    handlers.insert (handlers.end (), handlerValue ("sxw", &Application::processOpenOffice));
+#endif
+#ifdef SUPPORT_MSOFFICE
    handlers.insert (handlers.end (), handlerValue ("xls", &Application::processMSOffice));
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -366,20 +440,44 @@ void Application::showHelp () const {
       "   Style=HTML\n"
       "   SortFiles=1\n\n"
       << _("Currently supported files are:")
-      << "\n  - HTML (*.html, *.htm, *.shtml, *.shtm, *.sht, *.php)\n"
+      << "\n"
+#ifdef SUPPORT_HTML
+      "  - HTML (*.html, *.htm, *.shtml, *.shtm, *.sht, *.php)\n"
+#endif
+#ifdef SUPPORT_JPEG
       "  - JPEG (*.jpeg, *.jpg)\n"
+#endif
+#ifdef SUPPORT_PNG
       "  - PNG (*.png)\n"
+#endif
+#ifdef SUPPORT_GIF
       "  - GIF (*.gif)\n"
+#endif
+#ifdef SUPPORT_MP3
       "  - MP3 (*.mp3)\n"
+#endif
+#ifdef SUPPORT_OGG
       "  - OGG (*.ogg)\n"
+#endif
+#ifdef SUPPORT_PDF
       "  - PDF (*.pdf)\n"
+#endif
+#ifdef SUPPORT_OO
       "  - OpenOffice (Write (*.sxw), Calc (*.sxc), Impress (*.sxi), Math (*.sxm)"
           " &\n    Draw (*.sxd))\n"
       "  - OpenOffice 2 (Write (*.odt), Calc (*.ods), Impress (*.odp) & Draw (*.odg))\n"
       "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
+#endif
+#ifdef SUPPORT_ABIWORD
       "  - Abiword (*.abw)\n"
+#endif
+#ifdef SUPPORT_RTF
       "  - RTF (*.rtf)\n"
-      "  - Microsoft Office (Word (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n";
+#endif
+#ifdef SUPPORT_MSOFFICE
+      "  - Microsoft Office (Word (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n"
+#endif
+      ;
 }
 
 //-----------------------------------------------------------------------------
@@ -842,6 +940,7 @@ void Application::processFile (const YGP::File& file, HANDLER fnc) const {
    } // end-else file could be opened
 }
 
+#ifdef SUPPORT_HTML
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a HTML-document
 /// \param hFile: File to processs
@@ -851,7 +950,9 @@ void Application::processHTML (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseHTML ().parse (hFile, result);
 }
+#endif
 
+#ifdef SUPPORT_PDF
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a PDF document
 /// \param hFile: File to processs
@@ -861,7 +962,9 @@ void Application::processPDF (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParsePDF::parse (hFile, result);
 }
+#endif
 
+#ifdef SUPPORT_MP3
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a MP3 file
 /// \param hFile: File to processs
@@ -871,7 +974,9 @@ void Application::processMP3 (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseMP3::parse (hFile, result);
 }
+#endif
 
+#ifdef SUPPORT_OGG
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties out of a OGG file
 /// \param hFile: File to processs
@@ -881,7 +986,9 @@ void Application::processOGG (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseOGG::parse (hFile, result);
 }
+#endif
 
+#ifdef SUPPORT_OO
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a StarOffice document
 /// \param hFile: File to processs
@@ -901,7 +1008,9 @@ void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) c
    throw (std::string) {
    ParseOpenOffice ().parse (hFile, result);
 }
+#endif
 
+#ifdef SUPPORT_ABIWORD
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of an Abiword document
 /// \param hFile: File to processs
@@ -911,7 +1020,9 @@ void Application::processAbiword (YGP::Xistream& hFile, Properties& result) cons
    throw (std::string) {
    ParseAbiword ().parse (hFile, result);
 }
+#endif
 
+#ifdef SUPPORT_RTF
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a RTF-document
 /// \param hFile: File to processs
@@ -922,7 +1033,9 @@ void Application::processRTF (YGP::Xistream& hFile, Properties& result) const
    TRACE9 ("Parsing RTF");
    ParseRTF ().parse (hFile, result);
 }
+#endif
 
+#ifdef SUPPORT_MSOFFICE
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a MS-office document
 /// \param hFile: File to processs
@@ -932,7 +1045,9 @@ void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) con
    throw (std::string) {
    ParseMSOffice ().parse (hFile, result);
 }
+#endif
 
+#ifdef SUPPORT_JPEG
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a JPEG image
 /// \param hFile: File to processs
@@ -942,7 +1057,9 @@ void Application::processJPG (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseJPEG ().parse (hFile, result);
 }
+#endif
 
+#ifdef SUPPORT_PNG
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a PNG image
 /// \param hFile: File to processs
@@ -952,7 +1069,9 @@ void Application::processPNG (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParsePNG (result).parse (hFile);
 }
+#endif
 
+#ifdef SUPPORT_GIF
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a GIF image
 /// \param hFile: File to processs
@@ -962,6 +1081,7 @@ void Application::processGIF (YGP::Xistream& hFile, Properties& result) const
    throw (std::string) {
    ParseGIF (result).parse (hFile);
 }
+#endif
 
 //-----------------------------------------------------------------------------
 /// Returns a handling function to a filetype
