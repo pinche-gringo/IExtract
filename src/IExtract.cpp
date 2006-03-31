@@ -778,12 +778,16 @@ void Application::handleFiles (const char* pFile) const {
 	 fnc = getFileTypeHandler (name.substr (pos + 1));
 	 // Unknown type; try second to-last extension (if option passed)
 	 if (!fnc && (options & TRUNC_EXTENSION)) {
-	    unsigned int pos2 (name.rfind ('.', pos - 1));
-	    Check3 ((pos2 != std::string::npos) ? (pos2 < pos) : (pos2 != pos));
-	    if (pos2 != std::string::npos) {
-	       ++pos2;
-	       fnc = getFileTypeHandler (name.substr (pos2, pos - pos2));
-	    }
+	    do {
+	       unsigned int pos2 (name.rfind ('.', pos - 1));
+	       Check3 ((pos2 != std::string::npos) ? (pos2 < pos) : (pos2 != pos));
+	       if (pos2 == std::string::npos)
+		  break;
+	       else {
+		  fnc = getFileTypeHandler (name.substr (pos2 + 1, pos - pos2 - 1));
+		  pos = pos2;
+	       }
+	    } while (!fnc);
 	 }
       }
       if (fnc) {
