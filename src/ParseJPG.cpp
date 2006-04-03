@@ -207,7 +207,8 @@ int ParseJPEG::foundCommentPhotoShop (const char* pTitle, unsigned int len) {
 
       if (*(unsigned int*)pAct == ENTRY_TYPE) {
          pAct += 4;
-         pTitle = (unsigned int)(*pAct & 0xff) + pAct++;
+         pTitle = (unsigned int)(*pAct & 0xff) + pAct + 1;
+	 ++pAct;
          do {
             TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Type: *"
                     << std::hex << (unsigned int)pAct << " = " << get4BytesLSB (pAct) << std::dec);
