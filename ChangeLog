@@ -1,3 +1,18 @@
+2006-04-03  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.7.11 commented
+
+	* configure.in: Version to 0.7.11
+
+	* src/ParseJPG.cpp: Fixed compile-warning when compiling with GCC 4.1
+
+	* po/de.po, po/en.po, po/es.po: Actualized
+
+2006-03-30  Markus Schwab  <g17m0@lycos.com>
+
+	* src/IExtract.cpp:
+	  Option -X skips not only the last unknown extension, but all
+
 2006-03-09  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.7.10 commented
