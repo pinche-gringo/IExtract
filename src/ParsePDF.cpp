@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 08.11.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2004
+//COPYRIGHT   : Copyright (C) 2002 - 2004, 2006
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,9 +33,8 @@
 #endif
 
 #include <cstdio>
+#include <cstring>
 #include <cstdlib>
-
-#include <sstream>
 
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
@@ -90,7 +89,7 @@ ParsePDF::ParsePDF ()
      , seqInfoValue (_seqInfoValue, _("Info values"), -1U, 0)
      , selType (_selType, _("Valid type"))
      , selStartOfValue (_selStartOfValue, _("Start of values"))
-     , actEntry (NONE), offPrev (0), actObject (0), infoObject (-1U) {
+     , actEntry (NONE), offPrev (0), actObject (0), infoObject (-1U), strInfoObject (NULL) {
    _selXRef[0] = &seqXRef;
    _selXRef[1] = &skipS;
    _selXRef[2] = &skip;
@@ -164,6 +163,7 @@ ParsePDF::ParsePDF ()
 /// Destructor
 //-----------------------------------------------------------------------------
 ParsePDF::~ParsePDF () {
+   delete strInfoObject;
 }
 
 
@@ -248,12 +248,11 @@ void ParsePDF::parseInfoObject () {
 
    file->seekg (aOffsets[infoObject], std::ios::beg);
 
-   std::ostringstream str;
-   str << infoObject;
-   idObj.setValue (str.str ().c_str ());
-   idObj.setMaxCard (str.str ().size ());
-   idObj.setMinCard (str.str ().size ());
+   idObj.setValue (strInfoObject);
+   idObj.setMaxCard (strlen (strInfoObject));
+   idObj.setMinCard (idObj.getMaxCard ());
    skip.setValue ("\\ ");
+   TRACE9 ("PObj: " << idObj.getValue () << "; Size: " << idObj.getMaxCard ());
 
    Check3 (file);
    seqInfoObj.parse (*file);
@@ -269,6 +268,9 @@ int ParsePDF::foundObjectID (const char* pID, unsigned int len) {
    TRACE5 ("ParsePDF::foundObjectID (const char*, unsigned int) - " << pID);
    Check3 (pID); Check3 (file);
 
+   strInfoObject = new char [len + 1];
+   memcpy (strInfoObject, pID, len);
+   strInfoObject[len] = '\0';
    infoObject = atoi (pID);
    return YGP::ParseObject::PARSE_OK;
 }
@@ -359,7 +361,7 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
          { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
 
       Check3 (prop);
-      Check3 ((sizeof (values) / sizeof (values[0])) > actEntry);
+      Check3 ((sizeof (values) / sizeof (values[0])) > (unsigned int)actEntry);
       Check1 ((*value.getValue () == ')') || (*value.getValue () == '>'));
 
       if (*value.getValue () == ')')

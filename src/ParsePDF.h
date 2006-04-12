@@ -128,6 +128,7 @@ class ParsePDF {
    unsigned int offPrev;
    unsigned int actObject;
    unsigned int infoObject;
+   char* strInfoObject;
    std::map <unsigned int, unsigned int> aOffsets;
 };
 
