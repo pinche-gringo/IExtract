@@ -1,3 +1,20 @@
+2006-04-20  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.7.12 docummented
+
+	* configure.in: Version to 0.7.12
+
+	* Makefile.am: Added config.h to distribution; Removed Make.bat
+
+2006-04-12  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParsePDF.cpp, src/ParsePDF.h:
+	  Storing string-representation of ID of info-object
+
+2006-04-06  Markus Schwab  <g17m0@lycos.com>
+
+	* Make.bat: Removed
+
 2006-04-03  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.7.11 commented

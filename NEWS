@@ -1,3 +1,9 @@
+Overview of changes in version 0.7.12:
+
+  - Add config.h (symlinked to IExtract-cfg.h) to distribution
+  - Fixed parsing of PDF-files with ID of \Info-object > 9999
+
+
 Overview of changes in version 0.7.11:
 
   - Option -X skips not only the last, but all unknown extensions
