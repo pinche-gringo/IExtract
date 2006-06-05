@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 8.10.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2005
+//COPYRIGHT   : Copyright (C) 2002 - 2006
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -70,31 +70,31 @@ ParseMSOffice::ParseMSOffice() {
 /// Tries to parse a Microsoft Office documnent
 /// \param stream: Stream to read from
 /// \param result: Structure to hold the found information
-/// \throw std::string: In case of an error an describing text
+/// \throw YGP::ParseError: In case of an error an describing text
 //-----------------------------------------------------------------------------
-void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
+void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
    TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&)");
 
    // Read the header (the first block)
    char header[512];
    stream.read (header, 512);
    if (!stream)
-      throw std::string (_("Can't read document header!"));
+      throw (YGP::ParseError (_("Can't read document header!")));
 
    if (memcmp (header, "\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1", 8))
-      throw std::string (_("Office identifier not found!"));
+      throw (YGP::ParseError (_("Office identifier not found!")));
 
    // Blocksizes
    UINT16 sizeBlock (get2BytesLSB (header + 0x1e));
    UINT16 sizeBlockSmall (get2BytesLSB (header + 0x20));
    TRACE8 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Sizes: " << (1 << sizeBlock) << '/' << (1 << sizeBlockSmall));
    if ((sizeBlockSmall > sizeBlock) || (sizeBlock > 512))
-      throw std::string (_("Values for blocksizes are not plausible!"));
+      throw (YGP::ParseError (_("Values for blocksizes are not plausible!")));
 
    // Count of BAT blocks and offset of properties
    UINT32 cBAT (get4BytesLSB (header + 0x2c));
    if (cBAT > 109)
-      throw std::string (_("Number of blocks for BAT not plausible!"));
+      throw (YGP::ParseError (_("Number of blocks for BAT not plausible!")));
 
    UINT32 offProperties (get4BytesLSB (header + 0x30));
    TRACE6 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Properties: " << std::hex
@@ -110,7 +110,7 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (std
       snprintf (header, sizeof (header), "%p", (void*)((offProperties << sizeBlock) + 512));
       std::string error (_("Not a property block at offset %1!"));
       error.replace (error.find ("%1"), 2, header);
-      throw error;
+      throw (YGP::ParseError (error));
    }
    UINT32 offSBA (get4BytesLSB (block + 0x74));
 
@@ -119,10 +119,10 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (std
    try {
       readBAT (stream, (char*)pBAT, header + 0x4c, cBAT, sizeBlock);
    }
-   catch (std::string& e) {
+   catch (YGP::ParseError& e) {
       delete [] block;
       delete [] pBAT;
-      throw e;
+      throw (e);
    }
 
    const char* entry (block + 0x80);
@@ -173,12 +173,12 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (std
 			offBlock = pSBAT[offBlock];
 		     } // end-while
 		  }
-		  catch (std::string& e) {
+		  catch (YGP::ParseError& e) {
 		     delete [] pSBAT;
 		     for (std::map<unsigned int, char*>::iterator i (readBlocksSBA.begin ());
 			  i != readBlocksSBA.end (); ++i)
 			delete [] i->second;
-		     throw e;
+		     throw;
 		  }
 
 		  // Cleanup
@@ -199,14 +199,14 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (std
 	       TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - InfoSummary: " << std::hex << get2BytesLSB (infoBlock) << std::dec);
 	       if ((get2BytesLSB (infoBlock) != 0xfffe)
 		   || memcmp (infoBlock + 0x18, SECTIONID, 0x14))
-		  throw std::string (_("Not an Information-Summary section!"));
+		  throw YGP::ParseError (_("Not an Information-Summary section!"));
 
 	       TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Start section: " << std::hex << get4BytesLSB (infoBlock + 0x2c) << std::dec);
 	       actPos = infoBlock + get4BytesLSB (infoBlock + 0x2c);
 	       unsigned int entries (get4BytesLSB (actPos + 4));
 	       TRACE3 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Entries: " << entries);
 	       if (entries > 50)
-		  throw std::string (_("Number of information entries not plausible!"));
+		  throw YGP::ParseError (_("Number of information entries not plausible!"));
 
 	       entry = actPos + 8;
 	       while (entries--) {
@@ -218,7 +218,7 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (std
 			  ? ((get4BytesLSB (actPos + offset + 4) >= get4BytesLSB (actPos))
 			     || (offset < (get4BytesLSB (actPos + 4) << 3)))
 			  : false))
-		     throw std::string (_("Values of entry not plausible!"));
+		     throw YGP::ParseError (_("Values of entry not plausible!"));
 
 		  switch (get4BytesLSB (entry)) {
 		  case TYPE_TITLE:
@@ -254,11 +254,11 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (std
 	 readBlock (stream, offProperties, block, sizeBlock);
 	 entry = block;
       }
-      catch (std::string& e) {
+      catch (YGP::ParseError& e) {
 	 delete [] block;
 	 delete [] pBAT;
 	 delete [] infoBlock;
-	 throw e;
+	 throw;
       }
    } while (true); // end-do
 
@@ -273,11 +273,11 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (std
 /// \param offBlock: Index of block to read
 /// \param block: Block to read into
 /// \param sizeBlock: Size (as exponent of 2) of the block
-/// \throw std::string: In case of error a describing text
+/// \throw YGP::ParseError: In case of error a describing text
 /// \remarks - The first byte of block needs to be filled with the blocklength
 //-----------------------------------------------------------------------------
 void ParseMSOffice::readBlock (YGP::Xistream& stream, unsigned int offBlock, char* block,
-			       unsigned int sizeBlock) throw (std::string) {
+			       unsigned int sizeBlock) throw (YGP::ParseError) {
    TRACE9 ("ParseMSOffice::readBlock (YGP::Xistream&, unsigned int, char*, unsigned int): " << offBlock);
    stream.seekg ((offBlock << sizeBlock) + 512, std::ios_base::beg);
    stream.read (block, 1 << sizeBlock);
@@ -285,7 +285,7 @@ void ParseMSOffice::readBlock (YGP::Xistream& stream, unsigned int offBlock, cha
       snprintf (block, 1 << sizeBlock, "%p", (void*)((offBlock << sizeBlock) + 512));
       std::string error (_("Can't read block at offset %1"));
       error.replace (error.find ("%1"), 2, block);
-      throw error;
+      throw (YGP::ParseError (error));
    }
 }
 
@@ -297,10 +297,10 @@ void ParseMSOffice::readBlock (YGP::Xistream& stream, unsigned int offBlock, cha
 /// \param pBATBlocks: Pointer to the block-indexes of the BAT
 /// \param sizeBlock: Size of the blocks
 /// \param cBlocks: Number of BAT blocks
-/// \throw std::string: In case of error a describing text
+/// \throw YGP::ParseError: In case of error a describing text
 //-----------------------------------------------------------------------------
 void ParseMSOffice::readBAT (YGP::Xistream& stream, char* pBAT, const char* pBATBlocks,
-			     unsigned int cBlocks, unsigned int sizeBlock) throw (std::string) {
+			     unsigned int cBlocks, unsigned int sizeBlock) throw (YGP::ParseError) {
    TRACE9 ("ParseMSOffice::readBAT (YGP::Xistream&, 2x char*, 2x unsigned) - " << cBlocks);
    Check1 (pBAT);
 
@@ -317,10 +317,10 @@ void ParseMSOffice::readBAT (YGP::Xistream& stream, char* pBAT, const char* pBAT
 /// \param blocks: Number of block to read
 /// \param sizeBlock: Size (as exponent of 2) of the block
 /// \returns char*: Allocated buffer with file
-/// \throw std::string: In case of error a describing text
+/// \throw YGP::ParseError: In case of error a describing text
 //-----------------------------------------------------------------------------
 char* ParseMSOffice::readFile (YGP::Xistream& stream, unsigned int offBlock, void* pBAT,
-			       unsigned int blocks, unsigned int sizeBlock) throw (std::string) {
+			       unsigned int blocks, unsigned int sizeBlock) throw (YGP::ParseError) {
    char* pFile (new char [blocks << sizeBlock]);
    char* actPos (pFile);
    while (blocks--) {
@@ -338,14 +338,14 @@ char* ParseMSOffice::readFile (YGP::Xistream& stream, unsigned int offBlock, voi
 /// \param start: Start block
 /// \param nr: Nth block to find
 /// \returns unsigned int: Offset of block
-/// \throw std::string: In case of error a describing text
+/// \throw YGP::ParseError: In case of error a describing text
 //-----------------------------------------------------------------------------
-int ParseMSOffice::getBlock (void* pBAT, unsigned int start, unsigned int nr) throw (std::string) {
+int ParseMSOffice::getBlock (void* pBAT, unsigned int start, unsigned int nr) throw (YGP::ParseError) {
    TRACE9 ("ParseMSOffice::getBlock (void*, 2x unsigned int) - " << start);
    while (nr--) {
       start = ((UINT32*)pBAT)[start];
       if (start > 0x80000000)
-	 throw std::string (_("BAT not valid!"));
+	 throw (YGP::ParseError (_("BAT not valid!")));
    } // end-while
 
    TRACE8 ("ParseMSOffice::getBlock (void*, 2x unsigned int) - Result: " << start);

@@ -31,7 +31,7 @@ struct Properties;
 //  - The album is returned in strComment
 class ParseMP3 {
  public:
-   static void parse (YGP::Xistream& stream, Properties& result) throw (std::string);
+   static void parse (YGP::Xistream& stream, Properties& result);
 
  private:
    ParseMP3 ();

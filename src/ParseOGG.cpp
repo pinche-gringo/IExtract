@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 20.03.2005
-//COPYRIGHT   : Copyright (C) 2005
+//COPYRIGHT   : Copyright (C) 2005, 2006
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -76,8 +76,9 @@ ParseOGG::~ParseOGG () {
 /// Method to actually parse the OGG-file
 /// \param stream: OGG-file to analyze
 /// \param result: Out: Found information
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void ParseOGG::parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
+void ParseOGG::parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
    ParseOGG obj (result);
 
    obj.seqOGG.parse (stream);

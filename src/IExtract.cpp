@@ -172,38 +172,38 @@ class Application : public YGP::IVIOApplication {
 #endif
 
 #ifdef SUPPORT_MP3
-   void processMP3 (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processMP3 (YGP::Xistream& hFile, Properties& result) const;
 #endif
 #ifdef SUPPORT_OGG
-   void processOGG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processOGG (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_PDF
-   void processPDF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processPDF (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_JPEG
-   void processJPG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processJPG (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_PNG
-   void processPNG (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processPNG (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_GIF
-   void processGIF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processGIF (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_HTML
-   void processHTML (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processHTML (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_RTF
-   void processRTF (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processRTF (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_MSOFFICE
-   void processMSOffice (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processMSOffice (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_OO
-   void processOpenOffice (YGP::Xistream& hFile, Properties& result) const throw (std::string);
-   void processStarOffice (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processOpenOffice (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
+   void processStarOffice (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_ABIWORD
-   void processAbiword (YGP::Xistream& hFile, Properties& result) const throw (std::string);
+   void processAbiword (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
 #endif
 
    enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4, TRUNC_EXTENSION = 0x8, TERMINATE = 0x10 };
@@ -809,7 +809,7 @@ void Application::handleFiles (const char* pFile) const {
                   YGP::OThread<Application>::create2 ((Application*)this,
                                                       &Application::processThread, NULL));
             }
-            catch (std::string& err) {
+            catch (YGP::ExecError& err) {
                std::cerr << PACKAGE << _("-error: ") << err << '\n';
             }
          UNLOCKTHREADS
@@ -932,13 +932,15 @@ void Application::processFile (const YGP::File& file, HANDLER fnc) const {
          writer->printFile (std::cout, file, prop);
          UNLOCKOUTPUT
       }
-      catch (std::string& err) {
+      catch (YGP::ParseError& err) {
          LOCKOUTPUT;
-         std::cerr << PACKAGE << _("-error: ") << err << '\n';
-         err = ((options & SHOW_ERRORS)
-                ? std::string (_("Error while processing: ")) + err
-                : "");
-         writer->printMessage (std::cout, file, err);
+         std::cerr << PACKAGE << _("-error: ") << err.what () << '\n';
+	 std::string msg;
+	 if (options & SHOW_ERRORS) {
+	    msg =  _("Error while processing: ");
+	    msg += err.what ();
+	 }
+         writer->printMessage (std::cout, file, msg);
          UNLOCKOUTPUT
       } // end-catch
    } // end-else file could be opened
@@ -949,9 +951,10 @@ void Application::processFile (const YGP::File& file, HANDLER fnc) const {
 /// Tries to extract the properties of a HTML-document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void Application::processHTML (YGP::Xistream& hFile, Properties& result) const
-   throw (std::string) {
+   throw (YGP::ParseError) {
    ParseHTML ().parse (hFile, result);
 }
 #endif
@@ -961,9 +964,10 @@ void Application::processHTML (YGP::Xistream& hFile, Properties& result) const
 /// Tries to extract the properties of a PDF document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void Application::processPDF (YGP::Xistream& hFile, Properties& result) const
-   throw (std::string) {
+   throw (YGP::ParseError) {
    ParsePDF::parse (hFile, result);
 }
 #endif
@@ -974,8 +978,7 @@ void Application::processPDF (YGP::Xistream& hFile, Properties& result) const
 /// \param hFile: File to processs
 /// \param result: Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processMP3 (YGP::Xistream& hFile, Properties& result) const
-   throw (std::string) {
+void Application::processMP3 (YGP::Xistream& hFile, Properties& result) const {
    ParseMP3::parse (hFile, result);
 }
 #endif
@@ -985,9 +988,10 @@ void Application::processMP3 (YGP::Xistream& hFile, Properties& result) const
 /// Tries to extract the properties out of a OGG file
 /// \param hFile: File to processs
 /// \param result: Result of parsing
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void Application::processOGG (YGP::Xistream& hFile, Properties& result) const
-   throw (std::string) {
+   throw (YGP::ParseError) {
    ParseOGG::parse (hFile, result);
 }
 #endif
@@ -997,9 +1001,10 @@ void Application::processOGG (YGP::Xistream& hFile, Properties& result) const
 /// Tries to extract the properties of a StarOffice document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) const
-   throw (std::string) {
+   throw (YGP::ParseError) {
    ParseStarOffice ().parse (hFile, result);
 }
 
@@ -1007,9 +1012,10 @@ void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) c
 /// Tries to extract the properties of an OpenOffice document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) const
-   throw (std::string) {
+   throw (YGP::ParseError) {
    ParseOpenOffice ().parse (hFile, result);
 }
 #endif
@@ -1019,9 +1025,10 @@ void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) c
 /// Tries to extract the properties of an Abiword document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void Application::processAbiword (YGP::Xistream& hFile, Properties& result) const
-   throw (std::string) {
+   throw (YGP::ParseError) {
    ParseAbiword ().parse (hFile, result);
 }
 #endif
@@ -1031,9 +1038,10 @@ void Application::processAbiword (YGP::Xistream& hFile, Properties& result) cons
 /// Tries to extract the properties of a RTF-document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void Application::processRTF (YGP::Xistream& hFile, Properties& result) const
-   throw (std::string) {
+   throw (YGP::ParseError) {
    TRACE9 ("Parsing RTF");
    ParseRTF ().parse (hFile, result);
 }
@@ -1044,9 +1052,10 @@ void Application::processRTF (YGP::Xistream& hFile, Properties& result) const
 /// Tries to extract the properties of a MS-office document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) const
-   throw (std::string) {
+   throw (YGP::ParseError) {
    ParseMSOffice ().parse (hFile, result);
 }
 #endif
@@ -1056,9 +1065,10 @@ void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) con
 /// Tries to extract the properties of a JPEG image
 /// \param hFile: File to processs
 /// \param result: Result of parsing
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void Application::processJPG (YGP::Xistream& hFile, Properties& result) const
-   throw (std::string) {
+   throw (YGP::ParseError) {
    ParseJPEG ().parse (hFile, result);
 }
 #endif
@@ -1068,9 +1078,10 @@ void Application::processJPG (YGP::Xistream& hFile, Properties& result) const
 /// Tries to extract the properties of a PNG image
 /// \param hFile: File to processs
 /// \param result: Result of parsing
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void Application::processPNG (YGP::Xistream& hFile, Properties& result) const
-   throw (std::string) {
+   throw (YGP::ParseError) {
    ParsePNG (result).parse (hFile);
 }
 #endif
@@ -1080,9 +1091,10 @@ void Application::processPNG (YGP::Xistream& hFile, Properties& result) const
 /// Tries to extract the properties of a GIF image
 /// \param hFile: File to processs
 /// \param result: Result of parsing
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void Application::processGIF (YGP::Xistream& hFile, Properties& result) const
-   throw (std::string) {
+   throw (YGP::ParseError) {
    ParseGIF (result).parse (hFile);
 }
 #endif
@@ -1132,7 +1144,7 @@ void Application::readINIFile (const char* pFile) {
 
       INIFILE_READ ();
    }
-   catch (std::string& err) {
+   catch (std::exception& err) {
       TRACE1 (err);
    }
 

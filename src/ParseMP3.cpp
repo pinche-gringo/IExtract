@@ -50,7 +50,7 @@ ParseMP3::~ParseMP3 () {
 /// \param stream: MP3-file to analyze
 /// \param result: Out: Found information
 //-----------------------------------------------------------------------------
-void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
+void ParseMP3::parse (YGP::Xistream& stream, Properties& result) {
    stream.seekg (-0x80, std::ios::end);
    std::string value;
 

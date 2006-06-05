@@ -25,7 +25,8 @@
 
 #include <map>
 
-#include <YGP/Parse.h>
+#include <YGP/XStream.h>
+#include <YGP/Exception.h>
 
 struct Properties;
 
@@ -36,16 +37,16 @@ class ParseMSOffice  {
    ParseMSOffice ();
    ~ParseMSOffice () { }
 
-   void parse (YGP::Xistream& stream, Properties& result) throw (std::string);
+   void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError);
 
  private:
    static void readBAT (YGP::Xistream& stream, char* pBAT, const char* pBATBlocks,
-			unsigned int cBlocks, unsigned int sizeBlock) throw (std::string);
+			unsigned int cBlocks, unsigned int sizeBlock) throw (YGP::ParseError);
    static void readBlock (YGP::Xistream& stream, unsigned int offBlock,
-			  char* block, unsigned int sizeBlock) throw (std::string);
+			  char* block, unsigned int sizeBlock) throw (YGP::ParseError);
    static char* readFile (YGP::Xistream& stream, unsigned int offBlock,
-			  void* pBAT, unsigned int blocks, unsigned int sizeBlock) throw (std::string);
-   static int getBlock (void* pBAT, unsigned int start, unsigned int nr) throw (std::string);
+			  void* pBAT, unsigned int blocks, unsigned int sizeBlock) throw (YGP::ParseError);
+   static int getBlock (void* pBAT, unsigned int start, unsigned int nr) throw (YGP::ParseError);
 };
 
 #endif

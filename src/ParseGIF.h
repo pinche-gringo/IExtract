@@ -31,7 +31,7 @@ class ParseGIF {
    ParseGIF (Properties& result);
    virtual ~ParseGIF ();
 
-   void parse (YGP::Xistream& stream) throw (std::string) {
+   void parse (YGP::Xistream& stream) throw (YGP::ParseError) {
       gifImage.parse (stream); }
 
  private:

@@ -35,7 +35,7 @@ class ParsePNG {
    ParsePNG (Properties& result);
    virtual ~ParsePNG ();
 
-   void parse (YGP::Xistream& stream) throw (std::string) {
+   void parse (YGP::Xistream& stream) throw (YGP::ParseError) {
       pngImage.parse (stream); }
 
  private:

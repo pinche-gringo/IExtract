@@ -392,8 +392,9 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
 /// Method to parse a PDF object
 /// \param stream: Stream to parse
 /// \param result: Result where to store found data
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void ParsePDF::parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
+void ParsePDF::parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
    ParsePDF obj;
    stream.seekg (-40, std::ios::end);
    obj.prop = &result;
@@ -403,8 +404,8 @@ void ParsePDF::parse (YGP::Xistream& stream, Properties& result) throw (std::str
    unsigned int rc (obj.selXRef.parse (stream));
    while (!(rc || obj.aOffsets[obj.infoObject])) {
       if (!obj.offPrev)
-         throw (std::string (_("Document does not contain neither an /Info"
-                               " nor a /Prev entry")));
+         throw (YGP::ParseError (_("Document does not contain neither an /Info"
+				   " nor a /Prev entry")));
 
       stream.seekg (obj.offPrev, std::ios::beg);
       obj.offPrev = 0;

@@ -32,7 +32,7 @@ struct Properties;
 //  - The album is returned in strComment
 class ParseOGG {
  public:
-   static void parse (YGP::Xistream& stream, Properties& result) throw (std::string);
+   static void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError);
 
  private:
    ParseOGG (Properties& result);

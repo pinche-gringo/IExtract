@@ -30,7 +30,7 @@ class ParseJPEG  {
    ParseJPEG ();
    ~ParseJPEG () { }
 
-   void parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
+   void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
       prop = &result;
       jpegImage.parse (stream); }
 

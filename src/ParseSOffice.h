@@ -30,7 +30,7 @@ class ParseStarOffice  {
    ParseStarOffice ();
    ~ParseStarOffice () { }
 
-   void parse (YGP::Xistream& stream, Properties& result) throw (std::string) {
+   void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
       prop = &result;
       stream.seekg (0x800);
       selDocument.parse (stream); }
