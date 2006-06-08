@@ -1144,8 +1144,12 @@ void Application::readINIFile (const char* pFile) {
 
       INIFILE_READ ();
    }
-   catch (std::exception& err) {
-      TRACE1 (err);
+   catch (YGP::FileError&) { }
+   catch (std::exception& error) {
+      std::string err ("-warning: Error reading INI-file `%1'! %2\n");
+      err.replace (err.find ("%1"), 2, pFile);
+      err.replace (err.find ("%2"), 2, error.what ());
+      std::cerr << name () << err;
    }
 
    if (iniOpts.style.size ()) {
