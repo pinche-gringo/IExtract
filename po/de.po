@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.7 ($Revision$)\n"
 "Report-Msgid-Bugs-To: g17m0@lycos.com\n"
-"POT-Creation-Date: 2006-04-03 16:55-0400\n"
+"POT-Creation-Date: 2006-06-07 21:05-0400\n"
 "PO-Revision-Date: 2005-06-04 13:22-0400\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: Aleman <g17m0@lycos.com>\n"
@@ -425,11 +425,11 @@ msgstr ""
 "Datei \"%1\" kann nicht geöffnet werden!\n"
 "Ursache: "
 
-#: src/IExtract.cpp:939
+#: src/IExtract.cpp:940
 msgid "Error while processing: "
 msgstr "Error beim Bearbeiten: "
 
-#: src/IExtract.cpp:1151
+#: src/IExtract.cpp:1167
 msgid ""
 "-warning: The INI-file `%1' contains an invalid entry for the output style (`"
 "%2')! Using text\n"
@@ -437,155 +437,155 @@ msgstr ""
 "-Warnung: Das INI-File \"%1\" enthält einen ungültigen Eintrag für den "
 "Ausgabestil (\"%2\")! Verwende text\n"
 
-#: src/ParsePDF.cpp:55
+#: src/ParsePDF.cpp:54
 msgid "Tag for offset of cross reference table"
 msgstr "Tag für den Offset der Cross-Referenz-Tabelle"
 
-#: src/ParsePDF.cpp:56
+#: src/ParsePDF.cpp:55
 msgid "Offset of cross reference table"
 msgstr "Offset der Cross-Referenz-Tabelle"
 
-#: src/ParsePDF.cpp:57
+#: src/ParsePDF.cpp:56
 msgid "Start of startxref-tag"
 msgstr "Start des startxref-Tags"
 
-#: src/ParsePDF.cpp:58
+#: src/ParsePDF.cpp:57
 msgid "Unused data"
 msgstr "Unverwendeter Wert"
 
-#: src/ParsePDF.cpp:59
+#: src/ParsePDF.cpp:58
 msgid "Tag for cross reference table"
 msgstr "Tag für Cross-Referenz-Tabelle"
 
-#: src/ParsePDF.cpp:60 src/ParsePDF.cpp:61
+#: src/ParsePDF.cpp:59 src/ParsePDF.cpp:60
 msgid "Number of cross reference entries"
 msgstr "Anzahl der Cross-Referenz-Tabelleneinträge"
 
-#: src/ParsePDF.cpp:62
+#: src/ParsePDF.cpp:61
 msgid "Offset of object"
 msgstr "Offset eines Objektes"
 
-#: src/ParsePDF.cpp:63
+#: src/ParsePDF.cpp:62
 msgid "Tag for trailer"
 msgstr "Tag für Anhang"
 
-#: src/ParsePDF.cpp:64
+#: src/ParsePDF.cpp:63
 msgid "Start of object"
 msgstr "Start eines Objektes"
 
-#: src/ParsePDF.cpp:65
+#: src/ParsePDF.cpp:64
 msgid "Reference to info object"
 msgstr "Referenz zum Info-Object"
 
-#: src/ParsePDF.cpp:66
+#: src/ParsePDF.cpp:65
 msgid "Reference to other trailer"
 msgstr "Referenz zu einem anderen Anhang"
 
-#: src/ParsePDF.cpp:67
+#: src/ParsePDF.cpp:66
 msgid "Offset of /Prev entry"
 msgstr "Offset des /Prev-Eintrags"
 
-#: src/ParsePDF.cpp:68
+#: src/ParsePDF.cpp:67
 msgid "ID of object"
 msgstr "ID des Objektes"
 
-#: src/ParsePDF.cpp:69
+#: src/ParsePDF.cpp:68
 msgid "ID of object (repeated)"
 msgstr "ID des Objektes (wiederholt)"
 
-#: src/ParsePDF.cpp:70
+#: src/ParsePDF.cpp:69
 msgid "Generation"
 msgstr ""
 
-#: src/ParsePDF.cpp:71
+#: src/ParsePDF.cpp:70
 msgid "Tag for an object"
 msgstr "Tag für ein Objekt"
 
-#: src/ParsePDF.cpp:72
+#: src/ParsePDF.cpp:71
 msgid "End of object"
 msgstr "Ende des Objektes"
 
-#: src/ParsePDF.cpp:73
+#: src/ParsePDF.cpp:72
 msgid "Tag for title"
 msgstr "Tag für Titel"
 
-#: src/ParsePDF.cpp:74
+#: src/ParsePDF.cpp:73
 msgid "Tag for author"
 msgstr "Tag für Autor"
 
-#: src/ParsePDF.cpp:75
+#: src/ParsePDF.cpp:74
 msgid "Tag for comment (subject)"
 msgstr "Tag für Kommentar (Subjekt)"
 
-#: src/ParsePDF.cpp:76 src/ParseHTML.cpp:55 src/ParseRTF.cpp:58
+#: src/ParsePDF.cpp:75 src/ParseHTML.cpp:55 src/ParseRTF.cpp:58
 msgid "Value of entry"
 msgstr "Wert des Eintrags"
 
-#: src/ParsePDF.cpp:77
+#: src/ParsePDF.cpp:76
 msgid "Start of value ('(')"
 msgstr "Start des Wertes ('(')"
 
-#: src/ParsePDF.cpp:78
+#: src/ParsePDF.cpp:77
 msgid "Start of value ('<')"
 msgstr "Start des Wertes ('<')"
 
-#: src/ParsePDF.cpp:79
+#: src/ParsePDF.cpp:78
 msgid "End of value"
 msgstr "Ende des Wertes"
 
-#: src/ParsePDF.cpp:80
+#: src/ParsePDF.cpp:79
 msgid "Pointer to position of cross reference table"
 msgstr "Verweis zur Position der Cross-Referenz-Tabelle"
 
-#: src/ParsePDF.cpp:81
+#: src/ParsePDF.cpp:80
 msgid "Position of cross reference table"
 msgstr "Position der Cross-Referenz-Tabelle"
 
-#: src/ParsePDF.cpp:82
+#: src/ParsePDF.cpp:81
 msgid "Cross reference table"
 msgstr "Cross-Referenz-Tabelle"
 
-#: src/ParsePDF.cpp:83
+#: src/ParsePDF.cpp:82
 msgid "Cross reference table subsection"
 msgstr "Cross-Referenz-Tabellen Untereintrag"
 
-#: src/ParsePDF.cpp:84
+#: src/ParsePDF.cpp:83
 msgid "Entries in cross reference table"
 msgstr "Einträge der Cross-Referenz-Tabelle"
 
-#: src/ParsePDF.cpp:85
+#: src/ParsePDF.cpp:84
 msgid "Trailer"
 msgstr "Anhang"
 
-#: src/ParsePDF.cpp:86
+#: src/ParsePDF.cpp:85
 msgid "Trailer values"
 msgstr "Werte des Anhangs"
 
-#: src/ParsePDF.cpp:87
+#: src/ParsePDF.cpp:86
 msgid "Info entry"
 msgstr "Info-Eintrag"
 
-#: src/ParsePDF.cpp:88
+#: src/ParsePDF.cpp:87
 msgid "Prev entry"
 msgstr "Prev-Eintrag"
 
-#: src/ParsePDF.cpp:89
+#: src/ParsePDF.cpp:88
 msgid "Info object"
 msgstr "Info-Objekt"
 
-#: src/ParsePDF.cpp:90
+#: src/ParsePDF.cpp:89
 msgid "Info values"
 msgstr "Info-Werte"
 
-#: src/ParsePDF.cpp:91
+#: src/ParsePDF.cpp:90
 msgid "Valid type"
 msgstr "Gültiger Typ"
 
-#: src/ParsePDF.cpp:92
+#: src/ParsePDF.cpp:91
 msgid "Start of values"
 msgstr "Start der Werte"
 
-#: src/ParsePDF.cpp:404
+#: src/ParsePDF.cpp:407
 msgid "Document does not contain neither an /Info nor a /Prev entry"
 msgstr "Dokument enthält weder einen /Info- noch einen /Prev-Eintrag"
 
