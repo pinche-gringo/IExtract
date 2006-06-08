@@ -1,3 +1,18 @@
+2006-06-07  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.7.13 docummented
+
+	* src/IExtract.cpp: Improved errorhandling of reading INI-file
+
+	* configure.in: Version to 0.7.13; Needing libYGP 0.8.00
+
+	* po/de.po, po/en.po, po/es.po: Actualized
+
+2006-06-05  Markus Schwab  <g17m0@lycos.com>
+
+	* src/IExtract.cpp, src/ParseAbiword.h, src/ParseGIF.h, src/ParseHTML.h, src/ParseJPG.h, src/ParseMP3.cpp, src/ParseMP3.h, src/ParseMSOffice.cpp, src/ParseMSOffice.h, src/ParseOGG.cpp, src/ParseOGG.h, src/ParseOOffice.h, src/ParsePDF.cpp, src/ParsePDF.h, src/ParsePNG.h, src/ParseRTF.h, src/ParseSOffice.h:
+	  Adapted to new exception-handling style of libYGP 0.8.00
+
 2006-04-20  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.7.12 docummented
