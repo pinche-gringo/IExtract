@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.52)
 AC_REVISION($Revision$)
-AC_INIT(IExtract, 0.7.12, [g17m0@lycos.com], IExtract)
+AC_INIT(IExtract, 0.7.13, [g17m0@lycos.com], IExtract)
 
 RELEASE=${PACKAGE_VERSION%.*}
 AC_SUBST(PACKAGE_VERSION)
@@ -30,7 +30,7 @@ dnl Checks for programs.
 
 dnl Checks for libraries.
 AC_CHECK_LIB(stdc++, main)
-PKG_CHECK_MODULES(YMP, YGP >= 0.7.30, [],
+PKG_CHECK_MODULES(YMP, YGP >= 0.8.00, [],
                   [AC_MSG_ERROR(Need libYGP to make); exit])
 
 dnl Checks for header files.
