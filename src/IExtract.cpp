@@ -39,6 +39,9 @@
 #include <map>
 #include <string>
 
+#include <YGP/Check.h>
+#include <YGP/Trace.h>
+
 #ifdef ENABLE_THREADS
 #  include <queue>
 #  include <vector>
@@ -61,8 +64,6 @@
 #  define UNLOCKOUTPUT
 #endif
 
-#include <YGP/Check.h>
-#include <YGP/Trace.h>
 #include <YGP/XStream.h>
 #include <YGP/INIFile.h>
 #include <YGP/DirSrch.h>
