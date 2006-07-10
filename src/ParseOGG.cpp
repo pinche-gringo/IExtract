@@ -43,7 +43,9 @@
 ParseOGG::ParseOGG (Properties& result)
    : prop (result)
      , txtOGG ("OggS", _("OGG-ID"), false)
-     , skip (0x69)
+     , idCommentHeader ("\x03vorbis", false)
+     , skip (0x50)
+     , nrSegments ("\\*", _("Number of segments"), *this, &ParseOGG::foundNrSegments, 1, 1, false)
      , lenVendorStr ("\\*", _("Length of vendor string"), *this, &ParseOGG::foundLenVendorString, 4, 4, false)
      , nrComments ("\\*", _("Number of comments"), *this, &ParseOGG::foundNrComments, 4, 4, false)
      , lenEntry ("\\*", _("Length of comment entry"), *this, &ParseOGG::foundLenComment, 4, 4, false)
@@ -52,11 +54,14 @@ ParseOGG::ParseOGG (Properties& result)
      , seqOGG (_seqOGG, _("OGG file")) {
    _seqOGG[0] = &txtOGG;
    _seqOGG[1] = &skip;
-   _seqOGG[2] = &lenVendorStr;
+   _seqOGG[2] = &nrSegments;
    _seqOGG[3] = &skip;
-   _seqOGG[4] = &nrComments;
-   _seqOGG[5] = &seqComment;
-   _seqOGG[6] = NULL;
+   _seqOGG[4] = &idCommentHeader;
+   _seqOGG[5] = &lenVendorStr;
+   _seqOGG[6] = &skip;
+   _seqOGG[7] = &nrComments;
+   _seqOGG[8] = &seqComment;
+   _seqOGG[9] = NULL;
 
    _seqComment[0] = &lenEntry;
    _seqComment[1] = &txtEntry;
@@ -82,6 +87,18 @@ void ParseOGG::parse (YGP::Xistream& stream, Properties& result) throw (YGP::Par
    ParseOGG obj (result);
 
    obj.seqOGG.parse (stream);
+}
+
+//-----------------------------------------------------------------------------
+/// Callback after the number of segments has been parse
+/// \param nr: Pointer to number of segments
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+int ParseOGG::foundNrSegments (const char* nr, unsigned int) {
+   Check1 (nr);
+   TRACE8 ("ParseOGG::foundNrSegments (const char*, unsigned int): " << (unsigned int)*nr);
+   skip.setOffset (*nr);
+   return YGP::ParseObject::PARSE_OK;
 }
 
 //-----------------------------------------------------------------------------

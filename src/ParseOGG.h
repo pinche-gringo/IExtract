@@ -43,6 +43,7 @@ class ParseOGG {
    ParseOGG (const ParseOGG& other);
    const ParseOGG& operator= (const ParseOGG& other);
 
+   int foundNrSegments (const char* nr, unsigned int);
    int foundLenVendorString (const char* nr, unsigned int);
    int foundNrComments (const char* nr, unsigned int);
    int foundComment (const char* comment, unsigned int len);
@@ -53,7 +54,9 @@ class ParseOGG {
    typedef YGP::OFParseAttomic<ParseOGG>  OMParseAttomic;
 
    YGP::ParseExact     txtOGG;
+   YGP::ParseExact     idCommentHeader;
    YGP::ParseSkip      skip;
+   OMParseAttomic      nrSegments;
    OMParseAttomic      lenVendorStr;
    OMParseAttomic      nrComments;
    OMParseAttomic      lenEntry;
@@ -63,7 +66,7 @@ class ParseOGG {
    YGP::ParseSequence  seqOGG;
 
    YGP::ParseObject*   _seqComment[3];
-   YGP::ParseObject*   _seqOGG[7];
+   YGP::ParseObject*   _seqOGG[10];
 };
 
 #endif
