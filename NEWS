@@ -1,3 +1,8 @@
+Overview of changes in version 0.7.14:
+
+  - Fixed parsing OGG files with a segment-table with other than 17 entries
+
+
 Overview of changes in version 0.7.13:
 
   - Adapted to libYGP 0.8.00

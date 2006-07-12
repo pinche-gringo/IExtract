@@ -1,6 +1,22 @@
+2006-07-12  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.7.14 documented
+
+	* configure.in: Version to 0.7.14
+
+	* po/de.po, po/en.po, po/es.po:
+	  Added description of segment-nr in OGG-parser
+
+2006-07-10  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseOGG.cpp, src/ParseOGG.h:
+	  Fixed parsing files with a segment-table with other than 17 entries
+
+	* src/IExtract.cpp: First includes from libYGP are Check.h and Trace.h
+
 2006-06-07  Markus Schwab  <g17m0@lycos.com>
 
-	* ChangeLog, NEWS: Changes of V0.7.13 docummented
+	* ChangeLog, NEWS: Changes of V0.7.13 documented
 
 	* src/IExtract.cpp: Improved errorhandling of reading INI-file
 
@@ -15,7 +31,7 @@
 
 2006-04-20  Markus Schwab  <g17m0@lycos.com>
 
-	* ChangeLog, NEWS: Changes of V0.7.12 docummented
+	* ChangeLog, NEWS: Changes of V0.7.12 documented
 
 	* configure.in: Version to 0.7.12
 
