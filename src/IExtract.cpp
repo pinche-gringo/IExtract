@@ -75,6 +75,7 @@
 #include "Writer.h"
 #include "Options.h"
 #include "Properties.h"
+#include "FileTypeChk.h"
 
 #ifdef SUPPORT_MP3
 #  include "ParseMP3.h"
@@ -158,10 +159,10 @@ class Application : public YGP::IVIOApplication {
    const Application& operator= (const Application&);
 
    typedef void (Application::*HANDLER) (YGP::Xistream& hFile, Properties& result) const;
-   HANDLER getFileTypeHandler (const std::string& ext) const;
+   HANDLER getFileTypeHandler (const char* file) const;
 
-   typedef std::map<const std::string, HANDLER> handlerMap;
-   typedef std::pair<const std::string, HANDLER> handlerValue;
+   typedef std::map<FileTypeChecker::FileType, HANDLER> handlerMap;
+   typedef std::pair<FileTypeChecker::FileType, HANDLER> handlerValue;
    handlerMap handlers;
 
    static void convertFromWideChar (Properties& prop);
@@ -219,6 +220,8 @@ class Application : public YGP::IVIOApplication {
    std::string append, prepend;
 
    enum { TEXT = 0, QUOTED, HTML, LATEX, XML } outputStyle;
+
+   FileTypeChecker::FileType (*fnGetFileType) (const char*);
 
    static const longOptions lo[];
 
@@ -279,8 +282,9 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
 /// \param argv: Array holding (pointer to) arguments
 //----------------------------------------------------------------------------
 Application::Application (const int argc, const char* argv[])
-    : YGP::IVIOApplication (argc, argv, lo), options (0), chgFlag (0), iniOpts ()
-    , writer (NULL), outputStyle (TEXT)
+   : YGP::IVIOApplication (argc, argv, lo), options (0), chgFlag (0), iniOpts (),
+     writer (NULL), outputStyle (TEXT),
+     fnGetFileType (&FileTypeCheckerByName::getType)
 #ifdef ENABLE_THREADS
     , aThreads (0)
 #endif
@@ -292,69 +296,38 @@ Application::Application (const int argc, const char* argv[])
 #endif
 
 #ifdef SUPPORT_ABIWORD
-   handlers.insert (handlers.end (), handlerValue ("abw", &Application::processAbiword));
-#endif
-#ifdef SUPPORT_MSOFFICE
-   handlers.insert (handlers.end (), handlerValue ("doc", &Application::processMSOffice));
+   handlers[FileTypeChecker::ABIWORD] = &Application::processAbiword;
 #endif
 #ifdef SUPPORT_GIF
+   handlers[FileTypeChecker::GIF] = &Application::processGIF;
 #endif
-   handlers.insert (handlers.end (), handlerValue ("gif", &Application::processGIF));
 #ifdef SUPPORT_HTML
-   handlers.insert (handlers.end (), handlerValue ("htm", &Application::processHTML));
-   handlers.insert (handlers.end (), handlerValue ("html", &Application::processHTML));
+   handlers[FileTypeChecker::HTML] = &Application::processHTML;
 #endif
 #ifdef SUPPORT_JPEG
-   handlers.insert (handlers.end (), handlerValue ("jpeg", &Application::processJPG));
-   handlers.insert (handlers.end (), handlerValue ("jpg", &Application::processJPG));
+   handlers[FileTypeChecker::JPEG] = &Application::processJPG;
 #endif
 #ifdef SUPPORT_MP3
-   handlers.insert (handlers.end (), handlerValue ("mp3", &Application::processMP3));
+   handlers[FileTypeChecker::MP3] = &Application::processMP3;
 #endif
-#ifdef SUPPORT_OO
-   handlers.insert (handlers.end (), handlerValue ("odg", &Application::processOpenOffice));
-   handlers.insert (handlers.end (), handlerValue ("odp", &Application::processOpenOffice));
-   handlers.insert (handlers.end (), handlerValue ("ods", &Application::processOpenOffice));
-   handlers.insert (handlers.end (), handlerValue ("odt", &Application::processOpenOffice));
+#ifdef SUPPORT_MSOFFICE
+   handlers[FileTypeChecker::MSOFFICE] =  &Application::processMSOffice;
 #endif
 #ifdef SUPPORT_OGG
-   handlers.insert (handlers.end (), handlerValue ("ogg", &Application::processOGG));
+   handlers[FileTypeChecker::OGG] =  &Application::processOGG;
+#endif
+#ifdef SUPPORT_OO
+   handlers[FileTypeChecker::OPENOFFICE] =  &Application::processOpenOffice;
+   handlers[FileTypeChecker::STAROFFICE] =  &Application::processOpenOffice;
 #endif
 #ifdef SUPPORT_PDF
-   handlers.insert (handlers.end (), handlerValue ("pdf", &Application::processPDF));
-#endif
-#ifdef SUPPORT_HTML
-   handlers.insert (handlers.end (), handlerValue ("php", &Application::processHTML));
+   handlers[FileTypeChecker::PDF] = &Application::processPDF;
 #endif
 #ifdef SUPPORT_PNG
-   handlers.insert (handlers.end (), handlerValue ("png", &Application::processPNG));
-#endif
-#ifdef SUPPORT_MSOFFICE
-   handlers.insert (handlers.end (), handlerValue ("ppt", &Application::processMSOffice));
+   handlers[FileTypeChecker::PNG] = &Application::processPNG;
 #endif
 #ifdef SUPPORT_RTF
-   handlers.insert (handlers.end (), handlerValue ("rtf", &Application::processRTF));
-#endif
-#ifdef SUPPORT_OO
-   handlers.insert (handlers.end (), handlerValue ("sda", &Application::processStarOffice));
-   handlers.insert (handlers.end (), handlerValue ("sdc", &Application::processStarOffice));
-   handlers.insert (handlers.end (), handlerValue ("sdd", &Application::processStarOffice));
-   handlers.insert (handlers.end (), handlerValue ("sdw", &Application::processStarOffice));
-#endif
-#ifdef SUPPORT_HTML
-   handlers.insert (handlers.end (), handlerValue ("sht", &Application::processHTML));
-   handlers.insert (handlers.end (), handlerValue ("shtm", &Application::processHTML));
-   handlers.insert (handlers.end (), handlerValue ("shtml", &Application::processHTML));
-#endif
-#ifdef SUPPORT_OO
-   handlers.insert (handlers.end (), handlerValue ("sxc", &Application::processOpenOffice));
-   handlers.insert (handlers.end (), handlerValue ("sxd", &Application::processOpenOffice));
-   handlers.insert (handlers.end (), handlerValue ("sxi", &Application::processOpenOffice));
-   handlers.insert (handlers.end (), handlerValue ("sxm", &Application::processOpenOffice));
-   handlers.insert (handlers.end (), handlerValue ("sxw", &Application::processOpenOffice));
-#endif
-#ifdef SUPPORT_MSOFFICE
-   handlers.insert (handlers.end (), handlerValue ("xls", &Application::processMSOffice));
+   handlers[FileTypeChecker::RTF] = &Application::processRTF;
 #endif
 }
 
@@ -773,23 +746,18 @@ void Application::handleFiles (const char* pFile) const {
    while (file) {
       // Determine file-type from extension (or second-to-last extension)
       name = file->name ();
-      unsigned int pos (name.rfind ('.'));
-      HANDLER fnc (NULL);
-      if (pos != std::string::npos) {
-	 fnc = getFileTypeHandler (name.substr (pos + 1));
-	 // Unknown type; try second to-last extension (if option passed)
-	 if (!fnc && (options & TRUNC_EXTENSION)) {
-	    do {
-	       unsigned int pos2 (name.rfind ('.', pos - 1));
-	       Check3 ((pos2 != std::string::npos) ? (pos2 < pos) : (pos2 != pos));
-	       if (pos2 == std::string::npos)
-		  break;
-	       else {
-		  fnc = getFileTypeHandler (name.substr (pos2 + 1, pos - pos2 - 1));
-		  pos = pos2;
-	       }
-	    } while (!fnc);
-	 }
+      HANDLER fnc (getFileTypeHandler (name.c_str ()));
+      // U_nknown type; try second to-last extension (if option passed)
+      if ((options & TRUNC_EXTENSION) && !fnc) {
+	 do {
+	    unsigned int pos (name.rfind ('.'));
+	    if (pos == std::string::npos)
+	       break;
+	    else {
+	       name.replace (name.begin () + pos, name.end (), 0, '\0');
+	       fnc = getFileTypeHandler (name.c_str ());
+	    }
+	 } while (!fnc);
       }
       if (fnc) {
 #ifdef ENABLE_THREADS
@@ -1102,13 +1070,19 @@ void Application::processGIF (YGP::Xistream& hFile, Properties& result) const
 
 //-----------------------------------------------------------------------------
 /// Returns a handling function to a filetype
-/// \param ext: File extensions
+/// \param file: Filename
 /// \returns \c HANDLER: Method to handle this filetype; NULL in case of error
 //-----------------------------------------------------------------------------
-Application::HANDLER Application::getFileTypeHandler (const std::string& ext) const {
-   TRACE9 ("Application::getFileTypeHandler (const std::string&) - " << ext);
-   handlerMap::const_iterator i (handlers.find (ext));
-   return (i != handlers.end ()) ? i->second : NULL;
+Application::HANDLER Application::getFileTypeHandler (const char* file) const {
+   TRACE9 ("Application::getFileTypeHandler (const std::string&) - " << file);
+   Check1 (fnGetFileType);
+
+   FileTypeChecker::FileType type (fnGetFileType (file));
+   if (type != FileTypeChecker::UNKNOWN) {
+      handlerMap::const_iterator i (handlers.find (type));
+      return (i != handlers.end ()) ? i->second : NULL;
+   }
+   return NULL;
 }
 
 //-----------------------------------------------------------------------------
