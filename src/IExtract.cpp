@@ -272,6 +272,7 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
    { "pre-file", 'P' },
    { "sort", 'S' },
    { "ignore-ext", 'X' },
+   { "check-content", 'c' },
    { NULL, '\0' } };
 
 
@@ -284,7 +285,7 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
 Application::Application (const int argc, const char* argv[])
    : YGP::IVIOApplication (argc, argv, lo), options (0), chgFlag (0), iniOpts (),
      writer (NULL), outputStyle (TEXT),
-     fnGetFileType (&FileTypeCheckerByName::getType)
+     fnGetFileType (&FileClassCheckerByName::getType)
 #ifdef ENABLE_THREADS
     , aThreads (0)
 #endif
@@ -363,7 +364,8 @@ void Application::showHelp () const {
       << "\n  -x, --exclude=LIST .... " << _("Files not to inspect")
       << "\n  -f, --ini-file=FILE ... " << _("Read further options from specified file")
       << "\n  -S, --sort ..... ...... " << _("Sort found files alphabetically")
-      << "\n  -X, --ignore-ext ...... " << _("Ignore last extension (if unknown)")
+      << "\n  -X, --ignore-ext ...... " << _("Ignore last extensions (if unknown)")
+      << "\n  -c, --check-content ... " << _("Try to determine file-type from content")
       << "\n  -V, --version ......... " << _("Output version information and exit")
       << "\n  -h, -?, --help ........ " << _("Displays this help and exit\n")
       << _("  File(s) ... Files to analyze (the last part can contain wildcards)\n\n")
@@ -636,7 +638,21 @@ bool Application::handleOption (const char option) {
       iniOpts.sort = true;
       break;
 
-   case 'X': options |= TRUNC_EXTENSION; break;
+   case 'X':
+      options |= TRUNC_EXTENSION;
+
+      if (fnGetFileType == &FileClassCheckerByContent::getType)
+         std::cerr << PACKAGE << _("-warning: Disabling option 'c'!\n");
+      fnGetFileType = &FileClassCheckerByName::getType;
+      break;
+
+   case 'c':
+      if (options & TRUNC_EXTENSION) {
+	 options &= ~TRUNC_EXTENSION;
+         std::cerr << PACKAGE << _("-warning: Disabling option 'X'!\n");
+      }
+      fnGetFileType = &FileClassCheckerByContent::getType;
+      break;
 
    case 'V': std::cout << description () << '\n'; exit (0);
 
