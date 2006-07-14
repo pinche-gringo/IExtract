@@ -19,15 +19,28 @@
 
 
 #include <map>
-#include <cstring>
+#include <string>
 
 
 /**Base-class to check for file-types
  */
 class FileTypeChecker {
  public:
-   typedef enum { UNKNOWN, ABIWORD, GIF, HTML, JPEG, MP3, MSOFFICE, OGG,
-		  OPENOFFICE, PDF, PNG, RTF, STAROFFICE, LAST } FileType;
+   typedef enum { UNKNOWN, ABIWORD, GIF, HTML, JPEG, MP3, MSEXCEL, MSOFFICE,
+		  MSPOWERPT, MSWORD, OGG, OOCALC, OODRAW, OOIMPRESS, OOMATH,
+		  OOOFFICE, OOWRITE, PDF, PHP, PNG, RTF, SOCALC, SODRAW,
+		  SOIMPRESS, SOOFFICE, SOWRITE, LAST } FileType;
+
+ protected:
+   struct lessDereferenced : public std::binary_function<const char*, const char*, bool> {
+   /// Access to the functor
+   /// \param x: First object to compare
+   /// \param y: Second object to compare
+   /// \returns bool: True, if the string the  object x points to is
+   ///     smaller than the string the second objects points to.
+   bool operator() (const char* x, const char* y) const {
+      return strcmp (x, y) < 0; }
+   };
 
  private:
    FileTypeChecker ();
@@ -37,7 +50,22 @@ class FileTypeChecker {
 };
 
 
-/**Class to check for file-types by the name of the file
+/**Class to check for the class of file (e.g. MS Office document) by
+   the name of the file
+ */
+class FileClassCheckerByName : public FileTypeChecker {
+ public:
+   static FileType getType (const char* file);
+
+ private:
+   FileClassCheckerByName ();
+   FileClassCheckerByName (const FileClassCheckerByName& other);
+   ~FileClassCheckerByName ();
+   const FileClassCheckerByName& operator= (const FileClassCheckerByName& other);
+};
+
+
+/**Class to check for the type of files by the name of the file
  */
 class FileTypeCheckerByName : public FileTypeChecker {
  public:
@@ -49,31 +77,23 @@ class FileTypeCheckerByName : public FileTypeChecker {
    ~FileTypeCheckerByName ();
    const FileTypeCheckerByName& operator= (const FileTypeCheckerByName& other);
 
-   struct lessDereferenced : public std::binary_function<const char*, const char*, bool> {
-   /// Access to the functor
-   /// \param x: First object to compare
-   /// \param y: Second object to compare
-   /// \returns bool: True, if the string the  object x points to is
-   ///     smaller than the string the second objects points to.
-   bool operator() (const char* x, const char* y) const {
-      return strcmp (x, y) < 0; }
-   };
-
    static std::map<const char*, FileType, lessDereferenced> types;
 };
 
 
-/**Class to check for file-types by the content of the file
+/**Class to check for type of files by the content of the file
  */
-class FileTypeCheckerByContent : public FileTypeChecker {
+class FileClassCheckerByContent : public FileTypeChecker {
  public:
    static FileType getType (const char* file);
 
  private:
-   FileTypeCheckerByContent ();
-   FileTypeCheckerByContent (const FileTypeCheckerByContent& other);
-   ~FileTypeCheckerByContent ();
-   const FileTypeCheckerByContent& operator= (const FileTypeCheckerByContent& other);
+   FileClassCheckerByContent ();
+   FileClassCheckerByContent (const FileClassCheckerByContent& other);
+   ~FileClassCheckerByContent ();
+   const FileClassCheckerByContent& operator= (const FileClassCheckerByContent& other);
+
+   static std::map<std::string, FileType> types;
 };
 
 #endif
