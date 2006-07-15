@@ -26,10 +26,8 @@
  */
 class FileTypeChecker {
  public:
-   typedef enum { UNKNOWN, ABIWORD, GIF, HTML, JPEG, MP3, MSEXCEL, MSOFFICE,
-		  MSPOWERPT, MSWORD, OGG, OOCALC, OODRAW, OOIMPRESS, OOMATH,
-		  OOOFFICE, OOWRITE, PDF, PHP, PNG, RTF, SOCALC, SODRAW,
-		  SOIMPRESS, SOOFFICE, SOWRITE, LAST } FileType;
+   typedef enum { UNKNOWN, ABIWORD, GIF, HTML, JPEG, MP3, MSOFFICE, OGG,
+		  OPENOFFICE, PDF, PNG, RTF, STAROFFICE, LAST } FileType;
 
  protected:
    struct lessDereferenced : public std::binary_function<const char*, const char*, bool> {
@@ -53,20 +51,6 @@ class FileTypeChecker {
 /**Class to check for the class of file (e.g. MS Office document) by
    the name of the file
  */
-class FileClassCheckerByName : public FileTypeChecker {
- public:
-   static FileType getType (const char* file);
-
- private:
-   FileClassCheckerByName ();
-   FileClassCheckerByName (const FileClassCheckerByName& other);
-   ~FileClassCheckerByName ();
-   const FileClassCheckerByName& operator= (const FileClassCheckerByName& other);
-};
-
-
-/**Class to check for the type of files by the name of the file
- */
 class FileTypeCheckerByName : public FileTypeChecker {
  public:
    static FileType getType (const char* file);
@@ -81,17 +65,20 @@ class FileTypeCheckerByName : public FileTypeChecker {
 };
 
 
-/**Class to check for type of files by the content of the file
+/**Type to check for type of files by the content of the file
  */
-class FileClassCheckerByContent : public FileTypeChecker {
+class FileTypeCheckerByContent : public FileTypeChecker {
  public:
    static FileType getType (const char* file);
 
  private:
-   FileClassCheckerByContent ();
-   FileClassCheckerByContent (const FileClassCheckerByContent& other);
-   ~FileClassCheckerByContent ();
-   const FileClassCheckerByContent& operator= (const FileClassCheckerByContent& other);
+   FileTypeCheckerByContent ();
+   FileTypeCheckerByContent (const FileTypeCheckerByContent& other);
+   ~FileTypeCheckerByContent ();
+   const FileTypeCheckerByContent& operator= (const FileTypeCheckerByContent& other);
+
+   static const char* skipWS (const char* buffer, unsigned int size);
+   static const char* skipHTMLComment (const char* buffer, unsigned int size);
 
    static std::map<std::string, FileType> types;
 };
