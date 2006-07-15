@@ -271,8 +271,7 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
    { "prepend", 'p' },
    { "pre-file", 'P' },
    { "sort", 'S' },
-   { "ignore-ext", 'X' },
-   { "check-content", 'c' },
+   { "mode", 'M' },
    { NULL, '\0' } };
 
 
@@ -285,7 +284,7 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
 Application::Application (const int argc, const char* argv[])
    : YGP::IVIOApplication (argc, argv, lo), options (0), chgFlag (0), iniOpts (),
      writer (NULL), outputStyle (TEXT),
-     fnGetFileType (&FileClassCheckerByName::getType)
+     fnGetFileType (&FileTypeCheckerByName::getType)
 #ifdef ENABLE_THREADS
     , aThreads (0)
 #endif
@@ -364,8 +363,10 @@ void Application::showHelp () const {
       << "\n  -x, --exclude=LIST .... " << _("Files not to inspect")
       << "\n  -f, --ini-file=FILE ... " << _("Read further options from specified file")
       << "\n  -S, --sort ..... ...... " << _("Sort found files alphabetically")
-      << "\n  -X, --ignore-ext ...... " << _("Ignore last extensions (if unknown)")
-      << "\n  -c, --check-content ... " << _("Try to determine file-type from content")
+      << "\n  -M, --mode=[MODUS] .... " << _("Modus operandi to determine the file-type:\n"
+	                                     "\t\t\t  Ext: From (last) extension (Default)\n"
+					     "\t\t\t  AllExt: From any extensions (if unknown)\n"
+					     "\t\t\t  Content: From content of the file")
       << "\n  -V, --version ......... " << _("Output version information and exit")
       << "\n  -h, -?, --help ........ " << _("Displays this help and exit\n")
       << _("  File(s) ... Files to analyze (the last part can contain wildcards)\n\n")
@@ -638,21 +639,26 @@ bool Application::handleOption (const char option) {
       iniOpts.sort = true;
       break;
 
-   case 'X':
-      options |= TRUNC_EXTENSION;
-
-      if (fnGetFileType == &FileClassCheckerByContent::getType)
-         std::cerr << PACKAGE << _("-warning: Disabling option 'c'!\n");
-      fnGetFileType = &FileClassCheckerByName::getType;
-      break;
-
-   case 'c':
-      if (options & TRUNC_EXTENSION) {
+   case 'M': {
+      std::string mode (getOptionValue ());
+      if (mode == "Ext") {
+	 fnGetFileType = &FileTypeCheckerByName::getType;
 	 options &= ~TRUNC_EXTENSION;
-         std::cerr << PACKAGE << _("-warning: Disabling option 'X'!\n");
       }
-      fnGetFileType = &FileClassCheckerByContent::getType;
-      break;
+      else if (mode == "AllExt") {
+	 fnGetFileType = &FileTypeCheckerByName::getType;
+	 options |= TRUNC_EXTENSION;
+      }
+      else if (mode == "Content") {
+	 fnGetFileType = &FileTypeCheckerByContent::getType;
+	 options &= ~TRUNC_EXTENSION;
+      }
+      else {
+	 std::string error (_("warning: Invalid mode `%1'! Ignoring option 'M'!\n"));
+	 error.replace (error.find ("%1"), 2, mode);
+	 std::cerr << PACKAGE << error;
+      }
+      break; }
 
    case 'V': std::cout << description () << '\n'; exit (0);
 
@@ -761,7 +767,8 @@ void Application::handleFiles (const char* pFile) const {
    std::string name;
    while (file) {
       // Determine file-type from extension (or second-to-last extension)
-      name = file->name ();
+      name = file->path ();
+      name += file->name ();
       HANDLER fnc (getFileTypeHandler (name.c_str ()));
       // U_nknown type; try second to-last extension (if option passed)
       if ((options & TRUNC_EXTENSION) && !fnc) {
