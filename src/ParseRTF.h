@@ -33,7 +33,7 @@ class ParseRTF  {
    void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
       prop = &result;
       block.skipWS (stream);
-      block.parse (stream); }
+      docRTF.parse (stream); }
 
  private:
    // Callback-methods for type of parsed elementes
@@ -46,6 +46,7 @@ class ParseRTF  {
    typedef YGP::OFParseTextEsc<ParseRTF> OMParseTextEsc;
    typedef YGP::OFParseExact<ParseRTF> OMParseExact;
 
+   YGP::ParseExact   idRTFDoc;
    YGP::ParseExact   startBlock;
    YGP::ParseExact   endBlock;
    YGP::ParseExact   info;
@@ -67,6 +68,7 @@ class ParseRTF  {
    YGP::ParseSelection selEntry;
    YGP::ParseSelection selCmd;
    YGP::ParseSequence  block;
+   YGP::ParseSequence  docRTF;
 
    YGP::ParseObject* _seqInfo[4];
    YGP::ParseObject* _seqInfoValue[5];
@@ -75,6 +77,7 @@ class ParseRTF  {
    YGP::ParseObject* _selEntry[5];
    YGP::ParseObject* _selCmd[4];
    YGP::ParseObject* _block[5];
+   YGP::ParseObject* _docRTF[3];
 
    Properties*  prop;
    enum { NONE = -1, TITLE = 0, AUTHOR, COMMENT } actEntry;

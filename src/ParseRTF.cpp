@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 26.12.2003
-//COPYRIGHT   : Copyright (C) 2003, 2004
+//COPYRIGHT   : Copyright (C) 2003, 2004, 2006
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,25 +45,27 @@ static const unsigned LEN_COMMAND       = 64;
 /// (Default-)Constructor
 //-----------------------------------------------------------------------------
 ParseRTF::ParseRTF ()
-   : startBlock ("{", _("Start of block"))
-     , endBlock ("}", _("End of block"))
-     , info ("\\info", _("Info block"))
-     , endInfoBlock ("}", _("End of info block"), *this, &ParseRTF::finish)
-     , startCmd ("\\", _("Start of command"))
-     , otherCmd (" \t\n\r\\{}", _("Command"), LEN_COMMAND)
-     , noSpecialChar ("\\!\\\\{}", _("No special char"))
-     , author ("\\author", _("Author-entry"), *this, &ParseRTF::foundAuthor)
-     , title ("\\title", _("Title-entry"), *this, &ParseRTF::foundTitle)
-     , description ("\\doccomm", _("Description-entry"), *this, &ParseRTF::foundComment)
-     , value ("}>", _("Value of entry"), *this, &ParseRTF::foundValue, LEN_VALUE, 0)
-     , seqInfo (_seqInfo, _("Information block"))
-     , seqInfoValue (_seqInfoValue, _("Information block value"), -1U)
-     , seqOtherCmd (_seqOtherCmd, _("Other command"))
-     , seqValue (_seqValue, _("Value of command"), 1, 0)
-     , selEntry (_selEntry, _("Entry"))
-     , selCmd (_selCmd, _("Valid RTF command"), -1U)
-     , block (_block, _("RTF block"), -1U)
-     , prop (NULL), actEntry (NONE) {
+   : idRTFDoc ("{\\rtf1", _("ID of RTF document")),
+     startBlock ("{", _("Start of block")),
+     endBlock ("}", _("End of block")),
+     info ("\\info", _("Info block")),
+     endInfoBlock ("}", _("End of info block"), *this, &ParseRTF::finish),
+     startCmd ("\\", _("Start of command")),
+     otherCmd (" \t\n\r\\{}", _("Command"), LEN_COMMAND),
+     noSpecialChar ("\\!\\\\{}", _("No special char")),
+     author ("\\author", _("Author-entry"), *this, &ParseRTF::foundAuthor),
+     title ("\\title", _("Title-entry"), *this, &ParseRTF::foundTitle),
+     description ("\\doccomm", _("Description-entry"), *this, &ParseRTF::foundComment),
+     value ("}>", _("Value of entry"), *this, &ParseRTF::foundValue, LEN_VALUE, 0),
+     seqInfo (_seqInfo, _("Information block")),
+     seqInfoValue (_seqInfoValue, _("Information block value"), -1U),
+     seqOtherCmd (_seqOtherCmd, _("Other command")),
+     seqValue (_seqValue, _("Value of command"), 1, 0),
+     selEntry (_selEntry, _("Entry")),
+     selCmd (_selCmd, _("Valid RTF command"), -1U),
+     block (_block, _("RTF block"), -1U),
+     docRTF (_docRTF, _("RTF document")),
+     prop (NULL), actEntry (NONE) {
 
    _seqInfo[0] = &info;
    _seqInfo[1] = &seqInfoValue;
@@ -101,6 +103,10 @@ ParseRTF::ParseRTF ()
    _block[2] = &endBlock;
    _block[3] = &seqValue;
    _block[4] = NULL;
+
+   _docRTF[0] = &idRTFDoc;
+   _docRTF[1] = &selCmd;
+   _docRTF[2] = NULL;
 }
 
 
