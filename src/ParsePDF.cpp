@@ -251,7 +251,7 @@ void ParsePDF::parseInfoObject () {
    idObj.setValue (strInfoObject);
    idObj.setMaxCard (strlen (strInfoObject));
    idObj.setMinCard (idObj.getMaxCard ());
-   skip.setValue ("\\ ");
+   skip.setValue ("\\ (");
    TRACE9 ("PObj: " << idObj.getValue () << "; Size: " << idObj.getMaxCard ());
 
    Check3 (file);
@@ -395,8 +395,14 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void ParsePDF::parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
-   ParsePDF obj;
+   char buffer[5];
+   stream.read (buffer, sizeof (buffer));
+   if (memcmp (buffer, "%PDF-", sizeof (buffer)))
+      throw (YGP::ParseError (_("Not a PDF document!")));
    stream.seekg (-40, std::ios::end);
+
+
+   ParsePDF obj;
    obj.prop = &result;
    obj.file = &stream;
 
