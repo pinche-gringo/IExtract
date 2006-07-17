@@ -87,7 +87,7 @@ FileTypeChecker::FileType FileTypeCheckerByName::getType (const char* file) {
       TRACE9 ("FileTypeCheckerByName::getType (const char*) - Knowing types " << types.size ());
    }
 
-   const char* extension (strchr (file, '.'));
+   const char* extension (strrchr (file, '.'));
    if (extension) {
       TRACE3 ("FileTypeCheckerByName::getType (const char*) - Extension " << extension + 1);
       std::map<const char*, FileType>::const_iterator i (types.find (extension + 1));
@@ -109,13 +109,14 @@ FileTypeChecker::FileType FileTypeCheckerByContent::getType (const char* file) {
 
    // Create table of file-types, if not already done
    if (types.empty ()) {
+      types["%PDF"] = PDF;
+      types["{\\rtf"] = RTF;
       types["<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE abiword PUBLIC \"-//ABISOURCE//DTD AWML"] = ABIWORD;
+      types["ID3"] = MP3;
       types["GIF87a"] = GIF;
       types["GIF89a"] = GIF;
-      types["\xFF\xD8"] = JPEG;
-      types["\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1"] = MSOFFICE;
-      types["ID3"] = MP3;
       types["OggS"] = OGG;
+      types[std::string ("\xFF\xD8\xFF\xE0\x00\x10JFIF", 10)] = JPEG;
       types["\x89PNG\x0D\x0A\x1A\x0A"] = PNG;
 
       TRACE9 ("FileTypeCheckerByContent::getType (const char*) - Knowing types " << types.size ());
@@ -127,13 +128,20 @@ FileTypeChecker::FileType FileTypeCheckerByContent::getType (const char* file) {
       memset (buffer, '\0', sizeof (buffer));
       stream.read (buffer, sizeof (buffer));
 
+      // Check if first bytes identify the file
       for (std::map<std::string, FileType>::const_iterator i (types.begin ());
 	   i != types.end (); ++i)
 	 if (i->first == std::string (buffer, i->first.size ()))
 	    return i->second;
 
+      // Check for MP3
       if ((get2BytesLSB (buffer) & 0xE0FF) == 0xE0FF)
 	 return MP3;
+
+      // Check for OpenOffice
+      if ((get4BytesLSB (buffer) == 0x04034B50)
+	  && (memcmp (buffer + 0x1E, "mimetypeapplication/", 43)))
+	 return OPENOFFICE;
 
       // Check for HTML-document
       const char* start (buffer);
@@ -145,6 +153,16 @@ FileTypeChecker::FileType FileTypeCheckerByContent::getType (const char* file) {
       if ((static_cast<unsigned int> (start - buffer) < (sizeof (buffer) - 13))
 	  && !memcmp (start, "<!DOCTYPE HTML", 14))
 	 return HTML;
+
+      // Check for StarOffice/MS-Office (StarOffice up to V5 uses a
+      // MS-compatible format additional for the information, additional to
+      // their own format, so they could also be parsed as MS-Office document)
+      if (!memcmp (buffer, "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1", 8)) {
+	 char buffer[16];
+	 stream.seekg (0x8c2, std::ios::beg);
+	 stream.read (buffer, sizeof (buffer));
+	 return memcmp (buffer, "SfxDocumentInfo", 15) ? MSOFFICE : STAROFFICE;
+      }
    }
    return UNKNOWN;
 }
