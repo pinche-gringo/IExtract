@@ -32,8 +32,7 @@ class ParseStarOffice  {
 
    void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
       prop = &result;
-      stream.seekg (0x800);
-      selDocument.parse (stream); }
+      seqDocument.parse (stream); }
 
  private:
    // Callback-methods for type of parsed elementes
@@ -44,20 +43,18 @@ class ParseStarOffice  {
    typedef YGP::OFParseAttomic<ParseStarOffice>  OMParseAttomic;
    typedef YGP::OFParseSequence<ParseStarOffice> OMParseSequence;
 
-   YGP::ParseExact idSOffice;
-   YGP::ParseExact skipIDStart;
+   YGP::ParseExact idOffice;
+   YGP::ParseExact idDocInfo;
    YGP::ParseSkip  skip;
-   YGP::ParseText  skip2;
+   YGP::ParseSkip  skip2;
    OMParseAttomic  length;
    OMParseAttomic  value;
 
-   YGP::ParseSelection selDocument;                           // Startsequence
-   OMParseSequence     seqEntries;
-   YGP::ParseSequence  seqProperties;
+   YGP::ParseSequence seqDocument;                            // Startsequence
+   YGP::ParseSequence seqEntries;
 
-   YGP::ParseObject* _selDocument[4];
+   YGP::ParseObject* _seqDocument[5];
    YGP::ParseObject* _seqEntries[4];
-   YGP::ParseObject* _seqProperties[3];
 
    Properties*  prop;
    enum types { NONE = -1, CREATOR = 0, AUTHOR, TITLE, COMMENT } actEntry;
