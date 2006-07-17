@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 04.11.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2005
+//COPYRIGHT   : Copyright (C) 2002 - 2006
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,35 +41,31 @@
 
 
 // Tag for StarOffice document
-#define ID1 "S"
-#define ID ID1 "fxDocumentInfo"
+const char* ID ("\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1");
+const char* IDSTAROFFICE ("\x0F\0SfxDocumentInfo");
 
 
 //-----------------------------------------------------------------------------
 /// (Default-)Constructor
 //-----------------------------------------------------------------------------
 ParseStarOffice::ParseStarOffice ()
-   : idSOffice (ID, _("StarOffice ID"), false)
-     , skipIDStart (ID1, _("Start of StarOffice IDs"), 256, 1, false)
-     , skip (7)
-     , skip2 (ID1, _("Unused contents 2"), 0x900, 1, false, false)
-     , length ("\\*", _("Length of data-entry"), *this, &ParseStarOffice::foundLength, 2, 2, false)
-     , value ("\\*", _("Property-entry"), *this, &ParseStarOffice::foundValue, 1, 0, false)
-     , selDocument (_selDocument, _("StarOffice document"), -1U)
-     , seqEntries (_seqEntries, _("Entries of properties"), *this, &ParseStarOffice::foundProps, 4, 4, false)
-     , seqProperties (_seqProperties, _("Properties"), 1, 1, false)
-     , prop (NULL), actEntry (NONE) {
+   : idOffice (ID, _("ID of office document"), false),
+     idDocInfo (IDSTAROFFICE, _("ID of StarOffice document"), 17, 17, false),
+     skip (0x8c0, std::ios::beg),
+     skip2 (7),
+     length ("\\*", _("Length of data-entry"), *this, &ParseStarOffice::foundLength, 2, 2, false),
+     value ("\\*", _("Property-entry"), *this, &ParseStarOffice::foundValue, 1, 0, false),
+     seqDocument (_seqDocument, _("StarOffice document"), 1, 1),
+     seqEntries (_seqEntries, _("Entries of properties"), 4, 4, false),
+     prop (NULL), actEntry (NONE) {
 
-   _selDocument[0] = &seqProperties;
-   _selDocument[1] = &skipIDStart;
-   _selDocument[2] = &skip2;
-   _selDocument[3] = NULL;
+   _seqDocument[0] = &idOffice;
+   _seqDocument[1] = &skip;
+   _seqDocument[2] = &idDocInfo;
+   _seqDocument[3] = &seqEntries;
+   _seqDocument[4] = NULL;
 
-   _seqProperties[0] = &idSOffice;
-   _seqProperties[1] = &seqEntries;
-   _seqProperties[2] = NULL;
-
-   _seqEntries[0] = &skip;
+   _seqEntries[0] = &skip2;
    _seqEntries[1] = &length;
    _seqEntries[2] = &value;
    _seqEntries[3] = NULL;
@@ -102,7 +98,7 @@ int ParseStarOffice::foundValue (const char* pTitle, unsigned int len) {
       (prop->*(entries[actEntry].value)).assign (pTitle, len);
    }
 
-   skip.setOffset (entries[actEntry].offset - len);
+   skip2.setOffset (entries[actEntry].offset - len);
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -117,16 +113,5 @@ int ParseStarOffice::foundLength (const char* pLength, unsigned int) {
    Check3 (pLength);
    actEntry = (enum types)((int)actEntry + 1);
    value.setMaxCard (get2BytesLSB (pLength));
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the property-entries have been parsed
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseStarOffice::foundProps (const char*, unsigned int) {
-   TRACE9 ("ParseStarOffice::foundProps (const char*, unsigned int)");
-
-   selDocument.setMaxCard (1);
    return YGP::ParseObject::PARSE_OK;
 }
