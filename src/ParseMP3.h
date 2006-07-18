@@ -24,6 +24,10 @@
 
 struct Properties;
 
+namespace YGP {
+   class ParseError;
+}
+
 
 // Extracts the information out of MP3 files
 //  - The title is returned in strTitle
@@ -31,7 +35,7 @@ struct Properties;
 //  - The album is returned in strComment
 class ParseMP3 {
  public:
-   static void parse (YGP::Xistream& stream, Properties& result);
+   static void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError);
 
  private:
    ParseMP3 ();

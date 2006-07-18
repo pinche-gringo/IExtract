@@ -26,11 +26,15 @@
 
 
 #include <YGP/Trace.h>
+#include <YGP/Exception.h>
 
 #include "Utility.h"
 #include "Properties.h"
 
 #include "ParseMP3.h"
+
+
+static const unsigned int ID_MP3 (0xE0FF);
 
 
 //-----------------------------------------------------------------------------
@@ -50,11 +54,15 @@ ParseMP3::~ParseMP3 () {
 /// Method to actually parse the MP3-file
 /// \param stream: MP3-file to analyze
 /// \param result: Out: Found information
+/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void ParseMP3::parse (YGP::Xistream& stream, Properties& result) {
+void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
    char buffer[10];
    stream.read (buffer, sizeof (buffer));
    if (memcmp (buffer, "ID3", 3)) {
+      if ((get2BytesLSB (buffer) & ID_MP3) != ID_MP3)
+	 throw YGP::ParseError (_("MP3-ID not found"));
+
       stream.seekg (-0x80, std::ios::end);
 
       std::string value;
