@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 2005-11-26
-//COPYRIGHT   : Copyright (C) 2005
+//COPYRIGHT   : Copyright (C) 2005, 2006
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,25 +42,25 @@
 /// \param result: Structure to store the parsed values
 //-----------------------------------------------------------------------------
 ParseGIF::ParseGIF (Properties& result)
-   : idGIF ("GIF", _("GIF-ID"), false)
-     , skip (7)
-     , skip2 (2)
-     , colourTable ("\\*", _("Info about colour table"), *this, &ParseGIF::skipColourTable, 1, 1, false)
-     , idEndGIF ("\x3b", _("End of GIF image"), *this,  &ParseGIF::foundEndGIF, false)
-     , idCommentExt ("\x21\xfe", _("Comment extension"), false)
-     , idImage ("\x2c",  _("Image separator"), *this,  &ParseGIF::foundImage, false)
-     , idExtension ("\x21", _("Extension ID"))
-     , idTypeExtension ("\\*", _("Type of extension"), 1, 1, false)
-     , comment ("\\*", _("Comment"), *this, &ParseGIF::foundComment, 0, 0, false)
-     , lenBlock ("\\*", _("Length of sub-block"), *this, &ParseGIF::foundLength, 1, 1, false)
-     , blocks (_blocks, _("Blocks"), -1U, -1U, false)
-     , commentExt (_commentExt, _("Comment extension"), 1, 1, false)
-     , imageDesc (_imageDesc, _("Image description"))
-     , extension (_extension, _("Extension"),1, 1, false)
-     , commentBlocks (_commentBlocks, _("Comment blocks"), *this, &ParseGIF::foundSubblock, -1U, 0, false)
-     , subblocks (_subblocks, _("Subblocks"), *this, &ParseGIF::foundSubblock, -1U, 0, false)
-     , gifImage (_gifImage, _("GIF image"), 1, 1, false)
-     , prop (result) {
+   : idGIF ("GIF", _("GIF-ID"), false),
+     skip (7),
+     skip2 (2),
+     colourTable ("\\*", _("Info about colour table"), *this, &ParseGIF::skipColourTable, 1, 1, false),
+     idEndGIF ("\x3b", _("End of GIF image"), *this,  &ParseGIF::foundEndGIF, false),
+     idCommentExt ("\x21\xfe", _("Comment extension"), false),
+     idImage ("\x2c",  _("Image separator"), *this,  &ParseGIF::foundImage, false),
+     idExtension ("\x21", _("Extension ID")),
+     idTypeExtension ("\\*", _("Type of extension"), 1, 1, false),
+     comment ("\\*", _("Comment"), *this, &ParseGIF::foundComment, 0, 0, false),
+     lenBlock ("\\*", _("Length of sub-block"), *this, &ParseGIF::foundLength, 1, 1, false),
+     blocks (_blocks, _("Blocks"), -1U, -1U, false),
+     commentExt (_commentExt, _("Comment extension"), 1, 1, false),
+     imageDesc (_imageDesc, _("Image description")),
+     extension (_extension, _("Extension"),1, 1, false),
+     commentBlocks (_commentBlocks, _("Comment blocks"), *this, &ParseGIF::foundSubblock, -1U, 0, false),
+     subblocks (_subblocks, _("Subblocks"), *this, &ParseGIF::foundSubblock, -1U, 0, false),
+     gifImage (_gifImage, _("GIF image"), 1, 1, false),
+     prop (result) {
    TRACE9 ("ParseGIF::ParseGIF (Properties&)");
 
    _blocks[0] = &commentExt;
