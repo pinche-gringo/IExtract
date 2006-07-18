@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 4.06.2005
-//COPYRIGHT   : Copyright (C) 2005
+//COPYRIGHT   : Copyright (C) 2005, 2006
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -41,30 +41,38 @@
 #endif
 
 
-#define ID_METASTART   "<"
-#define ID_METAINFO    ID_METASTART "metadata>"
-#define ID_TITLE       "m key=\"dc.title\""
-#define ID_COMMENT     "m key=\"dc.description\""
-#define ID_AUTHOR      "m key=\"dc.creator\""
-#define ID_END         "</metadata>"
+#define ID_METASTART      "<"
+static const char* ID_METAINFO   (ID_METASTART "metadata>");
+static const char* ID_TITLE      ("m key=\"dc.title\"");
+static const char* ID_COMMENT    ("m key=\"dc.description\"");
+static const char* ID_AUTHOR     ("m key=\"dc.creator\"");
+static const char* ID_END        ("</metadata>");
+static const char* ID_ABIWORD    ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE abiword PUBLIC \"-//ABISOURCE//DTD AWML");
+
 
 
 //----------------------------------------------------------------------------
 /// Default constructor
 //----------------------------------------------------------------------------
 ParseAbiword::ParseAbiword ()
-    : prop (NULL)
-      , idMetadata (ID_METAINFO, _("Metadata information"), true, true)
-      , skipIDStart (ID_METASTART, _("Start of Abiword ID"), 256, 1, false, true)
-      , skipUnused (ID_METASTART, _("Unused contents"), 1024, 1, true, true)
-      , skipLine ("\n\r", _("Skip to end of line"), 1024, 1, true, true)
-      , tag ('<', _("Tag"), *this, &ParseAbiword::foundTag, 1024)
-      , value ("<", _("Value"), *this, &ParseAbiword::foundValue, 1024, 0)
-      , seqMetadata (_seqMetadata, _("Metadata"), 1, 1, true)
-      , seqEntry (_seqEntry, _("Entries"), -1U, 1, true  )
-      , selDocument (_selDocument, _("Abiword document"), -1U, 1, true)
-      , pEntry (NULL)
+   : prop (NULL),
+     idAbiword (ID_ABIWORD, _("ID of an AbiWord document")),
+     idMetadata (ID_METAINFO, _("Metadata information"), true, true),
+     skipIDStart (ID_METASTART, _("Start of Abiword ID"), 256, 1, false, true),
+     skipUnused (ID_METASTART, _("Unused contents"), 1024, 1, true, true),
+     skipLine ("\n\r", _("Skip to end of line"), 1024, 1, true, true),
+     tag ('<', _("Tag"), *this, &ParseAbiword::foundTag, 1024),
+     value ("<", _("Value"), *this, &ParseAbiword::foundValue, 1024, 0),
+     seqAbiWord (_seqAbiWord, _("AbiWord document")),
+     seqMetadata (_seqMetadata, _("Metadata"), 1, 1, true),
+     seqEntry (_seqEntry, _("Entries"), -1U, 1, true),
+     selDocument (_selDocument, _("Abiword document"), -1U, 1, true),
+     pEntry (NULL)
 {
+   _seqAbiWord[0] = &idAbiword;
+   _seqAbiWord[1] = &selDocument;
+   _seqAbiWord[2] = NULL;
+
    _selDocument[0] = &seqMetadata;
    _selDocument[1] = &skipIDStart;
    _selDocument[2] = &skipUnused;

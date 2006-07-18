@@ -50,6 +50,7 @@ class ParseAbiword {
 
    Properties*  prop;
 
+   YGP::ParseExact   idAbiword;
    YGP::ParseExact   idMetadata;
    YGP::ParseExact   skipIDStart;
    YGP::ParseText    skipUnused;
@@ -57,11 +58,13 @@ class ParseAbiword {
    OMParseQuoted     tag;
    OMParseText       value;
 
+   YGP::ParseSequence    seqAbiWord;
    YGP::ParseSequence    seqMetadata;
    YGP::ParseSequence    seqEntry;
 
    YGP::ParseSelection   selDocument;                         // Startsequence
 
+   YGP::ParseObject* _seqAbiWord[3];
    YGP::ParseObject* _selDocument[4];
    YGP::ParseObject* _seqMetadata[4];
    YGP::ParseObject* _seqEntry[3];
