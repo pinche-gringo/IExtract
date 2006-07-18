@@ -40,23 +40,23 @@ std::map<const char*, FileTypeChecker::FileType, FileTypeCheckerByName::lessDere
 std::map<std::string, FileTypeChecker::FileType> FileTypeCheckerByContent::types;
 
 
-const char ID_PDF[]        = "%PDF";
-const char ID_RTF[]        = "{\\rtf";
-const char ID_ABIWORD[]    = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE abiword PUBLIC \"-//ABISOURCE//DTD AWML";
-const char ID_ID3[]        = "ID3";
-const char ID_GIF87[]      = "GIF87a";
-const char ID_GIF89[]      = "GIF89a";
-const char ID_OGG[]        = "OggS";
-const char ID_JPEG[]       = "\xFF\xD8\xFF\xE0\x00\x10JFIF";
-const char ID_PNG[]        = "\x89PNG\x0D\x0A\x1A\x0A";
-const char ID_HTML[]       = "<!DOCTYPE HTML";
-const char ID_DOCOFFICE[]  = "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1";
-const char ID_STAROFFICE[] = "SfxDocumentInfo";
+static const char ID_PDF[]        = "%PDF";
+static const char ID_RTF[]        = "{\\rtf";
+static const char ID_ABIWORD[]    = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE abiword PUBLIC \"-//ABISOURCE//DTD AWML";
+static const char ID_ID3[]        = "ID3";
+static const char ID_GIF87[]      = "GIF87a";
+static const char ID_GIF89[]      = "GIF89a";
+static const char ID_OGG[]        = "OggS";
+static const char ID_JPEG[]       = "\xFF\xD8\xFF\xE0\x00\x10JFIF";
+static const char ID_PNG[]        = "\x89PNG\x0D\x0A\x1A\x0A";
+static const char ID_HTML[]       = "<!DOCTYPE HTML";
+static const char ID_DOCOFFICE[]  = "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1";
+static const char ID_STAROFFICE[] = "SfxDocumentInfo";
 
-const unsigned int ID_MP3                  (0xE0FF);
-const unsigned int ID_PKZIP_LOCALHDR       (0x04034b50);
-const unsigned int ID_PKZIP_END_CDR        (0x06054B50);
-const unsigned int ID_PKZIP_CENTRALFILEHDR (0x02014b50);
+static const unsigned int ID_MP3                  (0xE0FF);
+static const unsigned int ID_PKZIP_LOCALHDR       (0x04034b50);
+static const unsigned int ID_PKZIP_END_CDR        (0x06054B50);
+static const unsigned int ID_PKZIP_CENTRALFILEHDR (0x02014b50);
 
 
 //-----------------------------------------------------------------------------

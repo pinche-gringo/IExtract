@@ -41,8 +41,8 @@
 
 
 // Tag for StarOffice document
-const char* ID ("\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1");
-const char* IDSTAROFFICE ("\x0F\0SfxDocumentInfo");
+static const char* ID ("\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1");
+static const char* IDSTAROFFICE ("\x0F\0SfxDocumentInfo");
 
 
 //-----------------------------------------------------------------------------

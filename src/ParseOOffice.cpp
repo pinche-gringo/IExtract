@@ -43,16 +43,16 @@
 
 
 // IDs of OpenOffice's meta-info
-const char* ID_METAINFO ("meta.xml<?xml version=\"");
-const char* ID_TITLE    ("dc:title");
-const char* ID_COMMENT  ("dc:description");
-const char* ID_AUTHOR   ("dc:creator");
-const char* ID_END      ("/office:document-meta");
+static const char* ID_METAINFO ("meta.xml<?xml version=\"");
+static const char* ID_TITLE    ("dc:title");
+static const char* ID_COMMENT  ("dc:description");
+static const char* ID_AUTHOR   ("dc:creator");
+static const char* ID_END      ("/office:document-meta");
 
 // IDs of ZIP fiele
-const char* ID_LOCALHDR ("PK\03\04");
-const char* ID_ENDCDR   ("PK\05\06");
-const char* ID_CFILEHDR ("PK\01\02");
+static const char* ID_LOCALHDR ("PK\03\04");
+static const char* ID_ENDCDR   ("PK\05\06");
+static const char* ID_CFILEHDR ("PK\01\02");
 
 
 //----------------------------------------------------------------------------
