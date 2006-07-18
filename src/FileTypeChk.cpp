@@ -40,6 +40,25 @@ std::map<const char*, FileTypeChecker::FileType, FileTypeCheckerByName::lessDere
 std::map<std::string, FileTypeChecker::FileType> FileTypeCheckerByContent::types;
 
 
+const char ID_PDF[]        = "%PDF";
+const char ID_RTF[]        = "{\\rtf";
+const char ID_ABIWORD[]    = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE abiword PUBLIC \"-//ABISOURCE//DTD AWML";
+const char ID_ID3[]        = "ID3";
+const char ID_GIF87[]      = "GIF87a";
+const char ID_GIF89[]      = "GIF89a";
+const char ID_OGG[]        = "OggS";
+const char ID_JPEG[]       = "\xFF\xD8\xFF\xE0\x00\x10JFIF";
+const char ID_PNG[]        = "\x89PNG\x0D\x0A\x1A\x0A";
+const char ID_HTML[]       = "<!DOCTYPE HTML";
+const char ID_DOCOFFICE[]  = "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1";
+const char ID_STAROFFICE[] = "SfxDocumentInfo";
+
+const unsigned int ID_MP3                  (0xE0FF);
+const unsigned int ID_PKZIP_LOCALHDR       (0x04034b50);
+const unsigned int ID_PKZIP_END_CDR        (0x06054B50);
+const unsigned int ID_PKZIP_CENTRALFILEHDR (0x02014b50);
+
+
 //-----------------------------------------------------------------------------
 /// Returns the type of the file (e.g. MS Word document) according to
 /// passed file-name
@@ -109,23 +128,21 @@ FileTypeChecker::FileType FileTypeCheckerByContent::getType (const char* file) {
 
    // Create table of file-types, if not already done
    if (types.empty ()) {
-      types["%PDF"] = PDF;
-      types["{\\rtf"] = RTF;
-      types["<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE abiword PUBLIC \"-//ABISOURCE//DTD AWML"] = ABIWORD;
-      types["ID3"] = MP3;
-      types["GIF87a"] = GIF;
-      types["GIF89a"] = GIF;
-      types["OggS"] = OGG;
-      types[std::string ("\xFF\xD8\xFF\xE0\x00\x10JFIF", 10)] = JPEG;
-      types["\x89PNG\x0D\x0A\x1A\x0A"] = PNG;
-
-      TRACE9 ("FileTypeCheckerByContent::getType (const char*) - Knowing types " << types.size ());
+      types[std::string (ID_PDF, sizeof (ID_PDF) - 1)] = PDF;
+      types[std::string (ID_RTF, sizeof (ID_RTF) - 1)] = RTF;
+      types[std::string (ID_ABIWORD, sizeof (ID_ABIWORD) - 1)] = ABIWORD;
+      types[std::string (ID_ID3, sizeof (ID_ID3) - 1)] = MP3;
+      types[std::string (ID_GIF87, sizeof (ID_GIF87) - 1)] = GIF;
+      types[std::string (ID_GIF89, sizeof (ID_GIF89) - 1)] = GIF;
+      types[std::string (ID_OGG, sizeof (ID_OGG) - 1)] = OGG;
+      types[std::string (ID_JPEG, sizeof (ID_JPEG) - 1)] = JPEG;
+      types[std::string (ID_PNG, sizeof (ID_PNG) - 1)] = PNG;
+      TRACE9 ("FileTypeCheckerByContent::getType (const char*) - Known types " << types.size ());
    }
 
    std::ifstream stream (file);
    if (stream) {
-      char buffer[512];
-      memset (buffer, '\0', sizeof (buffer));
+      char buffer[512] = "";
       stream.read (buffer, sizeof (buffer));
 
       // Check if first bytes identify the file
@@ -135,13 +152,41 @@ FileTypeChecker::FileType FileTypeCheckerByContent::getType (const char* file) {
 	    return i->second;
 
       // Check for MP3
-      if ((get2BytesLSB (buffer) & 0xE0FF) == 0xE0FF)
+      if ((get2BytesLSB (buffer) & ID_MP3) == ID_MP3)
 	 return MP3;
 
       // Check for OpenOffice
-      if ((get4BytesLSB (buffer) == 0x04034B50)
-	  && (memcmp (buffer + 0x1E, "mimetypeapplication/", 43)))
-	 return OPENOFFICE;
+      if (get4BytesLSB (buffer) == ID_PKZIP_LOCALHDR) {
+	 char buffer[512] = "";
+	 stream.seekg (-22, std::ios::end);
+	 stream.read (buffer, 22);
+
+	 if (get4BytesLSB (buffer) == ID_PKZIP_END_CDR) {
+	    // Skip to central directory record
+	    unsigned int cEntries (get4BytesLSB (buffer + 10));
+	    stream.seekg (get4BytesLSB (buffer + 16), std::ios::beg);
+	    TRACE7 ("FileTypeCheckerByContent::getType (const char*) - Start CDR: " << get4BytesLSB (buffer + 16) << " (" << cEntries << ')');
+
+	    // Inspect all entries
+	    while (cEntries--) {
+	       stream.read (buffer, 46);
+	       if (get4BytesLSB (buffer) == ID_PKZIP_CENTRALFILEHDR) {
+		  unsigned int lenName (get2BytesLSB (buffer + 28));
+		  unsigned int lenSkip (get2BytesLSB (buffer + 30) + get2BytesLSB (buffer + 32));
+		  TRACE7 ("FileTypeCheckerByContent::getType (const char*) - Len of filename: " << lenName
+			  << "; Skipping: " << lenSkip);
+
+		  stream.read (buffer, lenName);
+		  if ((lenName == 8) && !memcmp ("meta.xml", buffer, lenName))
+		     return OPENOFFICE;
+		  stream.seekg (lenSkip, std::ios::cur);
+	       }
+	       else
+		  break;
+	    } // end-while
+	 }
+	 return UNKNOWN;
+      }
 
       // Check for HTML-document
       const char* start (buffer);
@@ -151,17 +196,18 @@ FileTypeChecker::FileType FileTypeCheckerByContent::getType (const char* file) {
 	 start = temp;
 
       if ((static_cast<unsigned int> (start - buffer) < (sizeof (buffer) - 13))
-	  && !memcmp (start, "<!DOCTYPE HTML", 14))
+	  && !memcmp (start, ID_HTML, sizeof (ID_HTML) - 1))
 	 return HTML;
 
       // Check for StarOffice/MS-Office (StarOffice up to V5 uses a
       // MS-compatible format additional for the information, additional to
       // their own format, so they could also be parsed as MS-Office document)
-      if (!memcmp (buffer, "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1", 8)) {
+      if (!memcmp (buffer, ID_DOCOFFICE, 8)) {
 	 char buffer[16];
 	 stream.seekg (0x8c2, std::ios::beg);
 	 stream.read (buffer, sizeof (buffer));
-	 return memcmp (buffer, "SfxDocumentInfo", 15) ? MSOFFICE : STAROFFICE;
+	 return (memcmp (buffer, ID_STAROFFICE, sizeof (ID_STAROFFICE) - 1)
+		 ? MSOFFICE : STAROFFICE);
       }
    }
    return UNKNOWN;
