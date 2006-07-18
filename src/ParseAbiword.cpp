@@ -66,7 +66,7 @@ ParseAbiword::ParseAbiword ()
      seqAbiWord (_seqAbiWord, _("AbiWord document")),
      seqMetadata (_seqMetadata, _("Metadata"), 1, 1, true),
      seqEntry (_seqEntry, _("Entries"), -1U, 1, true),
-     selDocument (_selDocument, _("Abiword document"), -1U, 1, true),
+     selDocument (_selDocument, _("AbiWord meta-info"), -1U, 1, true),
      pEntry (NULL)
 {
    _seqAbiWord[0] = &idAbiword;
