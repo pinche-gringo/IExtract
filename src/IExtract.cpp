@@ -318,7 +318,7 @@ Application::Application (const int argc, const char* argv[])
 #endif
 #ifdef SUPPORT_OO
    handlers[FileTypeChecker::OPENOFFICE] =  &Application::processOpenOffice;
-   handlers[FileTypeChecker::STAROFFICE] =  &Application::processOpenOffice;
+   handlers[FileTypeChecker::STAROFFICE] =  &Application::processStarOffice;
 #endif
 #ifdef SUPPORT_PDF
    handlers[FileTypeChecker::PDF] = &Application::processPDF;
