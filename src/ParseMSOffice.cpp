@@ -46,7 +46,7 @@
 #include "Properties.h"
 
 
-static const char SUMMARY[] = ("\x05\0\x53\0\x75\0\x6d\0\x6d\0\x61\0\x72\0\x79\0"
+static const char SUMMARY[] = ("\x05\0\x53\0\x75\0\x6D\0\x6D\0\x61\0\x72\0\x79\0"
 			       "\x49\0\x6E\0\x66\0\x6F\0\x72\0\x6D\0\x61\0\x74\0"
 			       "\x69\0\x6F\0\x6E\0\0");
 static const char ROOTENTRY[] = "R\0o\0o\0t\0 \0E\0n\0t\0r\0y\0\0";
@@ -81,7 +81,7 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (YGP
    if (!stream)
       throw (YGP::ParseError (_("Can't read document header!")));
 
-   if (memcmp (header, "\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1", 8))
+   if (memcmp (header, "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1", 8))
       throw (YGP::ParseError (_("Office identifier not found!")));
 
    // Blocksizes
