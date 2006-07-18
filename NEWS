@@ -1,3 +1,13 @@
+Overview of changes in version 0.8.00:
+
+  - Filetype can be determined by revising content, extension or all extensions
+    (thus option -X has been changed to -M AllExt)
+  - Further checks of filetypes while parsing
+  - MP3-parser recognizes files with ID3v2-tags (at start)
+  - Optimized StarOffice and OpenOffice parser
+  - Fixed bug parsing PDF documents with a docinfo dictionary without spaces
+
+
 Overview of changes in version 0.7.14:
 
   - Fixed parsing OGG files with a segment-table with other than 17 entries
