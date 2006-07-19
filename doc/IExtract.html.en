@@ -29,7 +29,7 @@
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Copyright (C) 2003 - 2005; distributed under the GNU General Public License">
+    <meta name="DC.Rights" content="Copyright (C) 2003 - 2006; distributed under the GNU General Public License">
 
     <style type="text/css">
       <!--
@@ -68,18 +68,13 @@
     the properites (title, author and comment) out of different
     documents and present them in a list for further processing.</p>
 
-    <p>The following documents are supported (each of them identified by the
-      extension):</p>
+    <p>The following documents are supported:</p>
 
     <dl>
       <dt><b>HTML</b></dt>
       <dd><p>Searches for the text between the <code>&lt;title&gt;</code> and
           <code>&lt;/title&gt;</code> tags and the content of the <code>meta</code>
-          tags (both according to HTML 4.0 and Dublin Core).</p>
-
-        <p>The files must have the extensions <code>*.htm</code>, <code>*.html</code>,
-          <code>*.sht</code>, <code>*.shtm</code>, <code>*.shtml</code> or
-	  <code>*.php</code>.</p></dd>
+          tags (both according to HTML 4.0 and Dublin Core).</p></dd>
 
       <dt><b>PNG</b></dt>
       <dd><p>PNG-images can contain text-chunks with <em>keyword</em>
@@ -95,12 +90,9 @@
 
       <dt><b>JPEG</b></dt>
       <dd><p>The application recognices comments stored after a comment
-          marker (0xfffe), in an APP1 Exif marker (as stored by
+          marker (0xFFFE), in an APP1 Exif marker (as stored by
 	  Microsoft/Windows XP and in an APPD marker (as seem to write
-	  some versions of PhotoShop.)</p>
-
-        <p>Files must have the extensions <code>*.jpg</code> or
-          <code>*.jpeg</code>.</p></dd>
+	  some versions of PhotoShop.)</p></dd>
 
       <dt><b>Microsoft Office documents</b></dt>
       <dd><p>Searches for the content of the properties dialog.</p>
@@ -111,8 +103,9 @@
 	  (maybe with the exception of documents bigger than 6.8 MB.)</p></dd>
 
       <dt><b>MP3</b></dt>
-      <dd><p>Extracts the content of the ID3 tag (version 1.x). The title of
-          the album is returned in the comment field.</p></dd>
+      <dd><p>Extracts the content of the ID3 tag (version 1.x and
+          2.x). The title of the album is returned in the comment
+          field.</p></dd>
 
       <dt><b>OGG</b></dt>
       <dd><p>Extracts the content of the comment header. The title of
@@ -330,11 +323,17 @@
           <td>Sorts the found files alphabetically.</td></tr>
         <tr><td>&nbsp;</td></tr>
 
-        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-X,&nbsp;--ignore-ext</b></td>
-          <td>If the file extension is unknown, take the previous to determine
-	    the type of the file. This is usefull for e.g. HTML documents
-	    available in various languages, which usually contain the language
-	    as additional extension (like index.html.en).</td></tr>
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-M,&nbsp;--mode=[MODUS]</b></td>
+        <td>Spezifies, how the type of the files is being determined.
+          Possible values are:
+
+	  <dl>
+	    <dt><b>Ext</b></dt><dd>From the last extension.</dd>
+	    <dt><b>AllExt</b></dt><dd>From the last known extension.</dd>
+	    <dt><b>Content</b></dt><dd>From the content of the file. This
+	      searches for certain identifiers characterising the
+	      different file-types.</dd>
+	  </dl></td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-V,&nbsp;--version</b></td>

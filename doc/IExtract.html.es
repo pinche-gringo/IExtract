@@ -29,7 +29,7 @@
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Copyright (C) 2003 - 2005; distribuido bajo las condiciones de la GNU Licensia Público">
+    <meta name="DC.Rights" content="Copyright (C) 2003 - 2006; distribuido bajo las condiciones de la GNU Licensia Público">
 
     <style type="text/css">
       <!--
@@ -67,22 +67,17 @@
     <hr size=1 noshade>
 
     <p><code>IExtract</code> es una utilidad para extraer
-            los propiedades (t&iacute;tulo, autor y comentario) de varios
-            tipos de documentos y pres&eacute;ntarlos en una lista para elaboraci&oacute;n
+            las propiedades (t&iacute;tulo, autor y comentario) de varios
+            tipos de documentos y presentarlos en una lista para elaboraci&oacute;n
             posterior.</p>
 
-    <p>Los documentos siguentes est&aacute;n procesados (distinguido por la
-      extensi&oacute;n):</p>
+    <p>Los documentos siguentes est&aacute;n procesados:</p>
 
     <dl>
       <dt><b>HTML</b></dt>
       <dd><p>Busca para el texto entre los tags <code>&lt;title&gt;</code> y
           <code>&lt;/title&gt;</code> y el contenido de los tags <code>meta</code>
-          (tanto en formato HTML 4.0 como "Dublin Core").</p>
-
-        <p>Los archivos necesitan tener la extensi&oacute;n <code>*.htm</code>, <code>*.html</code>,
-          <code>*.sht</code>, <code>*.shtm</code>, <code>*.shtml</code> o
-	  <code>*.php</code>.</p></dd>
+          (tanto en formato HTML 4.0 como "Dublin Core").</p></dd>
 
       <dt><b>PNG</b></dt>
       <dd><p>Imagenes del formato PNG pueden contener entradas de texto
@@ -93,19 +88,16 @@
 	  est&aacute; extraido.</p></dd>
 
       <dt><b>GIF</b></dt>
-      <dd><p>Imagenes del formato GIF pueden contener entradas de comentarios.
+      <dd><p>Imagenes del formato GIF pueden contener entradas de comentario.
           Esos entradas est&aacute;n extraidos en el campo
 	  "comentario". Las entradas por el autor y el t&iacute;tulo
 	  hacen falta.</p></dd>
 
       <dt><b>JPEG</b></dt>
       <dd><p>El programa reconoce comentarios despu&eacute;s de un
-          "marcador de comentarios" (0xfffe), en un "marcador APP1 Exif"
+          "marcador de comentarios" (0xFFFE), en un "marcador APP1 Exif"
 	  (como le usa Windows XP) y en un "marcador APPD" (como le usan
-	  unas versiones de PhotoShop).</p>
-
-        <p>Los archivos necesitan tener la extensi&oacute;n <code>*.jpg</code> o
-          <code>*.jpeg</code>.</p></dd>
+	  unas versiones de PhotoShop).</p></dd>
 
       <dt><b>Documentos de Microsoft Office</b></dt>
       <dd><p>Busca para el contenido de la ventana "propiedades".</p>
@@ -117,12 +109,14 @@
 	  m&aacute;s grande que 6.8 MB).</p></dd>
 
       <dt><b>MP3</b></dt>
-      <dd><p>Extrae el contenido del tag ID3 (versi&oacute;n 1.x). El
-          t&iacute;tulo del &aacute;lbum se pone en el campo comentario.</p></dd>
+      <dd><p>Extrae el contenido del tag ID3 (versi&oacute;n 1.x y
+          2.x). El t&iacute;tulo del &aacute;lbun est&aacute; puesto
+          en el campo comentario.</p></dd>
 
       <dt><b>OGG</b></dt>
       <dd><p>Extrae el contenido del "comment header" (cabeza de comentario).
-          El t&iacute;tulo del &aacute;lbum se pone en el campo comentario.</p></dd>
+          El t&iacute;tulo del &aacute;lbun est&aacute; puesto
+          en el campo comentario.</p></dd>
 
       <dt><b>PDF</b></dt>
       <dd><p>Documentos de PDF contienen un llamado <i>Document Information
@@ -299,7 +293,7 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-n,&nbsp;--new=[D&Iacute;AS:]TEXTO</b></td>
-        <td>Muestra TEXTO en el primer campo por archivos m&aacute;s joven que
+        <td>Muestra TEXTO en el primer campo por archivos m&aacute;s jovenes que
           D&Iacute;AS d&iacute;as (por defecto: 30).
 
           <p>D&Iacute;AS puede faltar o tener un ap&eacute;ndice de multiplicaci&oacute;n:
@@ -307,10 +301,10 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-i,&nbsp;--include=LISTA</b></td>
-        <td>Especifica cu&aacute;les archivos deben que est&aacute; investigado; eso
-          puede ser una lista tambi&eacute;n; separado por la la letra separado del
-          camino del sistema operativo (dos puntos (:) en Unices; punto y coma (;)
-          en Windoze).
+        <td>Especifica cu&aacute;les archivos deben estar investigados;
+          eso puede tambi&eacute;n ser una lista; separado por la la
+          letra de separaci&oacute;n del camino del sistema operativo
+          (dos puntos (:) en Unices; punto y coma (;) en Windows).
 
           <p>Los archivos pueden contener los comodines tipicales de UNIX.
             <a href="IExtract.html.de#Fileformat">Detalles</a> se encuentra
@@ -318,10 +312,10 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-x,&nbsp;--exclude=LISTA</b></td>
-        <td>Especifica cu&aacute;les archivos <b>no</b> deben que est&aacute;
-          investigado; eso puede ser una lista tambi&eacute;n; separado por la la
-          letra separado del camino del sistema operativo (dos puntos (:) en Unices;
-          punto y coma (;) en Windoze).
+        <td>Especifica cu&aacute;les archivos <b>no</b> deben estar
+          investigados; eso puede tambi&eacute;n ser una lista; separado por la la
+          letra de separaci&oacute;n del camino del sistema operativo (dos puntos (:) en Unices;
+          punto y coma (;) en Windows).
 
           <p>Los archivos pueden contener los comodines tipicales de UNIX.
             <a href="IExtract.html.de#Fileformat">Detalles</a> se encuentra
@@ -329,30 +323,37 @@
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-I,&nbsp;--ini-file=ARCHIVO</b></td>
-        <td>Lee m&aacute;s opciones del archivo especifado. Mira
-          <a href="IExtract.html.es#INIfile">Formato de archivos por iniciar</a> por
+        <td>Lee m&aacute;s opciones del archivo especificado. Mira
+          <a href="IExtract.html.es#INIfile">Formato de archivos por iniciar</a>
           por m&aacute;s informaci&oacute;n.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-t,&nbsp;--threads=N&Uacute;MERO</b></td>
-        <td>Pone el n&uacute;mero por los proceses del fondo (threads) para exerminar
-          los archivos (adicional al proceso por la busqueada).
+        <td>Pone el n&uacute;mero por los proceses del fondo (threads) para examinar
+          los archivos (adicional al proceso por la b&uacute;squeda).
 
-          <p>Aquel opci&oacute;n solamente est&aacute; existente, si el programa
+          <p>Esa opci&oacute;n es solamente disponible, si el programa
             estaba configurado (compilado) con <code>--enable-threads</code> (o
             <code>-DENABLE_THREADS</code>)!</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-S,&nbsp;--sort</b></td>
-        <td>Sortea los fichereos alfabeticalmente.</td></tr>
+        <td>Sortea los fichereos alfabeticamente.</td></tr>
       <tr><td>&nbsp;</td></tr>
 
-      <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-X,&nbsp;--ignore-ext</b></td>
-        <td>Si la extensi&oacute;n de los ficheros est&aacute; desconocida,
-	  usa la extensi&oacute;n anterior para determinar el tipo del archivo.
-	  Eso sirve por ejemplo para documentos HTML en varios idiomas, cuales
-	  suelen tener el idioma a&ntilde;adido como segunda extensi&oacute;n
-	  (como index.html.es).</td></tr>
+        <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-M,&nbsp;--mode=[MODO]</b></td>
+        <td>Specifica, como se determina el tipo del archivo. Modos posibles
+          son:
+
+	  <dl>
+	    <dt><b>Ext</b></dt><dd>De la &uacute;ltima extensi&oacute;n del
+               nombre.</dd>
+	    <dt><b>AllExt</b></dt><dd>De la &uacute;ltima extensi&oacute;n
+              conocida del nombre.</dd>
+	    <dt><b>Content</b></dt><dd>Del contenido del archivo. Eso busca
+	      para identificaciones caracteristicas de los diferentes
+	      tipos de archivos.</dd>
+	  </dl></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-V,&nbsp;--version</b></td>
