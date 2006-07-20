@@ -44,6 +44,8 @@ class ParseMP3 {
    const ParseMP3& operator= (const ParseMP3& other);
 
    static std::string strip (std::string& value, unsigned int pos, unsigned int len);
+   static unsigned int getLength (const char* value);
+   static std::string getString (const char* value, unsigned int length);
 };
 
 #endif

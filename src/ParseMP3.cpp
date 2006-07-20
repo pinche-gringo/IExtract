@@ -76,34 +76,47 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::Par
       }
    }
    else {
-      unsigned int lenID3 (0);
-      for (unsigned int i (6); i < 10; ++i) {
-	 lenID3 <<= 7;
-	 lenID3 += buffer[i];
-      }
+      unsigned int lenID3 (getLength (buffer + 6));
       TRACE5 ("ParseMP3::parse (Xistream&, Properties&) - Len of ID3: " << lenID3);
-
       char* id3 (new char [lenID3]);
       const char* pos (id3);
+
+      // Check if an extended header is present
+      if ((buffer[5] & 0x40) == 0x40) {
+	 stream.read (buffer, 4);
+	 unsigned int cExtHdr (getLength (buffer) - 4);
+	 TRACE9 ("ParseMP3::parse (Xistream&, Properties&) - Skipping ext. header: " << cExtHdr);
+
+	 // Only handle extended header, if its size is plausible, else ignore
+	 // to be able to handle badly written ID3 tags
+	 if ((cExtHdr >= 6) && (cExtHdr < lenID3)) {
+	    lenID3 -= cExtHdr;
+	    pos += cExtHdr;
+	 }
+	 else
+	    stream.seekg (-4, std::ios::cur);
+      }
+
       stream.read (id3, lenID3);
 
       while (static_cast<unsigned int> (pos - id3) < lenID3) {
-	 unsigned int len ((pos[4] << 21) + (pos[5] << 14) + (pos[6] << 7) + pos[7]);
-
+	 unsigned int len (getLength (pos + 4));
 	 TRACE7 ("ParseMP3::parse (Xistream&, Properties&) - Frame: " << std::string (pos, 4));
-	 TRACE3 ("ParseMP3::parse (Xistream&, Properties&) - Len of frame: " << len);
+	 TRACE3 ("ParseMP3::parse (Xistream&, Properties&) - Len of frame: " << std::hex << len << std::dec << " (" << len << ')');
+	 if (len > (lenID3 - (pos - id3)))
+	    throw YGP::ParseError (_("Invalid length of ID3 frame!"));
 
 	 switch (get4BytesLSB (pos)) {
 	 case 0x32544954:                                           // TIT2-tag
-	    result.strTitle = std::string (pos + 11, len - 1);
+	    result.strTitle = getString (pos + 10, len);
 	    break;
 
 	 case 0x31455054:                                           // TPE1-tag
-	    result.strAuthor = std::string (pos + 11, len - 1);
+	    result.strAuthor = getString (pos + 10, len);
 	    break;
 
-	 case 0x424C4154:                                           // TPE1-tag
-	    result.strComment = std::string (pos + 11, len - 1);
+	 case 0x424C4154:                                           // TALB-tag
+	    result.strComment = getString (pos + 10, len);
 	    break;
 
 	 case 0:
@@ -132,4 +145,54 @@ std::string ParseMP3::strip (std::string& value, unsigned int pos, unsigned int 
       --len;
    }
    return (pos == len) ? " " : value.substr (pos, len - pos + 1);
+}
+
+//-----------------------------------------------------------------------------
+/// Returns the value of a "32 bit synchsafe integer", an integer having the
+/// 7th bit of every byte cleared and ignored
+/// \param value: Pointer to 4 bytes
+/// \returns unsigned int: Integer value
+//-----------------------------------------------------------------------------
+unsigned int ParseMP3::getLength (const char* value) {
+   Check1 (value);
+   TRACE5 ("ParseMP3::getLength (const char*) - " << std::hex << get4BytesLSB (value) << std::dec);
+
+   unsigned int rc ((unsigned char)*value);
+   for (unsigned int i (0); i < 3; ++i) {
+      rc <<= 7;
+      rc += (unsigned char)*++value;
+   }
+   return rc;
+}
+
+//-----------------------------------------------------------------------------
+/// Gets a string; according the codification in ID3 tags, where the first byte
+/// of the buffer identifies, how the value is encoded
+/// \param value: Start of string
+/// \param length: Length of string
+/// \returns std::string: The extracted string
+//-----------------------------------------------------------------------------
+std::string ParseMP3::getString (const char* value, unsigned int length) {
+   Check1 (value);
+   TRACE7 ("ParseMP3::getString (const char*, unsigned int) - " << std::hex << get4BytesMSB (value) << std::dec);
+
+   switch (*value) {
+   case '\0':
+      if (get2BytesLSB (value + 1)) {
+	 ++value;
+	 --length;
+      }
+      else {
+	 length = get2BytesLSB (value + 3) - 1;
+	 value += 5;
+      }
+      break;
+
+   case '\x03':
+      ++value;
+      --length;
+      break;
+   } // end-switch
+   TRACE9 ("ParseMP3::getString (const char*, unsigned int): " << length << ": " << std::string (value, length));
+   return std::string (value, length);
 }
