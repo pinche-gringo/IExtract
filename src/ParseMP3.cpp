@@ -57,7 +57,7 @@ ParseMP3::~ParseMP3 () {
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
-   char buffer[10];
+   char buffer[10] = "\0";
    stream.read (buffer, sizeof (buffer));
    if (memcmp (buffer, "ID3", 3)) {
       if ((get2BytesLSB (buffer) & ID_MP3) != ID_MP3)
@@ -99,7 +99,7 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::Par
 	       stream.seekg (-4, std::ios::cur);
 	 }
 
-	 stream.read (id3, lenID3);
+	 stream.read (id3, lenID3 -= 10);
 
 	 while (static_cast<unsigned int> (pos - id3) < lenID3) {
 	    unsigned int len (getLength (pos + 4));
@@ -121,15 +121,20 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::Par
 	       result.strComment = getString (pos + 10, len);
 	       break;
 
+	    case 0x424F4547:           // GEOB-Tag seems to store length as MSB
+	       len = get4BytesMSB (pos + 4);
+	       break;
+
 	    case 0:
 	       return;
 	    } // end-switch
 
 	    pos += len + 10;
+	    TRACE7 ("ParseMP3::parse (Xistream&, Properties&) - Used: " << (pos - id3));
 	 } // end-while
       } // endif ID3v2.3 or above
       else {
-	 stream.read (id3, lenID3);
+	 stream.read (id3, lenID3 -= 6);
 
 	 while (static_cast<unsigned int> (pos - id3) < lenID3) {
 	    unsigned int len ((pos[3] << 14) + (pos[4] << 7) + pos[5]);
