@@ -81,50 +81,76 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::Par
       char* id3 (new char [lenID3]);
       const char* pos (id3);
 
-      // Check if an extended header is present
-      if ((buffer[5] & 0x40) == 0x40) {
-	 stream.read (buffer, 4);
-	 unsigned int cExtHdr (getLength (buffer) - 4);
-	 TRACE9 ("ParseMP3::parse (Xistream&, Properties&) - Skipping ext. header: " << cExtHdr);
+      // Check for ID3v2.3 or above
+      if (get2BytesLSB (buffer + 3) > 0x02) {
+	 // Check if an extended header is present
+	 if ((buffer[5] & 0x40) == 0x40) {
+	    stream.read (buffer, 4);
+	    unsigned int cExtHdr (getLength (buffer) - 4);
+	    TRACE9 ("ParseMP3::parse (Xistream&, Properties&) - Skipping ext. header: " << cExtHdr);
 
-	 // Only handle extended header, if its size is plausible, else ignore
-	 // to be able to handle badly written ID3 tags
-	 if ((cExtHdr >= 6) && (cExtHdr < lenID3)) {
-	    lenID3 -= cExtHdr;
-	    pos += cExtHdr;
+	    // Only handle extended header, if its size is plausible, else ignore
+	    // to be able to handle badly written ID3 tags
+	    if ((cExtHdr >= 6) && (cExtHdr < lenID3)) {
+	       lenID3 -= cExtHdr;
+	       pos += cExtHdr;
+	    }
+	    else
+	       stream.seekg (-4, std::ios::cur);
 	 }
-	 else
-	    stream.seekg (-4, std::ios::cur);
+
+	 stream.read (id3, lenID3);
+
+	 while (static_cast<unsigned int> (pos - id3) < lenID3) {
+	    unsigned int len (getLength (pos + 4));
+	    TRACE7 ("ParseMP3::parse (Xistream&, Properties&) - Frame: " << std::string (pos, 4));
+	    TRACE3 ("ParseMP3::parse (Xistream&, Properties&) - Len of frame: " << std::hex << len << std::dec << " (" << len << ')');
+	    if (len > (lenID3 - (pos - id3)))
+	       throw YGP::ParseError (_("Invalid length of ID3 frame!"));
+
+	    switch (get4BytesLSB (pos)) {
+	    case 0x32544954:                                        // TIT2-tag
+	       result.strTitle = getString (pos + 10, len);
+	       break;
+
+	    case 0x31455054:                                        // TPE1-tag
+	       result.strAuthor = getString (pos + 10, len);
+	       break;
+
+	    case 0x424C4154:                                        // TALB-tag
+	       result.strComment = getString (pos + 10, len);
+	       break;
+
+	    case 0:
+	       return;
+	    } // end-switch
+
+	    pos += len + 10;
+	 } // end-while
+      } // endif ID3v2.3 or above
+      else {
+	 stream.read (id3, lenID3);
+
+	 while (static_cast<unsigned int> (pos - id3) < lenID3) {
+	    unsigned int len ((pos[3] << 14) + (pos[4] << 7) + pos[5]);
+	    TRACE7 ("ParseMP3::parse (Xistream&, Properties&) - Frame: " << std::string (pos, 3));
+	    TRACE3 ("ParseMP3::parse (Xistream&, Properties&) - Len of frame: " << std::hex << len << std::dec << " (" << len << ')');
+	    if (len > (lenID3 - (pos - id3)))
+	       throw YGP::ParseError (_("Invalid length of ID3 frame!"));
+
+	    if (memcmp (pos, "TP1", 3))
+	       if (memcmp (pos, "TAL", 3)) {
+		  if (!memcmp (pos, "TT2", 3))
+		     result.strTitle = getString (pos + 6, len);
+	       }
+	       else
+		  result.strComment = getString (pos + 6, len);
+	    else
+	       result.strAuthor = getString (pos + 6, len);
+
+	    pos += len + 6;
+	 } // end-while
       }
-
-      stream.read (id3, lenID3);
-
-      while (static_cast<unsigned int> (pos - id3) < lenID3) {
-	 unsigned int len (getLength (pos + 4));
-	 TRACE7 ("ParseMP3::parse (Xistream&, Properties&) - Frame: " << std::string (pos, 4));
-	 TRACE3 ("ParseMP3::parse (Xistream&, Properties&) - Len of frame: " << std::hex << len << std::dec << " (" << len << ')');
-	 if (len > (lenID3 - (pos - id3)))
-	    throw YGP::ParseError (_("Invalid length of ID3 frame!"));
-
-	 switch (get4BytesLSB (pos)) {
-	 case 0x32544954:                                           // TIT2-tag
-	    result.strTitle = getString (pos + 10, len);
-	    break;
-
-	 case 0x31455054:                                           // TPE1-tag
-	    result.strAuthor = getString (pos + 10, len);
-	    break;
-
-	 case 0x424C4154:                                           // TALB-tag
-	    result.strComment = getString (pos + 10, len);
-	    break;
-
-	 case 0:
-	    return;
-	 } // end-switch
-
-	 pos += len + 10;
-      } // end-while
       delete id3;
    }
 }
@@ -183,8 +209,11 @@ std::string ParseMP3::getString (const char* value, unsigned int length) {
 	 --length;
       }
       else {
-	 length = get2BytesLSB (value + 3) - 1;
-	 value += 5;
+	 unsigned int newLen (get2BytesLSB (value + 3) - 1);
+	 if (newLen < length) {
+	    length = newLen;
+	    value += 5;
+	 }
       }
       break;
 
