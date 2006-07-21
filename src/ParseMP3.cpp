@@ -57,23 +57,15 @@ ParseMP3::~ParseMP3 () {
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
 void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
+   result.strTitle.clear ();
+   result.strAuthor.clear ();
+   result.strComment.clear ();
+
    char buffer[10] = "\0";
    stream.read (buffer, sizeof (buffer));
    if (memcmp (buffer, "ID3", 3)) {
       if ((get2BytesLSB (buffer) & ID_MP3) != ID_MP3)
 	 throw YGP::ParseError (_("MP3-ID not found"));
-
-      stream.seekg (-0x80, std::ios::end);
-
-      std::string value;
-      std::getline (stream, value, '\xff');
-      TRACE9 ("ParseMP3::parse (Xistream&, Properties&) - Found: " << value
-	      << "; Length: " << value.size ());
-      if ((value[0] == 'T') && (value[1] == 'A') && (value[2] == 'G')) {
-	 result.strComment = strip (value, 63, 29);
-	 result.strTitle = strip (value, 3, 29);
-	 result.strAuthor = strip (value, 33, 29);
-      }
    }
    else {
       unsigned int lenID3 (getLength (buffer + 6));
@@ -99,14 +91,13 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::Par
 	       stream.seekg (-4, std::ios::cur);
 	 }
 
-	 stream.read (id3, lenID3 -= 10);
+	 stream.read (id3, lenID3);
 
 	 while (static_cast<unsigned int> (pos - id3) < lenID3) {
-	    unsigned int len (getLength (pos + 4));
-	    TRACE7 ("ParseMP3::parse (Xistream&, Properties&) - Frame: " << std::string (pos, 4));
-	    TRACE3 ("ParseMP3::parse (Xistream&, Properties&) - Len of frame: " << std::hex << len << std::dec << " (" << len << ')');
+	    unsigned int len (get4BytesMSB (pos + 4));
+	    // Sometimes the length seems to be 7bit encoded, so correct, if so
 	    if (len > (lenID3 - (pos - id3)))
-	       throw YGP::ParseError (_("Invalid length of ID3 frame!"));
+	       break;
 
 	    switch (get4BytesLSB (pos)) {
 	    case 0x32544954:                                        // TIT2-tag
@@ -117,31 +108,24 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::Par
 	       result.strAuthor = getString (pos + 10, len);
 	       break;
 
-	    case 0x424C4154:                                        // TALB-tag
+	    case 0x424C4154:                                  // TALB-tag
 	       result.strComment = getString (pos + 10, len);
 	       break;
-
-	    case 0x424F4547:           // GEOB-Tag seems to store length as MSB
-	       len = get4BytesMSB (pos + 4);
-	       break;
-
-	    case 0:
-	       return;
 	    } // end-switch
 
 	    pos += len + 10;
-	    TRACE7 ("ParseMP3::parse (Xistream&, Properties&) - Used: " << (pos - id3));
+	    TRACE7 ("ParseMP3::parse (Xistream&, Properties&) - Used: " << (pos - id3) << "; Left: " << (lenID3 - (pos - id3)));
 	 } // end-while
       } // endif ID3v2.3 or above
       else {
-	 stream.read (id3, lenID3 -= 6);
+	 stream.read (id3, lenID3);
 
 	 while (static_cast<unsigned int> (pos - id3) < lenID3) {
 	    unsigned int len ((pos[3] << 14) + (pos[4] << 7) + pos[5]);
 	    TRACE7 ("ParseMP3::parse (Xistream&, Properties&) - Frame: " << std::string (pos, 3));
 	    TRACE3 ("ParseMP3::parse (Xistream&, Properties&) - Len of frame: " << std::hex << len << std::dec << " (" << len << ')');
 	    if (len > (lenID3 - (pos - id3)))
-	       throw YGP::ParseError (_("Invalid length of ID3 frame!"));
+	       break;
 
 	    if (memcmp (pos, "TP1", 3))
 	       if (memcmp (pos, "TAL", 3)) {
@@ -157,6 +141,19 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::Par
 	 } // end-while
       }
       delete id3;
+      if (result.strTitle.size () || result.strAuthor.size () || result.strComment.size ())
+	 return;
+   }
+   stream.seekg (-0x80, std::ios::end);
+
+   std::string value;
+   std::getline (stream, value, '\xff');
+   TRACE9 ("ParseMP3::parse (Xistream&, Properties&) - Found: " << value
+	   << "; Length: " << value.size ());
+   if ((value[0] == 'T') && (value[1] == 'A') && (value[2] == 'G')) {
+      result.strComment = strip (value, 63, 29);
+      result.strTitle = strip (value, 3, 29);
+      result.strAuthor = strip (value, 33, 29);
    }
 }
 
