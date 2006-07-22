@@ -1,3 +1,106 @@
+2006-07-22  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog: Changes of V0.8.0 documented
+
+	* po/de.po, po/en.po: Last actualizations for 0.8.00
+
+	* po/es.po: Changed explication of -M AllExt
+
+	* README:
+	  Copyright to 2006; Removed info about extension defining file-type
+
+2006-07-21  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseMP3.cpp:
+	Length of frames is MSB; if reading ID3 v2 info fails, fall back to ID3 v1
+
+2006-07-20  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseMP3.cpp:
+	  Special handling of GEOB ID3-tags; Fixed size of buffer
+
+	* src/ParseMP3.cpp: Handling also ID3v2.2 tags
+
+2006-07-19  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseMP3.cpp, src/ParseMP3.h:
+	  Skipping extended ID3 headers; Taking care of type of values in ID3 v2 tags
+
+2006-07-18  Markus Schwab  <g17m0@lycos.com>
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Adapted to the changes of V0.8.00
+
+	* src/ParseAbiword.cpp, src/ParseOOffice.cpp: Fixed messages
+
+	* po/de.po, po/en.po, po/es.po: Translations of messages in V0.8.00
+
+	* NEWS: Changes of V0.8.0 documented
+
+	* configure.in: Version to 0.8.00
+
+	* src/IExtract.cpp:
+	  Processing StarOffice documents with StarOffice parser
+
+	* src/ParseMSOffice.cpp: Uppercased hex-constants
+
+	* src/ParseGIF.cpp: Changed the formatting
+
+	* src/ParseMP3.cpp, src/ParseMP3.h: Added check if file is an MP3-file
+
+	* src/ParseOOffice.cpp, src/FileTypeChk.cpp, src/ParseSOffice.cpp:
+	  Made constants local to file
+
+	* src/ParseAbiword.cpp, src/ParseAbiword.h:
+	  Added check if the file is an AbiWord document
+
+	* src/ParseOOffice.cpp, src/ParseOOffice.h:
+	  Parsing documents according to ZIP-structure; added checks if file is correct
+
+	* src/FileTypeChk.cpp:
+	  Test for OpenOffice checks zipfile-contents; Using constants for IDs
+
+2006-07-17  Markus Schwab  <g17m0@lycos.com>
+
+	* src/ParseMP3.cpp: Also parsing files with ID3v2 tag
+
+	* src/ParsePDF.cpp:
+	  Checking file-type; Fixed parsing docinfo dictionary without spaces
+
+	* src/ParseRTF.cpp, src/ParseRTF.h: Checking if file is RTF-document
+
+	* src/ParseSOffice.cpp, src/ParseSOffice.h:
+	  Checking if file is office-document; Optimized
+
+2006-07-16  Markus Schwab  <g17m0@lycos.com>
+
+	* src/FileTypeChk.cpp:
+	  Added check for content of PDF, RTF and Star/OpenOffice documents
+
+2006-07-15  Markus Schwab  <g17m0@lycos.com>
+
+	* src/FileTypeChk.cpp, src/FileTypeChk.h:
+	  FileTypeCheckerByContent handles HTML-documents
+
+	* src/IExtract.cpp:
+	  Combined -X and -c to -M (modus operandi); Passing file + path for check
+
+2006-07-14  Markus Schwab  <g17m0@lycos.com>
+
+	* src/IExtract.cpp: Added option to get file-type from content
+
+	* src/FileTypeChk.cpp, src/FileTypeChk.h:
+	  Added FileClassCheckByName; 1st draft of FileClassCheckByContents
+
+2006-07-13  Markus Schwab  <g17m0@lycos.com>
+
+	* src/IExtract.cpp: Using FileTyeChecker to get type of files
+
+	* src/Makefile.am: Added FileTypeChk
+
+	* src/FileTypeChk.cpp, src/FileTypeChk.h:
+	  Initial revision; with FileTypeCheckerbyName implemented
+
 2006-07-12  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.7.14 documented
@@ -604,8 +707,8 @@
 2003-06-03  gettextize  <bug-gnu-gettext@gnu.org>
 
 	* Makefile.am (SUBDIRS): Add m4.
-	(ACLOCAL_AMFLAGS): New variable.
-	(EXTRA_DIST): New variable.
+	  (ACLOCAL_AMFLAGS): New variable.
+	  (EXTRA_DIST): New variable.
 	* configure.in (AC_OUTPUT): Add m4/Makefile.
 
 2003-03-26  Markus Schwab  <g17m0@lycos.com>
@@ -788,7 +891,7 @@
 
 2002-11-14  Markus Schwab  <g17m0@lycos.com>
 
-	* src/ParsePDF.cpp, src/ParsePDF.h: 
+	* src/ParsePDF.cpp, src/ParsePDF.h:
 	  Works for not-linearized files and text values
 
 	* src/ParsePDF.cpp, src/ParsePDF.h: Parsing /Info object added
