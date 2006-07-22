@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.8 ($Revision$)\n"
 "Report-Msgid-Bugs-To: g17m0@lycos.com\n"
-"POT-Creation-Date: 2006-07-18 19:35-0400\n"
+"POT-Creation-Date: 2006-07-22 15:46-0400\n"
 "PO-Revision-Date: 2005-03-20 21:33-0400\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: ENGLISH <g17m0@lycos.com>\n"
@@ -660,7 +660,7 @@ msgstr ""
 msgid "HTML document"
 msgstr ""
 
-#: src/ParseMP3.cpp:64
+#: src/ParseMP3.cpp:68
 msgid "MP3-ID not found"
 msgstr ""
 
