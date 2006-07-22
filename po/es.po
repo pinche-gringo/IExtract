@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.8 ($Revision$)\n"
 "Report-Msgid-Bugs-To: g17m0@lycos.com\n"
-"POT-Creation-Date: 2006-07-18 19:35-0400\n"
+"POT-Creation-Date: 2006-07-22 15:46-0400\n"
 "PO-Revision-Date: 2005-06-04 13:23-0400\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: ESPAÑOL <g17m0@lycos.com>\n"
@@ -128,7 +128,7 @@ msgid ""
 msgstr ""
 "Modo de operación para determinar el tipo del archivo:\n"
 "                          Ext: De la (última) extensión del nombre\n"
-"                          AllExt: De cualquier extensíon (mientras desconocida)\n"
+"                          AllExt: De la extensión conocida\n"
 "                          Content: Del contenido del archivo"
 
 #: src/IExtract.cpp:370
@@ -727,7 +727,7 @@ msgstr "Comando HTML valido"
 msgid "HTML document"
 msgstr "Documento HTML"
 
-#: src/ParseMP3.cpp:64
+#: src/ParseMP3.cpp:68
 msgid "MP3-ID not found"
 msgstr "No encontré la ID de un archivo MP3"
 
