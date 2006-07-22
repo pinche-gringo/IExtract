@@ -3,12 +3,12 @@
 
 
 Utility to extract the description out of certain file-types
-Copyright (C) 2002 - 2005 Markus Schwab <g17m0@lycos.com>
+Copyright (C) 2002 - 2006 Markus Schwab <g17m0@lycos.com>
 -----------------------------------------------------------------------
 
 
 At the moment the following documents are supported (unless disabled while
-configuring). The type of the file is identified by the extension:
+configuring).
 
   - PNG: PNG images can contain text-chunks with keyword-value pairs. The
          content of the keywords "Title", "Author" and "Description" is
