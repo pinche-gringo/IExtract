@@ -20,6 +20,7 @@
 
 #include <map>
 #include <string>
+#include <iosfwd>
 
 
 /**Base-class to check for file-types
@@ -77,8 +78,7 @@ class FileTypeCheckerByContent : public FileTypeChecker {
    ~FileTypeCheckerByContent ();
    const FileTypeCheckerByContent& operator= (const FileTypeCheckerByContent& other);
 
-   static const char* skipWS (const char* buffer, unsigned int size);
-   static const char* skipHTMLComment (const char* buffer, unsigned int size);
+   static void skipHTMLComments (char* buffer, unsigned int size, std::ifstream& stream);
 
    static std::map<std::string, FileType> types;
 };

@@ -142,7 +142,9 @@ FileTypeChecker::FileType FileTypeCheckerByContent::getType (const char* file) {
 
    std::ifstream stream (file);
    if (stream) {
-      char buffer[512] = "";
+      // Fill buffer with file
+      char buffer[512];
+      memset (buffer, 0, sizeof (buffer));
       stream.read (buffer, sizeof (buffer));
 
       // Check if first bytes identify the file
@@ -157,7 +159,8 @@ FileTypeChecker::FileType FileTypeCheckerByContent::getType (const char* file) {
 
       // Check for OpenOffice
       if (get4BytesLSB (buffer) == ID_PKZIP_LOCALHDR) {
-	 char buffer[512] = "";
+	 char buffer[80];
+	 memset (buffer, 0, sizeof (buffer));
 	 stream.seekg (-22, std::ios::end);
 	 stream.read (buffer, 22);
 
@@ -176,10 +179,14 @@ FileTypeChecker::FileType FileTypeCheckerByContent::getType (const char* file) {
 		  TRACE7 ("FileTypeCheckerByContent::getType (const char*) - Len of filename: " << lenName
 			  << "; Skipping: " << lenSkip);
 
-		  stream.read (buffer, lenName);
-		  if ((lenName == 8) && !memcmp ("meta.xml", buffer, lenName))
-		     return OPENOFFICE;
-		  stream.seekg (lenSkip, std::ios::cur);
+		  // Check if "meta.xml" entry has been found
+		  if (lenName == 8) {
+		     stream.read (buffer, 8);
+		     if (!memcmp ("meta.xml", buffer, 8))
+			return OPENOFFICE;
+		     lenName -= 8;
+		  }
+		  stream.seekg (lenName + lenSkip, std::ios::cur);
 	       }
 	       else
 		  break;
@@ -188,70 +195,90 @@ FileTypeChecker::FileType FileTypeCheckerByContent::getType (const char* file) {
 	 return UNKNOWN;
       }
 
-      // Check for HTML-document
-      const char* start (buffer);
-      const char* temp;
-      while ((temp = skipWS (start, sizeof (buffer) - (start - buffer)))
-	     || (temp = skipHTMLComment (start, sizeof (buffer) - (start - buffer))))
-	 start = temp;
-
-      if ((static_cast<unsigned int> (start - buffer) < (sizeof (buffer) - 13))
-	  && !memcmp (start, ID_HTML, sizeof (ID_HTML) - 1))
-	 return HTML;
-
       // Check for StarOffice/MS-Office (StarOffice up to V5 uses a
       // MS-compatible format additional for the information, additional to
       // their own format, so they could also be parsed as MS-Office document)
-      if (!memcmp (buffer, ID_DOCOFFICE, 8)) {
+      if (!memcmp (buffer, ID_DOCOFFICE, sizeof (ID_DOCOFFICE) - 1)) {
 	 char buffer[16];
 	 stream.seekg (0x8c2, std::ios::beg);
 	 stream.read (buffer, sizeof (buffer));
 	 return (memcmp (buffer, ID_STAROFFICE, sizeof (ID_STAROFFICE) - 1)
 		 ? MSOFFICE : STAROFFICE);
       }
+
+      // Check for HTML-document; this must be the last test, as the buffer
+      // might be updated
+      skipHTMLComments (buffer, sizeof (buffer), stream);
+      TRACE1 ("HTML: " << std::string (buffer, sizeof (ID_HTML) - 1));
+      if (!memcmp (buffer, ID_HTML, sizeof (ID_HTML) - 1))
+	 return HTML;
+      // Don't add further tests; the buffer might have been overwritten
    }
    return UNKNOWN;
 }
 
 //-----------------------------------------------------------------------------
-/// Skips over white-spaces
-/// \param buffer: Buffer to inspect
+/// Skips over HTML-comments and white-spaces
+/// \param buffer: Buffer to inspect (and maybe re-fill with new data from stream)
 /// \param size: Size of buffer
-/// \returns const char*: Pointer to end of skipped characters or NULL
+/// \param stream: Stream to read from
+/// \pre buffer must be at least 4 characters big
 //-----------------------------------------------------------------------------
-const char* FileTypeCheckerByContent::skipWS (const char* buffer, unsigned int size) {
-   Check1 (buffer);
-   TRACE5 ("FileTypeCheckerByContent::skipWS (const char*, unsigned int) - " << std::string (buffer, 5));
+void FileTypeCheckerByContent::skipHTMLComments (char* buffer, unsigned int size,
+						 std::ifstream& stream) {
+   Check1 (buffer); Check1 (size > 3);
 
-   if (size && isspace (*buffer)) {
-      while (isspace (*++buffer) && --size)
-	 ;
-      return buffer;
-   }
-   return NULL;
-}
+   const char* pos (buffer);
+   unsigned int left (size);
+   do {
+      TRACE5 ("FileTypeCheckerByContent::skipHTMLComments (char*, unsigned int, std::ifstream&) - " << std::string (pos, 5));
 
-//-----------------------------------------------------------------------------
-/// Skips over white-spaces
-/// \param buffer: Buffer to inspect
-/// \param size: Size of buffer
-/// \returns const char*: Pointer to end of skipped characters or NULL
-//-----------------------------------------------------------------------------
-const char* FileTypeCheckerByContent::skipHTMLComment (const char* buffer, unsigned int size) {
-   Check1 (buffer);
-   TRACE5 ("FileTypeCheckerByContent::skipHTMLComment (const char*, unsigned int) - " << size << ": " << std::string (buffer, 5));
+      // Simply skip whitespaces
+      if (isspace (*pos)) {
+	 ++pos;
+	 --left;
+      }
+      // Check for HTML comment (starting with <!--)
+      else if ((*pos == '<') && (pos[1] == '!') && (pos[2] == '-') && (pos[3] == '-')) {
+	 pos += 4;
+	 bool cont (true);
+	 do {
+	    // Try to find the end of the comment (-->)
+	    pos = static_cast<char*> (memchr (pos, '-', left));
+	    if (pos) {
+	       TRACE7 ("FileTypeCheckerByContent::skipHTMLComments (char*, unsigned int, std::ifstream&) - EOC: \"" << std::string (pos, (left > 4) ? 5 : left) << '"');
+	       left = size - (pos - buffer);
+	       if (left > 2) {
+		  if ((pos[1] == '-') && (pos[2] == '>')) {
+		     cont = false;
+		     memcpy (buffer, pos + 3, left - 3);
+		     pos = buffer;
+		  }
+		  else {
+		     ++pos;
+		     --left;
+		     continue;
+		  }
+	       }
+	       else {
+		  memcpy (buffer, pos, left);
+		  pos = buffer;
+	       }
+	    }
+	    else {
+	       left = 0;
+	       pos = buffer;
+	    }
 
-   if ((size > 3)
-       && (*buffer == '<') && (buffer[1] == '!')
-       && (buffer[2] == '-') && (buffer[3] == '-')) {
-      const char* temp;
-      while ((size > 2) && (temp = static_cast<char*> (memchr (buffer, '-', size)))) {
-	 if ((temp[1] == '-') && (temp[2] == '>'))
-	    return temp + 3;
-
-	 size -= ++temp - buffer;
-	 buffer = temp;
-      } // end-while
-   }
-   return NULL;
+	    TRACE9 ("FileTypeCheckerByContent::skipHTMLComments (char*, unsigned int, std::ifstream&) - Filling up: " << (size - left));
+	    stream.read (buffer + left, size - left);
+	    left += stream.gcount ();
+	 } while (cont);
+      } // endif HTML comment
+      else {
+	 memcpy (buffer, pos, left);
+	 stream.read (buffer + left, size - left);
+	 break;
+      }
+   } while (left);
 }
