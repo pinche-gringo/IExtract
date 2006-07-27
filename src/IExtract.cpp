@@ -284,7 +284,7 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
 Application::Application (const int argc, const char* argv[])
    : YGP::IVIOApplication (argc, argv, lo), options (0), chgFlag (0), iniOpts (),
      writer (NULL), outputStyle (TEXT),
-     fnGetFileType (&FileTypeCheckerByName::getType)
+     fnGetFileType (&FileTypeCheckerByExtension::getType)
 #ifdef ENABLE_THREADS
     , aThreads (0)
 #endif
@@ -365,7 +365,9 @@ void Application::showHelp () const {
       << "\n  -S, --sort ..... ...... " << _("Sort found files alphabetically")
       << "\n  -M, --mode=[MODUS] .... " << _("Modus operandi to determine the file-type:\n"
 	                                     "\t\t\t  Ext: From (last) extension (Default)\n"
-					     "\t\t\t  AllExt: From any extensions (if unknown)\n"
+	                                     "\t\t\t  EXT: From (last) extension (ignoring case)\n"
+					     "\t\t\t  AllExt: From any extension (if unknown)\n"
+					     "\t\t\t  AllEXT: From any extension (ignoring case)\n"
 					     "\t\t\t  Content: From content of the file")
       << "\n  -V, --version ......... " << _("Output version information and exit")
       << "\n  -h, -?, --help ........ " << _("Displays this help and exit\n")
@@ -642,11 +644,19 @@ bool Application::handleOption (const char option) {
    case 'M': {
       std::string mode (getOptionValue ());
       if (mode == "Ext") {
-	 fnGetFileType = &FileTypeCheckerByName::getType;
+	 fnGetFileType = &FileTypeCheckerByExtension::getType;
 	 options &= ~TRUNC_EXTENSION;
       }
       else if (mode == "AllExt") {
-	 fnGetFileType = &FileTypeCheckerByName::getType;
+	 fnGetFileType = &FileTypeCheckerByExtension::getType;
+	 options |= TRUNC_EXTENSION;
+      }
+      else if (mode == "EXT") {
+	 fnGetFileType = &FileTypeCheckerByCaseExt::getType;
+	 options &= ~TRUNC_EXTENSION;
+      }
+      else if (mode == "AllEXT") {
+	 fnGetFileType = &FileTypeCheckerByCaseExt::getType;
 	 options |= TRUNC_EXTENSION;
       }
       else if (mode == "Content") {
