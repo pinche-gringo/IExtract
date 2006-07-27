@@ -49,18 +49,38 @@ class FileTypeChecker {
 };
 
 
-/**Class to check for the class of file (e.g. MS Office document) by
-   the name of the file
+/**Class to check for the type of a file (e.g. MS Office document) by
+   the extension of the file
  */
-class FileTypeCheckerByName : public FileTypeChecker {
+class FileTypeCheckerByExtension : public FileTypeChecker {
+ public:
+   static FileType getType (const char* file);
+
+ protected:
+   static FileType getType4Extension (const char* extension);
+
+ private:
+   FileTypeCheckerByExtension ();
+   FileTypeCheckerByExtension (const FileTypeCheckerByExtension& other);
+   ~FileTypeCheckerByExtension ();
+   const FileTypeCheckerByExtension& operator= (const FileTypeCheckerByExtension& other);
+
+   static std::map<const char*, FileType, lessDereferenced> types;
+};
+
+
+/**Class to check for the type of a file (e.g. MS Office document) by
+   the extension  of the file (ignoring the case)
+ */
+class FileTypeCheckerByCaseExt : public FileTypeCheckerByExtension {
  public:
    static FileType getType (const char* file);
 
  private:
-   FileTypeCheckerByName ();
-   FileTypeCheckerByName (const FileTypeCheckerByName& other);
-   ~FileTypeCheckerByName ();
-   const FileTypeCheckerByName& operator= (const FileTypeCheckerByName& other);
+   FileTypeCheckerByCaseExt ();
+   FileTypeCheckerByCaseExt (const FileTypeCheckerByCaseExt& other);
+   ~FileTypeCheckerByCaseExt ();
+   const FileTypeCheckerByCaseExt& operator= (const FileTypeCheckerByCaseExt& other);
 
    static std::map<const char*, FileType, lessDereferenced> types;
 };

@@ -27,6 +27,7 @@
 
 #include <cctype>
 #include <fstream>
+#include <algorithm>
 
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
@@ -36,7 +37,7 @@
 #include "FileTypeChk.h"
 
 
-std::map<const char*, FileTypeChecker::FileType, FileTypeCheckerByName::lessDereferenced> FileTypeCheckerByName::types;
+std::map<const char*, FileTypeChecker::FileType, FileTypeCheckerByExtension::lessDereferenced> FileTypeCheckerByExtension::types;
 std::map<std::string, FileTypeChecker::FileType> FileTypeCheckerByContent::types;
 
 
@@ -65,9 +66,23 @@ static const unsigned int ID_PKZIP_CENTRALFILEHDR (0x02014b50);
 /// \param file: File to inspect
 /// \returns FileType: Type of file
 //-----------------------------------------------------------------------------
-FileTypeChecker::FileType FileTypeCheckerByName::getType (const char* file) {
+FileTypeChecker::FileType FileTypeCheckerByExtension::getType (const char* file) {
    Check1 (file);
-   TRACE1 ("FileTypeCheckerByName::getType (const char*) - Checking " << file);
+   TRACE1 ("FileTypeCheckerByExtension::getType (const char*) - Checking " << file);
+
+   const char* extension (strrchr (file, '.'));
+   return extension ? getType4Extension (extension + 1) : UNKNOWN;
+}
+
+//-----------------------------------------------------------------------------
+/// Returns the type of the file (e.g. MS Word document) according to
+/// passed extension
+/// \param file: File to inspect
+/// \returns FileType: Type of file
+//-----------------------------------------------------------------------------
+FileTypeChecker::FileType FileTypeCheckerByExtension::getType4Extension (const char* extension) {
+   Check1 (extension);
+   TRACE3 ("FileTypeCheckerByExtension::getType4Extension (const char*) - " << extension);
 
    // Create table of file-types, if not already done
    if (types.empty ()) {
@@ -103,14 +118,29 @@ FileTypeChecker::FileType FileTypeCheckerByName::getType (const char* file) {
       types.insert (types.end (), std::pair<const char*, FileType> ("sxw", OPENOFFICE));
       types.insert (types.end (), std::pair<const char*, FileType> ("xls", MSOFFICE));
 
-      TRACE9 ("FileTypeCheckerByName::getType (const char*) - Knowing types " << types.size ());
+      TRACE9 ("FileTypeCheckerByExtension::getType4Extension (const char*) - Knowing types " << types.size ());
    }
+
+   std::map<const char*, FileType>::const_iterator i (types.find (extension));
+   return i != types.end () ? i->second : UNKNOWN;
+}
+
+
+//-----------------------------------------------------------------------------
+/// Returns the type of the file (e.g. MS Word document) according to
+/// passed file-name (ignoring the case)
+/// \param file: File to inspect
+/// \returns FileType: Type of file
+//-----------------------------------------------------------------------------
+FileTypeChecker::FileType FileTypeCheckerByCaseExt::getType (const char* file) {
+   Check1 (file);
+   TRACE1 ("FileTypeCheckerByCaseExt::getType (const char*) - Checking " << file);
 
    const char* extension (strrchr (file, '.'));
    if (extension) {
-      TRACE3 ("FileTypeCheckerByName::getType (const char*) - Extension " << extension + 1);
-      std::map<const char*, FileType>::const_iterator i (types.find (extension + 1));
-      return i != types.end () ? i->second : UNKNOWN;
+      std::string ext (extension + 1);
+      std::transform (ext.begin (), ext.end (), ext.begin (), tolower);
+      return FileTypeCheckerByExtension::getType4Extension (ext.c_str ());
    }
    return UNKNOWN;
 }
@@ -218,7 +248,8 @@ FileTypeChecker::FileType FileTypeCheckerByContent::getType (const char* file) {
 }
 
 //-----------------------------------------------------------------------------
-/// Skips over HTML-comments and white-spaces
+/// Skips over HTML-comments and white-spaces. The buffer contains afterwards
+/// the first charcter not being a white-space or a HTML-comment.
 /// \param buffer: Buffer to inspect (and maybe re-fill with new data from stream)
 /// \param size: Size of buffer
 /// \param stream: Stream to read from
@@ -249,33 +280,35 @@ void FileTypeCheckerByContent::skipHTMLComments (char* buffer, unsigned int size
 	       TRACE7 ("FileTypeCheckerByContent::skipHTMLComments (char*, unsigned int, std::ifstream&) - EOC: \"" << std::string (pos, (left > 4) ? 5 : left) << '"');
 	       left = size - (pos - buffer);
 	       if (left > 2) {
+		  // Found end-of-comment: Stop parsing and copy remaining
+		  // characters to the beginning of the buffer
 		  if ((pos[1] == '-') && (pos[2] == '>')) {
 		     cont = false;
 		     memcpy (buffer, pos + 3, left - 3);
-		     pos = buffer;
 		  }
 		  else {
+		     // Only minus found; skip and continue
 		     ++pos;
 		     --left;
 		     continue;
 		  }
 	       }
-	       else {
+	       else
+		  // Reached end of buffer; store last unchecked chars
 		  memcpy (buffer, pos, left);
-		  pos = buffer;
-	       }
 	    }
-	    else {
+	    else
+	       // No minus found; re-fill the buffer completely
 	       left = 0;
-	       pos = buffer;
-	    }
 
 	    TRACE9 ("FileTypeCheckerByContent::skipHTMLComments (char*, unsigned int, std::ifstream&) - Filling up: " << (size - left));
 	    stream.read (buffer + left, size - left);
+	    pos = buffer;
 	    left += stream.gcount ();
 	 } while (cont);
       } // endif HTML comment
       else {
+	 // No more whitespaces or comments: Copy data to beginning of buffer
 	 memcpy (buffer, pos, left);
 	 stream.read (buffer + left, size - left);
 	 break;
