@@ -2,7 +2,7 @@
 <!-- $Id$ -->
 
 <!--
-  Copyright (C) 2003 - 2005 Markus Schwab (g17m0@lycos.com)
+  Copyright (C) 2003 - 2006 Markus Schwab (g17m0@lycos.com)
 
   This is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
@@ -348,8 +348,12 @@
 	  <dl>
 	    <dt><b>Ext</b></dt><dd>De la &uacute;ltima extensi&oacute;n del
                nombre.</dd>
+	    <dt><b>EXT</b></dt><dd>De la &uacute;ltima extensi&oacute;n del
+               nombre (sin diferenciar entre may&uacute;sculas y min&uacute;sculas).</dd>
 	    <dt><b>AllExt</b></dt><dd>De la &uacute;ltima extensi&oacute;n
               conocida del nombre.</dd>
+	    <dt><b>AllEXT</b></dt><dd>De la &uacute;ltima extensi&oacute;n
+              conocida del nombre (sin diferenciar entre may&uacute;sculas y min&uacute;sculas).</dd>
 	    <dt><b>Content</b></dt><dd>Del contenido del archivo. Eso busca
 	      para identificaciones caracteristicas de los diferentes
 	      tipos de archivos.</dd>

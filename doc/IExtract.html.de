@@ -2,7 +2,7 @@
 <!-- $Id$ -->
 
 <!--
-  Copyright (C) 2003 - 2005 Markus Schwab (g17m0@lycos.com)
+  Copyright (C) 2003 - 2006 Markus Schwab (g17m0@lycos.com)
 
   This is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
@@ -352,9 +352,16 @@
           wird. Mˆgliche Werte sind:
 
 	  <dl>
-	    <dt><b>Ext</b></dt><dd>Anhand der letzten Dateierweiterung (extension).</dd>
+	    <dt><b>Ext</b></dt><dd>Anhand der letzten Dateierweiterung
+	    (extension).</dd>
+	    <dt><b>EXT</b></dt><dd>Anhand der letzten Dateierweiterung
+	      (extension), wobei nicht zwischen Groﬂ- und
+	      Kleinschreibung unterschieden wird.</dd>
 	    <dt><b>AllExt</b></dt><dd>Anhand der letzten bekannten
-	    Dateierweiterung.</dd>
+	      Dateierweiterung.</dd>
+	    <dt><b>AllEXT</b></dt><dd>Anhand der letzten bekannten
+	      Dateierweiterung, wobei nicht zwischen Groﬂ- und
+	      Kleinschreibung unterschieden wird.</dd>
 	    <dt><b>Content</b></dt><dd>Anhand des Dateiinhalts. Dabei
 	      wird nach bestimmten Zeichenfolgen gesucht, die die
 	      jeweiligen Dateityp characterisieren.</dd>
