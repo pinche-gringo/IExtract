@@ -364,7 +364,10 @@
    MaxAgeForNewFiles=DAYS
    DirSeparatorText=TEXT
    Style=STYLE
-   SortFiles=1</pre>
+   SortFiles=1
+
+   [FileType]
+   Mode=Content</pre>
 
     <p>The same substituations as withhin the options are performed!</p>
 
