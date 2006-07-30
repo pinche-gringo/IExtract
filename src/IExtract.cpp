@@ -165,6 +165,8 @@ class Application : public YGP::IVIOApplication {
    typedef std::pair<FileTypeChecker::FileType, HANDLER> handlerValue;
    handlerMap handlers;
 
+   bool setMode (const std::string& mode);
+
    static void convertFromWideChar (Properties& prop);
 
    void handleFiles (const char* pFile) const;
@@ -418,6 +420,8 @@ void Application::showHelp () const {
       "   DirSeparatorText=%eListing of %n%s\n"
       "   Style=HTML\n"
       "   SortFiles=1\n\n"
+      "   [FileType]\n"
+      "   Mode=Content\n\n"
       << _("Currently supported files are:")
       << "\n"
 #ifdef SUPPORT_HTML
@@ -641,34 +645,14 @@ bool Application::handleOption (const char option) {
       iniOpts.sort = true;
       break;
 
-   case 'M': {
-      std::string mode (getOptionValue ());
-      if (mode == "Ext") {
-	 fnGetFileType = &FileTypeCheckerByExtension::getType;
-	 options &= ~TRUNC_EXTENSION;
-      }
-      else if (mode == "AllExt") {
-	 fnGetFileType = &FileTypeCheckerByExtension::getType;
-	 options |= TRUNC_EXTENSION;
-      }
-      else if (mode == "EXT") {
-	 fnGetFileType = &FileTypeCheckerByCaseExt::getType;
-	 options &= ~TRUNC_EXTENSION;
-      }
-      else if (mode == "AllEXT") {
-	 fnGetFileType = &FileTypeCheckerByCaseExt::getType;
-	 options |= TRUNC_EXTENSION;
-      }
-      else if (mode == "Content") {
-	 fnGetFileType = &FileTypeCheckerByContent::getType;
-	 options &= ~TRUNC_EXTENSION;
-      }
-      else {
-	 std::string error (_("warning: Invalid mode `%1'! Ignoring option 'M'!\n"));
-	 error.replace (error.find ("%1"), 2, mode);
-	 std::cerr << PACKAGE << error;
-      }
-      break; }
+   case 'M':
+      if (checkOptionValue ())
+	 if (setMode (getOptionValue ())) {
+	    std::string error (_("warning: Invalid mode `%1'! Ignoring option 'M'!\n"));
+	    error.replace (error.find ("%1"), 2, getOptionValue ());
+	    std::cerr << PACKAGE << error;
+	 }
+      break;
 
    case 'V': std::cout << description () << '\n'; exit (0);
 
@@ -679,6 +663,42 @@ bool Application::handleOption (const char option) {
    }
    }
    return true;
+}
+
+//-----------------------------------------------------------------------------
+/// Sets the mode how to determine the file-type according to the passed value
+/// \param mode: How to determine the file-type
+///              - Ext: By (last) extension
+///              - AllExt: By any extension (starting from the last)
+///              - EXT: By (last) extension (ignoring case)
+///              - AllEXT: By any extension (ignoring case)
+///              - Content: By the content of the file
+/// \returns bool: True, if the mode is unknown; else false
+//-----------------------------------------------------------------------------
+bool Application::setMode (const std::string& mode) {
+   if (mode == "Ext") {
+      fnGetFileType = &FileTypeCheckerByExtension::getType;
+      options &= ~TRUNC_EXTENSION;
+   }
+   else if (mode == "AllExt") {
+      fnGetFileType = &FileTypeCheckerByExtension::getType;
+      options |= TRUNC_EXTENSION;
+   }
+   else if (mode == "EXT") {
+      fnGetFileType = &FileTypeCheckerByCaseExt::getType;
+      options &= ~TRUNC_EXTENSION;
+   }
+   else if (mode == "AllEXT") {
+      fnGetFileType = &FileTypeCheckerByCaseExt::getType;
+      options |= TRUNC_EXTENSION;
+   }
+   else if (mode == "Content") {
+      fnGetFileType = &FileTypeCheckerByContent::getType;
+      options &= ~TRUNC_EXTENSION;
+   }
+   else
+      return true;
+   return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1146,9 +1166,13 @@ void Application::readINIFile (const char* pFile) {
    Check3 (pFile);
 
    std::string Style;
+   std::string mode;
    try {
       INIFILE (pFile);
       INIOBJ (iniOpts, Output);
+
+      INISECTION (FileType);
+      INIATTR2 (FileType, std::string, mode, Mode);
 
       INIFILE_READ ();
    }
@@ -1178,6 +1202,13 @@ void Application::readINIFile (const char* pFile) {
             std::cerr << PACKAGE << error;
          }
       }
+   }
+
+   if (mode.size () && setMode (mode)) {
+      std::string error (_("-warning: The INI-file `%1' contains an invalid mode to determine the file-type (`%2')! Using text\n"));
+      error.replace (error.find ("%1"), 2, pFile);
+      error.replace (error.find ("%2"), 2, iniOpts.style);
+      std::cerr << PACKAGE << error;
    }
 }
 
