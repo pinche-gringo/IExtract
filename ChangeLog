@@ -1,6 +1,40 @@
+2006-08-02  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.8.01 documented
+
+	* po/de.po, po/en.po, po/es.po:
+	  Added message for -M EXT/AllEXT and the new INI-file options
+
+2006-07-30  Markus Schwab  <g17m0@lycos.com>
+
+	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Added info about new INI-file value [FileType]
+
+	* src/IExtract.cpp:
+	  Mode to determine the file-type can be read from an INI-file
+
+2006-07-27  Markus Schwab  <g17m0@lycos.com>
+
+	* configure.in: Version to 0.8.10
+
+	* README: Minor fix (grammar)
+
+	* po/de.po, po/en.po, po/es.po, doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
+	  Added info about -M EXT and -M AllEXT
+
+	* src/IExtract.cpp: Added values EXT and AllEXT to option -M
+
+	* src/FileTypeChk.cpp, src/FileTypeChk.h:
+	  Added FileTypeCheckerByCaseExt; Renamed FileTypeCheckerByName to -Extension
+
+2006-07-26  Markus Schwab  <g17m0@lycos.com>
+
+	* src/FileTypeChk.cpp, src/FileTypeChk.h:
+	  Fixed check for (content of) HTML docs; Optimised check for OpenOffice (content)
+
 2006-07-22  Markus Schwab  <g17m0@lycos.com>
 
-	* ChangeLog: Changes of V0.8.0 documented
+	* ChangeLog: Changes of V0.8.00 documented
 
 	* po/de.po, po/en.po: Last actualizations for 0.8.00
 
@@ -35,7 +69,7 @@
 
 	* po/de.po, po/en.po, po/es.po: Translations of messages in V0.8.00
 
-	* NEWS: Changes of V0.8.0 documented
+	* NEWS: Changes of V0.8.00 documented
 
 	* configure.in: Version to 0.8.00
 
@@ -70,7 +104,7 @@
 	* src/ParseRTF.cpp, src/ParseRTF.h: Checking if file is RTF-document
 
 	* src/ParseSOffice.cpp, src/ParseSOffice.h:
-	  Checking if file is office-document; Optimized
+	  Checking if file is office-document; Optimised
 
 2006-07-16  Markus Schwab  <g17m0@lycos.com>
 
@@ -125,7 +159,7 @@
 
 	* configure.in: Version to 0.7.13; Needing libYGP 0.8.00
 
-	* po/de.po, po/en.po, po/es.po: Actualized
+	* po/de.po, po/en.po, po/es.po: Actualised
 
 2006-06-05  Markus Schwab  <g17m0@lycos.com>
 
@@ -157,7 +191,7 @@
 
 	* src/ParseJPG.cpp: Fixed compile-warning when compiling with GCC 4.1
 
-	* po/de.po, po/en.po, po/es.po: Actualized
+	* po/de.po, po/en.po, po/es.po: Actualised
 
 2006-03-30  Markus Schwab  <g17m0@lycos.com>
 
@@ -168,7 +202,7 @@
 
 	* ChangeLog, NEWS: Changes of V0.7.10 commented
 
-	* po/de.po, po/en.po, po/es.po: Actualized copyright-message
+	* po/de.po, po/en.po, po/es.po: Actualised copyright-message
 
 	* README: Mentioning configurability of supported file-types
 
@@ -198,14 +232,14 @@
 	* ChangeLog, NEWS: Changes of V0.7.00 commented
 
 	* README:
-	  Actualized JPEG/MS-Office comments; Added OpenOffice 2 documents; Fixes
+	  Actualised JPEG/MS-Office comments; Added OpenOffice 2 documents; Fixes
 
 	* po/de.po, po/en.po, po/es.po: Adapted to new JPEG/MS-Office parser
 
 	* po/POTFILES.in: Renamed ParseWord to ParseMSOffice
 
 	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
-	  Actualized description for JPEG and MS Office documents
+	  Actualised description for JPEG and MS Office documents
 
 	* configure.in: Version to 0.7.00; checking sizes of short/int/long
 
@@ -279,7 +313,7 @@
 	* src/Makefile.am: Added ParseGIF
 
 	* src/ParseGIF.cpp, src/ParseGIF.h:
-	  Generalized reading of extensions; Fixed reading blocks longer than 128 bytes
+	  Generalised reading of extensions; Fixed reading blocks longer than 128 bytes
 
 	* src/ParseGIF.cpp, src/ParseGIF.h: New file.
 
@@ -425,7 +459,7 @@
 
 	* configure.in: Needing libYGP 0.7.00
 
-	* po/en.po, po/es.po, po/de.po: Aktualized
+	* po/en.po, po/es.po, po/de.po: Aktualised
 
 	* doc/IExtract.html.es: Fixed minor spelling mistake
 
@@ -513,9 +547,9 @@
 
 2004-01-22  Markus Schwab  <g17m0@lycos.com>
 
-	* INSTALL: Actualized build-process for Windows
+	* INSTALL: Actualised build-process for Windows
 
-	* po/de.po, po/en.po, po/es.po: Actualized
+	* po/de.po, po/en.po, po/es.po: Actualised
 
 	* Windows/VCExtract.mak: Linking against (static) VCGeneral library
 
@@ -530,7 +564,7 @@
 
 	* configure.in: Version to 0.5.11
 
-	* INSTALL, README: Actualized
+	* INSTALL, README: Actualised
 
 2004-01-04  Markus Schwab  <g17m0@lycos.com>
 
@@ -585,7 +619,7 @@
 	* src/ParseRTF.cpp, src/ParseRTF.h: Blocks can have a following value
 
 	* src/IExtract.cpp:
-	  Handling RTF documents; optimized building of map defining files to handle
+	  Handling RTF documents; optimised building of map defining files to handle
 
 	* src/Makefile.am: ParseRTF added
 
@@ -597,7 +631,7 @@
 
 	* configure.in: Version to 0.4.02
 
-	* po/en.po, po/es.po, po/de.po: Actualized (only line numbers)
+	* po/en.po, po/es.po, po/de.po: Actualised (only line numbers)
 
 	* src/IExtract.cpp, src/ParseHTML.cpp, src/ParseJPG.cpp, src/ParseMP3.cpp, src/ParsePDF.cpp, src/ParseSOffice.cpp, src/ParseWord.cpp, src/Writer.cpp:
 	  Changed comment style to doxygen format
@@ -611,7 +645,7 @@
 
 2003-11-17  Markus Schwab  <g17m0@lycos.com>
 
-	* ChangeLog: Actualized (for V0.4.01)
+	* ChangeLog: Actualised (for V0.4.01)
 
 	* src/IExtract.cpp, src/Options.h, src/ParseHTML.h, src/ParseJPG.cpp, src/ParseJPG.h, src/ParseMP3.cpp, src/ParseMP3.h, src/ParseOOffice.cpp, src/ParseOOffice.h, src/ParsePDF.cpp, src/ParsePDF.h, src/ParseSOffice.cpp, src/ParseSOffice.h, src/ParseWord.cpp, src/ParseWord.h, src/Properties.h, src/Writer.cpp, src/Writer.h:
 	Including Trace.h (instead of Trace_.h)
@@ -648,7 +682,7 @@
 
 	* Windows/IExtract-cfg.h: Versionnr. to 0.4.00
 
-	* README: Actualized to reflect handling of OpenOffice
+	* README: Actualised to reflect handling of OpenOffice
 
 	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
 	  Handling of OpenOffice docs added
@@ -696,7 +730,7 @@
 
 	* Makefile.am: Switched to automake 1.7
 
-	* po/en.po: Actualized
+	* po/en.po: Actualised
 
 	* po/de.po, po/es.po: Removed warning for '%' in a message
 
@@ -719,7 +753,7 @@
 	  Copyright reformated in one line; thanks to gettext
 
 	* po/de.po, po/en.po, po/es.po:
-	  New messages added (for XML); Line numbers actualized
+	  New messages added (for XML); Line numbers actualised
 
 	* doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es:
 	  Features of 0.3.01 docommented
@@ -763,7 +797,7 @@
 
 2003-02-10  Markus Schwab  <g17m0@lycos.com>
 
-	* po/de.po, po/en.po, po/es.po: Actualized
+	* po/de.po, po/en.po, po/es.po: Actualised
 
 2003-02-01  Markus Schwab  <g17m0@lycos.com>
 
@@ -880,19 +914,19 @@
 	* configure.in: Version to 0.2.02
 
 	* src/ParsePDF.cpp, src/ParsePDF.h:
-	  Handling of linearized docus added; Strings can be in hex-format
+	  Handling of linearised docus added; Strings can be in hex-format
 
 	* README: Handling of PDF files commented
 
 	* NEWS: Changes in V0.2.02 commented
 
 	* src/ParsePDF.cpp, src/ParsePDF.h:
-	  Rewritten to better use it for linearized files; works as before
+	  Rewritten to better use it for linearised files; works as before
 
 2002-11-14  Markus Schwab  <g17m0@lycos.com>
 
 	* src/ParsePDF.cpp, src/ParsePDF.h:
-	  Works for not-linearized files and text values
+	  Works for not-linearised files and text values
 
 	* src/ParsePDF.cpp, src/ParsePDF.h: Parsing /Info object added
 
@@ -924,7 +958,7 @@
 
 	* Makefile.am: Typo corrected
 
-	* README: Actualized to reflect Changes up to 0.2.01
+	* README: Actualised to reflect Changes up to 0.2.01
 
 	* Windows/IExtract.dsp, Windows/VCExtract.mak: ParseSOffice added
 
@@ -956,7 +990,7 @@
 	* Windows/IExtract.dsp, Windows/VCExtract.mak:
 	  New classes added
 
-	* src/IExtract.cpp: Using more safe Thread::waitForThread-method
+	* src/IExtract.cpp: Using safer Thread::waitForThread-method
 
 	* configure.in: Type in helpstrings corected
 
@@ -1078,7 +1112,7 @@
 	* src/IExtract.cpp, src/Writer.cpp, src/Writer.h:
 	  Handling of new files added
 
-	* ChangeLog: Actualized for V0.1.00
+	* ChangeLog: Actualised for V0.1.00
 
 	* configure.in: New file.
 

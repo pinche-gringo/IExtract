@@ -1,10 +1,18 @@
+Overview of changes in version 0.8.10:
+
+  - Determining file-type also by (all) extension(s) ignoring case
+  - Reading mode for determining file-type from the INI-file
+  - Optimised determining OpenOffice's file-type
+  - Fixed using content to determine file-type for HTML-documents
+
+
 Overview of changes in version 0.8.00:
 
   - Filetype can be determined by revising content, extension or all extensions
     (thus option -X has been changed to -M AllExt)
   - Further checks of filetypes while parsing
-  - MP3-parser recognizes files with ID3v2-tags (at start)
-  - Optimized StarOffice and OpenOffice parser
+  - MP3-parser recognises files with ID3v2-tags (at start)
+  - Optimised StarOffice and OpenOffice parser
   - Fixed bug parsing PDF documents with a docinfo dictionary without spaces
 
 
@@ -102,7 +110,7 @@ Overview of changes in version 0.5.12:
 
 Overview of changes in version 0.5.11:
 
-  - Actualized info files (README, INSTALL)
+  - Actualised info files (README, INSTALL)
   - Linking with static libYGP (Windows version)
   - Changes for MSVC
 
