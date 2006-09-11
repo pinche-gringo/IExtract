@@ -646,12 +646,14 @@ bool Application::handleOption (const char option) {
       break;
 
    case 'M':
-      if (checkOptionValue ())
-	 if (setMode (getOptionValue ())) {
-	    std::string error (_("warning: Invalid mode `%1'! Ignoring option 'M'!\n"));
-	    error.replace (error.find ("%1"), 2, getOptionValue ());
+      if (checkOptionValue ()) {
+	 const char* mode (getOptionValue ());
+	 if (setMode (mode)) {
+	    std::string error (_("-warning: Invalid mode `%1'! Ignoring option 'M'!\n"));
+	    error.replace (error.find ("%1"), 2, mode);
 	    std::cerr << PACKAGE << error;
 	 }
+      }
       break;
 
    case 'V': std::cout << description () << '\n'; exit (0);
