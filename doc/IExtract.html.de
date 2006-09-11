@@ -137,7 +137,7 @@
       LaTeX (tabular) Format oder als Klartext (sowohl lesbar (durch
       Leerzeichen getrennt) oder bearbeitbar durch Machinen (unter
       Anf&uuml;hrungszeichen, getrennt durch Beistriche)) erfolgen. Beachte,
-      da&szlig; etwaige Sonderzeichen in den ausgelesenen Daten konvertiert
+      dass etwaige Sonderzeichen in den ausgelesenen Daten konvertiert
       werden.</p>
 
     <p>Das Verhalten des Programms wird von einem INI-File (~/.IExtract f&uuml;r
@@ -240,7 +240,7 @@
           gar keine Datei behandelt wurde).
 
           <p>TITEL gibt die Spalten der Ausgaben an; getrennt mit dem vertikalen Strich
-            (&brvbar;); jede Spalte mu&szlig; zumindest ein Zeichen enthalten.</p></td></tr>
+            (&brvbar;); jede Spalte muss zumindest ein Zeichen enthalten.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-s,&nbsp;--separate=TEXT</b></td>
