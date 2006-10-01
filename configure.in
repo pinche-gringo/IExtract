@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.52)
 AC_REVISION($Revision$)
-AC_INIT(IExtract, 0.8.10, [g17m0@lycos.com], IExtract)
+AC_INIT(IExtract, 0.8.11, [g17m0@lycos.com], IExtract)
 
 RELEASE=${PACKAGE_VERSION%.*}
 AC_SUBST(PACKAGE_VERSION)
@@ -24,6 +24,7 @@ AC_LANG(C++)
 AC_PROG_LIBTOOL
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
+AC_GNU_SOURCE
 AM_GNU_GETTEXT
 
 dnl Checks for programs.
@@ -156,7 +157,7 @@ fi
 AM_CONDITIONAL(SUPPORT_MSOFFICE, test "$enable_msoffice" != "no")
 
 
-AC_OUTPUT([Makefile src/Makefile doc/Makefile intl/Makefile po/Makefile.in m4/Makefile ])
+AC_OUTPUT([Makefile src/Makefile doc/Makefile intl/Makefile po/Makefile.in])
 
 dnl Settings for autoheader
 AH_TOP([#ifndef IEXTRACT_CFG_H
