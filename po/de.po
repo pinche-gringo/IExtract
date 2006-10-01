@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.8 ($Revision$)\n"
 "Report-Msgid-Bugs-To: g17m0@lycos.com\n"
-"POT-Creation-Date: 2006-08-01 23:20-0400\n"
+"POT-Creation-Date: 2006-10-01 11:30-0400\n"
 "PO-Revision-Date: 2005-06-04 13:22-0400\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: Aleman <g17m0@lycos.com>\n"
@@ -420,23 +420,23 @@ msgstr ""
 msgid "-error: `%1' is not a (readable) file! Ignoring option `%2'!\n"
 msgstr "-Fehler: \"%1\" ist keine (lesbare) Datei! Ignoriere Option \"%2\"!\n"
 
-#: src/IExtract.cpp:651
-msgid "warning: Invalid mode `%1'! Ignoring option 'M'!\n"
+#: src/IExtract.cpp:652
+msgid "-warning: Invalid mode `%1'! Ignoring option 'M'!\n"
 msgstr "-Warnung: Ungültiger Modus \"%1\"! Ignoriere Option 'M'!\n"
 
-#: src/IExtract.cpp:660
+#: src/IExtract.cpp:662
 msgid "-warning: Ignoring invalid option `%1'\n"
 msgstr "-Warnung: Ignoriere unbekannte Option \"%1\"\n"
 
-#: src/IExtract.cpp:835 src/IExtract.cpp:959
+#: src/IExtract.cpp:837 src/IExtract.cpp:961
 msgid "-error: "
 msgstr "-Fehler: "
 
-#: src/IExtract.cpp:846
+#: src/IExtract.cpp:848
 msgid "Unknown file-type"
 msgstr "Unbekannter Dateityp"
 
-#: src/IExtract.cpp:940
+#: src/IExtract.cpp:942
 msgid ""
 "-error: File `%1' can't be opened!\n"
 "Reason: "
@@ -444,11 +444,11 @@ msgstr ""
 "Datei \"%1\" kann nicht geöffnet werden!\n"
 "Ursache: "
 
-#: src/IExtract.cpp:962
+#: src/IExtract.cpp:964
 msgid "Error while processing: "
 msgstr "Error beim Bearbeiten: "
 
-#: src/IExtract.cpp:1199
+#: src/IExtract.cpp:1201
 msgid ""
 "-warning: The INI-file `%1' contains an invalid entry for the output style (`"
 "%2')! Using text\n"
@@ -456,8 +456,7 @@ msgstr ""
 "-Warnung: Das INI-File \"%1\" enthält einen ungültigen Eintrag für den "
 "Ausgabestil (\"%2\")! Verwende text\n"
 
-#: src/IExtract.cpp:1208
-#, fuzzy
+#: src/IExtract.cpp:1210
 msgid ""
 "-warning: The INI-file `%1' contains an invalid mode to determine the file-"
 "type (`%2')! Using text\n"
