@@ -1,3 +1,9 @@
+Overview of changes in version 0.8.11:
+
+  - Fixed trap, when passing an invalid mode to determine the file-type
+  - Changes for new automake/autoconf
+
+
 Overview of changes in version 0.8.10:
 
   - Determining file-type also by (all) extension(s) ignoring case

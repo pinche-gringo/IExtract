@@ -1,6 +1,23 @@
+2006-10-01  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.8.11 documented
+
+	* Makefile.am: Removed m4 subdirectory
+
+	* configure.in:
+	  Version to 0.8.11; Using AC_GNU_SOURE; Removed m4/Makefile
+
+	* po/de.po, po/en.po, po/es.po: Actualised
+
+2006-09-11  Markus Schwab  <g17m0@lycos.com>
+
+	* doc/IExtract.html.de: Adapted to new grammar
+
+	* src/IExtract.cpp: Fixed trap when passing an invalid option to -M
+
 2006-08-02  Markus Schwab  <g17m0@lycos.com>
 
-	* ChangeLog, NEWS: Changes of V0.8.01 documented
+	* ChangeLog, NEWS: Changes of V0.8.10 documented
 
 	* po/de.po, po/en.po, po/es.po:
 	  Added message for -M EXT/AllEXT and the new INI-file options
