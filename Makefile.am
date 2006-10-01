@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = m4  intl src doc po
+SUBDIRS = intl src doc po
 
 # Add files for windows; don't make own Makefile[.am], as a
 # Windows-compiler might need its own Makefile
