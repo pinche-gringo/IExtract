@@ -42,6 +42,10 @@
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 
+#ifdef ENABLE_DYNHANDLER
+#  include <YGP/Module.h>
+#endif
+
 #ifdef ENABLE_THREADS
 #  include <queue>
 #  include <vector>
@@ -158,11 +162,11 @@ class Application : public YGP::IVIOApplication {
    Application (const Application&);
    const Application& operator= (const Application&);
 
-   typedef void (Application::*HANDLER) (YGP::Xistream& hFile, Properties& result) const;
+   typedef void (*HANDLER) (YGP::Xistream& hFile, Properties& result);
    HANDLER getFileTypeHandler (const char* file) const;
 
-   typedef std::map<FileTypeChecker::FileType, HANDLER> handlerMap;
-   typedef std::pair<FileTypeChecker::FileType, HANDLER> handlerValue;
+   typedef std::map<unsigned int, HANDLER> handlerMap;
+   typedef std::pair<unsigned int, HANDLER> handlerValue;
    handlerMap handlers;
 
    bool setMode (const std::string& mode);
@@ -176,38 +180,38 @@ class Application : public YGP::IVIOApplication {
 #endif
 
 #ifdef SUPPORT_MP3
-   void processMP3 (YGP::Xistream& hFile, Properties& result) const;
+   static void processMP3 (YGP::Xistream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_OGG
-   void processOGG (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
+   static void processOGG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_PDF
-   void processPDF (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
+   static void processPDF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_JPEG
-   void processJPG (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
+   static void processJPG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_PNG
-   void processPNG (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
+   static void processPNG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_GIF
-   void processGIF (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
+   static void processGIF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_HTML
-   void processHTML (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
+   static void processHTML (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_RTF
-   void processRTF (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
+   static void processRTF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_MSOFFICE
-   void processMSOffice (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
+   static void processMSOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_OO
-   void processOpenOffice (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
-   void processStarOffice (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
+   static void processOpenOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+   static void processStarOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
 #endif
 #ifdef SUPPORT_ABIWORD
-   void processAbiword (YGP::Xistream& hFile, Properties& result) const throw (YGP::ParseError);
+   static void processAbiword (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
 #endif
 
    enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4, TRUNC_EXTENSION = 0x8, TERMINATE = 0x10 };
@@ -248,6 +252,12 @@ class Application : public YGP::IVIOApplication {
    } FILEFNC;
    YGP::Mutex           mxListFiles;
    std::queue<FILEFNC>  listFiles;
+#endif
+
+#ifdef ENABLE_DYNHANDLER
+   std::map<std::string, std::string> dynHandlers;
+
+   void setDynamicHandlers ();
 #endif
 };
 
@@ -739,6 +749,10 @@ int Application::perform (int argc, const char* argv[]) {
 
    writer->printStart (std::cout, iniOpts.title);
 
+#ifdef ENABLE_DYNHANDLER
+   setDynamicHandlers ();
+#endif
+
    std::string file;
    for (int j (0); j < argc; ++j) {
       file = argv[j];
@@ -950,7 +964,7 @@ void Application::processFile (const YGP::File& file, HANDLER fnc) const {
 
       try {
          Properties prop;
-         (this->*fnc) ((YGP::Xistream&)ifile, prop);
+         fnc ((YGP::Xistream&)ifile, prop);
          convertFromWideChar (prop);
          LOCKOUTPUT
          writer->printFile (std::cout, file, prop);
@@ -972,13 +986,12 @@ void Application::processFile (const YGP::File& file, HANDLER fnc) const {
 
 #ifdef SUPPORT_HTML
 //-----------------------------------------------------------------------------
-/// Tries to extract the properties of a HTML-document
+/// Tries to extract the properties of an HTML-document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void Application::processHTML (YGP::Xistream& hFile, Properties& result) const
-   throw (YGP::ParseError) {
+void Application::processHTML (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseHTML ().parse (hFile, result);
 }
 #endif
@@ -990,32 +1003,30 @@ void Application::processHTML (YGP::Xistream& hFile, Properties& result) const
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void Application::processPDF (YGP::Xistream& hFile, Properties& result) const
-   throw (YGP::ParseError) {
+void Application::processPDF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParsePDF::parse (hFile, result);
 }
 #endif
 
 #ifdef SUPPORT_MP3
 //-----------------------------------------------------------------------------
-/// Tries to extract the properties of a MP3 file
+/// Tries to extract the properties of an MP3 file
 /// \param hFile: File to processs
 /// \param result: Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processMP3 (YGP::Xistream& hFile, Properties& result) const {
+void Application::processMP3 (YGP::Xistream& hFile, Properties& result) {
    ParseMP3::parse (hFile, result);
 }
 #endif
 
 #ifdef SUPPORT_OGG
 //-----------------------------------------------------------------------------
-/// Tries to extract the properties out of a OGG file
+/// Tries to extract the properties out of an OGG file
 /// \param hFile: File to processs
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void Application::processOGG (YGP::Xistream& hFile, Properties& result) const
-   throw (YGP::ParseError) {
+void Application::processOGG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseOGG::parse (hFile, result);
 }
 #endif
@@ -1027,8 +1038,7 @@ void Application::processOGG (YGP::Xistream& hFile, Properties& result) const
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) const
-   throw (YGP::ParseError) {
+void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseStarOffice ().parse (hFile, result);
 }
 
@@ -1038,8 +1048,7 @@ void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) c
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) const
-   throw (YGP::ParseError) {
+void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseOpenOffice ().parse (hFile, result);
 }
 #endif
@@ -1051,21 +1060,19 @@ void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) c
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void Application::processAbiword (YGP::Xistream& hFile, Properties& result) const
-   throw (YGP::ParseError) {
+void Application::processAbiword (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseAbiword ().parse (hFile, result);
 }
 #endif
 
 #ifdef SUPPORT_RTF
 //-----------------------------------------------------------------------------
-/// Tries to extract the properties of a RTF-document
+/// Tries to extract the properties of an RTF-document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void Application::processRTF (YGP::Xistream& hFile, Properties& result) const
-   throw (YGP::ParseError) {
+void Application::processRTF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    TRACE9 ("Parsing RTF");
    ParseRTF ().parse (hFile, result);
 }
@@ -1073,13 +1080,12 @@ void Application::processRTF (YGP::Xistream& hFile, Properties& result) const
 
 #ifdef SUPPORT_MSOFFICE
 //-----------------------------------------------------------------------------
-/// Tries to extract the properties of a MS-office document
+/// Tries to extract the properties of an MS-office document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) const
-   throw (YGP::ParseError) {
+void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseMSOffice ().parse (hFile, result);
 }
 #endif
@@ -1091,8 +1097,7 @@ void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) con
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void Application::processJPG (YGP::Xistream& hFile, Properties& result) const
-   throw (YGP::ParseError) {
+void Application::processJPG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseJPEG ().parse (hFile, result);
 }
 #endif
@@ -1104,8 +1109,7 @@ void Application::processJPG (YGP::Xistream& hFile, Properties& result) const
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void Application::processPNG (YGP::Xistream& hFile, Properties& result) const
-   throw (YGP::ParseError) {
+void Application::processPNG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParsePNG (result).parse (hFile);
 }
 #endif
@@ -1117,8 +1121,7 @@ void Application::processPNG (YGP::Xistream& hFile, Properties& result) const
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void Application::processGIF (YGP::Xistream& hFile, Properties& result) const
-   throw (YGP::ParseError) {
+void Application::processGIF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseGIF (result).parse (hFile);
 }
 #endif
@@ -1176,6 +1179,9 @@ void Application::readINIFile (const char* pFile) {
       INISECTION (FileType);
       INIATTR2 (FileType, std::string, mode, Mode);
 
+#ifdef ENABLE_DYNHANDLER
+      INIMAP2 (Handler, std::string, dynHandlers);
+#endif
       INIFILE_READ ();
    }
    catch (YGP::FileError&) { }
@@ -1212,7 +1218,49 @@ void Application::readINIFile (const char* pFile) {
       error.replace (error.find ("%2"), 2, iniOpts.style);
       std::cerr << PACKAGE << error;
    }
+
 }
+
+#ifdef ENABLE_DYNHANDLER
+//-----------------------------------------------------------------------------
+/// Adds the dynamic handlers (which are loaded as shared libraries) to the
+/// default handlers (compiled-in).
+///
+/// Errors are reported to std::cerr
+//-----------------------------------------------------------------------------
+void Application::setDynamicHandlers () {
+   TRACE1 ("Application::setDynamicHandlers (std::map<std::string, std::string>&): " << dynHandlers.size ());
+
+   unsigned int offset (FileTypeChecker::LAST);
+   for (std::map<std::string, std::string>::const_iterator i (dynHandlers.begin ());
+	i != dynHandlers.end (); ++i) {
+      try {
+	 YGP::Module mod (i->second.c_str ());
+	 void* symbol (mod.getSymbol ("processFile"));
+	 if (!symbol) {
+	    std::string error (_("Invalid module `%1'!\n"));
+	    error.replace (error.find ("%1"), 2, i->second);
+	    throw YGP::FileError (error);
+	 }
+
+	 // Add handling method
+	 if (fnGetFileType == &FileTypeCheckerByContent::getType) {
+	    symbol = mod.getSymbol ("getFileType");
+	    if (!symbol) {
+	       std::string error (_("Invalid module `%1'!\n"));
+	       error.replace (error.find ("%1"), 2, i->second);
+	       throw YGP::FileError (error);
+	    }
+	    
+	 }
+	 handlers[offset++] = (HANDLER)symbol;
+      }
+      catch (YGP::FileError& e) {
+	 std::cerr << PACKAGE << _("-warning: ") << e.what ();
+      }
+   }
+}
+#endif
 
 
 //-----------------------------------------------------------------------------
