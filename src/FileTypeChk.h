@@ -30,6 +30,31 @@ class FileTypeChecker {
    typedef enum { UNKNOWN, ABIWORD, GIF, HTML, JPEG, MP3, MSOFFICE, OGG,
 		  OPENOFFICE, PDF, PNG, RTF, STAROFFICE, LAST } FileType;
 
+   virtual FileType getType (const char* file) const = 0;
+   virtual ~FileTypeChecker ();
+
+protected:
+   FileTypeChecker () { }
+
+ private:
+   FileTypeChecker (const FileTypeChecker& other);
+   const FileTypeChecker& operator= (const FileTypeChecker& other);
+};
+
+
+/**Class to check for the type of a file (e.g. MS Office document) by
+   the extension of the file
+ */
+class FileTypeCheckerByExtension : public FileTypeChecker {
+ public:
+   FileTypeCheckerByExtension ();
+   ~FileTypeCheckerByExtension ();
+
+   /// Gets the type of the passed file
+   /// \param file: File to analyse
+   /// \returns FileType: Type of file
+   virtual FileType getType (const char* file) const;
+
  protected:
    struct lessDereferenced : public std::binary_function<const char*, const char*, bool> {
    /// Access to the functor
@@ -41,31 +66,16 @@ class FileTypeChecker {
       return strcmp (x, y) < 0; }
    };
 
- private:
-   FileTypeChecker ();
-   FileTypeChecker (const FileTypeChecker& other);
-   ~FileTypeChecker ();
-   const FileTypeChecker& operator= (const FileTypeChecker& other);
-};
-
-
-/**Class to check for the type of a file (e.g. MS Office document) by
-   the extension of the file
- */
-class FileTypeCheckerByExtension : public FileTypeChecker {
- public:
-   static FileType getType (const char* file);
-
- protected:
-   static FileType getType4Extension (const char* extension);
+   /// Gets the file-type defined by the passed extension
+   /// \param file: Extension of file to analyse
+   /// \returns FileType: Type of file
+   FileType getType4Extension (const char* extension) const;
 
  private:
-   FileTypeCheckerByExtension ();
    FileTypeCheckerByExtension (const FileTypeCheckerByExtension& other);
-   ~FileTypeCheckerByExtension ();
    const FileTypeCheckerByExtension& operator= (const FileTypeCheckerByExtension& other);
 
-   static std::map<const char*, FileType, lessDereferenced> types;
+   std::map<const char*, FileType, lessDereferenced> types;
 };
 
 
@@ -74,15 +84,18 @@ class FileTypeCheckerByExtension : public FileTypeChecker {
  */
 class FileTypeCheckerByCaseExt : public FileTypeCheckerByExtension {
  public:
-   static FileType getType (const char* file);
+   /// Defaultconstructor
+   FileTypeCheckerByCaseExt () : FileTypeCheckerByExtension () { }
+   ~FileTypeCheckerByCaseExt ();
+
+   /// Gets the type of the passed file
+   /// \param file: File to analyse
+   /// \returns FileType: Type of file
+   virtual FileType getType (const char* file) const;
 
  private:
-   FileTypeCheckerByCaseExt ();
    FileTypeCheckerByCaseExt (const FileTypeCheckerByCaseExt& other);
-   ~FileTypeCheckerByCaseExt ();
    const FileTypeCheckerByCaseExt& operator= (const FileTypeCheckerByCaseExt& other);
-
-   static std::map<const char*, FileType, lessDereferenced> types;
 };
 
 
@@ -90,17 +103,21 @@ class FileTypeCheckerByCaseExt : public FileTypeCheckerByExtension {
  */
 class FileTypeCheckerByContent : public FileTypeChecker {
  public:
-   static FileType getType (const char* file);
+   FileTypeCheckerByContent ();
+   ~FileTypeCheckerByContent ();
+
+   /// Gets the type of the passed file
+   /// \param file: File to analyse
+   /// \returns FileType: Type of file
+   virtual FileType getType (const char* file) const;
 
  private:
-   FileTypeCheckerByContent ();
    FileTypeCheckerByContent (const FileTypeCheckerByContent& other);
-   ~FileTypeCheckerByContent ();
    const FileTypeCheckerByContent& operator= (const FileTypeCheckerByContent& other);
 
    static void skipHTMLComments (char* buffer, unsigned int size, std::ifstream& stream);
 
-   static std::map<std::string, FileType> types;
+   std::map<std::string, FileType> types;
 };
 
 #endif

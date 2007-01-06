@@ -37,10 +37,6 @@
 #include "FileTypeChk.h"
 
 
-std::map<const char*, FileTypeChecker::FileType, FileTypeCheckerByExtension::lessDereferenced> FileTypeCheckerByExtension::types;
-std::map<std::string, FileTypeChecker::FileType> FileTypeCheckerByContent::types;
-
-
 static const char ID_PDF[]        = "%PDF";
 static const char ID_RTF[]        = "{\\rtf";
 static const char ID_ABIWORD[]    = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE abiword PUBLIC \"-//ABISOURCE//DTD AWML";
@@ -61,14 +57,67 @@ static const unsigned int ID_PKZIP_CENTRALFILEHDR (0x02014b50);
 
 
 //-----------------------------------------------------------------------------
+/// Destructor
+//-----------------------------------------------------------------------------
+FileTypeChecker::~FileTypeChecker () {
+}
+
+
+//-----------------------------------------------------------------------------
+/// Defaultconstructor
+//-----------------------------------------------------------------------------
+FileTypeCheckerByExtension::FileTypeCheckerByExtension () : FileTypeChecker () {
+   // Create table of file-types
+   types.insert (types.end (), std::pair<const char*, FileType> ("abw", ABIWORD));
+   types.insert (types.end (), std::pair<const char*, FileType> ("doc", MSOFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("gif", GIF));
+   types.insert (types.end (), std::pair<const char*, FileType> ("htm", HTML));
+   types.insert (types.end (), std::pair<const char*, FileType> ("html", HTML));
+   types.insert (types.end (), std::pair<const char*, FileType> ("jpeg", JPEG));
+   types.insert (types.end (), std::pair<const char*, FileType> ("jpg", JPEG));
+   types.insert (types.end (), std::pair<const char*, FileType> ("mp3", MP3));
+   types.insert (types.end (), std::pair<const char*, FileType> ("odg", OPENOFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("odp", OPENOFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("ods", OPENOFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("odt", OPENOFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("ogg", OGG));
+   types.insert (types.end (), std::pair<const char*, FileType> ("pdf", PDF));
+   types.insert (types.end (), std::pair<const char*, FileType> ("php", HTML));
+   types.insert (types.end (), std::pair<const char*, FileType> ("png", PNG));
+   types.insert (types.end (), std::pair<const char*, FileType> ("ppt", MSOFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("rtf", RTF));
+   types.insert (types.end (), std::pair<const char*, FileType> ("sda", STAROFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("sdc", STAROFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("sdd", STAROFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("sdw", STAROFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("sht", HTML));
+   types.insert (types.end (), std::pair<const char*, FileType> ("shtm", HTML));
+   types.insert (types.end (), std::pair<const char*, FileType> ("shtml", HTML));
+   types.insert (types.end (), std::pair<const char*, FileType> ("sxc", OPENOFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("sxd", OPENOFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("sxi", OPENOFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("sxm", OPENOFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("sxw", OPENOFFICE));
+   types.insert (types.end (), std::pair<const char*, FileType> ("xls", MSOFFICE));
+   TRACE9 ("FileTypeCheckerByExtension::FileTypeCheckerByExtension () - Known types " << types.size ());
+}
+
+//-----------------------------------------------------------------------------
+/// Destructor
+//-----------------------------------------------------------------------------
+FileTypeCheckerByExtension::~FileTypeCheckerByExtension () {
+}
+
+
+//-----------------------------------------------------------------------------
 /// Returns the type of the file (e.g. MS Word document) according to
 /// passed file-name
 /// \param file: File to inspect
 /// \returns FileType: Type of file
 //-----------------------------------------------------------------------------
-FileTypeChecker::FileType FileTypeCheckerByExtension::getType (const char* file) {
+FileTypeChecker::FileType FileTypeCheckerByExtension::getType (const char* file) const {
    Check1 (file);
-   TRACE1 ("FileTypeCheckerByExtension::getType (const char*) - Checking " << file);
+   TRACE1 ("FileTypeCheckerByExtension::getType (const char*) const - Checking " << file);
 
    const char* extension (strrchr (file, '.'));
    return extension ? getType4Extension (extension + 1) : UNKNOWN;
@@ -80,49 +129,19 @@ FileTypeChecker::FileType FileTypeCheckerByExtension::getType (const char* file)
 /// \param file: File to inspect
 /// \returns FileType: Type of file
 //-----------------------------------------------------------------------------
-FileTypeChecker::FileType FileTypeCheckerByExtension::getType4Extension (const char* extension) {
+FileTypeChecker::FileType FileTypeCheckerByExtension::getType4Extension (const char* extension) const {
    Check1 (extension);
-   TRACE3 ("FileTypeCheckerByExtension::getType4Extension (const char*) - " << extension);
-
-   // Create table of file-types, if not already done
-   if (types.empty ()) {
-      types.insert (types.end (), std::pair<const char*, FileType> ("abw", ABIWORD));
-      types.insert (types.end (), std::pair<const char*, FileType> ("doc", MSOFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("gif", GIF));
-      types.insert (types.end (), std::pair<const char*, FileType> ("htm", HTML));
-      types.insert (types.end (), std::pair<const char*, FileType> ("html", HTML));
-      types.insert (types.end (), std::pair<const char*, FileType> ("jpeg", JPEG));
-      types.insert (types.end (), std::pair<const char*, FileType> ("jpg", JPEG));
-      types.insert (types.end (), std::pair<const char*, FileType> ("mp3", MP3));
-      types.insert (types.end (), std::pair<const char*, FileType> ("odg", OPENOFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("odp", OPENOFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("ods", OPENOFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("odt", OPENOFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("ogg", OGG));
-      types.insert (types.end (), std::pair<const char*, FileType> ("pdf", PDF));
-      types.insert (types.end (), std::pair<const char*, FileType> ("php", HTML));
-      types.insert (types.end (), std::pair<const char*, FileType> ("png", PNG));
-      types.insert (types.end (), std::pair<const char*, FileType> ("ppt", MSOFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("rtf", RTF));
-      types.insert (types.end (), std::pair<const char*, FileType> ("sda", STAROFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("sdc", STAROFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("sdd", STAROFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("sdw", STAROFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("sht", HTML));
-      types.insert (types.end (), std::pair<const char*, FileType> ("shtm", HTML));
-      types.insert (types.end (), std::pair<const char*, FileType> ("shtml", HTML));
-      types.insert (types.end (), std::pair<const char*, FileType> ("sxc", OPENOFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("sxd", OPENOFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("sxi", OPENOFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("sxm", OPENOFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("sxw", OPENOFFICE));
-      types.insert (types.end (), std::pair<const char*, FileType> ("xls", MSOFFICE));
-
-      TRACE9 ("FileTypeCheckerByExtension::getType4Extension (const char*) - Knowing types " << types.size ());
-   }
+   TRACE3 ("FileTypeCheckerByExtension::getType4Extension (const char*) const - " << extension);
 
    std::map<const char*, FileType>::const_iterator i (types.find (extension));
    return i != types.end () ? i->second : UNKNOWN;
+}
+
+
+//-----------------------------------------------------------------------------
+/// Destructor
+//-----------------------------------------------------------------------------
+FileTypeCheckerByCaseExt::~FileTypeCheckerByCaseExt () {
 }
 
 
@@ -132,9 +151,9 @@ FileTypeChecker::FileType FileTypeCheckerByExtension::getType4Extension (const c
 /// \param file: File to inspect
 /// \returns FileType: Type of file
 //-----------------------------------------------------------------------------
-FileTypeChecker::FileType FileTypeCheckerByCaseExt::getType (const char* file) {
+FileTypeChecker::FileType FileTypeCheckerByCaseExt::getType (const char* file) const {
    Check1 (file);
-   TRACE1 ("FileTypeCheckerByCaseExt::getType (const char*) - Checking " << file);
+   TRACE1 ("FileTypeCheckerByCaseExt::getType (const char*) const - Checking " << file);
 
    const char* extension (strrchr (file, '.'));
    if (extension) {
@@ -146,29 +165,40 @@ FileTypeChecker::FileType FileTypeCheckerByCaseExt::getType (const char* file) {
 }
 
 
+
+//-----------------------------------------------------------------------------
+/// Defaultconstructor
+//-----------------------------------------------------------------------------
+FileTypeCheckerByContent::FileTypeCheckerByContent () : FileTypeChecker () {
+   // Create table of file-types
+   types[std::string (ID_PDF, sizeof (ID_PDF) - 1)] = PDF;
+   types[std::string (ID_RTF, sizeof (ID_RTF) - 1)] = RTF;
+   types[std::string (ID_ABIWORD, sizeof (ID_ABIWORD) - 1)] = ABIWORD;
+   types[std::string (ID_ID3, sizeof (ID_ID3) - 1)] = MP3;
+   types[std::string (ID_GIF87, sizeof (ID_GIF87) - 1)] = GIF;
+   types[std::string (ID_GIF89, sizeof (ID_GIF89) - 1)] = GIF;
+   types[std::string (ID_OGG, sizeof (ID_OGG) - 1)] = OGG;
+   types[std::string (ID_JPEG, sizeof (ID_JPEG) - 1)] = JPEG;
+   types[std::string (ID_PNG, sizeof (ID_PNG) - 1)] = PNG;
+   TRACE9 ("FileTypeCheckerByContent::FileTypeCheckerByContent () - Known types " << types.size ());
+}
+
+//-----------------------------------------------------------------------------
+/// Destructor
+//-----------------------------------------------------------------------------
+FileTypeCheckerByContent::~FileTypeCheckerByContent () {
+}
+
+
 //-----------------------------------------------------------------------------
 /// Returns the class of the file (e.g. MS Office document) according
 /// to passed file-name
 /// \param file: File to inspect
 /// \returns FileType: Class of file
 //-----------------------------------------------------------------------------
-FileTypeChecker::FileType FileTypeCheckerByContent::getType (const char* file) {
+FileTypeChecker::FileType FileTypeCheckerByContent::getType (const char* file) const {
    Check1 (file);
-   TRACE1 ("FileTypeCheckerByContent::getType (const char*) - Checking " << file);
-
-   // Create table of file-types, if not already done
-   if (types.empty ()) {
-      types[std::string (ID_PDF, sizeof (ID_PDF) - 1)] = PDF;
-      types[std::string (ID_RTF, sizeof (ID_RTF) - 1)] = RTF;
-      types[std::string (ID_ABIWORD, sizeof (ID_ABIWORD) - 1)] = ABIWORD;
-      types[std::string (ID_ID3, sizeof (ID_ID3) - 1)] = MP3;
-      types[std::string (ID_GIF87, sizeof (ID_GIF87) - 1)] = GIF;
-      types[std::string (ID_GIF89, sizeof (ID_GIF89) - 1)] = GIF;
-      types[std::string (ID_OGG, sizeof (ID_OGG) - 1)] = OGG;
-      types[std::string (ID_JPEG, sizeof (ID_JPEG) - 1)] = JPEG;
-      types[std::string (ID_PNG, sizeof (ID_PNG) - 1)] = PNG;
-      TRACE9 ("FileTypeCheckerByContent::getType (const char*) - Known types " << types.size ());
-   }
+   TRACE1 ("FileTypeCheckerByContent::getType (const char*) const - Checking " << file);
 
    std::ifstream stream (file);
    if (stream) {
