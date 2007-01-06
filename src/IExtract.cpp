@@ -227,7 +227,7 @@ class Application : public YGP::IVIOApplication {
 
    enum { TEXT = 0, QUOTED, HTML, LATEX, XML } outputStyle;
 
-   FileTypeChecker::FileType (*fnGetFileType) (const char*);
+   FileTypeChecker* ftchk;
 
    static const longOptions lo[];
 
@@ -296,7 +296,7 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
 Application::Application (const int argc, const char* argv[])
    : YGP::IVIOApplication (argc, argv, lo), options (0), chgFlag (0), iniOpts (),
      writer (NULL), outputStyle (TEXT),
-     fnGetFileType (&FileTypeCheckerByExtension::getType)
+     ftchk (NULL)
 #ifdef ENABLE_THREADS
     , aThreads (0)
 #endif
@@ -685,31 +685,35 @@ bool Application::handleOption (const char option) {
 ///              - EXT: By (last) extension (ignoring case)
 ///              - AllEXT: By any extension (ignoring case)
 ///              - Content: By the content of the file
-/// \returns bool: True, if the mode is unknown; else false
+/// \returns bool: True, if the passed mode is invalid
 //-----------------------------------------------------------------------------
 bool Application::setMode (const std::string& mode) {
+   FileTypeChecker* newFtchk (NULL);
    if (mode == "Ext") {
-      fnGetFileType = &FileTypeCheckerByExtension::getType;
+      newFtchk = new FileTypeCheckerByExtension;
       options &= ~TRUNC_EXTENSION;
    }
    else if (mode == "AllExt") {
-      fnGetFileType = &FileTypeCheckerByExtension::getType;
+      newFtchk = new FileTypeCheckerByExtension;
       options |= TRUNC_EXTENSION;
    }
    else if (mode == "EXT") {
-      fnGetFileType = &FileTypeCheckerByCaseExt::getType;
+      newFtchk = new FileTypeCheckerByCaseExt;
       options &= ~TRUNC_EXTENSION;
    }
    else if (mode == "AllEXT") {
-      fnGetFileType = &FileTypeCheckerByCaseExt::getType;
+      newFtchk = new FileTypeCheckerByCaseExt;
       options |= TRUNC_EXTENSION;
    }
    else if (mode == "Content") {
-      fnGetFileType = &FileTypeCheckerByContent::getType;
+      newFtchk = new FileTypeCheckerByContent;
       options &= ~TRUNC_EXTENSION;
    }
    else
       return true;
+
+   delete ftchk;
+   ftchk = newFtchk;
    return false;
 }
 
@@ -727,8 +731,11 @@ int Application::perform (int argc, const char* argv[]) {
 
    if ((outputStyle == XML) && !(chgFlag & 1))
       iniOpts.format = DEFAULT_XML_FORMAT;
-
    Check3 (iniOpts.format.size ());
+
+   if (!ftchk)
+      ftchk = new FileTypeCheckerByExtension;
+   Check3 (ftchk);
 
    typedef Writer* (*CREATEWRITER) (const std::string&, const std::string&,
                                     unsigned long);
@@ -1133,9 +1140,9 @@ void Application::processGIF (YGP::Xistream& hFile, Properties& result) throw (Y
 //-----------------------------------------------------------------------------
 Application::HANDLER Application::getFileTypeHandler (const char* file) const {
    TRACE9 ("Application::getFileTypeHandler (const std::string&) - " << file);
-   Check1 (fnGetFileType);
+   Check1 (ftchk);
 
-   FileTypeChecker::FileType type (fnGetFileType (file));
+   FileTypeChecker::FileType type (ftchk->getType (file));
    if (type != FileTypeChecker::UNKNOWN) {
       handlerMap::const_iterator i (handlers.find (type));
       return (i != handlers.end ()) ? i->second : NULL;
@@ -1218,7 +1225,6 @@ void Application::readINIFile (const char* pFile) {
       error.replace (error.find ("%2"), 2, iniOpts.style);
       std::cerr << PACKAGE << error;
    }
-
 }
 
 #ifdef ENABLE_DYNHANDLER
@@ -1244,14 +1250,13 @@ void Application::setDynamicHandlers () {
 	 }
 
 	 // Add handling method
-	 if (fnGetFileType == &FileTypeCheckerByContent::getType) {
+	 if (typeid (*ftchk) == typeid (FileTypeCheckerByContent)) {
 	    symbol = mod.getSymbol ("getFileType");
 	    if (!symbol) {
 	       std::string error (_("Invalid module `%1'!\n"));
 	       error.replace (error.find ("%1"), 2, i->second);
 	       throw YGP::FileError (error);
 	    }
-	    
 	 }
 	 handlers[offset++] = (HANDLER)symbol;
       }
