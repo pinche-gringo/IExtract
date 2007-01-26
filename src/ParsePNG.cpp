@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 2005-08-02
-//COPYRIGHT   : Copyright (C) 2005
+//COPYRIGHT   : Copyright (C) 2005, 2007
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@
 
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
+#include <YGP/Utility.h>
 
-#include "Utility.h"
 #include "ParsePNG.h"
 #include "Properties.h"
 
@@ -91,10 +91,10 @@ ParsePNG::~ParsePNG () {
 int ParsePNG::foundType (const char* type, unsigned int) {
    Check2 (type);
    TRACE9 ("ParsePNG::foundType (const char*, unsigned int) - " << std::hex
-	   << get4BytesMSB (type) << std::dec);
+	   << YGP::get4BytesMSB (type) << std::dec);
    Check2 (_chunk[2] == &skip);
 
-   if (get4BytesMSB (type) == TYPE_TEXT) {
+   if (YGP::get4BytesMSB (type) == TYPE_TEXT) {
       _chunk[2] = &comment;
       comment.setMinCard (skip.getOffset ());
       comment.setMaxCard (skip.getOffset ());
@@ -110,9 +110,9 @@ int ParsePNG::foundType (const char* type, unsigned int) {
 int ParsePNG::foundLength (const char* length, unsigned int) {
    Check2 (length);
    Check3 (!(*length & 0x80));
-   TRACE8 ("ParsePNG::foundLength (const char*, unsigned int) - " << get4BytesMSB (length));
+   TRACE8 ("ParsePNG::foundLength (const char*, unsigned int) - " << YGP::get4BytesMSB (length));
 
-   skip.setOffset (get4BytesMSB (length));
+   skip.setOffset (YGP::get4BytesMSB (length));
    return YGP::ParseObject::PARSE_OK;
 }
 

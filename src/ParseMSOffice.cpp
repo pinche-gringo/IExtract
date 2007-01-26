@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 8.10.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2006
+//COPYRIGHT   : Copyright (C) 2002 - 2007
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,8 +40,8 @@
 
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
+#include <YGP/Utility.h>
 
-#include "Utility.h"
 #include "ParseMSOffice.h"
 #include "Properties.h"
 
@@ -85,18 +85,18 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (YGP
       throw (YGP::ParseError (_("Office identifier not found!")));
 
    // Blocksizes
-   UINT16 sizeBlock (get2BytesLSB (header + 0x1e));
-   UINT16 sizeBlockSmall (get2BytesLSB (header + 0x20));
+   UINT16 sizeBlock (YGP::get2BytesLSB (header + 0x1e));
+   UINT16 sizeBlockSmall (YGP::get2BytesLSB (header + 0x20));
    TRACE8 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Sizes: " << (1 << sizeBlock) << '/' << (1 << sizeBlockSmall));
    if ((sizeBlockSmall > sizeBlock) || (sizeBlock > 512))
       throw (YGP::ParseError (_("Values for blocksizes are not plausible!")));
 
    // Count of BAT blocks and offset of properties
-   UINT32 cBAT (get4BytesLSB (header + 0x2c));
+   UINT32 cBAT (YGP::get4BytesLSB (header + 0x2c));
    if (cBAT > 109)
       throw (YGP::ParseError (_("Number of blocks for BAT not plausible!")));
 
-   UINT32 offProperties (get4BytesLSB (header + 0x30));
+   UINT32 offProperties (YGP::get4BytesLSB (header + 0x30));
    TRACE6 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Properties: " << std::hex
 	   << offProperties << " -> " << ((offProperties << sizeBlock) + 512));
 
@@ -105,14 +105,14 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (YGP
    readBlock (stream, offProperties, block, sizeBlock);
 
    // First entry must be the root-entry (which has a pointer to the small block area
-   if ((get2BytesLSB (block + 0x40) != 0x16) || memcmp (block, ROOTENTRY, 0x16)) {
+   if ((YGP::get2BytesLSB (block + 0x40) != 0x16) || memcmp (block, ROOTENTRY, 0x16)) {
       delete [] block;
       snprintf (header, sizeof (header), "%p", (void*)((offProperties << sizeBlock) + 512));
       std::string error (_("Not a property block at offset %1!"));
       error.replace (error.find ("%1"), 2, header);
       throw (YGP::ParseError (error));
    }
-   UINT32 offSBA (get4BytesLSB (block + 0x74));
+   UINT32 offSBA (YGP::get4BytesLSB (block + 0x74));
 
    // Read the block array table
    UINT32* pBAT (new UINT32 [(cBAT << sizeBlock) >> 2]);
@@ -130,12 +130,12 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (YGP
       char* infoBlock (NULL);
       try {
 	 while (entry < (block + (1 << sizeBlock))) {
-	    TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Entry with " << std::hex << get2BytesLSB (entry + 0x40) << " bytes");
+	    TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Entry with " << std::hex << YGP::get2BytesLSB (entry + 0x40) << " bytes");
 
 	    // Check for InformationSummary-block
-	    if ((get2BytesLSB (entry + 0x40) == 0x28) && !memcmp (entry, SUMMARY, 0x28)) {
-	       INT32 length (get4BytesLSB (entry + 0x78));
-	       UINT32 offBlock (get4BytesLSB (entry + 0x74));
+	    if ((YGP::get2BytesLSB (entry + 0x40) == 0x28) && !memcmp (entry, SUMMARY, 0x28)) {
+	       INT32 length (YGP::get4BytesLSB (entry + 0x78));
+	       UINT32 offBlock (YGP::get4BytesLSB (entry + 0x74));
 	       TRACE8 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Info in " << std::hex
 		       << offBlock << std::dec << "; " << length << " bytes");
 
@@ -147,8 +147,8 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (YGP
 
 		  try {
 		     // Read SBAT table
-		     pSBAT = (UINT32*)readFile (stream, get4BytesLSB (header + 0x3c), pBAT,
-						get4BytesLSB (header + 0x40), sizeBlock);
+		     pSBAT = (UINT32*)readFile (stream, YGP::get4BytesLSB (header + 0x3c), pBAT,
+						YGP::get4BytesLSB (header + 0x40), sizeBlock);
 
 		     unsigned int cBlocks ((length & ((1 << sizeBlock) - 1))
 					   ? ((((length >> sizeBlock)) + 1))
@@ -196,47 +196,47 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (YGP
 
 	       // Check info-block
 	       char* actPos (infoBlock);
-	       TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - InfoSummary: " << std::hex << get2BytesLSB (infoBlock) << std::dec);
-	       if ((get2BytesLSB (infoBlock) != 0xfffe)
+	       TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - InfoSummary: " << std::hex << YGP::get2BytesLSB (infoBlock) << std::dec);
+	       if ((YGP::get2BytesLSB (infoBlock) != 0xfffe)
 		   || memcmp (infoBlock + 0x18, SECTIONID, 0x14))
 		  throw YGP::ParseError (_("Not an Information-Summary section!"));
 
-	       TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Start section: " << std::hex << get4BytesLSB (infoBlock + 0x2c) << std::dec);
-	       actPos = infoBlock + get4BytesLSB (infoBlock + 0x2c);
-	       unsigned int entries (get4BytesLSB (actPos + 4));
+	       TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Start section: " << std::hex << YGP::get4BytesLSB (infoBlock + 0x2c) << std::dec);
+	       actPos = infoBlock + YGP::get4BytesLSB (infoBlock + 0x2c);
+	       unsigned int entries (YGP::get4BytesLSB (actPos + 4));
 	       TRACE3 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Entries: " << entries);
 	       if (entries > 50)
 		  throw YGP::ParseError (_("Number of information entries not plausible!"));
 
 	       entry = actPos + 8;
 	       while (entries--) {
-		  UINT32 offset (get4BytesLSB (entry + 4));
-		  TRACE7 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Entry: " << get4BytesLSB (entry) << ": Offset " << std::hex << offset << std::dec);
+		  UINT32 offset (YGP::get4BytesLSB (entry + 4));
+		  TRACE7 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Entry: " << YGP::get4BytesLSB (entry) << ": Offset " << std::hex << offset << std::dec);
 
-		  if ((offset >= get4BytesLSB (actPos))
-		      || ((get4BytesLSB (actPos + offset) == 0x1e)
-			  ? ((get4BytesLSB (actPos + offset + 4) >= get4BytesLSB (actPos))
-			     || (offset < (get4BytesLSB (actPos + 4) << 3)))
+		  if ((offset >= YGP::get4BytesLSB (actPos))
+		      || ((YGP::get4BytesLSB (actPos + offset) == 0x1e)
+			  ? ((YGP::get4BytesLSB (actPos + offset + 4) >= YGP::get4BytesLSB (actPos))
+			     || (offset < (YGP::get4BytesLSB (actPos + 4) << 3)))
 			  : false))
 		     throw YGP::ParseError (_("Values of entry not plausible!"));
 
-		  switch (get4BytesLSB (entry)) {
+		  switch (YGP::get4BytesLSB (entry)) {
 		  case TYPE_TITLE:
-		     Check3 (actPos[offset + 8 + get4BytesLSB (actPos + offset + 4) - 1] == '\0');
+		     Check3 (actPos[offset + 8 + YGP::get4BytesLSB (actPos + offset + 4) - 1] == '\0');
 		     result.strTitle.assign (actPos + offset + 8,
-					     get4BytesLSB (actPos + offset + 4) - 1);
+					     YGP::get4BytesLSB (actPos + offset + 4) - 1);
 		     break;
 
 		  case TYPE_AUTHOR:
-		     Check3 (actPos[offset + 8 + get4BytesLSB (actPos + offset + 4) - 1] == '\0');
+		     Check3 (actPos[offset + 8 + YGP::get4BytesLSB (actPos + offset + 4) - 1] == '\0');
 		     result.strAuthor.assign (actPos + offset + 8,
-					      get4BytesLSB (actPos + offset + 4) - 1);
+					      YGP::get4BytesLSB (actPos + offset + 4) - 1);
 		     break;
 
 		  case TYPE_COMMENT:
-		     Check3 (actPos[offset + 8 + get4BytesLSB (actPos + offset + 4) - 1] == '\0');
+		     Check3 (actPos[offset + 8 + YGP::get4BytesLSB (actPos + offset + 4) - 1] == '\0');
 		     result.strComment.assign (actPos + offset + 8,
-					       get4BytesLSB (actPos + offset + 4) - 1);
+					       YGP::get4BytesLSB (actPos + offset + 4) - 1);
 
 		     break;
 		  } // end-switch
@@ -305,7 +305,7 @@ void ParseMSOffice::readBAT (YGP::Xistream& stream, char* pBAT, const char* pBAT
    Check1 (pBAT);
 
    for (unsigned int i (0); i < cBlocks; ++i)
-      readBlock (stream, get4BytesLSB (pBATBlocks + (i << 2)), pBAT + (i << sizeBlock), sizeBlock);
+      readBlock (stream, YGP::get4BytesLSB (pBATBlocks + (i << 2)), pBAT + (i << sizeBlock), sizeBlock);
 }
 
 //-----------------------------------------------------------------------------

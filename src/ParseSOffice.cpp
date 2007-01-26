@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 04.11.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2006
+//COPYRIGHT   : Copyright (C) 2002 - 2007
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@
 
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
+#include <YGP/Utility.h>
 
-#include "Utility.h"
 #include "Properties.h"
 #include "ParseSOffice.h"
 
@@ -109,9 +109,9 @@ int ParseStarOffice::foundValue (const char* pTitle, unsigned int len) {
 //-----------------------------------------------------------------------------
 int ParseStarOffice::foundLength (const char* pLength, unsigned int) {
    TRACE5 ("ParseStarOffice::foundLength (const char*, unsigned int) - "
-           << get2BytesLSB (pLength));
+           << YGP::get2BytesLSB (pLength));
    Check3 (pLength);
    actEntry = (enum types)((int)actEntry + 1);
-   value.setMaxCard (get2BytesLSB (pLength));
+   value.setMaxCard (YGP::get2BytesLSB (pLength));
    return YGP::ParseObject::PARSE_OK;
 }

@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 20.03.2005
-//COPYRIGHT   : Copyright (C) 2005, 2006
+//COPYRIGHT   : Copyright (C) 2005 - 2007
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,8 +30,8 @@
 #include <cstring>
 
 #include <YGP/Trace.h>
+#include <YGP/Utility.h>
 
-#include "Utility.h"
 #include "ParseOGG.h"
 #include "Properties.h"
 
@@ -108,8 +108,8 @@ int ParseOGG::foundNrSegments (const char* nr, unsigned int) {
 //-----------------------------------------------------------------------------
 int ParseOGG::foundLenVendorString (const char* nr, unsigned int) {
    Check1 (nr);
-   TRACE8 ("ParseOGG::foundLenVendorString (const char*, unsigned int): " << get4BytesLSB (nr));
-   skip.setOffset (get4BytesLSB (nr));
+   TRACE8 ("ParseOGG::foundLenVendorString (const char*, unsigned int): " << YGP::get4BytesLSB (nr));
+   skip.setOffset (YGP::get4BytesLSB (nr));
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -120,7 +120,7 @@ int ParseOGG::foundLenVendorString (const char* nr, unsigned int) {
 //-----------------------------------------------------------------------------
 int ParseOGG::foundNrComments (const char* nr, unsigned int) {
    Check1 (nr);
-   unsigned int len (get4BytesLSB (nr));
+   unsigned int len (YGP::get4BytesLSB (nr));
    TRACE8 ("ParseOGG::foundNrComments (const char*, unsigned int): " << len);
    seqComment.setMaxCard (len);
    seqComment.setMinCard (len);
@@ -134,7 +134,7 @@ int ParseOGG::foundNrComments (const char* nr, unsigned int) {
 //-----------------------------------------------------------------------------
 int ParseOGG::foundLenComment (const char* nr, unsigned int) {
    Check1 (nr);
-   unsigned int len (get4BytesLSB (nr));
+   unsigned int len (YGP::get4BytesLSB (nr));
    TRACE8 ("ParseOGG::foundLenComment (const char*, unsigned int): " << len);
    txtEntry.setMaxCard (len);
    txtEntry.setMinCard (len);

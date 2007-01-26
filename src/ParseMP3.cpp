@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 15.01.2003
-//COPYRIGHT   : Copyright (C) 2003 - 2006
+//COPYRIGHT   : Copyright (C) 2003 - 2007
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,10 +25,12 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
+#include <IExtract-cfg.h>
+
 #include <YGP/Trace.h>
 #include <YGP/Exception.h>
+#include <YGP/Utility.h>
 
-#include "Utility.h"
 #include "Properties.h"
 
 #include "ParseMP3.h"
@@ -64,7 +66,7 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::Par
    char buffer[10] = "\0";
    stream.read (buffer, sizeof (buffer));
    if (memcmp (buffer, "ID3", 3)) {
-      if ((get2BytesLSB (buffer) & ID_MP3) != ID_MP3)
+      if ((YGP::get2BytesLSB (buffer) & ID_MP3) != ID_MP3)
 	 throw YGP::ParseError (_("MP3-ID not found"));
    }
    else {
@@ -74,7 +76,7 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::Par
       const char* pos (id3);
 
       // Check for ID3v2.3 or above
-      if (get2BytesLSB (buffer + 3) > 0x02) {
+      if (YGP::get2BytesLSB (buffer + 3) > 0x02) {
 	 // Check if an extended header is present
 	 if ((buffer[5] & 0x40) == 0x40) {
 	    stream.read (buffer, 4);
@@ -94,12 +96,12 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::Par
 	 stream.read (id3, lenID3);
 
 	 while (static_cast<unsigned int> (pos - id3) < lenID3) {
-	    unsigned int len (get4BytesMSB (pos + 4));
+	    unsigned int len (YGP::get4BytesMSB (pos + 4));
 	    // Sometimes the length seems to be 7bit encoded, so correct, if so
 	    if (len > (lenID3 - (pos - id3)))
 	       break;
 
-	    switch (get4BytesLSB (pos)) {
+	    switch (YGP::get4BytesLSB (pos)) {
 	    case 0x32544954:                                        // TIT2-tag
 	       result.strTitle = getString (pos + 10, len);
 	       break;
@@ -183,7 +185,7 @@ std::string ParseMP3::strip (std::string& value, unsigned int pos, unsigned int 
 //-----------------------------------------------------------------------------
 unsigned int ParseMP3::getLength (const char* value) {
    Check1 (value);
-   TRACE5 ("ParseMP3::getLength (const char*) - " << std::hex << get4BytesLSB (value) << std::dec);
+   TRACE5 ("ParseMP3::getLength (const char*) - " << std::hex << YGP::get4BytesLSB (value) << std::dec);
 
    unsigned int rc ((unsigned char)*value);
    for (unsigned int i (0); i < 3; ++i) {
@@ -202,16 +204,16 @@ unsigned int ParseMP3::getLength (const char* value) {
 //-----------------------------------------------------------------------------
 std::string ParseMP3::getString (const char* value, unsigned int length) {
    Check1 (value);
-   TRACE7 ("ParseMP3::getString (const char*, unsigned int) - " << std::hex << get4BytesMSB (value) << std::dec);
+   TRACE7 ("ParseMP3::getString (const char*, unsigned int) - " << std::hex << YGP::get4BytesMSB (value) << std::dec);
 
    switch (*value) {
    case '\0':
-      if (get2BytesLSB (value + 1)) {
+      if (YGP::get2BytesLSB (value + 1)) {
 	 ++value;
 	 --length;
       }
       else {
-	 unsigned int newLen (get2BytesLSB (value + 3) - 1);
+	 unsigned int newLen (YGP::get2BytesLSB (value + 3) - 1);
 	 if (newLen < length) {
 	    length = newLen;
 	    value += 5;

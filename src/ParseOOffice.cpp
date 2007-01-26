@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 17.06.2003
-//COPYRIGHT   : Copyright (C) 2003 - 2006
+//COPYRIGHT   : Copyright (C) 2003 - 2007
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@
 #include <YGP/Trace.h>
 
 #include <IExtract-cfg.h>
+#include <YGP/Utility.h>
 
-#include "Utility.h"
 #include "Properties.h"
 #include "ParseOOffice.h"
 
@@ -190,9 +190,9 @@ int ParseOpenOffice::foundValue (const char* pValue, unsigned int len) {
 int ParseOpenOffice::foundOffsetCDR (const char* pValue, unsigned int len) {
    Check1 (pValue);
    TRACE5 ("ParseOpenOffice::foundOffsetCBR (const char*, unsigned int) - Value: "
-           << std::hex << get4BytesLSB (pValue) << std::dec);
+           << std::hex << YGP::get4BytesLSB (pValue) << std::dec);
 
-   skip.setOffset (get4BytesLSB (pValue));
+   skip.setOffset (YGP::get4BytesLSB (pValue));
    skip.setWay (std::ios::beg);
    skip2.setOffset (24);
    skip2.setWay (std::ios::cur);
@@ -207,8 +207,8 @@ int ParseOpenOffice::foundOffsetCDR (const char* pValue, unsigned int len) {
 //----------------------------------------------------------------------------
 int ParseOpenOffice::foundNrEntries (const char* pValue, unsigned int len) {
    Check1 (pValue);
-   TRACE5 ("ParseOpenOffice::foundNrEntries (const char*, unsigned int) - Value: " << get2BytesLSB (pValue));
-   seqCDREntries.setMaxCard (get2BytesLSB (pValue));
+   TRACE5 ("ParseOpenOffice::foundNrEntries (const char*, unsigned int) - Value: " << YGP::get2BytesLSB (pValue));
+   seqCDREntries.setMaxCard (YGP::get2BytesLSB (pValue));
    skip2.setOffset (4);
    return YGP::ParseObject::PARSE_OK;
 }
@@ -221,8 +221,8 @@ int ParseOpenOffice::foundNrEntries (const char* pValue, unsigned int len) {
 //----------------------------------------------------------------------------
 int ParseOpenOffice::foundLenName (const char* pValue, unsigned int len) {
    Check1 (pValue);
-   TRACE5 ("ParseOpenOffice::foundLenName (const char*, unsigned int) - Value: " << get2BytesLSB (pValue));
-   len = get2BytesLSB (pValue);
+   TRACE5 ("ParseOpenOffice::foundLenName (const char*, unsigned int) - Value: " << YGP::get2BytesLSB (pValue));
+   len = YGP::get2BytesLSB (pValue);
    name.setMinCard (len);
    name.setMaxCard (len);
    skip.setOffset (8);
@@ -238,8 +238,8 @@ int ParseOpenOffice::foundLenName (const char* pValue, unsigned int len) {
 //----------------------------------------------------------------------------
 int ParseOpenOffice::foundLength (const char* pValue, unsigned int len) {
    Check1 (pValue);
-   TRACE5 ("ParseOpenOffice::foundLength (const char*, unsigned int) - Value: " << get2BytesLSB (pValue));
-   skip.setOffset (get2BytesLSB (pValue) + skip.getOffset ());
+   TRACE5 ("ParseOpenOffice::foundLength (const char*, unsigned int) - Value: " << YGP::get2BytesLSB (pValue));
+   skip.setOffset (YGP::get2BytesLSB (pValue) + skip.getOffset ());
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -269,7 +269,7 @@ int ParseOpenOffice::foundName (const char* pValue, unsigned int len) {
 int ParseOpenOffice::foundOffsetFile (const char* pValue, unsigned int len) {
    Check1 (pValue);
    TRACE5 ("ParseOpenOffice::foundOffsetFile (const char*, unsigned int) - "
-           << std::hex << get4BytesLSB (pValue) << std::dec);
-   posMetaInfo.setOffset (get4BytesLSB (pValue));
+           << std::hex << YGP::get4BytesLSB (pValue) << std::dec);
+   posMetaInfo.setOffset (YGP::get4BytesLSB (pValue));
    return YGP::ParseObject::PARSE_OK;
 }

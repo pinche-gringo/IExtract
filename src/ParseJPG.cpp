@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 17.10.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2005
+//COPYRIGHT   : Copyright (C) 2002 - 2007
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@
 // special characters!
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
+#include <YGP/Utility.h>
 
-#include "Utility.h"
 #include "ParseJPG.h"
 #include "Properties.h"
 
@@ -211,7 +211,7 @@ int ParseJPEG::foundCommentPhotoShop (const char* pTitle, unsigned int len) {
 	 ++pAct;
          do {
             TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Type: *"
-                    << std::hex << (unsigned int)pAct << " = " << get4BytesLSB (pAct) << std::dec);
+                    << std::hex << (unsigned int)pAct << " = " << YGP::get4BytesLSB (pAct) << std::dec);
 
             static std::string Properties::* values[] = { &Properties::strTitle,
                                                           &Properties::strComment,
@@ -250,8 +250,8 @@ int ParseJPEG::foundCommentPhotoShop (const char* pTitle, unsigned int len) {
 int ParseJPEG::foundLengthLSB (const char* length, unsigned int) {
    Check3 (length);
    TRACE8 ("ParseJPEG::foundLengthLSB (const char*, unsigned int): " << lengths[1]
-	   << " = 0x" << std::hex << get2BytesLSB (length) << std::dec);
-   foundLength (get2BytesLSB (length) - 2);
+	   << " = 0x" << std::hex << YGP::get2BytesLSB (length) << std::dec);
+   foundLength (YGP::get2BytesLSB (length) - 2);
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -278,8 +278,8 @@ unsigned long ParseJPEG::foundLength (unsigned int length) {
 int ParseJPEG::foundLengthMSB (const char* length, unsigned int) {
    Check3 (length);
    TRACE8 ("ParseJPEG::foundLengthMSB (const char*, unsigned int): " << lengths[1]
-	   << " = 0x" << std::hex << get2BytesMSB (length) << std::dec);
-   foundLength (get2BytesMSB (length) - 2);
+	   << " = 0x" << std::hex << YGP::get2BytesMSB (length) << std::dec);
+   foundLength (YGP::get2BytesMSB (length) - 2);
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -313,10 +313,10 @@ bool ParseJPEG::supportedLength4 (unsigned int length) {
 //-----------------------------------------------------------------------------
 int ParseJPEG::foundLengthLSB4 (const char* length, unsigned int) {
    Check3 (length);
-   TRACE8 ("ParseJPEG::foundLengthLSB4 (const char*, unsigned int): " << get4BytesLSB (length)
-	   << " = 0x" << std::hex << get4BytesLSB (length) << std::dec);
+   TRACE8 ("ParseJPEG::foundLengthLSB4 (const char*, unsigned int): " << YGP::get4BytesLSB (length)
+	   << " = 0x" << std::hex << YGP::get4BytesLSB (length) << std::dec);
 
-   supportedLength4 (get4BytesLSB (length));
+   supportedLength4 (YGP::get4BytesLSB (length));
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -328,9 +328,9 @@ int ParseJPEG::foundLengthLSB4 (const char* length, unsigned int) {
 int ParseJPEG::foundLengthMSB4 (const char* length, unsigned int) {
    Check3 (length);
    TRACE8 ("ParseJPEG::foundLengthMSB4 (const char*, unsigned int): " << lengths[1]
-	   << " = 0x" << std::hex << get4BytesMSB (length) << std::dec);
+	   << " = 0x" << std::hex << YGP::get4BytesMSB (length) << std::dec);
 
-   supportedLength4 (get4BytesMSB (length));
+   supportedLength4 (YGP::get4BytesMSB (length));
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -341,7 +341,7 @@ int ParseJPEG::foundLengthMSB4 (const char* length, unsigned int) {
 //-----------------------------------------------------------------------------
 int ParseJPEG::foundNumber (const char* nr, unsigned int) {
    Check3 (nr);
-   cEntries = ((_seqIFD[1] == &lengthMSB4) ? get2BytesMSB (nr) : get2BytesLSB (nr));
+   cEntries = ((_seqIFD[1] == &lengthMSB4) ? YGP::get2BytesMSB (nr) : YGP::get2BytesLSB (nr));
    TRACE8 ("ParseJPEG::foundNumber (const char*, unsigned int): " << cEntries);
 
    skipLen.setOffset (4);
@@ -382,7 +382,7 @@ int ParseJPEG::foundType (const char* pType, unsigned int) {
 int ParseJPEG::foundOffset (const char* pOffset, unsigned int len) {
    Check3 (pOffset);
    if (actEntry != -1U) {
-      offsets[actEntry] = get4BytesLSB (pOffset);
+      offsets[actEntry] = YGP::get4BytesLSB (pOffset);
       TRACE8 ("ParseJPEG::foundOffset (const char*, unsigned int) - " << offsets[actEntry]
               << " (0x" << std::hex << offsets[actEntry] << std::dec << ')');
    }
