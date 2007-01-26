@@ -21,7 +21,7 @@
 
 
 // Structure holding the properties of a file
-struct Properties  {
+struct Properties {
    std::string strTitle;
    std::string strComment;
    std::string strAuthor;
