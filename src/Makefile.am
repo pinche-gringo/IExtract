@@ -1,5 +1,5 @@
 ## Process this file with automake to produce Makefile.in
-SUBDIRS = Plugins
+DIST_SUBDIRS = Plugins
 
 SRC_ABIWORD=ParseAbiword.cpp ParseAbiword.h
 if SUPPORT_ABIWORD
