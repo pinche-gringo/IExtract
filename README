@@ -3,7 +3,7 @@
 
 
 Utility to extract the description out of certain file-types
-Copyright (C) 2002 - 2006 Markus Schwab <g17m0@lycos.com>
+Copyright (C) 2002 - 2007 Markus Schwab <g17m0@lycos.com>
 -----------------------------------------------------------------------
 
 
@@ -66,6 +66,8 @@ configuring).
 
   - Abiword documents (*.abw): Extracts the contents of the property dialog
 
+  - Other types can easily be added by the use of plug-ins (see below)
+
 
 Feel free to report/send me any not-working documents or suggest other files,
 which you like to be supported.
@@ -80,6 +82,22 @@ The extraction of the description can be performed with threads. Note that this
 can actually cause the program to be slower, if the thread searching for files
 doesn't find enough files to be processed. And it does definitely *not* speed
 things up on single-processor systems!
+
+
+Plug-ins
+--------
+
+IExtract can use plug-ins to support further file-formats. A plug-in is a
+shared library (DLL), which must contain a function called "processFile" and
+- if the contents of the file determines its type - another one called
+"getFileType" - which either extracts respectively checks a file. An example
+can be found in src/Plugins/Text.cpp
+
+These shared libraries are added by a "Handler"-section in an INI-file:
+
+  [Handler]
+  txt=libText
+  db=libDB
 
 
 Installation
@@ -114,5 +132,5 @@ If you report a bug, please be sure to add anything which might be of use! Like
   - The version of the used libYGP library.
   - How to reproduce the bug; a file provocing it would be great.
   - In case of a crash there should also be a stackdump in your systemlog which
-    might help in localizing the bug.
+    might help in localising the bug.
   - Anything else you think might be helpful.
