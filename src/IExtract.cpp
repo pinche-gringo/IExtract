@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 10.08.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2006
+//COPYRIGHT   : Copyright (C) 2002 - 2007
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,8 +42,11 @@
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 
-#ifdef ENABLE_DYNHANDLER
+#ifdef ENABLE_PLUGINS
 #  include <YGP/Module.h>
+
+const char* PLUGIN_PROCESS ("processFile");
+const char* PLUGIN_CHECKTYPE ("getFileType");
 #endif
 
 #ifdef ENABLE_THREADS
@@ -75,11 +78,11 @@
 #include <YGP/PathSrch.h>
 #include <YGP/IVIOAppl.h>
 #include <YGP/SortDirSrch.h>
+#include <YGP/FileTypeChk.h>
 
 #include "Writer.h"
 #include "Options.h"
 #include "Properties.h"
-#include "FileTypeChk.h"
 
 #ifdef SUPPORT_MP3
 #  include "ParseMP3.h"
@@ -227,7 +230,7 @@ class Application : public YGP::IVIOApplication {
 
    enum { TEXT = 0, QUOTED, HTML, LATEX, XML } outputStyle;
 
-   FileTypeChecker* ftchk;
+   YGP::FileTypeChecker* ftchk;
 
    static const longOptions lo[];
 
@@ -254,10 +257,11 @@ class Application : public YGP::IVIOApplication {
    std::queue<FILEFNC>  listFiles;
 #endif
 
-#ifdef ENABLE_DYNHANDLER
+#ifdef ENABLE_PLUGINS
    std::map<std::string, std::string> dynHandlers;
+   std::vector<YGP::Module*> modules;
 
-   void setDynamicHandlers ();
+   void setPlugins ();
 #endif
 };
 
@@ -308,38 +312,38 @@ Application::Application (const int argc, const char* argv[])
 #endif
 
 #ifdef SUPPORT_ABIWORD
-   handlers[FileTypeChecker::ABIWORD] = &Application::processAbiword;
+   handlers[YGP::FileTypeChecker::ABIWORD] = &Application::processAbiword;
 #endif
 #ifdef SUPPORT_GIF
-   handlers[FileTypeChecker::GIF] = &Application::processGIF;
+   handlers[YGP::FileTypeChecker::GIF] = &Application::processGIF;
 #endif
 #ifdef SUPPORT_HTML
-   handlers[FileTypeChecker::HTML] = &Application::processHTML;
+   handlers[YGP::FileTypeChecker::HTML] = &Application::processHTML;
 #endif
 #ifdef SUPPORT_JPEG
-   handlers[FileTypeChecker::JPEG] = &Application::processJPG;
+   handlers[YGP::FileTypeChecker::JPEG] = &Application::processJPG;
 #endif
 #ifdef SUPPORT_MP3
-   handlers[FileTypeChecker::MP3] = &Application::processMP3;
+   handlers[YGP::FileTypeChecker::MP3] = &Application::processMP3;
 #endif
 #ifdef SUPPORT_MSOFFICE
-   handlers[FileTypeChecker::MSOFFICE] =  &Application::processMSOffice;
+   handlers[YGP::FileTypeChecker::MSOFFICE] =  &Application::processMSOffice;
 #endif
 #ifdef SUPPORT_OGG
-   handlers[FileTypeChecker::OGG] =  &Application::processOGG;
+   handlers[YGP::FileTypeChecker::OGG] =  &Application::processOGG;
 #endif
 #ifdef SUPPORT_OO
-   handlers[FileTypeChecker::OPENOFFICE] =  &Application::processOpenOffice;
-   handlers[FileTypeChecker::STAROFFICE] =  &Application::processStarOffice;
+   handlers[YGP::FileTypeChecker::OPENOFFICE] =  &Application::processOpenOffice;
+   handlers[YGP::FileTypeChecker::STAROFFICE] =  &Application::processStarOffice;
 #endif
 #ifdef SUPPORT_PDF
-   handlers[FileTypeChecker::PDF] = &Application::processPDF;
+   handlers[YGP::FileTypeChecker::PDF] = &Application::processPDF;
 #endif
 #ifdef SUPPORT_PNG
-   handlers[FileTypeChecker::PNG] = &Application::processPNG;
+   handlers[YGP::FileTypeChecker::PNG] = &Application::processPNG;
 #endif
 #ifdef SUPPORT_RTF
-   handlers[FileTypeChecker::RTF] = &Application::processRTF;
+   handlers[YGP::FileTypeChecker::RTF] = &Application::processRTF;
 #endif
 }
 
@@ -432,6 +436,11 @@ void Application::showHelp () const {
       "   SortFiles=1\n\n"
       "   [FileType]\n"
       "   Mode=Content\n\n"
+#ifdef ENABLE_PLUGINS
+      "   [Handler]\n"
+      "   <Extension1>=<Library1>\n"
+      "   <ExtensionN>=<LibraryN>\n\n"
+#endif
       << _("Currently supported files are:")
       << "\n"
 #ifdef SUPPORT_HTML
@@ -688,25 +697,25 @@ bool Application::handleOption (const char option) {
 /// \returns bool: True, if the passed mode is invalid
 //-----------------------------------------------------------------------------
 bool Application::setMode (const std::string& mode) {
-   FileTypeChecker* newFtchk (NULL);
+   YGP::FileTypeChecker* newFtchk (NULL);
    if (mode == "Ext") {
-      newFtchk = new FileTypeCheckerByExtension;
+      newFtchk = new YGP::FileTypeCheckerByExtension;
       options &= ~TRUNC_EXTENSION;
    }
    else if (mode == "AllExt") {
-      newFtchk = new FileTypeCheckerByExtension;
+      newFtchk = new YGP::FileTypeCheckerByExtension;
       options |= TRUNC_EXTENSION;
    }
    else if (mode == "EXT") {
-      newFtchk = new FileTypeCheckerByCaseExt;
+      newFtchk = new YGP::FileTypeCheckerByCaseExt;
       options &= ~TRUNC_EXTENSION;
    }
    else if (mode == "AllEXT") {
-      newFtchk = new FileTypeCheckerByCaseExt;
+      newFtchk = new YGP::FileTypeCheckerByCaseExt;
       options |= TRUNC_EXTENSION;
    }
    else if (mode == "Content") {
-      newFtchk = new FileTypeCheckerByContent;
+      newFtchk = new YGP::FileTypeCheckerByContent;
       options &= ~TRUNC_EXTENSION;
    }
    else
@@ -734,7 +743,7 @@ int Application::perform (int argc, const char* argv[]) {
    Check3 (iniOpts.format.size ());
 
    if (!ftchk)
-      ftchk = new FileTypeCheckerByExtension;
+      ftchk = new YGP::FileTypeCheckerByExtension;
    Check3 (ftchk);
 
    typedef Writer* (*CREATEWRITER) (const std::string&, const std::string&,
@@ -756,8 +765,8 @@ int Application::perform (int argc, const char* argv[]) {
 
    writer->printStart (std::cout, iniOpts.title);
 
-#ifdef ENABLE_DYNHANDLER
-   setDynamicHandlers ();
+#ifdef ENABLE_PLUGINS
+   setPlugins ();
 #endif
 
    std::string file;
@@ -792,6 +801,12 @@ int Application::perform (int argc, const char* argv[]) {
 
    if (append.size ())
       std::cout << append;
+
+#ifdef ENABLE_PLUGINS
+   for (std::vector<YGP::Module*>::const_iterator i (modules.begin ());
+	i != modules.end (); ++i)
+      delete (*i);
+#endif
    return 0;
 }
 
@@ -1142,8 +1157,8 @@ Application::HANDLER Application::getFileTypeHandler (const char* file) const {
    TRACE9 ("Application::getFileTypeHandler (const std::string&) - " << file);
    Check1 (ftchk);
 
-   FileTypeChecker::FileType type (ftchk->getType (file));
-   if (type != FileTypeChecker::UNKNOWN) {
+   unsigned int type (ftchk->getType (file));
+   if (type != YGP::FileTypeChecker::UNKNOWN) {
       handlerMap::const_iterator i (handlers.find (type));
       return (i != handlers.end ()) ? i->second : NULL;
    }
@@ -1186,7 +1201,7 @@ void Application::readINIFile (const char* pFile) {
       INISECTION (FileType);
       INIATTR2 (FileType, std::string, mode, Mode);
 
-#ifdef ENABLE_DYNHANDLER
+#ifdef ENABLE_PLUGINS
       INIMAP2 (Handler, std::string, dynHandlers);
 #endif
       INIFILE_READ ();
@@ -1227,41 +1242,45 @@ void Application::readINIFile (const char* pFile) {
    }
 }
 
-#ifdef ENABLE_DYNHANDLER
+#ifdef ENABLE_PLUGINS
 //-----------------------------------------------------------------------------
 /// Adds the dynamic handlers (which are loaded as shared libraries) to the
 /// default handlers (compiled-in).
 ///
 /// Errors are reported to std::cerr
 //-----------------------------------------------------------------------------
-void Application::setDynamicHandlers () {
-   TRACE1 ("Application::setDynamicHandlers (std::map<std::string, std::string>&): " << dynHandlers.size ());
+void Application::setPlugins () {
+   TRACE1 ("Application::setPlugins (std::map<std::string, std::string>&): " << dynHandlers.size ());
 
-   unsigned int offset (FileTypeChecker::LAST);
+   unsigned int offset (YGP::FileTypeChecker::LAST);
    for (std::map<std::string, std::string>::const_iterator i (dynHandlers.begin ());
 	i != dynHandlers.end (); ++i) {
       try {
-	 YGP::Module mod (i->second.c_str ());
-	 void* symbol (mod.getSymbol ("processFile"));
-	 if (!symbol) {
+	 YGP::Module* mod (new YGP::Module (i->second.c_str ()));
+	 modules.push_back (mod);
+	 void* fnProcess (mod->getSymbol (PLUGIN_PROCESS));
+	 if (!fnProcess) {
 	    std::string error (_("Invalid module `%1'!\n"));
 	    error.replace (error.find ("%1"), 2, i->second);
 	    throw YGP::FileError (error);
 	 }
 
 	 // Add handling method
-	 if (typeid (*ftchk) == typeid (FileTypeCheckerByContent)) {
-	    symbol = mod.getSymbol ("getFileType");
-	    if (!symbol) {
+	 if (typeid (*ftchk) == typeid (YGP::FileTypeCheckerByContent)) {
+	    void* fnCheckType (mod->getSymbol (PLUGIN_CHECKTYPE));
+	    if (!fnCheckType) {
 	       std::string error (_("Invalid module `%1'!\n"));
 	       error.replace (error.find ("%1"), 2, i->second);
 	       throw YGP::FileError (error);
 	    }
+	    ((YGP::FileTypeCheckerByContent*)ftchk)->addType (offset, (YGP::FileTypeCheckerByContent::MATCHFNC)fnCheckType);
 	 }
-	 handlers[offset++] = (HANDLER)symbol;
+	 else
+	    ((YGP::FileTypeCheckerByExtension*)ftchk)->addType (i->first.c_str (), offset);
+	 handlers[offset++] = (HANDLER)fnProcess;
       }
       catch (YGP::FileError& e) {
-	 std::cerr << PACKAGE << _("-warning: ") << e.what ();
+	 std::cerr << PACKAGE << _("-warning: ") << e.what () << '\n';
       }
    }
 }
