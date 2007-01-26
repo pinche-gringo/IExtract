@@ -1,4 +1,5 @@
 ## Process this file with automake to produce Makefile.in
+SUBDIRS = Plugins
 
 SRC_ABIWORD=ParseAbiword.cpp ParseAbiword.h
 if SUPPORT_ABIWORD
@@ -58,15 +59,20 @@ bin_PROGRAMS=IExtract
 
 DEFS=@DEFS@ -Wall
 
+INCLUDES = @INCLUDES@ @YMP_CFLAGS@
+
 IExtract_LDADD=@YMP_LIBS@ @LTLIBINTL@
-IExtract_SOURCES=FileTypeChk.cpp FileTypeChk.h Utility.h Writer.cpp	\
-Writer.h Properties.h Options.h $(USE_HTML) $(USE_GIF) $(USE_JPEG)	\
-$(USE_OO) $(USE_PDF) $(USE_PNG) $(USE_MP3) $(USE_OGG) $(USE_RTF)	\
-$(USE_ABIWORD) $(USE_MSOFFICE) IExtract.cpp
+IExtract_SOURCES=Writer.cpp Writer.h Properties.h Options.h		\
+$(USE_HTML) $(USE_GIF) $(USE_JPEG) $(USE_OO) $(USE_PDF) $(USE_PNG)	\
+$(USE_MP3) $(USE_OGG) $(USE_RTF) $(USE_ABIWORD) $(USE_MSOFFICE)		\
+IExtract.cpp
 
 EXTRA_DIST=Options.meta $(SRC_HTML) $(SRC_MSOFFICE) $(SRC_JPEG)		\
 $(SRC_OO) $(SRC_PDF) $(SRC_MP3) $(SRC_OGG) $(SRC_RTF) $(SRC_ABIWORD)	\
 $(SRC_PNG) $(SRC_GIF)
+
+include_HEADERS=Properties.h
+includedir = ${prefix}/include/IExtract
 
 Options.meta: Options.h
 	mgeni.pl Options.h>Options.meta
