@@ -151,7 +151,7 @@ class Application : public YGP::IVIOApplication {
    virtual const char* name () const { return PACKAGE; }
    virtual const char* description () const {
       static std::string version (PACKAGE " V" VERSION " - ");
-      version += (_("Compiled on %1 at %2\n\nCopyright (C) 2002 - 2006 Markus Schwab; email: g17m0@lycos.com\nDistributed under the terms of the GNU General Public License"));
+      version += (_("Compiled on %1 at %2\n\nCopyright (C) 2002 - 2007 Markus Schwab; email: g17m0@lycos.com\nDistributed under the terms of the GNU General Public License"));
       version.replace (version.find ("%1"), 2, __DATE__);
       version.replace (version.find ("%2"), 2, __TIME__);
       return version.c_str (); }
@@ -1260,7 +1260,7 @@ void Application::setPlugins () {
 	 modules.push_back (mod);
 	 void* fnProcess (mod->getSymbol (PLUGIN_PROCESS));
 	 if (!fnProcess) {
-	    std::string error (_("Invalid module `%1'!\n"));
+	    std::string error (_("Invalid plug-in `%1'!\n"));
 	    error.replace (error.find ("%1"), 2, i->second);
 	    throw YGP::FileError (error);
 	 }
@@ -1269,7 +1269,7 @@ void Application::setPlugins () {
 	 if (typeid (*ftchk) == typeid (YGP::FileTypeCheckerByContent)) {
 	    void* fnCheckType (mod->getSymbol (PLUGIN_CHECKTYPE));
 	    if (!fnCheckType) {
-	       std::string error (_("Invalid module `%1'!\n"));
+	       std::string error (_("Invalid plug-in `%1'!\n"));
 	       error.replace (error.find ("%1"), 2, i->second);
 	       throw YGP::FileError (error);
 	    }
