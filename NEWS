@@ -1,3 +1,10 @@
+Overview of changes in version 0.9.00:
+
+  - Additional file-handles can be added dynamically (via plug-ins)
+  - Fix in english documentation
+  - Using automake 1.9 and autoconf 2.61
+
+
 Overview of changes in version 0.8.11:
 
   - Fixed trap, when passing an invalid mode to determine the file-type
