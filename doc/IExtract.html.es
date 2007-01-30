@@ -1,8 +1,8 @@
-<!-- -*-HTML-*- -->
+s<!-- -*-HTML-*- -->
 <!-- $Id$ -->
 
 <!--
-  Copyright (C) 2003 - 2006 Markus Schwab (g17m0@lycos.com)
+  Copyright (C) 2003 - 2007 Markus Schwab (g17m0@lycos.com)
 
   This is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
@@ -29,7 +29,7 @@
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Copyright (C) 2003 - 2006; distribuido bajo las condiciones de la GNU Licensia Público">
+    <meta name="DC.Rights" content="Copyright (C) 2003 - 2007; distribuido bajo las condiciones de la GNU Licensia Público">
 
     <style type="text/css">
       <!--
@@ -52,26 +52,26 @@
             English&nbsp;version</a></td>
         <td>&nbsp;</td>
         <td rowspan="3">
-          <p>&Eacute;ste programa se distribuye bajo las condiciones de la
-            <a href="http://www.gnu.org">GNU</a> Licensia General
-            P&uacute;blico; con la esperanza de que sea &uacute;til,
+          <p>&Eacute;ste programa se distribuye bajo las condiciones
+            de la <a href="http://www.gnu.org">GNU</a> <a
+            href="http://www.gnu.org/licenses/">Licensia General
+            P&uacute;blico</a>; con la esperanza de que sea &uacute;til,
             pero SIN NINGUNA GARANT&Iacute;A, ni siquiera la
             garant&iacute;a impl&iacute;cita de COMERCIABILIDAD o
-            CONVENIENCIA PARA UN PROP&Oacute;SITO
-            PARTICULAR.</p></tr>
-      <tr><td class="unselected"><a href="IExtract.html.de">Deutsche&nbsp;Version</a></td>
-        <td>&nbsp;</td></tr>
-      <tr><td class="selected">Versi&oacute;n&nbsp;en&nbsp;castellano</td>
-        <td>&nbsp;</td></tr>
-    </table>
-    <hr size=1 noshade>
+            CONVENIENCIA PARA UN PROP&Oacute;SITO PARTICULAR.</p></tr>
+            <tr><td class="unselected"><a
+            href="IExtract.html.de">Deutsche&nbsp;Version</a></td>
+            <td>&nbsp;</td></tr> <tr><td
+            class="selected">Versi&oacute;n&nbsp;en&nbsp;castellano</td>
+            <td>&nbsp;</td></tr> </table> <hr size=1 noshade>
 
-    <p><code>IExtract</code> es una utilidad para extraer
-            las propiedades (t&iacute;tulo, autor y comentario) de varios
-            tipos de documentos y presentarlos en una lista para elaboraci&oacute;n
-            posterior.</p>
+    <p><code>IExtract</code> es una utilidad para extraer las
+      propiedades (t&iacute;tulo, autor y comentario) de varios tipos
+      de documentos y presentarlos en una lista para
+      elaboraci&oacute;n posterior.</p>
 
-    <p>Los documentos siguentes est&aacute;n procesados:</p>
+    <p>Los documentos siguentes est&aacute;n procesados (se puede
+      añadir tipos adicionales con <a href="#Plugins">plugins</a>:</p>
 
     <dl>
       <dt><b>HTML</b></dt>
@@ -149,7 +149,7 @@
     <p>El comportamiento del programa est&aacute; controlado con un archivo de
       iniciaci&oacute;n (~/.IExtract para UNICES o %HOMEDRIVE%%HOMEPATH%IExtract.ini
       para Windows). Mira
-      <a href="IExtract.html.es#INIfile">Formato de archivos por iniciar</a> por
+      <a href="#INIfile">Formato de archivos por iniciar</a> por
       por m&aacute;s informaci&oacute;n.</p>
 
     <p>Aquel comportamiento se puede cambiar con especificar un otro archivo o
@@ -306,8 +306,8 @@
           letra de separaci&oacute;n del camino del sistema operativo
           (dos puntos (:) en Unices; punto y coma (;) en Windows).
 
-          <p>Los archivos pueden contener los comodines tipicales de UNIX.
-            <a href="IExtract.html.de#Fileformat">Detalles</a> se encuentra
+          <p>Los archivos pueden contener los comodines típicales de UNIX.
+            <a href="#Fileformat">Detalles</a> se encuentran
             m&aacute;s arriba en el documento.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
@@ -317,14 +317,14 @@
           letra de separaci&oacute;n del camino del sistema operativo (dos puntos (:) en Unices;
           punto y coma (;) en Windows).
 
-          <p>Los archivos pueden contener los comodines tipicales de UNIX.
-            <a href="IExtract.html.de#Fileformat">Detalles</a> se encuentra
+          <p>Los archivos pueden contener los comodines típicales de UNIX.
+            <a href="#Fileformat">Detalles</a> se encuentran
             m&aacute;s arriba en el documento.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-I,&nbsp;--ini-file=ARCHIVO</b></td>
         <td>Lee m&aacute;s opciones del archivo especificado. Mira
-          <a href="IExtract.html.es#INIfile">Formato de archivos por iniciar</a>
+          <a href="#INIfile">Formato de archivos por iniciar</a>
           por m&aacute;s informaci&oacute;n.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
 
@@ -376,6 +376,21 @@
       <i>prepend</i> y <i>pre-file</i>) pueden ser repetidos. Cada
       opci&oacute;n nuevo a&ntilde;ade su texto a los anteriores.</p>
 
+    <h2><a name="Plugins"></a>Plugins</h2>
+    <p>Plugins son pequeñas extensiones cual añaden más tipos de documentos.</p>
+
+    <p>Son realisados como bibliotecas compartidas (para UNIX) o DLLs
+      (para Windows) que ofrecen dos subrutinas:</p>
+
+    <dl>
+      <dt><b>processFile</b></dt>
+      <dd>Lee las propiedades de un archivo</dd>
+      <dt><b>getFileType</b></dt>
+      <dd>Pruebe si el archivo es de un cierto tipo</dd>
+    </dl>
+
+    <p>Hay un ejemplo en <i>src/Plugins/Text.cpp</i>.</p>
+
     <h2><a name="INIfile"></a>Formato de archivos por iniciar</h2>
     <p>Los archivos por iniciar tienen el siguente formato (entradas pueden faltar):</p>
 
@@ -389,7 +404,12 @@
    SortFiles=1
 
    [FileType]
-   Mode=Content</pre>
+   Mode=Content
+
+   [Handler]
+   &lt;Extensión1&gt;=&lt;Plugin1&gt;
+   &lt;Extensión2&gt;=&lt;Plugin2&gt;
+   &lt;ExtensiónN&gt;=&lt;PluginN&gt;</pre>
 
     <p>&iexcl;Pasan los mismos cambios como con las opciones!</p>
 

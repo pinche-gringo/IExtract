@@ -2,7 +2,7 @@
 <!-- $Id$ -->
 
 <!--
-  Copyright (C) 2003 - 2006 Markus Schwab (g17m0@lycos.com)
+  Copyright (C) 2003 - 2007 Markus Schwab (g17m0@lycos.com)
 
   This is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
@@ -29,7 +29,7 @@
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Copyright (C) 2003 - 2006; distributed under the GNU General Public License">
+    <meta name="DC.Rights" content="Copyright (C) 2003 - 2007; distributed under the GNU General Public License">
 
     <style type="text/css">
       <!--
@@ -51,24 +51,25 @@
         <tr valign=top><td class="selected">English&nbsp;version</td>
           <td>&nbsp;</td>
           <td rowspan="3">
-            <p>This program is distributed under the terms of the
-              <a href="http://www.gnu.org">GNU</a> General Public License;
-              in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-              without even the implied warranty of MERCHANTABILITY or FITNESS
-              FOR A PARTICULAR PURPOSE.</p></tr>
-        <tr><td class="unselected"><a href="IExtract.html.de">Deutsche&nbsp;Version</a></td>
-          <td>&nbsp;</td></tr>
-        <tr><td class="unselected"><a href="IExtract.html.es">
+            <p>This program is distributed under the terms of the <a
+              href="http://www.gnu.org">GNU</a> <a
+              href="http://www.gnu.org/licenses/">General Public
+              License</a>; in the hope that it will be useful, but WITHOUT
+              ANY WARRANTY; without even the implied warranty of
+              MERCHANTABILITY or FITNESS FOR A PARTICULAR
+              PURPOSE.</p></tr> <tr><td class="unselected"><a
+              href="IExtract.html.de">Deutsche&nbsp;Version</a></td>
+              <td>&nbsp;</td></tr> <tr><td class="unselected"><a
+              href="IExtract.html.es">
               Versi&oacute;n&nbsp;en&nbsp;castellano</a></td>
-          <td>&nbsp;</td></tr>
-    </table>
-    <hr size=1 noshade>
+              <td>&nbsp;</td></tr> </table> <hr size=1 noshade>
 
     <p><code>IExtract</code> is a little utility designed to extract
     the properites (title, author and comment) out of different
     documents and present them in a list for further processing.</p>
 
-    <p>The following documents are supported:</p>
+    <p>The following documents are supported (further types can be
+      added with <a href="Plugins">plugins</a>):</p>
 
     <dl>
       <dt><b>HTML</b></dt>
@@ -138,8 +139,7 @@
 
     <p>The behaviour of the program is controlled with a INI file (~/.IExtract for
       UNICES or %HOMEDRIVE%%HOMEPATH%IExtract.ini for Windows). See
-      <a href="IExtract.html.en#INIfile">Format of the INI file</a> for further
-      information.</p>
+      <a href="#INIfile">Format of the INI file</a> for further information.</p>
 
     <p>This handling can be overridden by specifying either a different INI file
       or by passing further options to the program.</p>
@@ -290,7 +290,7 @@
             system (the colon (:) for UNICES; the semicolon (;) for Windows).
 
             <p>File specifications can contain the UNIX-typical wildcards.
-            <a href="IExtract.html.en#Fileformat">Details</a> can be found
+            <a href="#Fileformat">Details</a> can be found
               in the top of the document.</p></td></tr>
         <tr><td>&nbsp;</td></tr>
 
@@ -300,13 +300,13 @@
             system (the colon (:) for UNICES; the semicolon (;) for Windows).
 
             <p>File specifications can contain the UNIX-typical wildcards.
-            <a href="IExtract.html.en#Fileformat">Details</a> can be found
+            <a href="#Fileformat">Details</a> can be found
               in the top of the document.</p></td></tr>
         <tr><td>&nbsp;</td></tr>
 
         <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-I,&nbsp;--ini-file=FILE</b></td>
           <td>Read further options from the specified file. See
-            <a href="IExtract.html.en#INIfile">Format of the INI file</a> for further
+            <a href="#INIfile">Format of the INI file</a> for further
             information.</td></tr>
         <tr><td>&nbsp;</td></tr>
 
@@ -354,6 +354,23 @@
       <i>prepend</i> and <i>pre-file</i>) can be repeated. Each new options
       adds its text to the previous ones.</p>
 
+    <h2><a name="Plugins"></a>Plugins</h2>
+    <p>Plugins are little extensions, which add the support of
+      further types of documents.</p>
+
+    <p>They are realised as shared libraries (UNIX) or DLLs (Windows),
+      which offer two functions:</p>
+
+    <dl>
+      <dt><b>processFile</b></dt>
+      <dd>Reads the properties from the passed file</dd>
+      <dt><b>getFileType</b></dt>
+      <dd>Checks, if the passed file has the right type</dd>
+    </dl>
+
+    <p>An example can be found in <i>src/Plugins/Text.cpp</i>.</p>
+
+
     <h2><a name="INIfile"></a>Format of the INI file</h2>
     <p>The format of the INI file is like this (entries can be missing):</p>
 
@@ -367,7 +384,12 @@
    SortFiles=1
 
    [FileType]
-   Mode=Content</pre>
+   Mode=Content
+
+   [Handler]
+   &lt;Extension1&gt;=&lt;Library1&gt;
+   &lt;Extension2&gt;=&lt;Library2&gt;
+   &lt;ExtensionN&gt;=&lt;LibraryN&gt;</pre>
 
     <p>The same substituations as within the options are performed!</p>
 
