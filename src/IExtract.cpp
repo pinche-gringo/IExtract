@@ -841,7 +841,7 @@ void Application::handleFiles (const char* pFile) const {
       // U_nknown type; try second to-last extension (if option passed)
       if ((options & TRUNC_EXTENSION) && !fnc) {
 	 do {
-	    unsigned int pos (name.rfind ('.'));
+	    size_t pos (name.rfind ('.'));
 	    if (pos == std::string::npos)
 	       break;
 	    else {

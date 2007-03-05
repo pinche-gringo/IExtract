@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 13.10.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2005
+//COPYRIGHT   : Copyright (C) 2002 - 2005, 2007
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -93,8 +93,7 @@ Writer::~Writer () {
 //-----------------------------------------------------------------------------
 void Writer::printSeparator (std::ostream& out, const YGP::File& file,
                              const std::string& data, const std::string& title) const {
-   unsigned int pos (0);
-   unsigned int oldPos (0);
+   size_t pos (0), oldPos (0);
    while ((pos < data.size ())
           && ((pos = data.find ('%', oldPos)) != std::string::npos)) {
       TRACE9 ("printSeparator (ostream&, const YGP::File, const string&) - Inspecting "
@@ -116,12 +115,12 @@ void Writer::printSeparator (std::ostream& out, const YGP::File& file,
       case 'U': {
          std::string path (file.path ());
 #if SYSTEM != UNIX
-         unsigned int pos (0);
-         while ((pos = path.find (YGP::File::DIRSEPARATOR, pos)) != std::string::npos)
-            path.replace (pos, 1, 1, '/');
+         size_t ps (0);
+         while ((ps = path.find (YGP::File::DIRSEPARATOR, ps)) != std::string::npos)
+            path.replace (ps, 1, 1, '/');
 #endif
 
-         if (data[pos] == 'U')
+         if (data[ps] == 'U')
             path += file.name ();
          break; }
       }
@@ -212,9 +211,9 @@ std::string Writer::getSubstitute (char ctrl, bool extend) const {
    case 'U': {
       subst = extend ? changeSpecialFileChars (file_->path ()) : file_->path ();
 #if SYSTEM != UNIX
-      unsigned int pos (0);
-      while ((pos = subst.find (YGP::File::DIRSEPARATOR, pos)) != std::string::npos)
-         subst.replace (pos, 1, 1, '/');
+      size_t ps (0);
+      while ((ps = subst.find (YGP::File::DIRSEPARATOR, ps)) != std::string::npos)
+         subst.replace (ps, 1, 1, '/');
 #endif
 
       if (ctrl == 'U')
