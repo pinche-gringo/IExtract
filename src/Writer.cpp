@@ -94,8 +94,11 @@ Writer::~Writer () {
 void Writer::printSeparator (std::ostream& out, const YGP::File& file,
                              const std::string& data, const std::string& title) const {
    size_t pos (0), oldPos (0);
-   while ((pos < data.size ())
-          && ((pos = data.find ('%', oldPos)) != std::string::npos)) {
+   while (pos < data.size ()) {
+      if ((pos = data.find ('%', oldPos)) == std::string::npos) {
+	 pos = data.size ();
+	 break;
+      }
       TRACE9 ("printSeparator (ostream&, const YGP::File, const string&) - Inspecting "
              << data[pos + 1]);
       out << data.substr (oldPos, pos - oldPos );
@@ -120,8 +123,9 @@ void Writer::printSeparator (std::ostream& out, const YGP::File& file,
             path.replace (ps, 1, 1, '/');
 #endif
 
-         if (data[ps] == 'U')
+         if (data[pos] == 'U')
             path += file.name ();
+	 out << path;
          break; }
       }
       oldPos = pos + 1;
@@ -153,7 +157,7 @@ void Writer::printSeparator (std::ostream& out, const YGP::File& file,
 /// \returns std::string: String with which to replace the character
 //-----------------------------------------------------------------------------
 std::string Writer::getSubstitute (char ctrl, bool extend) const {
-   Check3 (prop_); Check3 (file_); Check1 (writer);
+   Check3 (prop_); Check3 (file_);
 
    std::string subst;
    switch (ctrl) {
