@@ -1,3 +1,10 @@
+Overview of changes in version 0.9.01:
+
+  - Can be compiled under x86_64
+  - Minor documentation fixes
+  - Minor optimisation in Writer-class
+
+
 Overview of changes in version 0.9.00:
 
   - Additional file-handles can be added dynamically (via plug-ins)

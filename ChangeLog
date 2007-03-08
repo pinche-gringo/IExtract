@@ -1,3 +1,19 @@
+2007-03-08  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.9.01 documented
+
+	* configure.in: Version to 0.9.01
+
+	* doc/IExtract.html.en, doc/IExtract.html.es: Minor changes
+
+2007-03-05  Markus Schwab  <g17m0@lycos.com>
+
+	* INSTALL: Minor fix
+
+	* src/Writer.cpp: Fixed compile-error; Improvements
+
+	* src/IExtract.cpp, src/Writer.cpp: Can be compiled under x86_64
+
 2007-01-30  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.9.00 documented
