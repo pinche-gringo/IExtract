@@ -1,4 +1,4 @@
-s<!-- -*-HTML-*- -->
+<!-- -*-HTML-*- -->
 <!-- $Id$ -->
 
 <!--
@@ -67,15 +67,15 @@ s<!-- -*-HTML-*- -->
 
     <p><code>IExtract</code> es una utilidad para extraer las
       propiedades (t&iacute;tulo, autor y comentario) de varios tipos
-      de documentos y presentarlos en una lista para
+      de documentos y presentarlas en una lista para
       elaboraci&oacute;n posterior.</p>
 
     <p>Los documentos siguentes est&aacute;n procesados (se puede
-      añadir tipos adicionales con <a href="#Plugins">plugins</a>:</p>
+      añadir tipos adicionales con <a href="#Plugins">plugins</a>):</p>
 
     <dl>
       <dt><b>HTML</b></dt>
-      <dd><p>Busca para el texto entre los tags <code>&lt;title&gt;</code> y
+      <dd><p>Busca por el texto entre los tags <code>&lt;title&gt;</code> y
           <code>&lt;/title&gt;</code> y el contenido de los tags <code>meta</code>
           (tanto en formato HTML 4.0 como "Dublin Core").</p></dd>
 
@@ -100,7 +100,7 @@ s<!-- -*-HTML-*- -->
 	  unas versiones de PhotoShop).</p></dd>
 
       <dt><b>Documentos de Microsoft Office</b></dt>
-      <dd><p>Busca para el contenido de la ventana "propiedades".</p>
+      <dd><p>Busca por el contenido de la ventana "propiedades".</p>
 
         <p>Gracias al proyecto de Apache Jakarta POI y su
 	  documentaci&oacute;n del "formato OLE2 Document Compound"
@@ -128,16 +128,16 @@ s<!-- -*-HTML-*- -->
       </dd>
 
       <dt><b>Documentos de StarOffice</b></dt>
-      <dd><p>Busca para el contenido de la ventana "propiedades".</p>
+      <dd><p>Busca por el contenido de la ventana "propiedades".</p>
 
       <dt><b>Documentos de OpenOffice</b></dt>
-      <dd><p>Busca para el contenido de la ventana "propiedades".</p>
+      <dd><p>Busca por el contenido de la ventana "propiedades".</p>
 
       <dt><b>Documentos de Abiword</b></dt>
-      <dd><p>Busca para el contenido de la ventana "propiedades".</p>
+      <dd><p>Busca por el contenido de la ventana "propiedades".</p>
 
       <dt><b>Documentos en formato RTF (Rich Text Format)</b></dt>
-      <dd><p>Busca para el contenido del bloque "info".</p>
+      <dd><p>Busca por el contenido del bloque "info".</p>
     </dl>
 
     <p>La salida puede ser en el formato HTML (una tabla), XML (XHTML por
@@ -146,7 +146,7 @@ s<!-- -*-HTML-*- -->
       Nota que letras especiales en la informaci&oacute;n extraido est&aacute;
       cambiado.</p>
 
-    <p>El comportamiento del programa est&aacute; controlado con un archivo de
+    <p>El comportamiento del programa est&aacute; controlado por un archivo de
       iniciaci&oacute;n (~/.IExtract para UNICES o %HOMEDRIVE%%HOMEPATH%IExtract.ini
       para Windows). Mira
       <a href="#INIfile">Formato de archivos por iniciar</a> por
@@ -160,13 +160,13 @@ s<!-- -*-HTML-*- -->
     <pre>   IExtract [OPCIONES] &lt;Archivo(s)&gt;</pre>
 
     <p><a name="Fileformat"></a>Los archivos busqueados pueden
-      contener los comodines tipicales de UNIX (estrella (*) por cada
+      contener los comodines t&iacute;picales de UNIX (estrella (*) por cada
       numero de todas las letras y, el signo de interrogación (?) por
       cualquiera letra sola y letras especificas en chorchetes ([) y
       (]), o detalladolos, especifacadolos por sus l&iacute;mites
       (separado por un gui&oacute;n) o sus clases (entre '[:' y
       ':]'). Por invertir esa selecci&oacute;n usa la caret (^) o el
-      signo de exclamaci&oacute;n (!) en la primera posici&oacute;). Eso
+      signo de exclamaci&oacute;n (!) en la primera posici&oacute;n). Eso
       tambi&eacute;n vale por la versi&oacute;n de Windows.</p>
 
     <p>Por ejemplo:</p>
@@ -372,7 +372,7 @@ s<!-- -*-HTML-*- -->
         <td>Especifica la carpeta y/o los archivos para investigar.</td></tr>
     </table>
 
-    <p>Los opciones <i>append</i> y <i>app-file</i> (o equivalente
+    <p>Las opciones <i>append</i> y <i>app-file</i> (o equivalente
       <i>prepend</i> y <i>pre-file</i>) pueden ser repetidos. Cada
       opci&oacute;n nuevo a&ntilde;ade su texto a los anteriores.</p>
 

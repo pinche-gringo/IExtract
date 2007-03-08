@@ -69,7 +69,7 @@
     documents and present them in a list for further processing.</p>
 
     <p>The following documents are supported (further types can be
-      added with <a href="Plugins">plugins</a>):</p>
+      added with <a href="#Plugins">plug-ins</a>):</p>
 
     <dl>
       <dt><b>HTML</b></dt>
@@ -87,7 +87,7 @@
       <dt><b>GIF</b></dt>
       <dd><p>GIF-images can contain "Comment extensions". The content of
           these entries is returned in the comment-field. Author and title
-	  are left empty (for lack of availability.)<p></dd>
+	  are left empty (for lack of availability.)</p></dd>
 
       <dt><b>JPEG</b></dt>
       <dd><p>The application recognices comments stored after a comment
@@ -354,8 +354,8 @@
       <i>prepend</i> and <i>pre-file</i>) can be repeated. Each new options
       adds its text to the previous ones.</p>
 
-    <h2><a name="Plugins"></a>Plugins</h2>
-    <p>Plugins are little extensions, which add the support of
+    <h2><a name="Plugins"></a>Plug-ins</h2>
+    <p>Plug-ins are little extensions, which add the support of
       further types of documents.</p>
 
     <p>They are realised as shared libraries (UNIX) or DLLs (Windows),
