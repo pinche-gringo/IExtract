@@ -1,3 +1,9 @@
+Overview of changes in version 0.9.02:
+
+  - Fixed parsing PDF-documents with docinfo dictionary without line-breaks
+  - Fixed parsing PDF-documents containing values with a closing parenthesis
+
+
 Overview of changes in version 0.9.01:
 
   - Can be compiled under x86_64

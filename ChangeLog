@@ -1,3 +1,16 @@
+2007-10-29  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.9.02 documented
+
+	* po/de.po, po/en.po, po/es.po: New start-of-value for PDF-docs added
+
+	* configure.in: Version to 0.9.02
+
+	* src/ParsePDF.cpp, src/ParsePDF.h:
+	  Fixed parsing values containing a closing parenthesis ')'
+
+	* src/Properties.h: Removed unneeded method clear()
+
 2007-03-08  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.9.01 documented
