@@ -30,7 +30,11 @@
 struct Properties;
 
 
-// Class to extract the properties of a PDF document
+/**Class to extract the properties of a PDF document.
+ *
+ * The PDF-specification can be found at
+ * http://www.adobe.com/devnet/acrobat/pdfs/pdf_reference.pdf
+ */
 class ParsePDF {
  public:
    ParsePDF ();
@@ -54,8 +58,10 @@ class ParsePDF {
    int foundObjOffset (const char*, unsigned int);
    int foundObjectID (const char*, unsigned int);
    int foundEndObj (const char*, unsigned int);
+   int foundObject (const char*, unsigned int);
    int foundParenthesis (const char*, unsigned int);
    int foundBracket (const char*, unsigned int);
+   int foundSlash (const char*, unsigned int);
 
    void parseInfoObject ();
 
@@ -74,7 +80,7 @@ class ParsePDF {
    OMParseAttomic  offObject;
 
    YGP::ParseExact   tagTrailer;
-   YGP::ParseExact   startObj;
+   OMParseExact      startObj;
    YGP::ParseExact   objInfo;
    YGP::ParseExact   objPrev;
    OMParseAttomic    objOffPrev;
@@ -91,6 +97,7 @@ class ParsePDF {
 
    OMParseExact    startOfValue1;
    OMParseExact    startOfValue2;
+   OMParseExact    startOfValue3;
    YGP::ParseExact endOfValue;
 
    YGP::ParseSelection selXRef;
@@ -100,12 +107,14 @@ class ParsePDF {
    YGP::ParseSequence  seqXRefTableEntries;
    YGP::ParseSequence  seqTrailer;
    YGP::ParseSelection selValues;
+   YGP::ParseSequence  seqSkipEntry;
    YGP::ParseSequence  seqInfo;
    YGP::ParseSequence  seqPrev;
    YGP::ParseSequence  seqInfoObj;
    YGP::ParseSequence  seqInfoValue;
    YGP::ParseSelection selType;
    YGP::ParseSelection selStartOfValue;
+   YGP::ParseSequence  seqFullValue;
 
    YGP::ParseObject* _selXRef[4];
    YGP::ParseObject* _seqXRef[4];
@@ -114,12 +123,14 @@ class ParsePDF {
    YGP::ParseObject* _seqXRefTableEntries[3];
    YGP::ParseObject* _seqTrailer[4];
    YGP::ParseObject* _selValues[5];
+   YGP::ParseObject* _seqSkipEntry[3];
    YGP::ParseObject* _seqInfo[4];
    YGP::ParseObject* _seqPrev[3];
    YGP::ParseObject* _seqInfoObj[6];
    YGP::ParseObject* _seqInfoValue[5];
    YGP::ParseObject* _selType[6];
-   YGP::ParseObject* _selStartOfValue[3];
+   YGP::ParseObject* _selStartOfValue[4];
+   YGP::ParseObject* _seqFullValue[3];
 
    Properties* prop;
 

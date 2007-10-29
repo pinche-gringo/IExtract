@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 08.11.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2004, 2006
+//COPYRIGHT   : Copyright (C) 2002 - 2004, 2006, 2007
 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,8 +36,11 @@
 #include <cstring>
 #include <cstdlib>
 
+#define CHECK 9
+#define TRACELEVEL 1
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
+#include <YGP/Utility.h>
 
 #include "Properties.h"
 
@@ -51,45 +54,48 @@
 /// (Default-)Constructor
 //-----------------------------------------------------------------------------
 ParsePDF::ParsePDF ()
-   : startXRef (ID, _("Tag for offset of cross reference table"))
-     , offXRef ("\\9", _("Offset of cross reference table"), *this, &ParsePDF::foundOffset, 10, 1)
-     , skipS (ID1, _("Start of startxref-tag"), 20, 1, true)
-     , skip (ID1, _("Unused data"), 256, 1, true, false)
-     , idXRef ("xref", _("Tag for cross reference table"))
-     , nrStart ("\\9", _("Number of cross reference entries"), *this, &ParsePDF::foundStartNumber, 10)
-     , count ("\\9", _("Number of cross reference entries"), *this, &ParsePDF::foundNumber, 10)
-     , offObject ("\\9", _("Offset of object"), *this, &ParsePDF::foundObjOffset, 10, 1, false)
-     , tagTrailer ("trailer", _("Tag for trailer"))
-     , startObj ("<<", _("Start of object"))
-     , objInfo ("/Info", _("Reference to info object"))
-     , objPrev ("/Prev", _("Reference to other trailer"))
-     , objOffPrev ("\\9", _("Offset of /Prev entry"), *this, &ParsePDF::foundPrevOffset, 10, 1)
-     , idObject ("\\9", _("ID of object"), *this, &ParsePDF::foundObjectID, 10)
-     , idObj ("1", _("ID of object (repeated)"))
-     , number ("\\9", _("Generation"), 10)
-     , tagObj ("obj", _("Tag for an object"))
-     , endObj (">>", _("End of object"), *this, &ParsePDF::foundEndObj)
-     , tagTitle ("/Title", _("Tag for title"), *this, &ParsePDF::foundTitle)
-     , tagAuthor ("/Author", _("Tag for author"), *this, &ParsePDF::foundAuthor)
-     , tagComment ("/Subject", _("Tag for comment (subject)"), *this, &ParsePDF::foundComment)
-     , value (")>", _("Value of entry"), *this, &ParsePDF::foundValue, 512, 0)
-     , startOfValue1 ("(", _("Start of value ('(')"), *this, &ParsePDF::foundParenthesis)
-     , startOfValue2 ("<", _("Start of value ('<')"), *this, &ParsePDF::foundBracket)
-     , endOfValue (")", _("End of value"))
-     , selXRef (_selXRef, _("Pointer to position of cross reference table"), -1U, 0)
-     , seqXRef (_seqXRef, _("Position of cross reference table"))
-     , seqXRefTable (_seqXRefTable, _("Cross reference table"))
-     , seqXRefSubsection (_seqXRefSubsection, _("Cross reference table subsection"), -1U)
-     , seqXRefTableEntries (_seqXRefTableEntries, _("Entries in cross reference table"), 0, 0)
-     , seqTrailer (_seqTrailer, _("Trailer"))
-     , selValues (_selValues, _("Trailer values"), -1U, 0)
-     , seqInfo (_seqInfo, _("Info entry"))
-     , seqPrev (_seqPrev, _("Prev entry"))
-     , seqInfoObj (_seqInfoObj, _("Info object"))
-     , seqInfoValue (_seqInfoValue, _("Info values"), -1U, 0)
-     , selType (_selType, _("Valid type"))
-     , selStartOfValue (_selStartOfValue, _("Start of values"))
-     , actEntry (NONE), offPrev (0), actObject (0), infoObject (-1U), strInfoObject (NULL) {
+   : startXRef (ID, _("Tag for offset of cross reference table")),
+     offXRef ("\\9", _("Offset of cross reference table"), *this, &ParsePDF::foundOffset, 10, 1),
+     skipS (ID1, _("First char of tag"), 20, 1, true),
+     skip (ID1, _("Unused data"), 256, 1, true, false),
+     idXRef ("xref", _("Tag for cross reference table")),
+     nrStart ("\\9", _("Number of cross reference entries"), *this, &ParsePDF::foundStartNumber, 10),
+     count ("\\9", _("Number of cross reference entries"), *this, &ParsePDF::foundNumber, 10),
+     offObject ("\\9", _("Offset of object"), *this, &ParsePDF::foundObjOffset, 10, 1, false),
+     tagTrailer ("trailer", _("Tag for trailer")),
+     startObj ("<<", _("Start of object"), *this, &ParsePDF::foundObject),
+     objInfo ("/Info", _("Reference to info object")),
+     objPrev ("/Prev", _("Reference to other trailer")),
+     objOffPrev ("\\9", _("Offset of /Prev entry"), *this, &ParsePDF::foundPrevOffset, 10, 1),
+     idObject ("\\9", _("ID of object"), *this, &ParsePDF::foundObjectID, 10),
+     idObj ("1", _("ID of object (repeated)")),
+     number ("\\9", _("Generation"), 10),
+     tagObj ("obj", _("Tag for an object")),
+     endObj (">>", _("End of object"), *this, &ParsePDF::foundEndObj),
+     tagTitle ("/Title", _("Tag for title"), *this, &ParsePDF::foundTitle),
+     tagAuthor ("/Author", _("Tag for author"), *this, &ParsePDF::foundAuthor),
+     tagComment ("/Subject", _("Tag for comment (subject)"), *this, &ParsePDF::foundComment),
+     value (")>", _("Value of entry"), *this, &ParsePDF::foundValue, 512, 0),
+     startOfValue1 ("(", _("Start of value ('(')"), *this, &ParsePDF::foundParenthesis),
+     startOfValue2 ("<", _("Start of value ('<')"), *this, &ParsePDF::foundBracket),
+     startOfValue3 ("/", _("Start of value ('/')"), *this, &ParsePDF::foundSlash),
+     endOfValue (")", _("End of value")),
+     selXRef (_selXRef, _("Pointer to position of cross reference table"), -1U, 0),
+     seqXRef (_seqXRef, _("Position of cross reference table")),
+     seqXRefTable (_seqXRefTable, _("Cross reference table")),
+     seqXRefSubsection (_seqXRefSubsection, _("Cross reference table subsection"), -1U),
+     seqXRefTableEntries (_seqXRefTableEntries, _("Entries in cross reference table"), 0, 0),
+     seqTrailer (_seqTrailer, _("Trailer")),
+     selValues (_selValues, _("Trailer values"), -1U, 0),
+     seqSkipEntry (_seqSkipEntry, _("Entry to skip")),
+     seqInfo (_seqInfo, _("Info entry")),
+     seqPrev (_seqPrev, _("Prev entry")),
+     seqInfoObj (_seqInfoObj, _("Info object")),
+     seqInfoValue (_seqInfoValue, _("Info values"), -1U, 0),
+     selType (_selType, _("Valid type")),
+     selStartOfValue (_selStartOfValue, _("Start of values")),
+     seqFullValue (_seqFullValue, _("Full value"), 1, 1),
+     actEntry (NONE), offPrev (0), actObject (0), infoObject (-1U), strInfoObject (NULL) {
    _selXRef[0] = &seqXRef;
    _selXRef[1] = &skipS;
    _selXRef[2] = &skip;
@@ -122,7 +128,7 @@ ParsePDF::ParsePDF ()
    _selValues[0] = &seqInfo;
    _selValues[1] = &seqPrev;
    _selValues[2] = &endObj;
-   _selValues[3] = &skip;
+   _selValues[3] = &seqSkipEntry;
    _selValues[4] = NULL;
 
    _seqInfo[0] = &objInfo;
@@ -134,6 +140,10 @@ ParsePDF::ParsePDF ()
    _seqPrev[1] = &objOffPrev;
    _seqPrev[2] = NULL;
 
+   _seqSkipEntry[0] = &skipS;
+   _seqSkipEntry[1] = &skip;
+   _seqSkipEntry[2] = NULL;
+
    _seqInfoObj[0] = &idObj;
    _seqInfoObj[1] = &number;
    _seqInfoObj[2] = &tagObj;
@@ -143,7 +153,7 @@ ParsePDF::ParsePDF ()
 
    _seqInfoValue[0] = &selType;
    _seqInfoValue[1] = &selStartOfValue;
-   _seqInfoValue[2] = &value;
+   _seqInfoValue[2] = &seqFullValue;
    _seqInfoValue[3] = &endOfValue;
    _seqInfoValue[4] = NULL;
 
@@ -154,9 +164,14 @@ ParsePDF::ParsePDF ()
    _selType[4] = &skip;
    _selType[5] = NULL;
 
+   _seqFullValue[0] = &value;
+   _seqFullValue[1] = NULL;
+   _seqFullValue[2] = NULL;
+
    _selStartOfValue[0] = &startOfValue1;
    _selStartOfValue[1] = &startOfValue2;
-   _selStartOfValue[2] = NULL;
+   _selStartOfValue[2] = &startOfValue3;
+   _selStartOfValue[3] = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -244,15 +259,14 @@ void ParsePDF::parseInfoObject () {
    Check3 (aOffsets.find (infoObject) != aOffsets.end ());
 
    TRACE5 ("ParsePDF::parseInfoObject () - Going to pos " << aOffsets[infoObject]
-           << "; searching for " << infoObject);
+           << "; searching for " << strInfoObject);
 
    file->seekg (aOffsets[infoObject], std::ios::beg);
 
    idObj.setValue (strInfoObject);
    idObj.setMaxCard (strlen (strInfoObject));
    idObj.setMinCard (idObj.getMaxCard ());
-   skip.setValue ("\\ (");
-   TRACE9 ("PObj: " << idObj.getValue () << "; Size: " << idObj.getMaxCard ());
+   skip.setValue ("\\ (<");
 
    Check3 (file);
    seqInfoObj.parse (*file);
@@ -280,15 +294,21 @@ int ParsePDF::foundObjectID (const char* pID, unsigned int len) {
 /// \returns \c int: Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
 int ParsePDF::foundEndObj (const char*, unsigned int) {
-   TRACE9 ("ParsePDF::foundEndObj (const char*, unsigned int)");
-   if (selValues.getMaxCard ()) {
-      selValues.setMaxCard (0);
-      skip.setValue ("(<");
-   }
-   else {
-      seqInfoValue.setMaxCard (0);
-      _seqInfoValue[1] = NULL;
-   }
+   TRACE9 ("ParsePDF::foundEndObj (const char*, unsigned int) - " << infoObject << ' ' << selValues.getMaxCard ());
+   seqInfoValue.setMaxCard (0);
+   _seqInfoValue[1] = NULL;
+   return YGP::ParseObject::PARSE_OK;
+}
+
+//-----------------------------------------------------------------------------
+/// Callback after an end-of-object tag was read
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+int ParsePDF::foundObject (const char*, unsigned int) {
+   TRACE9 ("ParsePDF::foundObject (const char*, unsigned int)");
+   if (infoObject == -1U)
+      skip.setValue ("/>");
+   skipS.setValue ("/>");
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -330,6 +350,8 @@ int ParsePDF::foundBracket (const char*, unsigned int) {
    TRACE5 ("ParsePDF::foundBracket (const char*, unsigned int)");
    endOfValue.setValue (">");
    value.setValue (">");
+   value.setSkipWS (true);
+   _seqInfoValue[3] = &endOfValue;
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -341,6 +363,21 @@ int ParsePDF::foundParenthesis (const char*, unsigned int) {
    TRACE5 ("ParsePDF::foundParenthesis (const char*, unsigned int)");
    endOfValue.setValue (")");
    value.setValue (")");
+   value.setSkipWS (true);
+   _seqInfoValue[3] = &endOfValue;
+   return YGP::ParseObject::PARSE_OK;
+}
+
+//-----------------------------------------------------------------------------
+/// Callback after the start of a name-value was read
+/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+//-----------------------------------------------------------------------------
+int ParsePDF::foundSlash (const char*, unsigned int) {
+   TRACE5 ("ParsePDF::foundBracket (const char*, unsigned int)");
+   endOfValue.setValue (" ");
+   value.setValue ("\r\n ");
+   value.setSkipWS (false);
+   _seqInfoValue[3] = NULL;
    return YGP::ParseObject::PARSE_OK;
 }
 
@@ -353,24 +390,25 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
    TRACE9 ("ParsePDF::foundValue (const char*, unsigned int) - " << pValue);
    Check3 (pValue);
 
+   std::string tmp;
    if (actEntry != NONE) {
-      TRACE9 ("ParsePDF::foundValue (const char*, unsigned int) - Assigning: "
-              << (((*pValue == '(') || (*pValue == '<')) ? (pValue + 1) : pValue));
+      TRACE9 ("ParsePDF::foundValue (const char*, unsigned int) - Assigning: " << pValue);
 
       static std::string Properties::* values[] =
          { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
 
       Check3 (prop);
       Check3 ((sizeof (values) / sizeof (values[0])) > (unsigned int)actEntry);
-      Check1 ((*value.getValue () == ')') || (*value.getValue () == '>'));
 
-      if (*value.getValue () == ')')
-         (prop->*(values[actEntry])).assign (pValue, len);
+      if (*value.getValue () == ')') {
+	 if ((prop->*(values[actEntry])).size ())
+	    (prop->*(values[actEntry])) += *value.getValue ();
+         (prop->*(values[actEntry])) += std::string (pValue, len);
+      }
       else {
-         prop->*(values[actEntry]) = "";
-
          Check1 (!(len & 1));
-         if (*(unsigned int*)pValue == 'FFEF') {      // Skip MS-header for ???
+	 // Skip MS-header for Unicode
+         if (YGP::get4BytesLSB (pValue) == 0x46464546) {
             pValue += 4;
             len -= 4;
          }
@@ -383,6 +421,31 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
             len -= 2;
          }
       }
+      tmp = prop->*(values[actEntry]);
+   }
+   else
+      tmp = std::string (pValue, len);
+
+   unsigned int openedBrackets (0);
+   unsigned int closedBrackets (0);
+   char openVal (((*value.getValue () == ')') ? '(' : '<'));
+   for (std::string::const_iterator i (tmp.begin ()); i != tmp.end (); ++i) {
+      if (*i == *value.getValue ())
+	 ++closedBrackets;
+      else if (*i == openVal)
+	 ++openedBrackets;
+   }
+   TRACE9 ("ParsePDF::foundValue (const char*, unsigned int) - Delimiters: "
+	   << openVal << " -> " << openedBrackets << '/' << closedBrackets);
+   if (openedBrackets != closedBrackets) {
+      seqFullValue.setMaxCard (seqFullValue.getMaxCard () + 1);
+      seqFullValue.setMinCard (seqFullValue.getMaxCard ());
+      _seqFullValue[1] = &endOfValue;
+   }
+   else {
+      seqFullValue.setMaxCard (1);
+      seqFullValue.setMinCard (1);
+      _seqFullValue[1] = NULL;
       actEntry = NONE;
    }
    return YGP::ParseObject::PARSE_OK;
@@ -400,7 +463,6 @@ void ParsePDF::parse (YGP::Xistream& stream, Properties& result) throw (YGP::Par
    if (memcmp (buffer, "%PDF-", sizeof (buffer)))
       throw (YGP::ParseError (_("Not a PDF document!")));
    stream.seekg (-40, std::ios::end);
-
 
    ParsePDF obj;
    obj.prop = &result;
