@@ -3,8 +3,14 @@
 
 
 Utility to extract the description out of certain file-types
-Copyright (C) 2002 - 2007 Markus Schwab <g17m0@lycos.com>
+Copyright (C) 2002 - 2008 Markus Schwab <g17m0@lycos.com>
 -----------------------------------------------------------------------
+
+This package is distributed under the GNU General Public License
+version 3; in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the file COPYING for more
+details.
 
 
 At the moment the following documents are supported (unless disabled while
@@ -66,7 +72,7 @@ configuring).
 
   - Abiword documents (*.abw): Extracts the contents of the property dialog
 
-  - Other types can easily be added by the use of plug-ins (see below)
+  - Other types can easily be added by the use of plugins (see below)
 
 
 Feel free to report/send me any not-working documents or suggest other files,
@@ -84,10 +90,10 @@ doesn't find enough files to be processed. And it does definitely *not* speed
 things up on single-processor systems!
 
 
-Plug-ins
---------
+Plugins
+-------
 
-IExtract can use plug-ins to support further file-formats. A plug-in is a
+IExtract can use plugins to support further file-formats. A plugin is a
 shared library (DLL), which must contain a function called "processFile" and
 - if the contents of the file determines its type - another one called
 "getFileType" - which either extracts respectively checks a file. An example

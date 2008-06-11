@@ -2,21 +2,22 @@
 <!-- $Id$ -->
 
 <!--
-  Copyright (C) 2003 - 2007 Markus Schwab (g17m0@lycos.com)
+  Copyright (C) 2003 - 2008 Markus Schwab (g17m0@lycos.com)
 
-  This is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
+  This file is part of IExtract.
 
-  This is distributed in the hope that it will be useful,
+  IExtract is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  IExtract is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-  You should have received a copy of the GNU General Public
-  License along with this library; if not, write to the Free
-  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  You should have received a copy of the GNU General Public License
+  along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//DE"
@@ -29,7 +30,7 @@
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Copyright (C) 2003 - 2007; vertrieben unter den Bedingungen der GNU General Public License">
+    <meta name="DC.Rights" content="Copyright (C) 2003 - 2008; vertrieben unter den Bedingungen der GNU General Public License">
 
     <style type="text/css">
       <!--
