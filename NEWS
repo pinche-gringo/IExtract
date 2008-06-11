@@ -1,3 +1,9 @@
+Overview of changes in version 0.9.03:
+
+  - Put under GPL version 3
+  - Can be compiled with GCC 4.3
+
+
 Overview of changes in version 0.9.02:
 
   - Fixed parsing PDF-documents with docinfo dictionary without line-breaks

@@ -1,3 +1,19 @@
+2008-06-11  Markus Schwab  <g17m0@lycos.com>
+
+	* ChangeLog, NEWS: Changes of V0.9.03 documented
+
+	* configure.in: Version to 0.9.03
+
+	* po/de.po, po/en.po, po/es.po: Actualised
+
+	* README, Windows/IExtract-cfg.h, doc/IExtract.html.de, doc/IExtract.html.en, doc/IExtract.html.es src/ParseGIF.cpp, src/ParseHTML.cpp, src/ParseOGG.cpp, src/ParsePDF.cpp, src/ParsePNG.cpp, src/ParseRTF.cpp, src/ParseSOffice.cpp, src/Writer.cpp:
+	   Put under GPL V3
+
+	* src/IExtract.cpp: Fixed copyright; Put under GPL V3
+
+	* src/ParseAbiword.cpp, src/ParseJPG.cpp, src/ParseMP3.cpp, src/ParseMSOffice.cpp, src/ParseOOffice.cpp:
+	  Can be compiled with GCC 4.3; Put under GPL 4.3
+
 2007-10-29  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.9.02 documented
