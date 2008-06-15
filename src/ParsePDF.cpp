@@ -37,8 +37,6 @@
 #include <cstring>
 #include <cstdlib>
 
-#define CHECK 9
-#define TRACELEVEL 1
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 #include <YGP/Utility.h>
