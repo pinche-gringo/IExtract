@@ -25,7 +25,7 @@ if SUPPORT_MP3
    USE_MP3=$(SRC_MP3)
 endif
 
-SRC_MSOFFICE=ParseMSOffice.cpp ParseMSOffice.h
+SRC_MSOFFICE=ParseMSOffice.cpp ParseMSOffice.h ParseOOXML.cpp ParseOOXML.h
 if SUPPORT_MSOFFICE
    USE_MSOFFICE=$(SRC_MSOFFICE)
 endif

@@ -1,11 +1,11 @@
-//$Id$
+//$Id: IExtract.cpp,v 1.86 2008/06/11 18:46:09 markus Rel $
 
 //PROJECT     : Extract
 //SUBSYSTEM   : Extract
 //REFERENCES  :
 //TODO        :
 //BUGS        :
-//REVISION    : $Revision$
+//REVISION    : $Revision: 1.86 $
 //AUTHOR      : Markus Schwab
 //CREATED     : 10.08.2002
 //COPYRIGHT   : Copyright (C) 2002 - 2008
@@ -40,6 +40,8 @@
 #include <map>
 #include <string>
 
+#define CHECK 9
+#define TRACELEVEL 9
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 
@@ -111,6 +113,9 @@ const char* PLUGIN_CHECKTYPE ("getFileType");
 #endif
 #ifdef SUPPORT_MSOFFICE
 #  include "ParseMSOffice.h"
+#  ifdef SUPPORT_OOXML
+#     include "ParseOOXML.h"
+#  endif
 #endif
 #ifdef SUPPORT_ABIWORD
 #  include "ParseAbiword.h"
@@ -209,6 +214,9 @@ class Application : public YGP::IVIOApplication {
 #endif
 #ifdef SUPPORT_MSOFFICE
    static void processMSOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+#  ifdef SUPPORT_OOXML
+   static void processOOXML (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+#  endif
 #endif
 #ifdef SUPPORT_OO
    static void processOpenOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
@@ -329,6 +337,9 @@ Application::Application (const int argc, const char* argv[])
 #endif
 #ifdef SUPPORT_MSOFFICE
    handlers[YGP::FileTypeChecker::MSOFFICE] =  &Application::processMSOffice;
+#  ifdef SUPPORT_OOXML
+   handlers[YGP::FileTypeChecker::MSOFFICE2007] =  &Application::processOOXML;
+#  endif
 #endif
 #ifdef SUPPORT_OGG
    handlers[YGP::FileTypeChecker::OGG] =  &Application::processOGG;
@@ -479,6 +490,9 @@ void Application::showHelp () const {
 #endif
 #ifdef SUPPORT_MSOFFICE
       "  - Microsoft Office (Word (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n"
+#  ifdef SUPPORT_OOXML
+      "  - Microsoft Office Open XML (*.docx)\n"
+#  endif
 #endif
       ;
 }
@@ -839,7 +853,7 @@ void Application::handleFiles (const char* pFile) const {
       name = file->path ();
       name += file->name ();
       HANDLER fnc (getFileTypeHandler (name.c_str ()));
-      // U_nknown type; try second to-last extension (if option passed)
+      // Unknown type; try second to-last extension (if option passed)
       if ((options & TRUNC_EXTENSION) && !fnc) {
 	 do {
 	    size_t pos (name.rfind ('.'));
@@ -1090,7 +1104,7 @@ void Application::processAbiword (YGP::Xistream& hFile, Properties& result) thro
 
 #ifdef SUPPORT_RTF
 //-----------------------------------------------------------------------------
-/// Tries to extract the properties of an RTF-document
+/// Tries to extract the properties of a RTF-document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
@@ -1103,7 +1117,7 @@ void Application::processRTF (YGP::Xistream& hFile, Properties& result) throw (Y
 
 #ifdef SUPPORT_MSOFFICE
 //-----------------------------------------------------------------------------
-/// Tries to extract the properties of an MS-office document
+/// Tries to extract the properties of a MS-office document
 /// \param hFile: File to processs
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
@@ -1111,6 +1125,18 @@ void Application::processRTF (YGP::Xistream& hFile, Properties& result) throw (Y
 void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseMSOffice ().parse (hFile, result);
 }
+
+#  ifdef SUPPORT_OOXML
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of a MS Office Open XML document
+/// \param hFile: File to processs
+/// \param result: Result of parsing
+/// \throw YGP::ParseError: In case of an error
+//-----------------------------------------------------------------------------
+void Application::processOOXML (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
+   ParseOOXML ().parse (hFile, result);
+}
+#  endif
 #endif
 
 #ifdef SUPPORT_JPEG
