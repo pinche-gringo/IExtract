@@ -47,55 +47,6 @@ static const unsigned int ID_PKZIP_CENTRALFILEHDR (0x02014b50);
 
 
 //-----------------------------------------------------------------------------
-/// Checks if the passed stream is a ZIP-archive having the passed file inside
-/// \param stream Stream from where to read more characters
-/// \param buffer Buffer to inspect
-/// \param file Name of file which must be inside the ZIP-file
-/// \param length Lenght of file-name
-/// \returns bool True, if the file is included
-//-----------------------------------------------------------------------------
-static UINT32 getFileInArchive (std::ifstream& stream, char* buffer,
-				const char* file, unsigned int lenFile) {
-   if (YGP::get4BytesLSB (buffer) == ID_PKZIP_LOCALHDR) {
-      char buffer[80];
-      memset (buffer, 0, sizeof (buffer));
-      stream.seekg (-22, std::ios::end);
-      stream.read (buffer, 22);
-
-      if (YGP::get4BytesLSB (buffer) == ID_PKZIP_END_CDR) {
-	 // Skip to central directory record
-	 unsigned int cEntries (YGP::get4BytesLSB (buffer + 10));
-	 stream.seekg (YGP::get4BytesLSB (buffer + 16), std::ios::beg);
-	 TRACE6 ("getFileInArchive (2x const char*, unsigned int, std::ifstream&) - Start CDR: " << YGP::get4BytesLSB (buffer + 16) << " (" << cEntries << ')');
-
-	 // Inspect all entries
-	 while (cEntries--) {
-	    stream.read (buffer, 46);
-	    if (YGP::get4BytesLSB (buffer) == ID_PKZIP_CENTRALFILEHDR) {
-	       unsigned int lenName (YGP::get2BytesLSB (buffer + 28));
-	       unsigned int lenSkip (YGP::get2BytesLSB (buffer + 30) + YGP::get2BytesLSB (buffer + 32));
-	       TRACE6 ("getFileInArchive (2x const char*, unsigned int, std::ifstream&) - Len of filename: " << lenName
-		       << "; Skipping: " << lenSkip);
-
-	       // Check if "meta.xml" entry has been found
-	       if (lenName == lenFile) {
-		  UINT32 posFile (YGP::get4BytesLSB (buffer + 42));
-		  stream.read (buffer, lenFile);
-		  if (!memcmp (file, buffer, lenFile))
-		     return posFile;
-		  lenName -= lenFile;
-	       }
-	       stream.seekg (lenName + lenSkip, std::ios::cur);
-	    }
-	    else
-	       break;
-	 } // end-while
-      }
-   }
-   return NULL;
-}
-
-//-----------------------------------------------------------------------------
 /// (Default-)Constructor
 //-----------------------------------------------------------------------------
 ParseOOXML::ParseOOXML () {
@@ -110,7 +61,7 @@ ParseOOXML::ParseOOXML () {
 void ParseOOXML::parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
    UINT32 posFile;
    stream.read ((char*)&posFile, sizeof (posFile));
-   posFile = getFileInArchive ((std::ifstream&)stream, (char*)&posFile, "docProps/core.xml", 17);
+   posFile = YGP::getFileOffsetInArchive ((std::ifstream&)stream, (char*)&posFile, "docProps/core.xml", 17);
    if (posFile) {
       TRACE1 ("ParseOOXML::parse (YGP::Xistream&, Properties&) - Skipping to " << posFile);
 
