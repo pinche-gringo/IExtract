@@ -1,8 +1,8 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.52)
-AC_REVISION($Revision$)
-AC_INIT(IExtract, 0.9.03, [g17m0@lycos.com], IExtract)
+AC_REVISION($Revision: 1.41 $)
+AC_INIT(IExtract, 0.9.10, [g17m0@lycos.com], IExtract)
 
 RELEASE=${PACKAGE_VERSION%.*}
 AC_SUBST(PACKAGE_VERSION)
@@ -31,7 +31,8 @@ dnl Checks for programs.
 
 dnl Checks for libraries.
 AC_CHECK_LIB(stdc++, main)
-PKG_CHECK_MODULES(YMP, YGP >= 0.8.20, [],
+AC_CHECK_LIB(z, main)
+PKG_CHECK_MODULES(YMP, YGP >= 0.9.10, [],
                   [AC_MSG_ERROR(Need libYGP to make); exit])
 
 dnl Checks for header files.
@@ -156,6 +157,10 @@ AC_ARG_ENABLE(msoffice,
                              [Disables handling of MS-Office-documents]))
 if test "$enable_msoffice" != "no"; then
    AC_DEFINE_UNQUOTED(SUPPORT_MSOFFICE, 1, [Define if MS-Office documents are handled])
+
+   if test "$ac_cv_lib_z_main" = yes; then
+      AC_DEFINE_UNQUOTED(SUPPORT_OOXML, 1, [Define if OOXML documents are handled])
+   fi
 fi
 AM_CONDITIONAL(SUPPORT_MSOFFICE, test "$enable_msoffice" != "no")
 
