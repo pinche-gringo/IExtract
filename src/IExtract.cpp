@@ -40,8 +40,6 @@
 #include <map>
 #include <string>
 
-#define CHECK 9
-#define TRACELEVEL 9
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 
