@@ -10,7 +10,6 @@
 *.m4
 IExtract
 .deps
-.gitignore
 ABOUT-NLS
 COPYING
 intl
@@ -22,7 +21,7 @@ m4
 missing
 IExtract-cfg.h
 Makefile
-config.*
+config.??*
 configure
 stamp-h1
 autom4te.cache
