@@ -34,8 +34,6 @@
 
 #include <cstring>
 
-#define CHECK 9
-#define TRACELEVEL 9
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 #include <YGP/Utility.h>
@@ -117,8 +115,26 @@ void ParseOOXML::parse (YGP::Xistream& stream, Properties& result) throw (YGP::P
       TRACE1 ("ParseOOXML::parse (YGP::Xistream&, Properties&) - Skipping to " << posFile);
 
       stream.seekg (posFile, std::ios::beg);
-      unsigned char input[1024];
       unsigned char output[1024];
+      stream.read ((char*)output, 30);
+      TRACE9 ("Hdr: " << YGP::get4BytesLSB ((char*)output) << "; Compr: " << YGP::get2BytesLSB ((char*)output + 8)
+	      << "; Len: " << YGP::get2BytesLSB ((char*)output + 26));
+      if ((YGP::get4BytesLSB ((char*)output) != ID_PKZIP_LOCALHDR)
+	  || (YGP::get2BytesLSB ((char*)output + 8) != 8)
+	  || (YGP::get2BytesLSB ((char*)output + 26) != 17))
+	 throw (YGP::ParseError (_("Archive contains an invalid file entry!")));
+
+      // Skip over filename and extra field
+      TRACE9 ("ParseOOXML::parse (YGP::Xistream&, Properties&) - Skipping "
+	      << YGP::get2BytesLSB ((char*)output + 28));
+      stream.seekg (YGP::get2BytesLSB ((char*)output + 28) + 17, std::ios::cur);
+
+      // Read the number of bytes stored in the header
+      std::string props;
+      unsigned int size (YGP::get4BytesLSB ((char*)output + 18));
+      TRACE9 ("ParseOOXML::parse (YGP::Xistream&, Properties&) - Size: " << size);
+
+      unsigned char input[1024];
       z_stream zStream;
 
       zStream.zalloc = Z_NULL;                        // Allocate inflate state
@@ -126,20 +142,24 @@ void ParseOOXML::parse (YGP::Xistream& stream, Properties& result) throw (YGP::P
       zStream.opaque = Z_NULL;
       zStream.avail_in = 0;
       zStream.next_in = Z_NULL;
-      int rc (inflateInit (&zStream));
+      int rc (inflateInit2 (&zStream, -MAX_WBITS));
       if (rc != Z_OK)
-	 throw  (YGP::ParseError (_("Can't initialise zlib!")));
+	 throw (YGP::ParseError (_("Can't initialise zlib!")));
 
-      // Read the whole file
-      std::string props;
-      while (stream) {
-	 stream.read ((char*)input, sizeof (input));
+      while (stream && size) {
+	 stream.read ((char*)input, (size > sizeof (input)) ? sizeof (input) : size);
 	 TRACE6 ("ParseOOXML::parse (YGP::Xistream&, Properties&) - Bytes read: " << stream.gcount ());
+
+	 TRACE1 (std::hex);
+	 for (unsigned int x (0); x < 8; ++x)
+	    TRACE1 ((unsigned int)input[x] << ' ');
+	 TRACE1 (std::hex);
 
 	 zStream.avail_in = stream.gcount ();
 	 if (!zStream.avail_in)
 	    break;
 	 zStream.next_in = input;
+	 size -= zStream.avail_in;
 
 	 // Run inflate() on input until output buffer is full
 	 do {
@@ -178,7 +198,6 @@ void ParseOOXML::parse (YGP::Xistream& stream, Properties& result) throw (YGP::P
 	    }
 	    return;
 	 }
-	    
       }
       inflateEnd (&zStream);
       throw (YGP::ParseError (_("Unexpected end of file!")));
