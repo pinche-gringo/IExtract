@@ -336,7 +336,7 @@ Application::Application (const int argc, const char* argv[])
 #ifdef SUPPORT_MSOFFICE
    handlers[YGP::FileTypeChecker::MSOFFICE] =  &Application::processMSOffice;
 #  ifdef SUPPORT_OOXML
-   handlers[YGP::FileTypeChecker::MSOFFICE2007] =  &Application::processOOXML;
+   handlers[YGP::FileTypeChecker::OOXML] =  &Application::processOOXML;
 #  endif
 #endif
 #ifdef SUPPORT_OGG
