@@ -1,3 +1,9 @@
+Overview of changes in version 0.9.10:
+
+  - Handling Office Open XML documents (if zlib is installed)
+  - Disabling Traces and Checks in ParsePDF
+
+
 Overview of changes in version 0.9.03:
 
   - Put under GPL version 3
