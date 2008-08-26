@@ -16,3 +16,4 @@ src/ParseOGG.cpp
 src/ParseAbiword.cpp
 src/ParsePNG.cpp
 src/ParseGIF.cpp
+src/ParseOOXML.cpp
