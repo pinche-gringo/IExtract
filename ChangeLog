@@ -1,3 +1,61 @@
+2008-08-26 18:35:23 +0200  Markus Schwab  <g17m0@lycos.com>
+
+        * ChangeLog: Documented changes in V0.9.10
+
+        * *.po: Translated messages from ParseOOXML
+
+2008-08-26 18:34:51 +0200  Markus Schwab  <g17m0@lycos.com>
+
+        * POTFILES: Added ParseOOXML.cpp
+
+2008-08-25 23:21:24 +0200  Markus Schwab  <g17m0@lycos.com>
+
+        * .gitignore: Removed .gitignore, config.h
+
+2008-08-25 23:20:48 +0200  Markus Schwab  <g17m0@lycos.com>
+
+        * config.h: Added (links to IExtract-cfg.h
+
+2008-08-25 19:18:49 +0200  Markus Schwab  <g17m0@lycos.com>
+
+        * NEWS: Documented changes in V0.9.10
+
+2008-08-25 19:18:20 +0200  Markus Schwab  <g17m0@lycos.com>
+
+        * IExtract.cpp: Adapted to new FileTypeChk-file types
+
+2008-08-25 19:17:24 +0200  Markus Schwab  <g17m0@lycos.com>
+
+        * ParseOOXML: Using YGP::getFileOffsetInArchive to jump to docProps/core.xml
+
+2008-08-25 18:30:43 +0200  Markus Schwab  <g17m0@lycos.com>
+
+        * configure.in: Version to 0.9.10; Testing for zlib
+
+2008-08-25 18:29:51 +0200  Markus Schwab  <g17m0@lycos.com>
+
+        * .gitignore: Initial version
+
+2008-08-25 18:29:20 +0200  Markus Schwab  <g17m0@lycos.com>
+
+        * Skipping file-header of entires in ZIP-archive; Using inflateInit2
+
+2008-08-25 18:28:08 +0200  Markus Schwab  <g17m0@lycos.com>
+
+        * IExtract.cpp: Removed checks and traces
+
+2008-08-24 14:19:13 +0200  Markus Schwab  <g17m0@lycos.com>
+
+        * IExtract.cpp: Hanling OOXML documents
+
+2008-08-24 14:18:08 +0200  Markus Schwab  <g17m0@lycos.com>
+
+        * ParseOOXML: Initial revision
+
+2008-06-15 12:33:25 +0000  Markus Schwab  <g17m0@lycos.com>
+
+        * ParsePDF: Disabled traces and checks
+
 2008-06-11  Markus Schwab  <g17m0@lycos.com>
 
 	* ChangeLog, NEWS: Changes of V0.9.03 documented
