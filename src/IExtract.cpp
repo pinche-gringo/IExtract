@@ -489,7 +489,7 @@ void Application::showHelp () const {
 #ifdef SUPPORT_MSOFFICE
       "  - Microsoft Office (Word (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n"
 #  ifdef SUPPORT_OOXML
-      "  - Microsoft Office Open XML (*.docx)\n"
+      "  - Microsoft Office Open XML (*.docx, *.xlsx, *.pptx)\n"
 #  endif
 #endif
       ;
