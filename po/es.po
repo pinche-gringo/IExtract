@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: IExtract V0.9 ($Revision$)\n"
 "Report-Msgid-Bugs-To: g17m0@lycos.com\n"
 "POT-Creation-Date: 2008-08-26 18:26+0200\n"
-"PO-Revision-Date: 2008-08-26 18:31+0200\n"
+"PO-Revision-Date: 2008-09-02 14:21+0200\n"
 "Last-Translator: Markus Schwab <g17m0@lycos.com>\n"
 "Language-Team: ESPAÑOL <g17m0@lycos.com>\n"
 "MIME-Version: 1.0\n"
@@ -66,42 +66,44 @@ msgid ""
 "Separate subdirectories with TEXT (default: empty);\n"
 "\t\t\t  implies recursion into subdirectories (--recursive)"
 msgstr ""
-"Separa carpetas bajos con TEXT (por defecto: vacio);\n"
+"Separa carpetas bajos con TEXT (por defecto: vacío);\n"
 "                          implica recursión en carpetas (--recursive)"
 
 #: src/IExtract.cpp:378
 msgid "Text to print before any output"
-msgstr "Texto para escribir antes de cualquiera salida"
+msgstr "Texto para escribir antes de cualquier salida"
 
 #: src/IExtract.cpp:379
 msgid "File to print before any output"
-msgstr "Archivo para escribir antes de cualquiera salida"
+msgstr "Archivo para escribir antes de cualquier salida"
 
 #: src/IExtract.cpp:380
 msgid "Text to print at the end of the output"
-msgstr "Texto para escribir después de cualquiera salida<"
+msgstr "Texto para escribir después de cualquier salida<"
 
 #: src/IExtract.cpp:381
 msgid "File to print at the end of the output"
-msgstr "Archivo para escribir después de cualquiera salida<"
+msgstr "Archivo para escribir después de cualquier salida<"
 
 #: src/IExtract.cpp:382
 msgid "Puts error messages (additionally) into the output"
-msgstr "Pone también el mensaje del error en la salida"
+msgstr "Pon también el mensaje del error en la salida"
 
 #: src/IExtract.cpp:383
 msgid "Show all files (including unknown types) in output"
-msgstr "Mostra todos los archivos (también tipos inconocidos)"
+msgstr "Muestra todos los archivos (también tipos desconocidos)"
 
 #: src/IExtract.cpp:385
 msgid "Number of threads for examining files (default: 1)"
-msgstr "Número de procesos del fondo (threads) adicional (por defecto: 1)"
+msgstr ""
+"Número de procesos del fondo (threads) adicionales (por\n"
+"                             defecto: 1)"
 
 #: src/IExtract.cpp:387
 msgid "Show TEXT for files younger than DAYS days (def: 30)"
 msgstr ""
-"Mostra TEXT por archivos más joven que DAYS (por\n"
-"                          defecto: 30)"
+"Muestra TEXT por archivos más joven que DAYS (por\n"
+"                              defecto: 30)"
 
 #: src/IExtract.cpp:388
 msgid "Files to inspect"
@@ -117,7 +119,7 @@ msgstr "Lee más opciones desde el archivo especificado"
 
 #: src/IExtract.cpp:391
 msgid "Sort found files alphabetically"
-msgstr "Sortea los archivos alfabeticalmente"
+msgstr "Sortea los archivos por orden alfabético"
 
 #: src/IExtract.cpp:392
 msgid ""
@@ -130,9 +132,8 @@ msgid ""
 msgstr ""
 "Modo de operación para determinar el tipo del archivo:\n"
 "                          Ext: De la (última) extensión del nombre\n"
-"                          EXT: De la extensión del nombre (ignorando "
-"mayúsculas)\n"
-"                          AllExt: De la extensión conocida\n"
+"                          EXT: De la extensión del nombre (ignorando mayúsculas)\n"
+"                          AllExt: De la última extensión conocida\n"
 "                          AllEXT: De la extensión conocida (sin mayúsculas)\n"
 "                          Content: Del contenido del archivo"
 
@@ -149,7 +150,7 @@ msgid ""
 "  File(s) ... Files to analyze (the last part can contain wildcards)\n"
 "\n"
 msgstr ""
-"  Archivo(s) ... Archivos por inspectar (el último parte puede contener\n"
+"  Archivo(s) ... Archivos por inspectar (la último parte puede contener\n"
 "                 fijadores de posiciones)\n"
 "\n"
 
@@ -158,16 +159,12 @@ msgid ""
 "DAYS (in option -n) may be omited or may have an multiplier suffix: m for "
 "30.\n"
 "\n"
-msgstr ""
-"DAYS puede hacer falta o tener un apéndice de multiplicación: m por 30.\n"
-"\n"
+msgstr "DAYS puede hacer falta o tener un apéndice de multiplicación: m por 30.\n\n"
 
 #: src/IExtract.cpp:402
 msgid ""
 "LIST is a list of files; seperated with the path-separator of the operating\n"
-msgstr ""
-"LIST es una lista de archivos; separada por la la letra seperado del camino "
-"del\n"
+msgstr "LIST es una lista de archivos; separada por la la letra separando el camino del\n"
 
 #: src/IExtract.cpp:403
 msgid ""
@@ -226,7 +223,7 @@ msgstr "       %n está cambiado por el nombre del archivo\n"
 
 #: src/IExtract.cpp:413
 msgid "       %N is substituted with path and name of the file\n"
-msgstr "       %N está cambiado por nombre y camino del archivo\n"
+msgstr "       %N está cambiado por el nombre y camino del archivo\n"
 
 #: src/IExtract.cpp:414
 #, c-format
@@ -262,8 +259,7 @@ msgid ""
 "       %U is substituted with path and name of the file in UNIX style "
 "(with /)\n"
 msgstr ""
-"       %U está cambiado por nombre y camino del archivo en estilo UNIX "
-"(separado\n"
+"       %U está cambiado por el nombre y camino del archivo en estilo UNIX (separado\n"
 "          con un slash (/))\n"
 
 #: src/IExtract.cpp:420
@@ -272,10 +268,8 @@ msgid ""
 "          producing a non-empty string (e.g. %(tn) is the titel if not \n"
 "          empty or else the filename.)\n"
 msgstr ""
-"       %(LETRAS) está cambiado por el primer cambio (de las reglas "
-"anteriores)\n"
-"         que produce un text no vacio (p.e. %(tn) será el titulo (si hay) o "
-"el\n"
+"       %(LETRAS) está cambiado por el primer cambio (de las reglas anteriores)\n"
+"         que produce un text no vacío (p.e. %(tn) será el titulo (si hay) o el\n"
 "         nombre del archivo)\n"
 
 #: src/IExtract.cpp:423
@@ -288,9 +282,8 @@ msgid ""
 "\n"
 msgstr ""
 "       %*LETRA cambia la significancia de LETRA un poco. Para nombres de\n"
-"         archivo pasa adicional una converción le letras especiales; para "
-"los\n"
-"         demas se suprime ese converción\n"
+"         archivo pasa adicional una conversión le letras especiales; para los\n"
+"         demás se suprime ese conversión\n"
 
 #: src/IExtract.cpp:425
 #, no-c-format
@@ -326,7 +319,7 @@ msgstr ""
 
 #: src/IExtract.cpp:429
 msgid "     conversion strings:\n"
-msgstr "     indica que la letra siguente tiene significada especial:\n"
+msgstr "     indica que la letra siguente tiene significancia especial:\n"
 
 #: src/IExtract.cpp:430
 #, c-format
@@ -359,7 +352,7 @@ msgstr ""
 #: src/IExtract.cpp:435
 #, c-format
 msgid "       %s prints the start-of-output for the specified output style\n"
-msgstr "       %s imprima la empieza-de-la-salida por el estilo especifado\n"
+msgstr "       %s imprima la empieza-de-la-salida por el estilo especificado\n"
 
 #: src/IExtract.cpp:436
 msgid ""
@@ -367,8 +360,7 @@ msgid ""
 "(with /)\n"
 "\n"
 msgstr ""
-"       %U está cambiado por el nombre y el camino de la carpeta en estilo "
-"UNIX\n"
+"       %U está cambiado por el nombre y el camino de la carpeta en estilo UNIX\n"
 "          (separado por un slash (/))\n"
 
 #: src/IExtract.cpp:437
@@ -400,17 +392,16 @@ msgstr "-aviso: ¡Opción '%1' necesita un argumento! ¡Ignoro opción!\n"
 
 #: src/IExtract.cpp:530
 msgid "-warning: Style of output `%1' is not valid! Using text\n"
-msgstr "-aviso: ¡Estilo de la salida '%1' no es valido! Uso text\n"
+msgstr "-aviso: ¡Estilo de la salida '%1' no es válido! Uso text\n"
 
 #: src/IExtract.cpp:544
 msgid "-warning: Invalid number of threads!\n"
-msgstr "-aviso: ¡El número de los proceses del fondo (threads) no es valido!\n"
+msgstr "-aviso: ¡El número de los proceses del fondo (threads) no es válido!\n"
 
 #: src/IExtract.cpp:588
 msgid ""
 "-warning: Argument for new files `%1' is not valid! Ignoring option `n'\n"
-msgstr ""
-"-aviso: ¡Argumento por archivos nuevos '%1' no es valido! Ignoro opción 'n'\n"
+msgstr "-aviso: ¡Argumento por archivos nuevos '%1' no es válido! Ignoro opción 'n'\n"
 
 #: src/IExtract.cpp:653
 msgid "-error: `%1' is not a (readable) file! Ignoring option `%2'!\n"
@@ -422,7 +413,7 @@ msgstr "-aviso: ¡Modo '%1' inválido! ¡Ignoro opción 'M'!\n"
 
 #: src/IExtract.cpp:694
 msgid "-warning: Ignoring invalid option `%1'\n"
-msgstr "-aviso: Ignoro opción invalida '%1'\n"
+msgstr "-aviso: Ignoro opción inválida '%1'\n"
 
 #: src/IExtract.cpp:886 src/IExtract.cpp:1010
 msgid "-error: "
@@ -430,14 +421,14 @@ msgstr ""
 
 #: src/IExtract.cpp:897
 msgid "Unknown file-type"
-msgstr "Tipo del archivo inconocido"
+msgstr "Tipo del archivo desconocido"
 
 #: src/IExtract.cpp:991
 msgid ""
 "-error: File `%1' can't be opened!\n"
 "Reason: "
 msgstr ""
-"-error: ¡No se puede abrir archivo '%1'!\n"
+"-error: ¡No se puede abrir el archivo '%1'!\n"
 "Causa: "
 
 #: src/IExtract.cpp:1013
@@ -448,17 +439,13 @@ msgstr "Error procesando: "
 msgid ""
 "-warning: The INI-file `%1' contains an invalid entry for the output style (`"
 "%2')! Using text\n"
-msgstr ""
-"-avios: ¡El archivo por iniciar '%1' contiene una entrada invalida por el "
-"estilo de la salida ('%2')! Uso text\n"
+msgstr "-aviso: ¡El archivo por iniciar '%1' contiene una entrada inválida por el estilo de la salida ('%2')! Uso text\n"
 
 #: src/IExtract.cpp:1263
 msgid ""
 "-warning: The INI-file `%1' contains an invalid mode to determine the file-"
 "type (`%2')! Using text\n"
-msgstr ""
-"-avios: ¡El archivo por iniciar '%1' contiene una entrada inválida por el "
-"estilo de la salida ('%2')! Uso text\n"
+msgstr "-aviso: ¡El archivo por iniciar '%1' contiene una entrada inválida por el estilo de la salida ('%2')! Uso text\n"
 
 #: src/IExtract.cpp:1288 src/IExtract.cpp:1297
 msgid "Invalid plug-in `%1'!\n"
@@ -478,11 +465,11 @@ msgstr "Posición de la tabla de la referencia"
 
 #: src/ParsePDF.cpp:58
 msgid "First char of tag"
-msgstr "Primero character del identificador"
+msgstr "Primero caracter del identificador"
 
 #: src/ParsePDF.cpp:59
 msgid "Unused data"
-msgstr "Dato inusado"
+msgstr "Datos inutilizados"
 
 #: src/ParsePDF.cpp:60
 msgid "Tag for cross reference table"
@@ -494,7 +481,7 @@ msgstr "Número por las entradas de la referencia"
 
 #: src/ParsePDF.cpp:63
 msgid "Offset of object"
-msgstr "Posición del objecto"
+msgstr "Posición del objeto"
 
 #: src/ParsePDF.cpp:64
 msgid "Tag for trailer"
@@ -502,7 +489,7 @@ msgstr "ID por apéndice"
 
 #: src/ParsePDF.cpp:65
 msgid "Start of object"
-msgstr "Comienzo de objecto"
+msgstr "Comienzo de objeto"
 
 #: src/ParsePDF.cpp:66
 msgid "Reference to info object"
@@ -518,11 +505,11 @@ msgstr "Posición de la entrada \"/Prev\""
 
 #: src/ParsePDF.cpp:69
 msgid "ID of object"
-msgstr "ID del objecto"
+msgstr "ID del objeto"
 
 #: src/ParsePDF.cpp:70
 msgid "ID of object (repeated)"
-msgstr "ID del objecto (repitido)"
+msgstr "ID del objeto (repitido)"
 
 #: src/ParsePDF.cpp:71
 msgid "Generation"
@@ -530,11 +517,11 @@ msgstr "Generación"
 
 #: src/ParsePDF.cpp:72
 msgid "Tag for an object"
-msgstr "ID por un objecto"
+msgstr "ID por un objeto"
 
 #: src/ParsePDF.cpp:73
 msgid "End of object"
-msgstr "Fin de un objecto"
+msgstr "Fin de un objeto"
 
 #: src/ParsePDF.cpp:74
 msgid "Tag for title"
@@ -546,7 +533,7 @@ msgstr "ID por el autor"
 
 #: src/ParsePDF.cpp:76
 msgid "Tag for comment (subject)"
-msgstr "ID por el comentario (subject)"
+msgstr "ID por el comentario (subjeto)"
 
 #: src/ParsePDF.cpp:77 src/ParseHTML.cpp:56 src/ParseRTF.cpp:60
 msgid "Value of entry"
@@ -578,7 +565,7 @@ msgstr "Posición de la table de la referencia"
 
 #: src/ParsePDF.cpp:84
 msgid "Cross reference table"
-msgstr "Table de la referencia"
+msgstr "Tabla de la referencia"
 
 #: src/ParsePDF.cpp:85
 msgid "Cross reference table subsection"
@@ -610,7 +597,7 @@ msgstr "Entrada \"Prev\""
 
 #: src/ParsePDF.cpp:92
 msgid "Info object"
-msgstr "Objecto \"Info\""
+msgstr "Objeto \"Info\""
 
 #: src/ParsePDF.cpp:93
 msgid "Info values"
@@ -618,7 +605,7 @@ msgstr "Valores de la información"
 
 #: src/ParsePDF.cpp:94
 msgid "Valid type"
-msgstr "Tipo valido"
+msgstr "Tipo válido"
 
 #: src/ParsePDF.cpp:95
 msgid "Start of values"
@@ -634,7 +621,7 @@ msgstr "¡No documento PDF!"
 
 #: src/ParsePDF.cpp:474
 msgid "Document does not contain neither an /Info nor a /Prev entry"
-msgstr "Documento no contiene ni una entrada \"/Info\" ni una \"/Prev\""
+msgstr "Documento no contiene ni una entrada \"/Info\" ni \"/Prev\""
 
 #: src/ParseHTML.cpp:50
 msgid "Start of HTML-tag"
@@ -674,7 +661,7 @@ msgstr "Otro tag META"
 
 #: src/ParseHTML.cpp:60
 msgid "Unused information"
-msgstr "Dato inusado"
+msgstr "Datos inutilizados"
 
 #: src/ParseHTML.cpp:61
 msgid "Quote"
@@ -682,7 +669,7 @@ msgstr "Comilla"
 
 #: src/ParseHTML.cpp:62
 msgid "Equal sign"
-msgstr "Signo de igualidad"
+msgstr "Signo de igualdad"
 
 #: src/ParseHTML.cpp:63
 msgid "Name of meta tag"
@@ -722,7 +709,7 @@ msgstr "Título en el formato \"Dublin Core\""
 
 #: src/ParseHTML.cpp:72
 msgid "Valid HTML tag"
-msgstr "Tag HTML valido"
+msgstr "Tag HTML válido"
 
 #: src/ParseHTML.cpp:73
 msgid "Title entry"
@@ -754,7 +741,7 @@ msgstr "Script"
 
 #: src/ParseHTML.cpp:80
 msgid "Valid HTML command"
-msgstr "Comando HTML valido"
+msgstr "Comando HTML válido"
 
 #: src/ParseHTML.cpp:81
 msgid "HTML document"
@@ -866,7 +853,7 @@ msgstr "¡No pude encontrar la identificación!"
 
 #: src/ParseMSOffice.cpp:95
 msgid "Values for blocksizes are not plausible!"
-msgstr "¡Los valores para el tamaño de los bloques no está plausible!"
+msgstr "¡Los valores para el tamaño de los bloques no están plausibles!"
 
 #: src/ParseMSOffice.cpp:100
 msgid "Number of blocks for BAT not plausible!"
@@ -874,7 +861,7 @@ msgstr "¡El número de bloques del BAT no está plausible!"
 
 #: src/ParseMSOffice.cpp:114
 msgid "Not a property block at offset %1!"
-msgstr "¡No encontré ningún bloque de propiedad a posición %1!"
+msgstr "¡No encontré ningún bloque de propiedad en la posición %1!"
 
 #: src/ParseMSOffice.cpp:205
 msgid "Not an Information-Summary section!"
@@ -998,7 +985,7 @@ msgstr "ID de un documento RTF"
 
 #: src/ParseRTF.cpp:50
 msgid "Start of block"
-msgstr "Compienzo de bloque"
+msgstr "Comienzo de bloque"
 
 #: src/ParseRTF.cpp:51
 msgid "End of block"
@@ -1022,7 +1009,7 @@ msgstr "Comando"
 
 #: src/ParseRTF.cpp:56
 msgid "No special char"
-msgstr "Character no especial"
+msgstr "Caracter no especial"
 
 #: src/ParseRTF.cpp:57
 msgid "Author-entry"
@@ -1050,7 +1037,7 @@ msgstr "Otro comando"
 
 #: src/ParseRTF.cpp:64
 msgid "Value of command"
-msgstr "Valor de un Comando"
+msgstr "Valor de un comando"
 
 #: src/ParseRTF.cpp:65
 msgid "Entry"
@@ -1058,7 +1045,7 @@ msgstr "Entrada"
 
 #: src/ParseRTF.cpp:66
 msgid "Valid RTF command"
-msgstr "Comando RTF valido"
+msgstr "Comando RTF válido"
 
 #: src/ParseRTF.cpp:67
 msgid "RTF block"
@@ -1094,7 +1081,7 @@ msgstr "Comentario"
 
 #: src/ParseOGG.cpp:55
 msgid "OGG file"
-msgstr "Archive OGG"
+msgstr "Archivo OGG"
 
 #: src/ParseAbiword.cpp:62
 msgid "ID of an AbiWord document"
@@ -1106,7 +1093,7 @@ msgstr "Comienzo de bloque de información (Abiword)"
 
 #: src/ParseAbiword.cpp:65
 msgid "Unused contents"
-msgstr "Contento inusado"
+msgstr "Contento inutilizado"
 
 #: src/ParseAbiword.cpp:69
 msgid "AbiWord document"
@@ -1174,7 +1161,7 @@ msgstr "Descripción del imagen"
 
 #: src/ParseGIF.cpp:60
 msgid "Extension"
-msgstr "Extención"
+msgstr "Extensión"
 
 #: src/ParseGIF.cpp:61
 msgid "Comment blocks"
