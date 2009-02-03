@@ -8,7 +8,7 @@
 //REVISION    : $Revision: 1.86 $
 //AUTHOR      : Markus Schwab
 //CREATED     : 10.08.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2008
+//COPYRIGHT   : Copyright (C) 2002 - 2009
 
 // This file is part of IExtract.
 //
@@ -155,7 +155,7 @@ class Application : public YGP::IVIOApplication {
    virtual const char* name () const { return PACKAGE; }
    virtual const char* description () const {
       static std::string version (PACKAGE " V" VERSION " - ");
-      version += (_("Compiled on %1 at %2\n\nCopyright (C) 2002 - 2008 Markus Schwab; email: g17m0@lycos.com\nDistributed under the terms of the GNU General Public License"));
+      version += (_("Compiled on %1 at %2\n\nCopyright (C) 2002 - 2009 Markus Schwab; email: g17m0@users.sourceforge.net\nDistributed under the terms of the GNU General Public License"));
       version.replace (version.find ("%1"), 2, __DATE__);
       version.replace (version.find ("%2"), 2, __TIME__);
       return version.c_str (); }

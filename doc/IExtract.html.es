@@ -1,8 +1,6 @@
 <!-- -*-HTML-*- -->
-<!-- $Id$ -->
-
 <!--
-  Copyright (C) 2003 - 2008 Markus Schwab (g17m0@lycos.com)
+  Copyright (C) 2003 - 2009 Markus Schwab (g17m0@users.sourceforge.net)
 
   This file is part of IExtract.
 
@@ -20,7 +18,7 @@
   along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//ES"
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
@@ -30,7 +28,7 @@
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Copyright (C) 2003 - 2008; distribuido bajo las condiciones de la GNU Licensia Público">
+    <meta name="DC.Rights" content="Copyright (C) 2003 - 2009; distribuido bajo las condiciones de la GNU Licensia Público">
 
     <style type="text/css">
       <!--
@@ -415,6 +413,6 @@
     <p>&iexcl;Pasan los mismos cambios como con las opciones!</p>
 
     <hr>
-    <address><a href="mailto:g17m0@lycos.com">Envia comentarios</a></address>
+    <address><a href="mailto:g17m0@users.sourceforge.net">Envia comentarios</a></address>
   </body>
 </html>
