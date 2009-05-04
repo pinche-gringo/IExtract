@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.9 ($Revision$)\n"
 "Report-Msgid-Bugs-To: g17m0@users.sourceforge.net\n"
-"POT-Creation-Date: 2009-02-03 15:12-0300\n"
+"POT-Creation-Date: 2009-05-05 00:12+0200\n"
 "PO-Revision-Date: 2009-02-03 15:13-0300\n"
 "Last-Translator: Markus Schwab <g17m0@users.sourceforge.net>\n"
 "Language-Team: ENGLISH <g17m0@users.sourceforge.net>\n"
@@ -130,7 +130,7 @@ msgstr ""
 
 #: src/IExtract.cpp:400
 msgid ""
-"  File(s) ... Files to analyze (the last part can contain wildcards)\n"
+"  File(s) ... Files to analyse (the last part can contain wildcards)\n"
 "\n"
 msgstr ""
 

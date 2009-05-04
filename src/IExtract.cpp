@@ -397,7 +397,7 @@ void Application::showHelp () const {
 					     "\t\t\t  Content: From content of the file")
       << "\n  -V, --version ......... " << _("Output version information and exit")
       << "\n  -h, -?, --help ........ " << _("Displays this help and exit\n")
-      << _("  File(s) ... Files to analyze (the last part can contain wildcards)\n\n")
+      << _("  File(s) ... Files to analyse (the last part can contain wildcards)\n\n")
       << _("DAYS (in option -n) may be omited or may have an multiplier suffix: m for 30.\n\n")
       << _("LIST is a list of files; seperated with the path-separator of the operating\n")
       << _("     system (':' for UNICES, ';' for Windows). E.g. *.html:*.doc\n\n")
