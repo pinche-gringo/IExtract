@@ -224,6 +224,8 @@ class Application : public YGP::IVIOApplication {
    static void processAbiword (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
 #endif
 
+   void showSupportedTypes () const;
+
    enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4, TRUNC_EXTENSION = 0x8, TERMINATE = 0x10 };
 
    unsigned int options;
@@ -295,6 +297,7 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
    { "pre-file", 'P' },
    { "sort", 'S' },
    { "mode", 'M' },
+   { "list-types", 'l' },
    { NULL, '\0' } };
 
 
@@ -389,6 +392,7 @@ void Application::showHelp () const {
       << "\n  -x, --exclude=LIST .... " << _("Files not to inspect")
       << "\n  -f, --ini-file=FILE ... " << _("Read further options from specified file")
       << "\n  -S, --sort ..... ...... " << _("Sort found files alphabetically")
+      << "\n  -l, --list-types ...... " << _("List supported file types and exit")
       << "\n  -M, --mode=[MODUS] .... " << _("Modus operandi to determine the file-type:\n"
 	                                     "\t\t\t  Ext: From (last) extension (Default)\n"
 	                                     "\t\t\t  EXT: From (last) extension (ignoring case)\n"
@@ -451,48 +455,8 @@ void Application::showHelp () const {
       "   <Extension1>=<Library1>\n"
       "   <ExtensionN>=<LibraryN>\n\n"
 #endif
-      << _("Currently supported files are:")
-      << "\n"
-#ifdef SUPPORT_HTML
-      "  - HTML (*.html, *.htm, *.shtml, *.shtm, *.sht, *.php)\n"
-#endif
-#ifdef SUPPORT_JPEG
-      "  - JPEG (*.jpeg, *.jpg)\n"
-#endif
-#ifdef SUPPORT_PNG
-      "  - PNG (*.png)\n"
-#endif
-#ifdef SUPPORT_GIF
-      "  - GIF (*.gif)\n"
-#endif
-#ifdef SUPPORT_MP3
-      "  - MP3 (*.mp3)\n"
-#endif
-#ifdef SUPPORT_OGG
-      "  - OGG (*.ogg)\n"
-#endif
-#ifdef SUPPORT_PDF
-      "  - PDF (*.pdf)\n"
-#endif
-#ifdef SUPPORT_OO
-      "  - OpenOffice (Write (*.sxw), Calc (*.sxc), Impress (*.sxi), Math (*.sxm)"
-          " &\n    Draw (*.sxd))\n"
-      "  - OpenOffice 2 (Write (*.odt), Calc (*.ods), Impress (*.odp) & Draw (*.odg))\n"
-      "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
-#endif
-#ifdef SUPPORT_ABIWORD
-      "  - Abiword (*.abw)\n"
-#endif
-#ifdef SUPPORT_RTF
-      "  - RTF (*.rtf)\n"
-#endif
-#ifdef SUPPORT_MSOFFICE
-      "  - Microsoft Office (Word (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n"
-#  ifdef SUPPORT_OOXML
-      "  - Microsoft Office Open XML (*.docx, *.xlsx, *.pptx)\n"
-#  endif
-#endif
       ;
+   showSupportedTypes ();
 }
 
 //-----------------------------------------------------------------------------
@@ -687,6 +651,10 @@ bool Application::handleOption (const char option) {
 	 }
       }
       break;
+
+   case 'l':
+      showSupportedTypes ();
+      exit (0);
 
    case 'V': std::cout << description () << '\n'; exit (0);
 
@@ -1266,6 +1234,55 @@ void Application::readINIFile (const char* pFile) {
       std::cerr << PACKAGE << error;
    }
 }
+
+
+//-----------------------------------------------------------------------------
+/// Prints a list of supported files
+//-----------------------------------------------------------------------------
+void Application::showSupportedTypes () const {
+   std::cout << _("Currently supported files are:") << "\n"
+#ifdef SUPPORT_HTML
+      "  - HTML (*.html, *.htm, *.shtml, *.shtm, *.sht, *.php)\n"
+#endif
+#ifdef SUPPORT_JPEG
+      "  - JPEG (*.jpeg, *.jpg)\n"
+#endif
+#ifdef SUPPORT_PNG
+      "  - PNG (*.png)\n"
+#endif
+#ifdef SUPPORT_GIF
+      "  - GIF (*.gif)\n"
+#endif
+#ifdef SUPPORT_MP3
+      "  - MP3 (*.mp3)\n"
+#endif
+#ifdef SUPPORT_OGG
+      "  - OGG (*.ogg)\n"
+#endif
+#ifdef SUPPORT_PDF
+      "  - PDF (*.pdf)\n"
+#endif
+#ifdef SUPPORT_OO
+      "  - OpenOffice (Write (*.sxw), Calc (*.sxc), Impress (*.sxi), Math (*.sxm)"
+          " &\n    Draw (*.sxd))\n"
+      "  - OpenOffice 2 (Write (*.odt), Calc (*.ods), Impress (*.odp) & Draw (*.odg))\n"
+      "  - StarOffice (Write (*.sdw), Calc (*.sdc), Impress (*.sdd) & Draw (*.sda))\n"
+#endif
+#ifdef SUPPORT_ABIWORD
+      "  - Abiword (*.abw)\n"
+#endif
+#ifdef SUPPORT_RTF
+      "  - RTF (*.rtf)\n"
+#endif
+#ifdef SUPPORT_MSOFFICE
+      "  - Microsoft Office (Word (*.doc), Excel (*.xls) & Powerpoint (*.ppt))\n"
+#  ifdef SUPPORT_OOXML
+      "  - Microsoft Office Open XML (*.docx, *.xlsx, *.pptx)\n"
+#  endif
+#endif
+      ;
+}
+
 
 #ifdef ENABLE_PLUGINS
 //-----------------------------------------------------------------------------
