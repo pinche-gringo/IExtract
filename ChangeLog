@@ -1,3 +1,25 @@
+2009-05-18 13:47:30 +0200  Markus Schwab  <g17m0@users.sourceforge.net>
+
+        * ChangeLog, NEWS: Documented changes in V0.9.20
+
+        * IExtract: Added option --list-types to display supported types
+
+2009-05-18 13:47:00 +0200  Markus Schwab  <g17m0@users.sourceforge.net>
+
+        * configure.ac: Version to 0.9.20
+
+2009-05-05 00:15:12 +0200  Markus Schwab  <g17m0@users.sourceforge.net>
+
+        * IExtract.cpp: Changed text to british english
+
+2009-05-05 00:02:35 +0200  Markus Schwab  <g17m0@users.sourceforge.net>
+
+        * IExtract: Merged changes from work in SA
+
+2008-09-10 20:05:14 +0200  Markus Schwab  <g17m0@users.sourceforge.net>
+
+        * es.po: Improved
+
 2009-02-03 15:30:54 -0300  Markus Schwab  <g17m0@users.sourceforge.net>
 
         * ChangeLog: Documented changes in V0.9.11
