@@ -32,8 +32,6 @@ namespace YGP {
 struct Properties;
 
 
-#include <YGP/Tokenize.h>
-
 
 /**Baseclass of output classes
  */

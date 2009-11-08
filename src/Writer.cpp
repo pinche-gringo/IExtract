@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 13.10.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2005, 2007, 2008
+//COPYRIGHT   : Copyright (C) 2002 - 2005, 2007 - 2009
 
 // This file is part of IExtract.
 //
@@ -38,7 +38,6 @@
 #include <YGP/File.h>
 #include <YGP/ATStamp.h>
 #include <YGP/ANumeric.h>
-#include <YGP/Tokenize.h>
 
 #include "Writer.h"
 #include "Properties.h"
