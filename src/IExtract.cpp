@@ -40,6 +40,8 @@
 #include <map>
 #include <string>
 
+#include <boost/tokenizer.hpp>
+
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 
@@ -72,11 +74,11 @@ const char* PLUGIN_CHECKTYPE ("getFileType");
 #  define UNLOCKOUTPUT
 #endif
 
+#include <YGP/Path.h>
 #include <YGP/XStream.h>
 #include <YGP/INIFile.h>
 #include <YGP/DirSrch.h>
 #include <YGP/XDirSrch.h>
-#include <YGP/PathSrch.h>
 #include <YGP/IVIOAppl.h>
 #include <YGP/SortDirSrch.h>
 #include <YGP/FileTypeChk.h>
@@ -568,12 +570,15 @@ bool Application::handleOption (const char option) {
    case 'i':  {
       const char* files = getOptionValue ();
       if (files) {
-         std::string node;
-         YGP::PathSearch list (files);
-         while ((node = list.getNextNode ()).size ()) {
+         std::string lFiles (files);
+	 boost::tokenizer<boost::char_separator<char> > list
+	    (lFiles, boost::char_separator<char> (YGP::Path::SEPARATOR_STR));
+
+	 for (boost::tokenizer<boost::char_separator<char> >::iterator i (list.begin ());
+	      i != list.end (); ++i) {
             filelist += option;
-            filelist += node;
-            filelist += YGP::PathSearch::PATHSEPARATOR;
+            filelist += *i;
+            filelist += YGP::Path::SEPARATOR;
          }
       }
       else {
@@ -804,13 +809,15 @@ void Application::handleFiles (const char* pFile) const {
       (iniOpts.sort
        ? *new YGP::SortedDirSearch<YGP::ExtDirectorySearch> (pFile)
        : *new YGP::ExtDirectorySearch (pFile));
-   std::string node;
-   YGP::PathSearch list (filelist);
-   while (!(node = list.getNextNode ()).empty ()) {
-      bool include (node[0] == 'i');
-      node.replace (0, 1, 0, '\0');
-      include ? ds.addFilesToInclude (node) : ds.addFilesToExclude (node);
-   } // end-while
+
+   boost::tokenizer<boost::char_separator<char> > list
+      (filelist, boost::char_separator<char> (YGP::Path::SEPARATOR_STR));
+
+   for (boost::tokenizer<boost::char_separator<char> >::iterator i (list.begin ());
+	i != list.end (); ++i)
+      ((*i).at (0) == 'i')
+	 ? ds.addFilesToInclude (i->substr (1))
+	 : ds.addFilesToExclude (i->substr (1));
 
    const YGP::File* file = ds.find (YGP::IDirectorySearch::FILE_NORMAL);
    std::string name;

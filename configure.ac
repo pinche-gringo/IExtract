@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.52)
 AC_REVISION($Revision: 1.41 $)
-AC_INIT(IExtract, 0.9.20, [g17m0@users.sourceforge.net], IExtract)
+AC_INIT(IExtract, 0.9.30, [g17m0@users.sourceforge.net], IExtract)
 
 RELEASE=${PACKAGE_VERSION%.*}
 AC_SUBST(PACKAGE_VERSION)
@@ -17,6 +17,7 @@ AC_C_BIGENDIAN
 ALL_LINGUAS="de en es"
 
 AM_INIT_AUTOMAKE(dist-bzip2)
+m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 AM_CONFIG_HEADER(IExtract-cfg.h)
 
 AC_PROG_CXX
@@ -32,7 +33,7 @@ dnl Checks for programs.
 dnl Checks for libraries.
 AC_CHECK_LIB(stdc++, main)
 AC_CHECK_LIB(z, main)
-PKG_CHECK_MODULES(YMP, YGP >= 0.9.10, [],
+PKG_CHECK_MODULES(YMP, YGP >= 0.9.30, [],
                   [AC_MSG_ERROR(Need libYGP to make! Get it from http://sourceforge.net/projects/libymp/); exit])
 
 dnl Checks for header files.

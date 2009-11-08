@@ -1,3 +1,9 @@
+Overview of changes in version 0.9.30:
+
+  - Using libYGP-0.9.30
+  - Prettifying output of make (if supported by automake)
+
+
 Overview of changes in version 0.9.20:
 
   - Added option --show-types to show supported types
