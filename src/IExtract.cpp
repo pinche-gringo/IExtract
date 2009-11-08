@@ -304,6 +304,9 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
 
 
 
+typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+
+
 //----------------------------------------------------------------------------
 /// Constructor
 /// \Param argc: Number of parameters to the program
@@ -571,11 +574,9 @@ bool Application::handleOption (const char option) {
       const char* files = getOptionValue ();
       if (files) {
          std::string lFiles (files);
-	 boost::tokenizer<boost::char_separator<char> > list
-	    (lFiles, boost::char_separator<char> (YGP::Path::SEPARATOR_STR));
+	 tokenizer list (lFiles, boost::char_separator<char> (YGP::Path::SEPARATOR_STR));
 
-	 for (boost::tokenizer<boost::char_separator<char> >::iterator i (list.begin ());
-	      i != list.end (); ++i) {
+	 for (tokenizer::iterator i (list.begin ()); i != list.end (); ++i) {
             filelist += option;
             filelist += *i;
             filelist += YGP::Path::SEPARATOR;
@@ -810,12 +811,10 @@ void Application::handleFiles (const char* pFile) const {
        ? *new YGP::SortedDirSearch<YGP::ExtDirectorySearch> (pFile)
        : *new YGP::ExtDirectorySearch (pFile));
 
-   boost::tokenizer<boost::char_separator<char> > list
-      (filelist, boost::char_separator<char> (YGP::Path::SEPARATOR_STR));
+   tokenizer list (filelist, boost::char_separator<char> (YGP::Path::SEPARATOR_STR));
 
-   for (boost::tokenizer<boost::char_separator<char> >::iterator i (list.begin ());
-	i != list.end (); ++i)
-      ((*i).at (0) == 'i')
+   for (tokenizer::iterator i (list.begin ()); i != list.end (); ++i)
+      (i->at (0) == 'i')
 	 ? ds.addFilesToInclude (i->substr (1))
 	 : ds.addFilesToExclude (i->substr (1));
 
