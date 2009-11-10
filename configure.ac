@@ -37,6 +37,7 @@ PKG_CHECK_MODULES(YMP, YGP >= 0.9.30, [],
                   [AC_MSG_ERROR(Need libYGP to make! Get it from http://sourceforge.net/projects/libymp/); exit])
 
 dnl Checks for header files.
+AC_CHECK_HEADERS(boost/tokenizer.hpp,, AC_MSG_ERROR([Required headers not found]))
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 
