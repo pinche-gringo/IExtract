@@ -1,3 +1,25 @@
+2009-11-17 16:24:31 +0100  Markus Schwab  <g17m0@users.sourceforge.net>
+
+        * ChangeLog: Documented changes in V0.9.30
+
+        * po/*.po: Actualised
+
+2009-11-10 18:16:41 +0100  Markus Schwab  <g17m0@users.sourceforge.net>
+
+        * configure.ac: Checking for boost-headers; Version to 0.9.30
+
+2009-11-08 17:50:24 +0100  Markus Schwab  <g17m0@users.sourceforge.net>
+
+        * IExtract.cpp: Minor optimisations
+
+2009-11-08 17:39:19 +0100  Markus Schwab  <g17m0@users.sourceforge.net>
+
+        * Adapting to style of libYPG 0.9.30 (using boost)
+
+2009-11-08 17:11:31 +0100  Markus Schwab  <g17m0@users.sourceforge.net>
+
+        * Writer: Removed unneeded includes
+
 2009-05-18 13:47:30 +0200  Markus Schwab  <g17m0@users.sourceforge.net>
 
         * ChangeLog, NEWS: Documented changes in V0.9.20
