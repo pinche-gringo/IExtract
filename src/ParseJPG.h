@@ -36,6 +36,9 @@ class ParseJPEG  {
       jpegImage.parse (stream); }
 
  private:
+   ParseJPEG (const ParseJPEG&);
+   ParseJPEG& operator= (const ParseJPEG&);
+
    // Callback-methods for type of parsed elementes
    int foundType (const char*, unsigned int);
    int foundNumber (const char*, unsigned int);

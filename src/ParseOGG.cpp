@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 20.03.2005
-//COPYRIGHT   : Copyright (C) 2005 - 2008
+//COPYRIGHT   : Copyright (C) 2005 - 2008, 2011
 
 // This file is part of IExtract.
 //
@@ -42,17 +42,17 @@
 /// \param result: Properties, where the found data is stored
 //-----------------------------------------------------------------------------
 ParseOGG::ParseOGG (Properties& result)
-   : prop (result)
-     , txtOGG ("OggS", _("OGG-ID"), false)
-     , idCommentHeader ("\x03vorbis", false)
-     , skip (0x50)
-     , nrSegments ("\\*", _("Number of segments"), *this, &ParseOGG::foundNrSegments, 1, 1, false)
-     , lenVendorStr ("\\*", _("Length of vendor string"), *this, &ParseOGG::foundLenVendorString, 4, 4, false)
-     , nrComments ("\\*", _("Number of comments"), *this, &ParseOGG::foundNrComments, 4, 4, false)
-     , lenEntry ("\\*", _("Length of comment entry"), *this, &ParseOGG::foundLenComment, 4, 4, false)
-     , txtEntry ("\\*", _("Comment entry"), *this, &ParseOGG::foundComment, 0, 0, false)
-     , seqComment (_seqComment, _("Comment entry"), 0, 0, false)
-     , seqOGG (_seqOGG, _("OGG file")) {
+   : prop (result),
+     txtOGG ("OggS", _("OGG-ID"), false),
+     idCommentHeader ("\x03vorbis", _("Comment header"), false),
+     skip (0x50),
+     nrSegments ("\\*", _("Number of segments"), *this, &ParseOGG::foundNrSegments, 1, 1, false),
+     lenVendorStr ("\\*", _("Length of vendor string"), *this, &ParseOGG::foundLenVendorString, 4, 4, false),
+     nrComments ("\\*", _("Number of comments"), *this, &ParseOGG::foundNrComments, 4, 4, false),
+     lenEntry ("\\*", _("Length of comment entry"), *this, &ParseOGG::foundLenComment, 4, 4, false),
+     txtEntry ("\\*", _("Comment entry"), *this, &ParseOGG::foundComment, 0, 0, false),
+     seqComment (_seqComment, _("Comment entry"), 0, 0, false),
+     seqOGG (_seqOGG, _("OGG file")) {
    _seqOGG[0] = &txtOGG;
    _seqOGG[1] = &skip;
    _seqOGG[2] = &nrSegments;

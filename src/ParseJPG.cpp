@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 17.10.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2008
+//COPYRIGHT   : Copyright (C) 2002 - 2008, 2011
 
 // This file is part of IExtract.
 //
@@ -103,7 +103,7 @@ ParseJPEG::ParseJPEG ()
 
      seqIFD (_seqIFD, _("Image file directory"), 1, 1, false),
      jpegImage (_jpegImage, _("JPEG image"), 1, 1),
-     cRead (0), actEntry (TYPE_TITLE), cEntries (0) {
+     cRead (0), actEntry (TYPE_TITLE), cEntries (0), prop (NULL) {
 
    _jpegImage[0] = &idJPEG;
    _jpegImage[1] = &selMarker;
@@ -158,9 +158,9 @@ ParseJPEG::ParseJPEG ()
 
 //-----------------------------------------------------------------------------
 /// Callback after a title was read
-/// \param pTitle: Pointer to title
-/// \param len: Length of title
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+/// \param pTitle Pointer to title
+/// \param len Length of title
+/// \returns \c int Status YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
 int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
    Check3 (prop); Check3 (pTitle);
@@ -186,9 +186,9 @@ int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
 
 //-----------------------------------------------------------------------------
 /// Callback after a comment entry (Photoshop stlye) was read
-/// \param pTitle: Pointer to title
-/// \param len: Length of title
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+/// \param pTitle Pointer to title
+/// \param len Length of title
+/// \returns \c int Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
 int ParseJPEG::foundCommentPhotoShop (const char* pTitle, unsigned int len) {
    Check3 (prop); Check3 (pTitle);
@@ -247,8 +247,8 @@ int ParseJPEG::foundCommentPhotoShop (const char* pTitle, unsigned int len) {
 
 //-----------------------------------------------------------------------------
 /// Callback after the length of the title was read (in LSB format)
-/// \param length: Pointer to length
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+/// \param length Pointer to length
+/// \returns \c int Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
 int ParseJPEG::foundLengthLSB (const char* length, unsigned int) {
    Check3 (length);
@@ -260,8 +260,8 @@ int ParseJPEG::foundLengthLSB (const char* length, unsigned int) {
 
 //-----------------------------------------------------------------------------
 /// Sets the length of the title to read
-/// \param length: Length of title
-/// \returns \c unsigned long: Status: YGP::ParseObject::PARSE_OK
+/// \param length Length of title
+/// \returns \c unsigned long Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
 unsigned long ParseJPEG::foundLength (unsigned int length) {
    skipLen.setOffset (lengths[1] = length);
@@ -275,7 +275,7 @@ unsigned long ParseJPEG::foundLength (unsigned int length) {
 
 //-----------------------------------------------------------------------------
 /// Callback after the length of the title was read (in MSB format)
-/// \param length: Pointer to length
+/// \param length Pointer to length
 /// \returns \c int: Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
 int ParseJPEG::foundLengthMSB (const char* length, unsigned int) {
@@ -288,9 +288,9 @@ int ParseJPEG::foundLengthMSB (const char* length, unsigned int) {
 
 //-----------------------------------------------------------------------------
 /// Checks if a supported type has been read and sets the length, if so
-/// \param length: Pointer to length
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-/// \pre: actEnty must have been set before
+/// \param length Pointer to length
+/// \returns \c int Status: YGP::ParseObject::PARSE_OK
+/// \pre actEnty must have been set before
 //-----------------------------------------------------------------------------
 bool ParseJPEG::supportedLength4 (unsigned int length) {
    TRACE8 ("ParseJPEG::supportedLength4 (unsigned int) - " << length);
@@ -311,8 +311,8 @@ bool ParseJPEG::supportedLength4 (unsigned int length) {
 
 //-----------------------------------------------------------------------------
 /// Callback after the length of the title was read (in LSB format)
-/// \param length: Pointer to length
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+/// \param length Pointer to length
+/// \returns \c int Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
 int ParseJPEG::foundLengthLSB4 (const char* length, unsigned int) {
    Check3 (length);
@@ -325,8 +325,8 @@ int ParseJPEG::foundLengthLSB4 (const char* length, unsigned int) {
 
 //-----------------------------------------------------------------------------
 /// Callback after the length of the title was read (in MSB format)
-/// \param length: Pointer to length
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+/// \param length Pointer to length
+/// \returns \c int Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
 int ParseJPEG::foundLengthMSB4 (const char* length, unsigned int) {
    Check3 (length);
@@ -339,8 +339,8 @@ int ParseJPEG::foundLengthMSB4 (const char* length, unsigned int) {
 
 //-----------------------------------------------------------------------------
 /// Callback after the number of entries has been read
-/// \param nr: Pointer to number of entries
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+/// \param nr Pointer to number of entries
+/// \returns \c int Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
 int ParseJPEG::foundNumber (const char* nr, unsigned int) {
    Check3 (nr);
@@ -366,8 +366,8 @@ int ParseJPEG::foundNumber (const char* nr, unsigned int) {
 
 //-----------------------------------------------------------------------------
 /// Callback after the type of an entry has been parsed
-/// \param pType: Pointer to found type
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+/// \param pType Pointer to found type
+/// \returns \c int Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
 int ParseJPEG::foundType (const char* pType, unsigned int) {
    Check3 (pType);
@@ -378,9 +378,9 @@ int ParseJPEG::foundType (const char* pType, unsigned int) {
 
 //-----------------------------------------------------------------------------
 /// Callback after the offset of an entry has been parsed
-/// \param pOffset: Pointer to found offset
-/// \param len: Length of data
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+/// \param pOffset Pointer to found offset
+/// \param len Length of data
+/// \returns \c int Status: YGP::ParseObject::PARSE_OK
 //-----------------------------------------------------------------------------
 int ParseJPEG::foundOffset (const char* pOffset, unsigned int len) {
    Check3 (pOffset);

@@ -1,3 +1,8 @@
+Overview of changes in version 0.9.31:
+
+  - Compiles without warnings with GCC 4.6 (except generated code)
+
+
 Overview of changes in version 0.9.30:
 
   - Using libYGP-0.9.30

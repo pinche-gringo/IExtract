@@ -69,6 +69,10 @@ class Writer : public YGP::TableWriter {
 
    const YGP::File* file_;
    const Properties* prop_;
+
+ private:
+   Writer (const Writer&);
+   Writer& operator= (const Writer&);
 };
 
 
@@ -86,6 +90,10 @@ class TextWriter : public Writer {
    static TextWriter* create (const std::string& format, const std::string& strNew,
                               unsigned long age = 0) {
       return new TextWriter (format, strNew, age); }
+
+ private:
+   TextWriter (const TextWriter&);
+   TextWriter& operator= (const TextWriter&);
 };
 
 
@@ -105,6 +113,10 @@ class QuotedTextWriter : public Writer {
    static QuotedTextWriter* create (const std::string& format, const std::string& strNew,
 				    unsigned long age = 0) {
       return new QuotedTextWriter (format, strNew, age); }
+
+ private:
+   QuotedTextWriter (const QuotedTextWriter&);
+   QuotedTextWriter& operator= (const QuotedTextWriter&);
 };
 
 
@@ -125,6 +137,10 @@ class HTMLWriter : public Writer {
    static HTMLWriter* create (const std::string& format, const std::string& strNew,
                               unsigned long age = 0) {
       return new HTMLWriter (format, strNew, age); }
+
+ private:
+   HTMLWriter (const HTMLWriter&);
+   HTMLWriter& operator= (const HTMLWriter&);
 };
 
 
@@ -143,6 +159,10 @@ class XMLWriter : public HTMLWriter {
    static XMLWriter* create (const std::string& format, const std::string& strNew,
                               unsigned long age = 0) {
       return new XMLWriter (format, strNew, age); }
+
+ private:
+   XMLWriter (const XMLWriter&);
+   XMLWriter& operator= (const XMLWriter&);
 };
 
 
@@ -163,6 +183,10 @@ class LaTeXWriter : public Writer {
    static LaTeXWriter* create (const std::string& format, const std::string& strNew,
                                unsigned long age = 0) {
       return new LaTeXWriter (format, strNew, age); }
+
+ private:
+   LaTeXWriter (const LaTeXWriter&);
+   LaTeXWriter& operator= (const LaTeXWriter&);
 };
 
 

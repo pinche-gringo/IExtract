@@ -36,6 +36,9 @@ class ParseStarOffice  {
       seqDocument.parse (stream); }
 
  private:
+   ParseStarOffice (const ParseStarOffice&);
+   ParseStarOffice& operator= (const ParseStarOffice&);
+
    // Callback-methods for type of parsed elementes
    int foundLength (const char*, unsigned int);
    int foundValue (const char*, unsigned int);

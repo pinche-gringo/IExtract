@@ -38,6 +38,9 @@ class ParseRTF  {
       docRTF.parse (stream); }
 
  private:
+   ParseRTF (const ParseRTF&);
+   ParseRTF& operator= (const ParseRTF&);
+
    // Callback-methods for type of parsed elementes
    int foundTitle (const char*, unsigned int);
    int foundAuthor (const char*, unsigned int);

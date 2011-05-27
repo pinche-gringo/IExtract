@@ -36,6 +36,9 @@ class ParseHTML  {
       htmlDoc.parse (stream); }
 
  private:
+   ParseHTML (const ParseHTML&);
+   ParseHTML& operator= (const ParseHTML&);
+
    // Callback-methods for type of parsed elementes
    int foundValue (const char* pValue, unsigned int len);
    int foundTitle (const char*, unsigned int);

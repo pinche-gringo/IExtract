@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 08.11.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2004, 2006 - 2008
+//COPYRIGHT   : Copyright (C) 2002 - 2004, 2006 - 2008, 2011
 
 // This file is part of IExtract.
 //
@@ -94,7 +94,8 @@ ParsePDF::ParsePDF ()
      selType (_selType, _("Valid type")),
      selStartOfValue (_selStartOfValue, _("Start of values")),
      seqFullValue (_seqFullValue, _("Full value"), 1, 1),
-     actEntry (NONE), offPrev (0), actObject (0), infoObject (-1U), strInfoObject (NULL) {
+     prop (NULL), actEntry (NONE), file (NULL), offPrev (0), actObject (0),
+     infoObject (-1U), strInfoObject (NULL), aOffsets () {
    _selXRef[0] = &seqXRef;
    _selXRef[1] = &skipS;
    _selXRef[2] = &skip;

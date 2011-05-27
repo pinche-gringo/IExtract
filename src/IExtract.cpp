@@ -8,7 +8,7 @@
 //REVISION    : $Revision: 1.86 $
 //AUTHOR      : Markus Schwab
 //CREATED     : 10.08.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2009
+//COPYRIGHT   : Copyright (C) 2002 - 2009, 2011
 
 // This file is part of IExtract.
 //
@@ -309,13 +309,13 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
 //----------------------------------------------------------------------------
 /// Constructor
-/// \Param argc: Number of parameters to the program
-/// \param argv: Array holding (pointer to) arguments
+/// \Param argc Number of parameters to the program
+/// \param argv Array holding (pointer to) arguments
 //----------------------------------------------------------------------------
 Application::Application (const int argc, const char* argv[])
-   : YGP::IVIOApplication (argc, argv, lo), options (0), chgFlag (0), iniOpts (),
-     writer (NULL), outputStyle (TEXT),
-     ftchk (NULL)
+   : YGP::IVIOApplication (argc, argv, lo), handlers (), options (0), chgFlag (0),
+     iniOpts (), writer (NULL), filelist (), append (), prepend (),
+     outputStyle (TEXT), ftchk (NULL)
 #ifdef ENABLE_THREADS
     , aThreads (0)
 #endif
@@ -466,8 +466,8 @@ void Application::showHelp () const {
 
 //-----------------------------------------------------------------------------
 /// Checks the validity of the passed option
-/// \param option: Actual option
-/// \returns \c bool: Status; false: Invalid option/option-value Require :
+/// \param option Actual option
+/// \returns \c bool Status; false: Invalid option/option-value Require :
 ///     option not '\0´'
 //-----------------------------------------------------------------------------
 bool Application::handleOption (const char option) {
@@ -675,13 +675,13 @@ bool Application::handleOption (const char option) {
 
 //-----------------------------------------------------------------------------
 /// Sets the mode how to determine the file-type according to the passed value
-/// \param mode: How to determine the file-type
-///              - Ext: By (last) extension
-///              - AllExt: By any extension (starting from the last)
-///              - EXT: By (last) extension (ignoring case)
-///              - AllEXT: By any extension (ignoring case)
-///              - Content: By the content of the file
-/// \returns bool: True, if the passed mode is invalid
+/// \param mode How to determine the file-type
+///             - Ext: By (last) extension
+///             - AllExt: By any extension (starting from the last)
+///             - EXT: By (last) extension (ignoring case)
+///             - AllEXT: By any extension (ignoring case)
+///             - Content: By the content of the file
+/// \returns bool True, if the passed mode is invalid
 //-----------------------------------------------------------------------------
 bool Application::setMode (const std::string& mode) {
    YGP::FileTypeChecker* newFtchk (NULL);
@@ -715,9 +715,9 @@ bool Application::setMode (const std::string& mode) {
 
 //-----------------------------------------------------------------------------
 /// Performs the job of the applications
-/// \param argc: Number of parameters (without options)
-/// \param argv: Array with pointer to arguments
-/// \returns \c int: Status
+/// \param argc Number of parameters (without options)
+/// \param argv Array with pointer to arguments
+/// \returns \c int Status
 //-----------------------------------------------------------------------------
 int Application::perform (int argc, const char* argv[]) {
    if (!argc) {                        // Check if enough arguments are passed
@@ -799,7 +799,7 @@ int Application::perform (int argc, const char* argv[]) {
 
 //-----------------------------------------------------------------------------
 /// Expands the filespecification and processes every file
-/// \param pFile: Filespecification; may contain wildcards
+/// \param pFile Filespecification; may contain wildcards
 /// \pre pFile not NULL
 //-----------------------------------------------------------------------------
 void Application::handleFiles (const char* pFile) const {
@@ -949,8 +949,8 @@ void* Application::processThread (void* pThread) {
 
 //-----------------------------------------------------------------------------
 /// Processes a single file with a known handler
-/// \param pFile: File to processs
-/// \param fnc: Handling function
+/// \param pFile File to processs
+/// \param fnc Handling function
 //-----------------------------------------------------------------------------
 void Application::processFile (const YGP::File& file, HANDLER fnc) const {
    TRACE1 ("Application::processFile (const YGP::File&) const - " << file.name ());
@@ -996,9 +996,9 @@ void Application::processFile (const YGP::File& file, HANDLER fnc) const {
 #ifdef SUPPORT_HTML
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of an HTML-document
-/// \param hFile: File to processs
-/// \param result: Result of parsing
-/// \throw YGP::ParseError: In case of an error
+/// \param hFile File to processs
+/// \param result Result of parsing
+/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
 void Application::processHTML (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseHTML ().parse (hFile, result);
@@ -1008,9 +1008,9 @@ void Application::processHTML (YGP::Xistream& hFile, Properties& result) throw (
 #ifdef SUPPORT_PDF
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a PDF document
-/// \param hFile: File to processs
-/// \param result: Result of parsing
-/// \throw YGP::ParseError: In case of an error
+/// \param hFile File to processs
+/// \param result Result of parsing
+/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
 void Application::processPDF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParsePDF::parse (hFile, result);
@@ -1020,8 +1020,8 @@ void Application::processPDF (YGP::Xistream& hFile, Properties& result) throw (Y
 #ifdef SUPPORT_MP3
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of an MP3 file
-/// \param hFile: File to processs
-/// \param result: Result of parsing
+/// \param hFile File to processs
+/// \param result Result of parsing
 //-----------------------------------------------------------------------------
 void Application::processMP3 (YGP::Xistream& hFile, Properties& result) {
    ParseMP3::parse (hFile, result);
@@ -1031,9 +1031,9 @@ void Application::processMP3 (YGP::Xistream& hFile, Properties& result) {
 #ifdef SUPPORT_OGG
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties out of an OGG file
-/// \param hFile: File to processs
-/// \param result: Result of parsing
-/// \throw YGP::ParseError: In case of an error
+/// \param hFile File to processs
+/// \param result Result of parsing
+/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
 void Application::processOGG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseOGG::parse (hFile, result);
@@ -1043,9 +1043,9 @@ void Application::processOGG (YGP::Xistream& hFile, Properties& result) throw (Y
 #ifdef SUPPORT_OO
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a StarOffice document
-/// \param hFile: File to processs
-/// \param result: Result of parsing
-/// \throw YGP::ParseError: In case of an error
+/// \param hFile File to processs
+/// \param result Result of parsing
+/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
 void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseStarOffice ().parse (hFile, result);
@@ -1053,9 +1053,9 @@ void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) t
 
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of an OpenOffice document
-/// \param hFile: File to processs
-/// \param result: Result of parsing
-/// \throw YGP::ParseError: In case of an error
+/// \param hFile File to processs
+/// \param result Result of parsing
+/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
 void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseOpenOffice ().parse (hFile, result);
@@ -1065,9 +1065,9 @@ void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) t
 #ifdef SUPPORT_ABIWORD
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of an Abiword document
-/// \param hFile: File to processs
-/// \param result: Result of parsing
-/// \throw YGP::ParseError: In case of an error
+/// \param hFile File to processs
+/// \param result Result of parsing
+/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
 void Application::processAbiword (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseAbiword ().parse (hFile, result);
@@ -1077,9 +1077,9 @@ void Application::processAbiword (YGP::Xistream& hFile, Properties& result) thro
 #ifdef SUPPORT_RTF
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a RTF-document
-/// \param hFile: File to processs
-/// \param result: Result of parsing
-/// \throw YGP::ParseError: In case of an error
+/// \param hFile File to processs
+/// \param result Result of parsing
+/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
 void Application::processRTF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    TRACE9 ("Parsing RTF");
@@ -1090,9 +1090,9 @@ void Application::processRTF (YGP::Xistream& hFile, Properties& result) throw (Y
 #ifdef SUPPORT_MSOFFICE
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a MS-office document
-/// \param hFile: File to processs
-/// \param result: Result of parsing
-/// \throw YGP::ParseError: In case of an error
+/// \param hFile File to processs
+/// \param result Result of parsing
+/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
 void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseMSOffice ().parse (hFile, result);
@@ -1101,9 +1101,9 @@ void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) thr
 #  ifdef SUPPORT_OOXML
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a MS Office Open XML document
-/// \param hFile: File to processs
-/// \param result: Result of parsing
-/// \throw YGP::ParseError: In case of an error
+/// \param hFile File to processs
+/// \param result Result of parsing
+/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
 void Application::processOOXML (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseOOXML ().parse (hFile, result);
@@ -1114,9 +1114,9 @@ void Application::processOOXML (YGP::Xistream& hFile, Properties& result) throw 
 #ifdef SUPPORT_JPEG
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a JPEG image
-/// \param hFile: File to processs
-/// \param result: Result of parsing
-/// \throw YGP::ParseError: In case of an error
+/// \param hFile File to processs
+/// \param result Result of parsing
+/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
 void Application::processJPG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseJPEG ().parse (hFile, result);
@@ -1126,9 +1126,9 @@ void Application::processJPG (YGP::Xistream& hFile, Properties& result) throw (Y
 #ifdef SUPPORT_PNG
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a PNG image
-/// \param hFile: File to processs
-/// \param result: Result of parsing
-/// \throw YGP::ParseError: In case of an error
+/// \param hFile File to processs
+/// \param result Result of parsing
+/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
 void Application::processPNG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParsePNG (result).parse (hFile);
@@ -1138,9 +1138,9 @@ void Application::processPNG (YGP::Xistream& hFile, Properties& result) throw (Y
 #ifdef SUPPORT_GIF
 //-----------------------------------------------------------------------------
 /// Tries to extract the properties of a GIF image
-/// \param hFile: File to processs
-/// \param result: Result of parsing
-/// \throw YGP::ParseError: In case of an error
+/// \param hFile File to processs
+/// \param result Result of parsing
+/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
 void Application::processGIF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
    ParseGIF (result).parse (hFile);
@@ -1149,8 +1149,8 @@ void Application::processGIF (YGP::Xistream& hFile, Properties& result) throw (Y
 
 //-----------------------------------------------------------------------------
 /// Returns a handling function to a filetype
-/// \param file: Filename
-/// \returns \c HANDLER: Method to handle this filetype; NULL in case of error
+/// \param file Filename
+/// \returns \c HANDLER Method to handle this filetype; NULL in case of error
 //-----------------------------------------------------------------------------
 Application::HANDLER Application::getFileTypeHandler (const char* file) const {
    TRACE9 ("Application::getFileTypeHandler (const std::string&) - " << file);
@@ -1166,7 +1166,7 @@ Application::HANDLER Application::getFileTypeHandler (const char* file) const {
 
 //-----------------------------------------------------------------------------
 /// Converts wide characters to normal strings
-/// \param prop: Properties to convert
+/// \param prop Properties to convert
 //-----------------------------------------------------------------------------
 void Application::convertFromWideChar (Properties& prop) {
    static std::string Properties::* values[] = { &Properties::strTitle,
@@ -1184,8 +1184,8 @@ void Application::convertFromWideChar (Properties& prop) {
 
 //-----------------------------------------------------------------------------
 /// Reads the options of the INI-file
-/// \param pFile: Pointer to filename
-/// \param Requieres : pFile not NULL
+/// \param pFile Pointer to filename
+/// \pre pFile not NULL
 //-----------------------------------------------------------------------------
 void Application::readINIFile (const char* pFile) {
    TRACE5 ("Application::readINIFile (const char*) - " << pFile);
@@ -1337,9 +1337,9 @@ void Application::setPlugins () {
 
 //-----------------------------------------------------------------------------
 /// Entrypoint of application
-/// \param argc: Anzahl der Parameter
-/// \param argv: Array mit Zeigern auf Parameter
-/// \returns \c int: Status
+/// \param argc Anzahl der Parameter
+/// \param argv Array mit Zeigern auf Parameter
+/// \returns \c int Status
 //-----------------------------------------------------------------------------
 int main (int argc, const char* argv[]) {
    YGP::IVIOApplication::initI18n (PACKAGE, LOCALEDIR),

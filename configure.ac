@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.52)
 AC_REVISION($Revision: 1.41 $)
-AC_INIT(IExtract, 0.9.30, [g17m0@users.sourceforge.net], IExtract)
+AC_INIT(IExtract, 0.9.31, [g17m0@users.sourceforge.net], IExtract)
 
 RELEASE=${PACKAGE_VERSION%.*}
 AC_SUBST(PACKAGE_VERSION)
@@ -52,6 +52,7 @@ AC_ARG_ENABLE(debug,
                   CXXFLAGS="-g -O2 -DTRACELEVEL=$enableval";
               else
                   CXXFLAGS="-O2 -UTRACELEVEL"; fi)
+CXXFLAGS="$CXXFLAGS -Wall -Weffc++"
 AC_ARG_ENABLE(checks,
               AC_HELP_STRING([[[[[--enable-checks[=LEVEL]]]]]],
                              [Enables additional (internal) checks (LEVEL=0..9)]),

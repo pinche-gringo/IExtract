@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 13.10.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2005, 2007 - 2009
+//COPYRIGHT   : Copyright (C) 2002 - 2005, 2007 - 2009, 2011
 
 // This file is part of IExtract.
 //
@@ -45,18 +45,18 @@
 
 //-----------------------------------------------------------------------------
 /// Constructor
-/// \param New: Text to display for new files
-/// \param age: Maximal age for new files
-/// \param startRow: String starting rows
-/// \param endRow: String terminating rows
-/// \param sepColumn: String separating columns
-/// \param startTab: String starting table
-/// \param endTab: String terminating table
-/// \param sepTab: String separating the tableheader from the tablebody
-/// \param startRowHdr: String starting header of the table
-/// \param endRowHdr: String terminating header of the table
-/// \param sepHdrCol: String terminating columns of the header of the table
-/// \param defColumns: Definition of the columns
+/// \param New Text to display for new files
+/// \param age Maximal age for new files
+/// \param startRow String starting rows
+/// \param endRow String terminating rows
+/// \param sepColumn String separating columns
+/// \param startTab String starting table
+/// \param endTab String terminating table
+/// \param sepTab String separating the tableheader from the tablebody
+/// \param startRowHdr String starting header of the table
+/// \param endRowHdr String terminating header of the table
+/// \param sepHdrCol String terminating columns of the header of the table
+/// \param defColumns Definition of the columns
 //-----------------------------------------------------------------------------
 Writer::Writer (const std::string& format, const std::string& New, unsigned long age,
 		const char* startRow, const char* endRow, const char* sepColumn,
@@ -64,10 +64,8 @@ Writer::Writer (const std::string& format, const std::string& New, unsigned long
 		const char* rowStartHdr, const char* rowEndHdr,
 		const char* sepHdrCol, const char* defColumns)
    : YGP::TableWriter (format, startRow, endRow, sepColumn, startTab, endTab, sepTab, rowStartHdr, rowEndHdr, sepHdrCol, defColumns),
-     strNew (New), file_ (NULL), prop_ (NULL) {
+     strNew (New), limit (time (NULL) - age), file_ (NULL), prop_ (NULL) {
    Check3 (strNew.size () ? age : 1);
-
-   limit = time (NULL) - age;
 }
 
 //-----------------------------------------------------------------------------
@@ -87,10 +85,10 @@ Writer::~Writer () {
 ///   - 'p': With the path of the file
 ///   - 'P': With the path of the file in UNIX style (separated by /)
 ///   - 'U': With path and name of the file in UNIX style (separated by /)
-/// \param out: Stream where to put the output
-/// \param file: File specifying directory
-/// \param data: Text to print for separation
-/// \param title: Text to print as header for every new dir
+/// \param out Stream where to put the output
+/// \param file File specifying directory
+/// \param data Text to print for separation
+/// \param title Text to print as header for every new dir
 //-----------------------------------------------------------------------------
 void Writer::printSeparator (std::ostream& out, const YGP::File& file,
                              const std::string& data, const std::string& title) const {
@@ -153,9 +151,9 @@ void Writer::printSeparator (std::ostream& out, const YGP::File& file,
 ///   - 't': With the title (of the properties)
 ///   - 'U': With path and name of the file in UNIX style (separated by /)
 ///   - Other chars: With the character itself
-/// \param ctrl: Control character
-/// \param extend: Flag, if special formatting of substitute is wanted
-/// \returns std::string: String with which to replace the character
+/// \param ctrl Control character
+/// \param extend Flag, if special formatting of substitute is wanted
+/// \returns std::string String with which to replace the character
 //-----------------------------------------------------------------------------
 std::string Writer::getSubstitute (char ctrl, bool extend) const {
    Check3 (prop_); Check3 (file_);
@@ -244,8 +242,8 @@ std::string Writer::getSubstitute (char ctrl, bool extend) const {
 
 //-----------------------------------------------------------------------------
 /// Change characters with special meanings to ones understood by the writer
-/// \param value: Value to change
-/// \returns std::string: Changed valaue
+/// \param value Value to change
+/// \returns std::string Changed valaue
 //-----------------------------------------------------------------------------
 std::string Writer::changeSpecialChars (const std::string& value) const {
    return value;
@@ -253,8 +251,8 @@ std::string Writer::changeSpecialChars (const std::string& value) const {
 
 //-----------------------------------------------------------------------------
 /// Change characters with special meanings to ones understood by the writer
-/// \param value: Value to change
-/// \returns std::string: Changed valaue
+/// \param value Value to change
+/// \returns std::string Changed valaue
 //-----------------------------------------------------------------------------
 std::string Writer::changeSpecialFileChars (const std::string& value) const {
    return changeSpecialChars (value);
@@ -291,8 +289,8 @@ std::string Writer::convertToHumanString (unsigned long value) {
 
 //-----------------------------------------------------------------------------
 /// Prints the start of the table header
-/// \param out: Stream where to put the output
-/// \param title: Title information
+/// \param out Stream where to put the output
+/// \param title Title information
 //-----------------------------------------------------------------------------
 void Writer::printHeaderTail (std::ostream& out) const {
    if (strNew.size ())
@@ -301,9 +299,9 @@ void Writer::printHeaderTail (std::ostream& out) const {
 
 //-----------------------------------------------------------------------------
 /// Prints a file entry in HTML format
-/// \param out: Stream where to put the output
-/// \param file: File whose data should be printed
-/// \param prop: Properties of the file
+/// \param out Stream where to put the output
+/// \param file File whose data should be printed
+/// \param prop Properties of the file
 //-----------------------------------------------------------------------------
 void Writer::printFile (std::ostream& out, const YGP::File& file, const Properties& prop) {
    TRACE9 ("Writer::printFile (std::ostream&, const std::string&) const");
@@ -328,9 +326,9 @@ void Writer::printFile (std::ostream& out, const YGP::File& file, const Properti
 
 //-----------------------------------------------------------------------------
 /// Constructor
-/// \param format: Format how to display entries
-/// \param strNew: String to display for new entries
-/// \param age: Maximal age (in days) for entries to be considered as new
+/// \param format Format how to display entries
+/// \param strNew String to display for new entries
+/// \param age Maximal age (in days) for entries to be considered as new
 //-----------------------------------------------------------------------------
 TextWriter::TextWriter (const std::string& format, const std::string& strNew, unsigned long age)
    : Writer (format, strNew, age, TBLW_TEXT_PARAMS) {
@@ -345,9 +343,9 @@ TextWriter::~TextWriter () {
 
 //-----------------------------------------------------------------------------
 /// Prints a message
-/// \param out: Stream where to put the output
-/// \param file: File to which the message should be print
-/// \param msg: Message to print (not NULL)
+/// \param out Stream where to put the output
+/// \param file File to which the message should be print
+/// \param msg Message to print (not NULL)
 //-----------------------------------------------------------------------------
 void TextWriter::printMessage (std::ostream& out, const YGP::File& file,
                                const std::string& msg) const {
@@ -360,9 +358,9 @@ void TextWriter::printMessage (std::ostream& out, const YGP::File& file,
 
 //-----------------------------------------------------------------------------
 /// Constructor
-/// \param format: Format how to display entries
-/// \param strNew: String to display for new entries
-/// \param age: Maximal age (in days) for entries to be considered as new
+/// \param format Format how to display entries
+/// \param strNew String to display for new entries
+/// \param age Maximal age (in days) for entries to be considered as new
 //-----------------------------------------------------------------------------
 QuotedTextWriter::QuotedTextWriter (const std::string& format, const std::string& strNew, unsigned long age)
    : Writer (format, strNew, age, TBLW_QUOTEDTEXT_PARAMS) {
@@ -377,8 +375,8 @@ QuotedTextWriter::~QuotedTextWriter () {
 
 //-----------------------------------------------------------------------------
 /// Change characters with special meanings to ones understood by the writer
-/// \param value: Value to change
-/// \returns std::string: Changed valaue
+/// \param value Value to change
+/// \returns std::string Changed valaue
 //-----------------------------------------------------------------------------
 std::string QuotedTextWriter::changeSpecialChars (const std::string& value) const {
    return YGP::TableWriter::changeQuotedSpecialChars (value);
@@ -386,9 +384,9 @@ std::string QuotedTextWriter::changeSpecialChars (const std::string& value) cons
 
 //-----------------------------------------------------------------------------
 /// Prints a message
-/// \param out: Stream where to put the output
-/// \param file: File to which the message should be print
-/// \param msg: Message to print (not NULL)
+/// \param out Stream where to put the output
+/// \param file File to which the message should be printed
+/// \param msg Message to print (not NULL)
 //-----------------------------------------------------------------------------
 void QuotedTextWriter::printMessage (std::ostream& out, const YGP::File& file,
 				     const std::string& msg) const {
@@ -401,9 +399,9 @@ void QuotedTextWriter::printMessage (std::ostream& out, const YGP::File& file,
 
 //-----------------------------------------------------------------------------
 /// Constructor
-/// \param format: Format how to display entries
-/// \param strNew: String to display for new entries
-/// \param age: Maximal age (in days) for entries to be considered as new
+/// \param format Format how to display entries
+/// \param strNew String to display for new entries
+/// \param age Maximal age (in days) for entries to be considered as new
 //-----------------------------------------------------------------------------
 HTMLWriter::HTMLWriter (const std::string& format, const std::string& strNew, unsigned long age)
    : Writer (format, strNew, age, TBLW_HTML_PARAMS) {
@@ -418,8 +416,8 @@ HTMLWriter::~HTMLWriter () {
 
 //-----------------------------------------------------------------------------
 /// Change characters with special meanings to ones understood by the writer
-/// \param value: Value to change
-/// \returns std::string: Changed valaue
+/// \param value Value to change
+/// \returns std::string Changed valaue
 //-----------------------------------------------------------------------------
 std::string HTMLWriter::changeSpecialChars (const std::string& value) const {
    return YGP::TableWriter::changeHTMLSpecialChars (value);
@@ -427,8 +425,8 @@ std::string HTMLWriter::changeSpecialChars (const std::string& value) const {
 
 //-----------------------------------------------------------------------------
 /// Change characters with special meanings to ones understood by the writer
-/// \param value: Value to change
-/// \returns std::string: Changed valaue
+/// \param value Value to change
+/// \returns std::string Changed valaue
 //-----------------------------------------------------------------------------
 std::string HTMLWriter::changeSpecialFileChars (const std::string& value) const {
    return YGP::TableWriter::changeHTMLSpecialFileChars (value);
@@ -436,9 +434,9 @@ std::string HTMLWriter::changeSpecialFileChars (const std::string& value) const 
 
 //-----------------------------------------------------------------------------
 /// Prints a message in HTML-format (inside the table)
-/// \param out: Stream where to put the output
-/// \param file: File to which the message should be print
-/// \param msg: Message to print (not NULL)
+/// \param out Stream where to put the output
+/// \param file File to which the message should be print
+/// \param msg Message to print (not NULL)
 //-----------------------------------------------------------------------------
 void HTMLWriter::printMessage (std::ostream& out, const YGP::File& file,
                                const std::string& msg) const {
@@ -456,9 +454,9 @@ void HTMLWriter::printMessage (std::ostream& out, const YGP::File& file,
 
 //-----------------------------------------------------------------------------
 /// Constructor
-/// \param format: Format how to display entries
-/// \param strNew: String to display for new entries
-/// \param age: Maximal age (in days) for entries to be considered as new
+/// \param format Format how to display entries
+/// \param strNew String to display for new entries
+/// \param age Maximal age (in days) for entries to be considered as new
 //-----------------------------------------------------------------------------
 LaTeXWriter::LaTeXWriter (const std::string& format, const std::string& strNew, unsigned long age)
    : Writer (format, strNew, age, TBLW_LATEX_PARAMS) {
@@ -473,8 +471,8 @@ LaTeXWriter::~LaTeXWriter () {
 
 //-----------------------------------------------------------------------------
 /// Prints the start of the table header
-/// \param out: Stream where to put the output
-/// \param title: Title information
+/// \param out Stream where to put the output
+/// \param title Title information
 //-----------------------------------------------------------------------------
 void LaTeXWriter::printHeaderLead (std::ostream& out) const {
    YGP::TableWriter::printLaTeXHeaderLead (out, columns ());
@@ -482,8 +480,8 @@ void LaTeXWriter::printHeaderLead (std::ostream& out) const {
 
 //-----------------------------------------------------------------------------
 /// Change characters with special meanings to ones understood by the writer
-/// \param value: Value to change
-/// \returns std::string: Changed valaue
+/// \param value Value to change
+/// \returns std::string Changed valaue
 //-----------------------------------------------------------------------------
 std::string LaTeXWriter::changeSpecialChars (const std::string& value) const {
    return YGP::TableWriter::changeLaTeXSpecialChars (value);
@@ -491,9 +489,9 @@ std::string LaTeXWriter::changeSpecialChars (const std::string& value) const {
 
 //-----------------------------------------------------------------------------
 /// Prints a message in LaTeX-format (inside the table)
-/// \param out: Stream where to put the output
-/// \param file: File to which the message should be print
-/// \param msg: Message to print (not NULL)
+/// \param out Stream where to put the output
+/// \param file File to which the message should be print
+/// \param msg Message to print (not NULL)
 //-----------------------------------------------------------------------------
 void LaTeXWriter::printMessage (std::ostream& out, const YGP::File& file,
                                 const std::string& msg) const {
@@ -518,9 +516,9 @@ XMLWriter::~XMLWriter () {
 
 //-----------------------------------------------------------------------------
 /// Prints a message in XML-format (inside the table)
-/// \param out: Stream where to put the output
-/// \param file: File to which the message should be print
-/// \param msg: Message to print (not NULL)
+/// \param out Stream where to put the output
+/// \param file File to which the message should be print
+/// \param msg Message to print (not NULL)
 //-----------------------------------------------------------------------------
 void XMLWriter::printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const {
    Check3 (!msg.empty ());
