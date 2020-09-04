@@ -3,15 +3,12 @@
 *.pot
 *.template
 *.sed
-*.sin
 *.gmo
 *.meta
 *.header
 *.m4
 IExtract
 .deps
-ABOUT-NLS
-COPYING
 intl
 libtool
 install-sh
@@ -21,7 +18,10 @@ m4
 missing
 IExtract-cfg.h
 Makefile
-config.??*
+config.guess
+config.sub
+config.status
+config.status.lineno
 configure
 stamp-h1
 autom4te.cache
@@ -29,4 +29,3 @@ POTFILES
 Rules-quot
 depcomp
 stamp-po
-test

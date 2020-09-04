@@ -8,8 +8,8 @@ RELEASE=${PACKAGE_VERSION%.*}
 AC_SUBST(PACKAGE_VERSION)
 AC_SUBST(RELEASE)
 
-INCLUDES="-DLOCALEDIR=\\\"\$(datadir)/locale\\\""
-AC_SUBST(INCLUDES)
+AM_CPPFLAGS="-DLOCALEDIR=\\\"\$(datadir)/locale\\\""
+AC_SUBST(AM_CPPFLAGS)
 dnl AC_CANONICAL_SYSTEM
 
 AC_C_BIGENDIAN
@@ -26,14 +26,15 @@ AC_PROG_LIBTOOL
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AC_GNU_SOURCE
-AM_GNU_GETTEXT
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION([0.21])
 
 dnl Checks for programs.
 
 dnl Checks for libraries.
 AC_CHECK_LIB(stdc++, main)
 AC_CHECK_LIB(z, main)
-PKG_CHECK_MODULES(YMP, YGP >= 0.9.30, [],
+PKG_CHECK_MODULES(YGP, YGP >= 0.9.30, [],
                   [AC_MSG_ERROR(Need libYGP to make! Get it from http://sourceforge.net/projects/libymp/); exit])
 
 dnl Checks for header files.
@@ -168,7 +169,7 @@ fi
 AM_CONDITIONAL(SUPPORT_MSOFFICE, test "$enable_msoffice" != "no")
 
 
-AC_OUTPUT([Makefile src/Makefile src/Plugins/Makefile doc/Makefile po/Makefile.in intl/Makefile])
+AC_OUTPUT([Makefile src/Makefile src/Plugins/Makefile doc/Makefile po/Makefile.in])
 
 dnl Settings for autoheader
 AH_TOP([#ifndef IEXTRACT_CFG_H

@@ -1,0 +1,12 @@
+stages:
+  - test
+
+test:
+  before_script:
+    - aclocal -I m4 && libtoolize
+    - automake -a && autoheader && autoconf
+    - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
+    - ./configure
+    - make -j6
+  script:
+    - python -m unittest test/test.py
