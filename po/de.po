@@ -1,15 +1,16 @@
 # Deutsche Übersetzung der IExtract-Meldungen
-# Copyright (C) 2003 - 2009 Markus Schwab
+# Copyright (C) 2003 - 2009, 2011 Markus Schwab
 # Markus Schwab <g17m0@users.sourceforge.net>, 2003
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.9 ($Revision$)\n"
 "Report-Msgid-Bugs-To: g17m0@users.sourceforge.net\n"
-"POT-Creation-Date: 2009-11-17 16:24+0100\n"
-"PO-Revision-Date: 2009-05-18 13:40+0200\n"
+"POT-Creation-Date: 2011-05-27 21:02+0200\n"
+"PO-Revision-Date: 2011-05-27 21:03+0200\n"
 "Last-Translator: Markus Schwab <g17m0@users.sourceforge.net>\n"
 "Language-Team: German <g17m0@users.sourceforge.net>\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8-bit\n"
@@ -636,11 +637,11 @@ msgstr "Start der Werte"
 msgid "Full value"
 msgstr "Kompletter Wert"
 
-#: src/ParsePDF.cpp:463
+#: src/ParsePDF.cpp:464
 msgid "Not a PDF document!"
 msgstr "Kein PDF-Dokument!"
 
-#: src/ParsePDF.cpp:474
+#: src/ParsePDF.cpp:475
 msgid "Document does not contain neither an /Info nor a /Prev entry"
 msgstr "Dokument enthält weder einen /Info- noch einen /Prev-Eintrag"
 
@@ -1079,6 +1080,10 @@ msgstr "RTF-Dokument"
 #: src/ParseOGG.cpp:46
 msgid "OGG-ID"
 msgstr ""
+
+#: src/ParseOGG.cpp:47
+msgid "Comment header"
+msgstr "Kommentarbeginn"
 
 #: src/ParseOGG.cpp:49
 msgid "Number of segments"
