@@ -62,7 +62,7 @@ DEFS=@DEFS@ -Wall
 AM_CPPFLAGS = @AM_CPPFLAGS@ @YGP_CFLAGS@
 
 IExtract_LDADD=@YGP_LIBS@ @LTLIBINTL@
-IExtract_SOURCES=Writer.cpp Writer.h Properties.h Options.h		\
+IExtract_SOURCES=Writer.cpp Writer.h Properties.h Options.h             \
 $(USE_HTML) $(USE_GIF) $(USE_JPEG) $(USE_OO) $(USE_PDF) $(USE_PNG)	\
 $(USE_MP3) $(USE_OGG) $(USE_RTF) $(USE_ABIWORD) $(USE_MSOFFICE)		\
 IExtract.cpp
