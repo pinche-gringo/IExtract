@@ -75,7 +75,7 @@ ParseMSOffice::ParseMSOffice() {
 /// \param result Structure to hold the found information
 /// \throw YGP::ParseError In case of an error an describing text
 //-----------------------------------------------------------------------------
-void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
+void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) {
    TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&)");
 
    // Read the header (the first block)
@@ -142,11 +142,13 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (YGP
 	       TRACE8 ("ParseMSOffice::parse (YGP::Xistream&, Properties&) - Info in " << std::hex
 		       << offBlock << std::dec << "; " << length << " bytes");
 
-	       char* infoBlock (NULL);
+	       delete [] infoBlock;
+	       infoBlock = NULL;
 	       // Files less than 4K are stored in small blocks
 	       if (length < 4096) {
 		  UINT32* pSBAT (NULL);
-		  std::map<unsigned int, char*> readBlocksSBA;
+                  typedef std::map<unsigned int, char*> block;
+                  block readBlocksSBA;
 
 		  try {
 		     // Read SBAT table
@@ -161,15 +163,15 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (YGP
 		     char* actPos (infoBlock);
 
 		     // Read the small file
-		     int bigBlock (0);
 		     unsigned int cSmallBlocks (1 << (sizeBlock - sizeBlockSmall));
 		     while (length > 0) {
-			bigBlock = getBlock (pBAT, offSBA, offBlock >> (sizeBlock - sizeBlockSmall));
-			if (readBlocksSBA.find (bigBlock) == readBlocksSBA.end ()) {
-			   readBlocksSBA[bigBlock] = new char[1 << sizeBlock];
-			   readBlock (stream, bigBlock, readBlocksSBA[bigBlock], sizeBlock);
+                        int bigBlock(getBlock (pBAT, offSBA, offBlock >> (sizeBlock - sizeBlockSmall)));
+                        std::pair<block::iterator, bool> const& insert = readBlocksSBA.insert(block::value_type(bigBlock, (char*)NULL));
+			if (insert.second) {
+                           insert.first->second = new char[1 << sizeBlock];
+                           readBlock (stream, bigBlock, insert.first->second, sizeBlock);
 			}
-			memcpy (actPos, readBlocksSBA[bigBlock] + ((offBlock % cSmallBlocks) << sizeBlockSmall),
+			memcpy (actPos, insert.first->second + ((offBlock % cSmallBlocks) << sizeBlockSmall),
 				1 << sizeBlockSmall);
 			actPos += 1 << sizeBlockSmall;
 			length -= 1 << sizeBlockSmall;
@@ -280,7 +282,7 @@ void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) throw (YGP
 /// \remarks - The first byte of block needs to be filled with the blocklength
 //-----------------------------------------------------------------------------
 void ParseMSOffice::readBlock (YGP::Xistream& stream, unsigned int offBlock, char* block,
-			       unsigned int sizeBlock) throw (YGP::ParseError) {
+			       unsigned int sizeBlock) {
    TRACE9 ("ParseMSOffice::readBlock (YGP::Xistream&, unsigned int, char*, unsigned int): " << offBlock);
    stream.seekg ((offBlock << sizeBlock) + 512, std::ios_base::beg);
    stream.read (block, 1 << sizeBlock);
@@ -303,7 +305,7 @@ void ParseMSOffice::readBlock (YGP::Xistream& stream, unsigned int offBlock, cha
 /// \throw YGP::ParseError In case of error a describing text
 //-----------------------------------------------------------------------------
 void ParseMSOffice::readBAT (YGP::Xistream& stream, char* pBAT, const char* pBATBlocks,
-			     unsigned int cBlocks, unsigned int sizeBlock) throw (YGP::ParseError) {
+			     unsigned int cBlocks, unsigned int sizeBlock) {
    TRACE9 ("ParseMSOffice::readBAT (YGP::Xistream&, 2x char*, 2x unsigned) - " << cBlocks);
    Check1 (pBAT);
 
@@ -323,7 +325,7 @@ void ParseMSOffice::readBAT (YGP::Xistream& stream, char* pBAT, const char* pBAT
 /// \throw YGP::ParseError In case of error a describing text
 //-----------------------------------------------------------------------------
 char* ParseMSOffice::readFile (YGP::Xistream& stream, unsigned int offBlock, void* pBAT,
-			       unsigned int blocks, unsigned int sizeBlock) throw (YGP::ParseError) {
+			       unsigned int blocks, unsigned int sizeBlock) {
    char* pFile (new char [blocks << sizeBlock]);
    char* actPos (pFile);
    while (blocks--) {
@@ -343,7 +345,7 @@ char* ParseMSOffice::readFile (YGP::Xistream& stream, unsigned int offBlock, voi
 /// \returns unsigned int Offset of block
 /// \throw YGP::ParseError In case of error a describing text
 //-----------------------------------------------------------------------------
-int ParseMSOffice::getBlock (void* pBAT, unsigned int start, unsigned int nr) throw (YGP::ParseError) {
+int ParseMSOffice::getBlock (void* pBAT, unsigned int start, unsigned int nr) {
    TRACE9 ("ParseMSOffice::getBlock (void*, 2x unsigned int) - " << start);
    while (nr--) {
       start = ((UINT32*)pBAT)[start];

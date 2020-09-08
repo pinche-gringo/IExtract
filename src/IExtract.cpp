@@ -1191,7 +1191,6 @@ void Application::readINIFile (const char* pFile) {
    TRACE5 ("Application::readINIFile (const char*) - " << pFile);
    Check3 (pFile);
 
-   std::string Style;
    std::string mode;
    try {
       INIFILE (pFile);

@@ -39,16 +39,16 @@ class ParseMSOffice  {
    ParseMSOffice ();
    ~ParseMSOffice () { }
 
-   void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError);
+   void parse (YGP::Xistream& stream, Properties& result);
 
  private:
    static void readBAT (YGP::Xistream& stream, char* pBAT, const char* pBATBlocks,
-			unsigned int cBlocks, unsigned int sizeBlock) throw (YGP::ParseError);
+			unsigned int cBlocks, unsigned int sizeBlock);
    static void readBlock (YGP::Xistream& stream, unsigned int offBlock,
-			  char* block, unsigned int sizeBlock) throw (YGP::ParseError);
+			  char* block, unsigned int sizeBlock);
    static char* readFile (YGP::Xistream& stream, unsigned int offBlock,
-			  void* pBAT, unsigned int blocks, unsigned int sizeBlock) throw (YGP::ParseError);
-   static int getBlock (void* pBAT, unsigned int start, unsigned int nr) throw (YGP::ParseError);
+			  void* pBAT, unsigned int blocks, unsigned int sizeBlock);
+   static int getBlock (void* pBAT, unsigned int start, unsigned int nr);
 };
 
 #endif
