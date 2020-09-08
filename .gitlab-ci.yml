@@ -1,13 +1,26 @@
 stages:
   - test
 
-test:
+.something: &prepare_repo
+  - aclocal -I m4 && libtoolize
+  - automake -a && autoheader && autoconf
+  - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
+  - ./configure
+
+code_check:
+  stage: test
   before_script:
-    - aclocal -I m4 && libtoolize
-    - automake -a && autoheader && autoconf
-    - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
-    - ./configure
+    *prepare_repo
+  script:
+    make -C src check_code
+  only:
+    - master
+
+test:
+  stage: test
+  before_script:
+    - *prepare_repo
     - mgeni.pl src/Options.h>src/Options.meta
     - make -j6
   script:
-    - python -m unittest test/test.py
+    - python -m unittest -v test/test.py

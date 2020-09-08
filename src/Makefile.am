@@ -76,3 +76,6 @@ includedir = ${prefix}/include/IExtract
 
 Options.meta: Options.h
 	mgeni.pl Options.h>Options.meta
+
+check_code:
+	cppcheck --force ./ --enable=all @YGP_CFLAGS@
