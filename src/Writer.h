@@ -46,7 +46,7 @@ class Writer : public YGP::TableWriter {
 	   const char* sepHdrCol = NULL, const char* defColumns = NULL);
    virtual ~Writer ();
 
-   virtual std::string getSubstitute (char ctrl, bool extend = false) const;
+   virtual std::string getSubstitute (char ctrl, bool extend = false) const override;
 
    void printFile (std::ostream& out, const YGP::File& file, const Properties& prop);
    void printSeparator (std::ostream& out, const YGP::File& file,
@@ -83,7 +83,7 @@ class TextWriter : public Writer {
    TextWriter (const std::string& format, const std::string& strNew, unsigned long age = 0);
    virtual ~TextWriter ();
 
-   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const;
+   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
 
    /// Creates a text writer
    /// \param format: Format how to display entries
@@ -104,9 +104,9 @@ class QuotedTextWriter : public Writer {
    QuotedTextWriter (const std::string& format, const std::string& strNew, unsigned long age = 0);
    virtual ~QuotedTextWriter ();
 
-   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const;
+   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
 
-   virtual std::string changeSpecialChars (const std::string& value) const;
+   virtual std::string changeSpecialChars (const std::string& value) const override;
 
    /// Creates a text writer
    /// \param format: Format how to display entries
@@ -127,10 +127,10 @@ class HTMLWriter : public Writer {
    HTMLWriter (const std::string& format, const std::string& strNew, unsigned long age = 0);
    virtual ~HTMLWriter ();
 
-   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const;
+   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
 
-   virtual std::string changeSpecialChars (const std::string& value) const;
-   virtual std::string changeSpecialFileChars (const std::string& value) const;
+   virtual std::string changeSpecialChars (const std::string& value) const override;
+   virtual std::string changeSpecialFileChars (const std::string& value) const override;
 
    /// Creates an HTML writer
    /// \param format: Format how to display entries
@@ -152,7 +152,7 @@ class XMLWriter : public HTMLWriter {
 	      unsigned long age = 0) : HTMLWriter (format, strNew, age) { }
    virtual ~XMLWriter ();
 
-   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const;
+   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
 
    /// Creates an XML writer
    /// \param format: Format how to display entries
@@ -173,10 +173,10 @@ class LaTeXWriter : public Writer {
    LaTeXWriter (const std::string& format, const std::string& strNew, unsigned long age = 0);
    virtual ~LaTeXWriter ();
 
-   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const;
+   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
    virtual void printHeaderLead (std::ostream& out) const;
 
-   virtual std::string changeSpecialChars (const std::string& value) const;
+   virtual std::string changeSpecialChars (const std::string& value) const override;
 
    /// Creates a LaTeX writer
    /// \param format: Format how to display entries

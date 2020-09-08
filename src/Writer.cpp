@@ -226,7 +226,6 @@ std::string Writer::getSubstitute (char ctrl, bool extend) const {
    case 's':
    case 'S': {
       YGP::ANumeric size (file_->size ());
-      subst = "";
       subst = ((ctrl == 'S') ? convertToHumanString (file_->size ())
                : YGP::ANumeric::toString (file_->size ()));
       break; }
