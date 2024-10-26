@@ -41,7 +41,7 @@ class ParsePDF {
    ParsePDF ();
    ~ParsePDF ();
 
-   static void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError);
+   static void parse (YGP::Xistream& stream, Properties& result);
 
  private:
    ParsePDF (const ParsePDF& other);

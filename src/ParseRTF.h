@@ -32,7 +32,7 @@ class ParseRTF  {
    ParseRTF ();
    ~ParseRTF () { }
 
-   void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
+   void parse (YGP::Xistream& stream, Properties& result) {
       prop = &result;
       block.skipWS (stream);
       docRTF.parse (stream); }

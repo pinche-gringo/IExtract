@@ -8,7 +8,7 @@
 //REVISION    : $Revision: 1.30 $
 //AUTHOR      : Markus Schwab
 //CREATED     : 8.10.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2008
+//COPYRIGHT   : Copyright (C) 2002 - 2008, 2024
 
 // This file is part of IExtract.
 //
@@ -56,9 +56,8 @@ ParseOOXML::ParseOOXML () {
 /// Tries to parse an Office Open XML document
 /// \param stream: Stream to read from
 /// \param result: Structure to hold the found information
-/// \throw YGP::ParseError: In case of an error an describing text
 //-----------------------------------------------------------------------------
-void ParseOOXML::parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
+void ParseOOXML::parse (YGP::Xistream& stream, Properties& result) {
    UINT32 posFile;
    stream.read ((char*)&posFile, sizeof (posFile));
    posFile = YGP::getFileOffsetInArchive ((std::ifstream&)stream, (char*)&posFile, "docProps/core.xml", 17);

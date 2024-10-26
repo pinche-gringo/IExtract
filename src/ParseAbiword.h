@@ -32,7 +32,7 @@ class ParseAbiword {
    ParseAbiword ();
    ~ParseAbiword ();
 
-   void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
+   void parse (YGP::Xistream& stream, Properties& result) {
       prop = &result;
       selDocument.parse (stream);
    }

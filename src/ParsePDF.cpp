@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 08.11.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2004, 2006 - 2008, 2011
+//COPYRIGHT   : Copyright (C) 2002 - 2004, 2006 - 2008, 2011, 2024
 
 // This file is part of IExtract.
 //
@@ -455,9 +455,8 @@ int ParsePDF::foundValue (const char* pValue, unsigned int len) {
 /// Method to parse a PDF object
 /// \param stream: Stream to parse
 /// \param result: Result where to store found data
-/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void ParsePDF::parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
+void ParsePDF::parse (YGP::Xistream& stream, Properties& result) {
    char buffer[5];
    stream.read (buffer, sizeof (buffer));
    if (memcmp (buffer, "%PDF-", sizeof (buffer)))

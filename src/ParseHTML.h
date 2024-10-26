@@ -31,7 +31,7 @@ class ParseHTML  {
    ParseHTML ();
    ~ParseHTML () { }
 
-   void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
+   void parse (YGP::Xistream& stream, Properties& result) {
       prop = &result;
       htmlDoc.parse (stream); }
 

@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 20.03.2005
-//COPYRIGHT   : Copyright (C) 2005 - 2008, 2011
+//COPYRIGHT   : Copyright (C) 2005 - 2008, 2011, 2024
 
 // This file is part of IExtract.
 //
@@ -82,9 +82,8 @@ ParseOGG::~ParseOGG () {
 /// Method to actually parse the OGG-file
 /// \param stream: OGG-file to analyze
 /// \param result: Out: Found information
-/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void ParseOGG::parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
+void ParseOGG::parse (YGP::Xistream& stream, Properties& result) {
    ParseOGG obj (result);
 
    obj.seqOGG.parse (stream);

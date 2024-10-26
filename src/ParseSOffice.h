@@ -31,7 +31,7 @@ class ParseStarOffice  {
    ParseStarOffice ();
    ~ParseStarOffice () { }
 
-   void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
+   void parse (YGP::Xistream& stream, Properties& result) {
       prop = &result;
       seqDocument.parse (stream); }
 

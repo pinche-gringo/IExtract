@@ -31,7 +31,7 @@ class ParseOOXML  {
    ParseOOXML ();
    ~ParseOOXML () { }
 
-   void parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError);
+   void parse (YGP::Xistream& stream, Properties& result);
 };
 
 #endif

@@ -8,7 +8,7 @@
 //REVISION    : $Revision: 1.86 $
 //AUTHOR      : Markus Schwab
 //CREATED     : 10.08.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2009, 2011
+//COPYRIGHT   : Copyright (C) 2002 - 2009, 2011, 2024
 
 // This file is part of IExtract.
 //
@@ -192,38 +192,38 @@ class Application : public YGP::IVIOApplication {
    static void processMP3 (YGP::Xistream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_OGG
-   static void processOGG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+   static void processOGG (YGP::Xistream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_PDF
-   static void processPDF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+   static void processPDF (YGP::Xistream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_JPEG
-   static void processJPG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+   static void processJPG (YGP::Xistream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_PNG
-   static void processPNG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+   static void processPNG (YGP::Xistream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_GIF
-   static void processGIF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+   static void processGIF (YGP::Xistream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_HTML
-   static void processHTML (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+   static void processHTML (YGP::Xistream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_RTF
-   static void processRTF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+   static void processRTF (YGP::Xistream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_MSOFFICE
-   static void processMSOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+   static void processMSOffice (YGP::Xistream& hFile, Properties& result);
 #  ifdef SUPPORT_OOXML
-   static void processOOXML (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+   static void processOOXML (YGP::Xistream& hFile, Properties& result);
 #  endif
 #endif
 #ifdef SUPPORT_OO
-   static void processOpenOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
-   static void processStarOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+   static void processOpenOffice (YGP::Xistream& hFile, Properties& result);
+   static void processStarOffice (YGP::Xistream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_ABIWORD
-   static void processAbiword (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+   static void processAbiword (YGP::Xistream& hFile, Properties& result);
 #endif
 
    void showSupportedTypes () const;
@@ -998,9 +998,8 @@ void Application::processFile (const YGP::File& file, HANDLER fnc) const {
 /// Tries to extract the properties of an HTML-document
 /// \param hFile File to processs
 /// \param result Result of parsing
-/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
-void Application::processHTML (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
+void Application::processHTML (YGP::Xistream& hFile, Properties& result) {
    ParseHTML ().parse (hFile, result);
 }
 #endif
@@ -1010,9 +1009,8 @@ void Application::processHTML (YGP::Xistream& hFile, Properties& result) throw (
 /// Tries to extract the properties of a PDF document
 /// \param hFile File to processs
 /// \param result Result of parsing
-/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
-void Application::processPDF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
+void Application::processPDF (YGP::Xistream& hFile, Properties& result) {
    ParsePDF::parse (hFile, result);
 }
 #endif
@@ -1033,9 +1031,8 @@ void Application::processMP3 (YGP::Xistream& hFile, Properties& result) {
 /// Tries to extract the properties out of an OGG file
 /// \param hFile File to processs
 /// \param result Result of parsing
-/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
-void Application::processOGG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
+void Application::processOGG (YGP::Xistream& hFile, Properties& result) {
    ParseOGG::parse (hFile, result);
 }
 #endif
@@ -1045,9 +1042,8 @@ void Application::processOGG (YGP::Xistream& hFile, Properties& result) throw (Y
 /// Tries to extract the properties of a StarOffice document
 /// \param hFile File to processs
 /// \param result Result of parsing
-/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
-void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
+void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) {
    ParseStarOffice ().parse (hFile, result);
 }
 
@@ -1055,9 +1051,8 @@ void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) t
 /// Tries to extract the properties of an OpenOffice document
 /// \param hFile File to processs
 /// \param result Result of parsing
-/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
-void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
+void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) {
    ParseOpenOffice ().parse (hFile, result);
 }
 #endif
@@ -1067,9 +1062,8 @@ void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) t
 /// Tries to extract the properties of an Abiword document
 /// \param hFile File to processs
 /// \param result Result of parsing
-/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
-void Application::processAbiword (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
+void Application::processAbiword (YGP::Xistream& hFile, Properties& result) {
    ParseAbiword ().parse (hFile, result);
 }
 #endif
@@ -1079,9 +1073,8 @@ void Application::processAbiword (YGP::Xistream& hFile, Properties& result) thro
 /// Tries to extract the properties of a RTF-document
 /// \param hFile File to processs
 /// \param result Result of parsing
-/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
-void Application::processRTF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
+void Application::processRTF (YGP::Xistream& hFile, Properties& result) {
    TRACE9 ("Parsing RTF");
    ParseRTF ().parse (hFile, result);
 }
@@ -1092,9 +1085,8 @@ void Application::processRTF (YGP::Xistream& hFile, Properties& result) throw (Y
 /// Tries to extract the properties of a MS-office document
 /// \param hFile File to processs
 /// \param result Result of parsing
-/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
-void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
+void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) {
    ParseMSOffice ().parse (hFile, result);
 }
 
@@ -1103,9 +1095,8 @@ void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) thr
 /// Tries to extract the properties of a MS Office Open XML document
 /// \param hFile File to processs
 /// \param result Result of parsing
-/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
-void Application::processOOXML (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
+void Application::processOOXML (YGP::Xistream& hFile, Properties& result) {
    ParseOOXML ().parse (hFile, result);
 }
 #  endif
@@ -1116,9 +1107,8 @@ void Application::processOOXML (YGP::Xistream& hFile, Properties& result) throw 
 /// Tries to extract the properties of a JPEG image
 /// \param hFile File to processs
 /// \param result Result of parsing
-/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
-void Application::processJPG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
+void Application::processJPG (YGP::Xistream& hFile, Properties& result) {
    ParseJPEG ().parse (hFile, result);
 }
 #endif
@@ -1128,9 +1118,8 @@ void Application::processJPG (YGP::Xistream& hFile, Properties& result) throw (Y
 /// Tries to extract the properties of a PNG image
 /// \param hFile File to processs
 /// \param result Result of parsing
-/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
-void Application::processPNG (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
+void Application::processPNG (YGP::Xistream& hFile, Properties& result) {
    ParsePNG (result).parse (hFile);
 }
 #endif
@@ -1140,9 +1129,8 @@ void Application::processPNG (YGP::Xistream& hFile, Properties& result) throw (Y
 /// Tries to extract the properties of a GIF image
 /// \param hFile File to processs
 /// \param result Result of parsing
-/// \throw YGP::ParseError In case of an error
 //-----------------------------------------------------------------------------
-void Application::processGIF (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
+void Application::processGIF (YGP::Xistream& hFile, Properties& result) {
    ParseGIF (result).parse (hFile);
 }
 #endif

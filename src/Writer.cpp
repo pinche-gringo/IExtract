@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 13.10.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2005, 2007 - 2009, 2011
+//COPYRIGHT   : Copyright (C) 2002 - 2005, 2007 - 2009, 2011, 2024
 
 // This file is part of IExtract.
 //
@@ -221,7 +221,8 @@ std::string Writer::getSubstitute (char ctrl, bool extend) const {
 
       if (ctrl == 'U')
          subst += extend ? changeSpecialFileChars (file_->name ()) : file_->name ();
-         break; }
+         break;
+   }
 
    case 's':
    case 'S': {

@@ -32,7 +32,7 @@ class ParseGIF {
    ParseGIF (Properties& result);
    virtual ~ParseGIF ();
 
-   void parse (YGP::Xistream& stream) throw (YGP::ParseError) {
+   void parse (YGP::Xistream& stream) {
       gifImage.parse (stream); }
 
  private:

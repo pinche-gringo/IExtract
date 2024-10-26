@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 8.10.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2008, 2011
+//COPYRIGHT   : Copyright (C) 2002 - 2008, 2011, 2024
 
 // This file is part of IExtract.
 //
@@ -73,7 +73,6 @@ ParseMSOffice::ParseMSOffice() {
 /// Tries to parse a Microsoft Office documnent
 /// \param stream Stream to read from
 /// \param result Structure to hold the found information
-/// \throw YGP::ParseError In case of an error an describing text
 //-----------------------------------------------------------------------------
 void ParseMSOffice::parse (YGP::Xistream& stream, Properties& result) {
    TRACE9 ("ParseMSOffice::parse (YGP::Xistream&, Properties&)");

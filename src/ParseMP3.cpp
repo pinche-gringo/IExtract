@@ -8,7 +8,7 @@
 //REVISION    : $Revision$
 //AUTHOR      : Markus Schwab
 //CREATED     : 15.01.2003
-//COPYRIGHT   : Copyright (C) 2003 - 2008
+//COPYRIGHT   : Copyright (C) 2003 - 2008, 2024
 
 // This file is part of IExtract.
 //
@@ -59,9 +59,8 @@ ParseMP3::~ParseMP3 () {
 /// Method to actually parse the MP3-file
 /// \param stream: MP3-file to analyze
 /// \param result: Out: Found information
-/// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void ParseMP3::parse (YGP::Xistream& stream, Properties& result) throw (YGP::ParseError) {
+void ParseMP3::parse (YGP::Xistream& stream, Properties& result) {
    result.strTitle.clear ();
    result.strAuthor.clear ();
    result.strComment.clear ();
