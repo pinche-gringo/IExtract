@@ -23,6 +23,8 @@
 
 #include <YGP/Parse.h>
 
+#include "Selection.h"
+
 
 struct Properties;
 
@@ -63,7 +65,7 @@ class ParseAbiword {
    YGP::ParseSequence    seqMetadata;
    YGP::ParseSequence    seqEntry;
 
-   YGP::ParseSelection   selDocument;                         // Startsequence
+   Selection             selDocument;                         // Startsequence
 
    YGP::ParseObject* _seqAbiWord[3];
    YGP::ParseObject* _selDocument[4];

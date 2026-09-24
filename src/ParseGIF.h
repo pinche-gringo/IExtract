@@ -21,6 +21,8 @@
 
 #include <YGP/Parse.h>
 
+#include "Selection.h"
+
 
 struct Properties;
 
@@ -66,7 +68,7 @@ class ParseGIF {
    OMParseAttomic    comment;
    OMParseAttomic    lenBlock;
 
-   YGP::ParseSelection blocks;
+   Selection           blocks;
    YGP::ParseObject*   _blocks[5];
 
    YGP::ParseSequence commentExt;

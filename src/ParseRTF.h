@@ -23,6 +23,8 @@
 
 #include <YGP/Parse.h>
 
+#include "Selection.h"
+
 struct Properties;
 
 
@@ -70,8 +72,8 @@ class ParseRTF  {
    YGP::ParseSequence  seqInfoValue;
    YGP::ParseSequence  seqOtherCmd;
    YGP::ParseSequence  seqValue;
-   YGP::ParseSelection selEntry;
-   YGP::ParseSelection selCmd;
+   Selection           selEntry;
+   Selection           selCmd;
    YGP::ParseSequence  block;
    YGP::ParseSequence  docRTF;
 

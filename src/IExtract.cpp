@@ -857,7 +857,7 @@ void Application::handleFiles (const char* pFile) const {
                                                       &Application::processThread, NULL));
             }
             catch (YGP::ExecError& err) {
-               std::cerr << PACKAGE << _("-error: ") << err << '\n';
+               std::cerr << PACKAGE << _("-error: ") << err.what () << '\n';
             }
          UNLOCKTHREADS
 #else

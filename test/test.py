@@ -4,6 +4,10 @@ import subprocess
 import unittest
 
 
+class ExecuteError(Exception):
+    pass
+
+
 class TestExtract(unittest.TestCase):
     @staticmethod
     def execute(*args):

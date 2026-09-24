@@ -28,6 +28,8 @@
 
 #include <YGP/Parse.h>
 
+#include "Selection.h"
+
 struct Properties;
 
 
@@ -101,20 +103,20 @@ class ParsePDF {
    OMParseExact    startOfValue3;
    YGP::ParseExact endOfValue;
 
-   YGP::ParseSelection selXRef;
+   Selection           selXRef;
    YGP::ParseSequence  seqXRef;
    YGP::ParseSequence  seqXRefTable;
    YGP::ParseSequence  seqXRefSubsection;
    YGP::ParseSequence  seqXRefTableEntries;
    YGP::ParseSequence  seqTrailer;
-   YGP::ParseSelection selValues;
+   Selection           selValues;
    YGP::ParseSequence  seqSkipEntry;
    YGP::ParseSequence  seqInfo;
    YGP::ParseSequence  seqPrev;
    YGP::ParseSequence  seqInfoObj;
    YGP::ParseSequence  seqInfoValue;
-   YGP::ParseSelection selType;
-   YGP::ParseSelection selStartOfValue;
+   Selection           selType;
+   Selection           selStartOfValue;
    YGP::ParseSequence  seqFullValue;
 
    YGP::ParseObject* _selXRef[4];

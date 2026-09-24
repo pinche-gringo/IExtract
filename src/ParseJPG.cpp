@@ -199,14 +199,14 @@ int ParseJPEG::foundCommentPhotoShop (const char* pTitle, unsigned int len) {
    pTitle += len;
 
    TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Header: *"
-           << std::hex << (unsigned int)pAct << " = " << (*(unsigned int*)pAct) << std::dec);
+           << std::hex << (const void*)pAct << " = " << (*(unsigned int*)pAct) << std::dec);
 
    if (*(unsigned int*)pAct == ENTRY_BLOCK) {
       pAct += 6;
       pAct += (unsigned int)*pAct;
 
       TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Entry: *"
-              << std::hex << (unsigned int)pAct << " = " << (*(unsigned int*)pAct) << std::dec);
+              << std::hex << (const void*)pAct << " = " << (*(unsigned int*)pAct) << std::dec);
 
       if (*(unsigned int*)pAct == ENTRY_TYPE) {
          pAct += 4;
@@ -214,7 +214,7 @@ int ParseJPEG::foundCommentPhotoShop (const char* pTitle, unsigned int len) {
 	 ++pAct;
          do {
             TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Type: *"
-                    << std::hex << (unsigned int)pAct << " = " << YGP::get4BytesLSB (pAct) << std::dec);
+                    << std::hex << (const void*)pAct << " = " << YGP::get4BytesLSB (pAct) << std::dec);
 
             static std::string Properties::* values[] = { &Properties::strTitle,
                                                           &Properties::strComment,

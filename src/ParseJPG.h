@@ -21,6 +21,8 @@
 
 #include <YGP/Parse.h>
 
+#include "Selection.h"
+
 
 struct Properties;
 
@@ -86,7 +88,7 @@ class ParseJPEG  {
    YGP::ParseSkip  skip6;
    YGP::ParseSkip  skipLen;
 
-   YGP::ParseSelection  selMarker;
+   Selection            selMarker;
    YGP::ParseSequence   seqComment;
    OMParseSequence      seqEXIF;
    YGP::ParseSequence   seqAPPD;

@@ -22,6 +22,8 @@
 
 #include <YGP/Parse.h>
 
+#include "Selection.h"
+
 struct Properties;
 
 
@@ -87,11 +89,11 @@ class ParseHTML  {
    YGP::ParseSequence  seqMetaCmd;
    YGP::ParseSequence  seqMetaName;
    OMParseSequence     seqScript;
-   YGP::ParseSelection selMetaCmds;
-   YGP::ParseSelection selMetaTags;
-   YGP::ParseSelection selScriptContent;
-   YGP::ParseSelection selCmd;
-   YGP::ParseSelection htmlDoc;                                    // Startsequence
+   Selection           selMetaCmds;
+   Selection           selMetaTags;
+   Selection           selScriptContent;
+   Selection           selCmd;
+   Selection           htmlDoc;                                    // Startsequence
 
    YGP::ParseObject* _seqMetaName[11];
    YGP::ParseObject* _seqMetaCmd[3];
