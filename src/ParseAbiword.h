@@ -1,8 +1,6 @@
 #ifndef PARSEABIWORD_H
 #define PARSEABIWORD_H
 
-//$Id$
-
 // This file is part of IExtract.
 //
 // IExtract is free software: you can redistribute it and/or modify
@@ -28,14 +26,14 @@ struct Properties;
  * AbiWord document
  */
 class ParseAbiword {
-public:
-  ParseAbiword() = default;
+  public:
+    ParseAbiword() = default;
 
-  void parse(std::istream &stream, Properties &result);
+    void parse(std::istream& stream, Properties& result);
 
-private:
-  ParseAbiword(const ParseAbiword &other) = delete;
-  const ParseAbiword &operator=(const ParseAbiword &other) = delete;
+  private:
+    ParseAbiword(const ParseAbiword& other) = delete;
+    const ParseAbiword& operator=(const ParseAbiword& other) = delete;
 };
 
 #endif

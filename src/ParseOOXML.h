@@ -1,8 +1,6 @@
 #ifndef PARSEMSOOXML_H
 #define PARSEMSOOXML_H
 
-//$Id$
-
 // This file is part of IExtract.
 //
 // IExtract is free software: you can redistribute it and/or modify
@@ -25,14 +23,14 @@ struct Properties;
 
 // Class to extract the title (of the properties) of a Microsoft office document
 class ParseOOXML {
-public:
-  ParseOOXML() = default;
+  public:
+    ParseOOXML() = default;
 
-  void parse(std::istream &stream, Properties &result);
+    void parse(std::istream& stream, Properties& result);
 
-private:
-  ParseOOXML(const ParseOOXML &) = delete;
-  ParseOOXML &operator=(const ParseOOXML &) = delete;
+  private:
+    ParseOOXML(const ParseOOXML&) = delete;
+    ParseOOXML& operator=(const ParseOOXML&) = delete;
 };
 
 #endif

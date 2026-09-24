@@ -1,8 +1,6 @@
 #ifndef PARSERTF_H
 #define PARSERTF_H
 
-//$Id$
-
 // This file is part of IExtract.
 //
 // IExtract is free software: you can redistribute it and/or modify
@@ -26,14 +24,14 @@ struct Properties;
 
 // Class to extract the title of a RTF-document
 class ParseRTF {
-public:
-  ParseRTF() = default;
+  public:
+    ParseRTF() = default;
 
-  void parse(std::istream &stream, Properties &result);
+    void parse(std::istream& stream, Properties& result);
 
-private:
-  ParseRTF(const ParseRTF &) = delete;
-  ParseRTF &operator=(const ParseRTF &) = delete;
+  private:
+    ParseRTF(const ParseRTF&) = delete;
+    ParseRTF& operator=(const ParseRTF&) = delete;
 };
 
 #endif

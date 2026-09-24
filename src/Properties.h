@@ -1,8 +1,6 @@
 #ifndef PROPERTIES_H
 #define PROPERTIES_H
 
-//$Id$
-
 // This file is part of IExtract.
 //
 // IExtract is free software: you can redistribute it and/or modify
@@ -22,9 +20,9 @@
 
 // Structure holding the properties of a file
 struct Properties {
-  std::string strTitle;
-  std::string strComment;
-  std::string strAuthor;
+    std::string strTitle;
+    std::string strComment;
+    std::string strAuthor;
 };
 
 #endif

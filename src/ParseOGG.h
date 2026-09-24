@@ -1,8 +1,6 @@
 #ifndef PARSEOGG_H
 #define PARSEOGG_H
 
-//$Id$
-
 // This file is part of IExtract.
 //
 // IExtract is free software: you can redistribute it and/or modify
@@ -27,16 +25,16 @@ struct Properties;
 /**Class to extract the comments (title, artist, album) of OGG/Vorbis files
  */
 class ParseOGG {
-public:
-  static void parse(std::istream &stream, Properties &result);
+  public:
+    static void parse(std::istream& stream, Properties& result);
 
-private:
-  // Prohibited manager functions
-  ParseOGG() = delete;
-  ParseOGG(const ParseOGG &other) = delete;
-  const ParseOGG &operator=(const ParseOGG &other) = delete;
+  private:
+    // Prohibited manager functions
+    ParseOGG() = delete;
+    ParseOGG(const ParseOGG& other) = delete;
+    const ParseOGG& operator=(const ParseOGG& other) = delete;
 
-  static void foundComment(const std::string &comment, Properties &result);
+    static void foundComment(const std::string& comment, Properties& result);
 };
 
 #endif

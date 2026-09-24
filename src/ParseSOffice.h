@@ -1,8 +1,6 @@
 #ifndef PARSESOFFICE_H
 #define PARSESOFFICE_H
 
-//$Id$
-
 // This file is part of IExtract.
 //
 // IExtract is free software: you can redistribute it and/or modify
@@ -26,14 +24,14 @@ struct Properties;
 
 // Class to extract the properties of a StarOffice document
 class ParseStarOffice {
-public:
-  ParseStarOffice() = default;
+  public:
+    ParseStarOffice() = default;
 
-  void parse(std::istream &stream, Properties &result);
+    void parse(std::istream& stream, Properties& result);
 
-private:
-  ParseStarOffice(const ParseStarOffice &) = delete;
-  ParseStarOffice &operator=(const ParseStarOffice &) = delete;
+  private:
+    ParseStarOffice(const ParseStarOffice&) = delete;
+    ParseStarOffice& operator=(const ParseStarOffice&) = delete;
 };
 
 #endif

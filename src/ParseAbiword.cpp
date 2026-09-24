@@ -1,14 +1,11 @@
-//$Id$
-
 // PROJECT     : Extract
 // SUBSYSTEM   : ParseAbiword
 // REFERENCES  :
 // TODO        :
 // BUGS        :
-// REVISION    : $Revision$
 // AUTHOR      : Markus Schwab
 // CREATED     : 4.06.2005
-// COPYRIGHT   : Copyright (C) 2005, 2006, 2008
+// COPYRIGHT   : Copyright (C) 2005, 2006, 2008, 2026
 
 // This file is part of IExtract.
 //
@@ -34,9 +31,9 @@
 #include "ParseAbiword.h"
 #include "Properties.h"
 
-static const char *ID_TITLE("m key=\"dc.title\"");
-static const char *ID_COMMENT("m key=\"dc.description\"");
-static const char *ID_AUTHOR("m key=\"dc.creator\"");
+static const char* ID_TITLE("m key=\"dc.title\"");
+static const char* ID_COMMENT("m key=\"dc.description\"");
+static const char* ID_AUTHOR("m key=\"dc.creator\"");
 
 //-----------------------------------------------------------------------------
 /// Parses the AbiWord document
@@ -44,33 +41,30 @@ static const char *ID_AUTHOR("m key=\"dc.creator\"");
 /// \param result: Out: Found information
 /// \throw YGP::ParseError: In case of an invalid document
 //-----------------------------------------------------------------------------
-void ParseAbiword::parse(std::istream &stream, Properties &result) {
-  namespace x3 = boost::spirit::x3;
-  using SpiritParser::ws;
+void ParseAbiword::parse(std::istream& stream, Properties& result) {
+    namespace x3 = boost::spirit::x3;
+    using SpiritParser::ws;
 
-  std::string Properties::*entry(nullptr);
+    std::string Properties::* entry(nullptr);
 
-  auto tag = [&entry](auto &ctx) {
-    const std::string &tag(x3::_attr(ctx));
-    TRACE8("ParseAbiword::parse (std::istream&, Properties&) - Tag: " << tag);
-    entry = ((tag == ID_TITLE)     ? &Properties::strTitle
-             : (tag == ID_COMMENT) ? &Properties::strComment
-             : (tag == ID_AUTHOR)  ? &Properties::strAuthor
-                                   : nullptr);
-  };
-  auto value = [&entry, &result](auto &ctx) {
-    if (entry)
-      result.*entry = x3::_attr(ctx);
-    entry = nullptr;
-  };
+    auto tag = [&entry](auto& ctx) {
+        const std::string& tag(x3::_attr(ctx));
+        TRACE8("ParseAbiword::parse (std::istream&, Properties&) - Tag: " << tag);
+        entry = ((tag == ID_TITLE)     ? &Properties::strTitle
+                 : (tag == ID_COMMENT) ? &Properties::strComment
+                 : (tag == ID_AUTHOR)  ? &Properties::strAuthor
+                                       : nullptr);
+    };
+    auto value = [&entry, &result](auto& ctx) {
+        if (entry)
+            result.*entry = x3::_attr(ctx);
+        entry = nullptr;
+    };
 
-  auto endMetadata = x3::lit("</metadata>");
-  auto metaEntry = x3::lit('<') >> (*~x3::char_('>'))[tag] >> x3::lit('>') >>
-                   ws >> (*~x3::char_('<'))[value];
-  auto metadata = x3::lit("<metadata>") >> ws >> *(!endMetadata >> metaEntry) >>
-                  endMetadata;
-  auto document = *(x3::char_ - x3::lit("<metadata>")) >> -metadata;
+    auto endMetadata = x3::lit("</metadata>");
+    auto metaEntry = x3::lit('<') >> (*~x3::char_('>'))[tag] >> x3::lit('>') >> ws >> (*~x3::char_('<'))[value];
+    auto metadata = x3::lit("<metadata>") >> ws >> *(!endMetadata >> metaEntry) >> endMetadata;
+    auto document = *(x3::char_ - x3::lit("<metadata>")) >> -metadata;
 
-  SpiritParser::parse(SpiritParser::readStream(stream), document,
-                      _("AbiWord document"));
+    SpiritParser::parse(SpiritParser::readStream(stream), document, _("AbiWord document"));
 }

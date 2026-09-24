@@ -1,8 +1,6 @@
 #ifndef PARSEHTML_H
 #define PARSEHTML_H
 
-//$Id$
-
 // This file is part of IExtract.
 //
 // IExtract is free software: you can redistribute it and/or modify
@@ -27,14 +25,14 @@ struct Properties;
 // Class to extract the properties (title, author, description) of a
 // HTML-document
 class ParseHTML {
-public:
-  ParseHTML() = default;
+  public:
+    ParseHTML() = default;
 
-  void parse(std::istream &stream, Properties &result);
+    void parse(std::istream& stream, Properties& result);
 
-private:
-  ParseHTML(const ParseHTML &) = delete;
-  ParseHTML &operator=(const ParseHTML &) = delete;
+  private:
+    ParseHTML(const ParseHTML&) = delete;
+    ParseHTML& operator=(const ParseHTML&) = delete;
 };
 
 #endif

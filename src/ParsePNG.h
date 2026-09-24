@@ -1,8 +1,6 @@
 #ifndef PARSEPNG_H
 #define PARSEPNG_H
 
-//$Id$
-
 // This file is part of IExtract.
 //
 // IExtract is free software: you can redistribute it and/or modify
@@ -29,20 +27,20 @@ struct Properties;
  *  http://www.w3.org/TR/REC-png
  */
 class ParsePNG {
-public:
-  ParsePNG(Properties &result) : prop(result) {}
+  public:
+    ParsePNG(Properties& result) : prop(result) {}
 
-  void parse(std::istream &stream);
+    void parse(std::istream& stream);
 
-private:
-  //@Section prohibited manager functions
-  ParsePNG() = delete;
-  ParsePNG(const ParsePNG &other) = delete;
-  const ParsePNG &operator=(const ParsePNG &other) = delete;
+  private:
+    //@Section prohibited manager functions
+    ParsePNG() = delete;
+    ParsePNG(const ParsePNG& other) = delete;
+    const ParsePNG& operator=(const ParsePNG& other) = delete;
 
-  void foundChunk(unsigned int type, const std::string &data);
+    void foundChunk(unsigned int type, const std::string& data);
 
-  Properties &prop;
+    Properties& prop;
 };
 
 #endif

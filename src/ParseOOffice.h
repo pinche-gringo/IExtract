@@ -1,8 +1,6 @@
 #ifndef PARSEOOFICE_H
 #define PARSEOOFICE_H
 
-//$Id$
-
 // This file is part of IExtract.
 //
 // IExtract is free software: you can redistribute it and/or modify
@@ -28,16 +26,16 @@ struct Properties;
  * OpenOffice.org document
  */
 class ParseOpenOffice {
-public:
-  ParseOpenOffice() = default;
+  public:
+    ParseOpenOffice() = default;
 
-  void parse(std::istream &stream, Properties &result);
+    void parse(std::istream& stream, Properties& result);
 
-private:
-  ParseOpenOffice(const ParseOpenOffice &other) = delete;
-  const ParseOpenOffice &operator=(const ParseOpenOffice &other) = delete;
+  private:
+    ParseOpenOffice(const ParseOpenOffice& other) = delete;
+    const ParseOpenOffice& operator=(const ParseOpenOffice& other) = delete;
 
-  static void parseMetaInfo(const std::string &metaInfo, Properties &result);
+    static void parseMetaInfo(const std::string& metaInfo, Properties& result);
 };
 
 #endif

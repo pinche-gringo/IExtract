@@ -1,8 +1,6 @@
 #ifndef PARSEGIF_H
 #define PARSEGIF_H
 
-//$Id$
-
 // This file is part of IExtract.
 //
 // IExtract is free software: you can redistribute it and/or modify
@@ -27,18 +25,18 @@ struct Properties;
 /**Class to extract the comments out of GIF images
  */
 class ParseGIF {
-public:
-  ParseGIF(Properties &result) : prop(result) {}
+  public:
+    ParseGIF(Properties& result) : prop(result) {}
 
-  void parse(std::istream &stream);
+    void parse(std::istream& stream);
 
-private:
-  //@Section prohibited manager functions
-  ParseGIF() = delete;
-  ParseGIF(const ParseGIF &other) = delete;
-  const ParseGIF &operator=(const ParseGIF &other) = delete;
+  private:
+    //@Section prohibited manager functions
+    ParseGIF() = delete;
+    ParseGIF(const ParseGIF& other) = delete;
+    const ParseGIF& operator=(const ParseGIF& other) = delete;
 
-  Properties &prop;
+    Properties& prop;
 };
 
 #endif

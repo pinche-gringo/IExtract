@@ -1,8 +1,6 @@
 #ifndef PARSEJPG_H
 #define PARSEJPG_H
 
-//$Id$
-
 // This file is part of IExtract.
 //
 // IExtract is free software: you can redistribute it and/or modify
@@ -28,18 +26,18 @@ struct Properties;
  * the EXIF information (Windows XP tags) or the IPTC data (stored by Photoshop)
  */
 class ParseJPEG {
-public:
-  ParseJPEG() = default;
+  public:
+    ParseJPEG() = default;
 
-  void parse(std::istream &stream, Properties &result);
+    void parse(std::istream& stream, Properties& result);
 
-private:
-  ParseJPEG(const ParseJPEG &) = delete;
-  ParseJPEG &operator=(const ParseJPEG &) = delete;
+  private:
+    ParseJPEG(const ParseJPEG&) = delete;
+    ParseJPEG& operator=(const ParseJPEG&) = delete;
 
-  static bool parseEXIF(const std::string &data, Properties &result);
-  static void parsePhotoshop(const std::string &data, Properties &result);
-  static void parseIPTC(const std::string &data, Properties &result);
+    static bool parseEXIF(const std::string& data, Properties& result);
+    static void parsePhotoshop(const std::string& data, Properties& result);
+    static void parseIPTC(const std::string& data, Properties& result);
 };
 
 #endif

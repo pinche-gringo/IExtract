@@ -1,8 +1,6 @@
 #ifndef PARSEMSOFFICE_H
 #define PARSEMSOFFICE_H
 
-//$Id$
-
 // This file is part of IExtract.
 //
 // IExtract is free software: you can redistribute it and/or modify
@@ -30,27 +28,23 @@ struct Properties;
 // Class to extract the properties of Microsoft Office documents (OLE compound
 // files)
 class ParseMSOffice {
-public:
-  ParseMSOffice() = default;
+  public:
+    ParseMSOffice() = default;
 
-  void parse(std::istream &stream, Properties &result);
+    void parse(std::istream& stream, Properties& result);
 
-private:
-  ParseMSOffice(const ParseMSOffice &) = delete;
-  ParseMSOffice &operator=(const ParseMSOffice &) = delete;
+  private:
+    ParseMSOffice(const ParseMSOffice&) = delete;
+    ParseMSOffice& operator=(const ParseMSOffice&) = delete;
 
-  using BAT = std::vector<std::uint32_t>; ///< Block allocation table
+    using BAT = std::vector<std::uint32_t>; ///< Block allocation table
 
-  static BAT readBAT(std::istream &stream, const char *pBATBlocks,
-                     unsigned int cBlocks, unsigned int sizeBlock);
-  static void readBlock(std::istream &stream, unsigned int offBlock,
-                        char *block, unsigned int sizeBlock);
-  static std::vector<char> readFile(std::istream &stream, unsigned int offBlock,
-                                    const BAT &bat, unsigned int blocks,
-                                    unsigned int sizeBlock);
-  static unsigned int nextBlock(const BAT &bat, unsigned int block);
-  static unsigned int getBlock(const BAT &bat, unsigned int start,
-                               unsigned int nr);
+    static BAT readBAT(std::istream& stream, const char* pBATBlocks, unsigned int cBlocks, unsigned int sizeBlock);
+    static void readBlock(std::istream& stream, unsigned int offBlock, char* block, unsigned int sizeBlock);
+    static std::vector<char> readFile(std::istream& stream, unsigned int offBlock, const BAT& bat, unsigned int blocks,
+                                      unsigned int sizeBlock);
+    static unsigned int nextBlock(const BAT& bat, unsigned int block);
+    static unsigned int getBlock(const BAT& bat, unsigned int start, unsigned int nr);
 };
 
 #endif

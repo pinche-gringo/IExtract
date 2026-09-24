@@ -1,14 +1,11 @@
-//$Id$
-
 // PROJECT     : Extract
 // SUBSYSTEM   : GIF-parser
 // REFERENCES  :
 // TODO        :
 // BUGS        :
-// REVISION    : $Revision$
 // AUTHOR      : Markus Schwab
 // CREATED     : 2005-11-26
-// COPYRIGHT   : Copyright (C) 2005, 2006, 2008
+// COPYRIGHT   : Copyright (C) 2005, 2006, 2008, 2026
 
 // This file is part of IExtract.
 //
@@ -40,38 +37,33 @@
 /// \param stream: Stream to parse
 /// \throw YGP::ParseError: In case of an invalid image
 //-----------------------------------------------------------------------------
-void ParseGIF::parse(std::istream &stream) {
-  namespace x3 = boost::spirit::x3;
-  using SpiritParser::bytes;
-  using SpiritParser::skip;
+void ParseGIF::parse(std::istream& stream) {
+    namespace x3 = boost::spirit::x3;
+    using SpiritParser::bytes;
+    using SpiritParser::skip;
 
-  std::size_t length(0);
+    std::size_t length(0);
 
-  // Packed flags specifying a colour table: Sets its length
-  auto colourTable = x3::byte_[([&length](auto &ctx) {
-    unsigned int flag(x3::_attr(ctx));
-    length = (flag & 0x80) ? (1 << ((flag & 0x7) + 1)) * 3 : 0;
-    TRACE8("ParseGIF::parse (std::istream&) - Colour table: " << length
-                                                              << " bytes");
-  })];
-  auto setLength = [&length](auto &ctx) { length = x3::_attr(ctx); };
-  auto addComment = [this](auto &ctx) {
-    prop.strComment += x3::_attr(ctx).c_str();
-  };
+    // Packed flags specifying a colour table: Sets its length
+    auto colourTable = x3::byte_[([&length](auto& ctx) {
+        unsigned int flag(x3::_attr(ctx));
+        length = (flag & 0x80) ? (1 << ((flag & 0x7) + 1)) * 3 : 0;
+        TRACE8("ParseGIF::parse (std::istream&) - Colour table: " << length << " bytes");
+    })];
+    auto setLength = [&length](auto& ctx) { length = x3::_attr(ctx); };
+    auto addComment = [this](auto& ctx) { prop.strComment += x3::_attr(ctx).c_str(); };
 
-  // Data sub-blocks (length and data); terminated by an empty block
-  auto lenBlock = (x3::byte_ - x3::byte_(0))[setLength];
-  auto subblocks = *(lenBlock >> skip(length)) >> x3::byte_(0);
-  auto commentBlocks = *(lenBlock >> bytes(length)[addComment]) >> x3::byte_(0);
+    // Data sub-blocks (length and data); terminated by an empty block
+    auto lenBlock = (x3::byte_ - x3::byte_(0))[setLength];
+    auto subblocks = *(lenBlock >> skip(length)) >> x3::byte_(0);
+    auto commentBlocks = *(lenBlock >> bytes(length)[addComment]) >> x3::byte_(0);
 
-  auto commentExt = x3::lit("\x21\xfe") >> commentBlocks;
-  auto imageDesc = x3::lit('\x2c') >> x3::repeat(8)[x3::byte_] >> colourTable >>
-                   x3::byte_ >> skip(length) >> subblocks;
-  auto extension = x3::lit('\x21') >> x3::byte_ >> subblocks;
+    auto commentExt = x3::lit("\x21\xfe") >> commentBlocks;
+    auto imageDesc = x3::lit('\x2c') >> x3::repeat(8)[x3::byte_] >> colourTable >> x3::byte_ >> skip(length) >> subblocks;
+    auto extension = x3::lit('\x21') >> x3::byte_ >> subblocks;
 
-  auto image = x3::lit("GIF") >> x3::repeat(7)[x3::byte_] >> colourTable >>
-               x3::repeat(2)[x3::byte_] >> skip(length) >>
-               *(commentExt | imageDesc | extension) >> x3::lit('\x3b');
+    auto image = x3::lit("GIF") >> x3::repeat(7)[x3::byte_] >> colourTable >> x3::repeat(2)[x3::byte_] >> skip(length) >>
+                 *(commentExt | imageDesc | extension) >> x3::lit('\x3b');
 
-  SpiritParser::parse(SpiritParser::readStream(stream), image, _("GIF image"));
+    SpiritParser::parse(SpiritParser::readStream(stream), image, _("GIF image"));
 }
