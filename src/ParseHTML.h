@@ -18,96 +18,25 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #include <string>
 
-#include <YGP/Parse.h>
-
-#include "Selection.h"
+#include <YGP/XStream.h>
 
 struct Properties;
 
 
-// Class to extract the title of an HTML-file
+// Class to extract the properties (title, author, description) of a HTML-document
 class ParseHTML  {
  public:
-   ParseHTML ();
+   ParseHTML () { }
    ~ParseHTML () { }
 
-   void parse (YGP::Xistream& stream, Properties& result) {
-      prop = &result;
-      htmlDoc.parse (stream); }
+   void parse (YGP::Xistream& stream, Properties& result);
 
  private:
    ParseHTML (const ParseHTML&);
    ParseHTML& operator= (const ParseHTML&);
-
-   // Callback-methods for type of parsed elementes
-   int foundValue (const char* pValue, unsigned int len);
-   int foundTitle (const char*, unsigned int);
-   int foundAuthor (const char*, unsigned int);
-   int foundComment (const char*, unsigned int);
-   int foundEndOfHead (const char*, unsigned int);
-   int foundEndScript (const char*, unsigned int);
-   int foundScript (const char*, unsigned int);
-   int foundQuote (const char* pValue, unsigned int len);
-
-   typedef YGP::OFParseText<ParseHTML> OMParseText;
-   typedef YGP::OFParseExact<ParseHTML> OMParseExact;
-   typedef YGP::OFParseSequence<ParseHTML> OMParseSequence;
-   typedef YGP::OFParseUpperExact<ParseHTML> OMParseUpperExact;
-
-   YGP::ParseExact      startTag;
-   YGP::ParseExact      endTag;
-   YGP::ParseUpperExact tagMeta;
-   OMParseUpperExact    tagTitle;
-   YGP::ParseUpperExact tagEndTitle;
-   OMParseUpperExact    tagEndHead;
-   OMParseText          title;
-   OMParseText          value;
-   YGP::ParseText       otherTag;
-   YGP::ParseText       scriptType;
-   YGP::ParseText       otherMetaEntry;
-   YGP::ParseText       ignore;
-
-   // Elements to parse meta contents
-   OMParseExact         quote;
-   YGP::ParseExact      equal;
-   YGP::ParseUpperExact name;
-   YGP::ParseUpperExact content;
-   YGP::ParseUpperExact script;
-   OMParseUpperExact    endScript;
-
-   // Supported meta-content
-   OMParseUpperExact description;
-   OMParseUpperExact author;
-   OMParseUpperExact DCdescription;
-   OMParseUpperExact DCauthor;
-   OMParseUpperExact DCtitle;
-
-   YGP::ParseSequence  seqTag;
-   YGP::ParseSequence  seqTitle;
-   YGP::ParseSequence  seqMetaCmd;
-   YGP::ParseSequence  seqMetaName;
-   OMParseSequence     seqScript;
-   Selection           selMetaCmds;
-   Selection           selMetaTags;
-   Selection           selScriptContent;
-   Selection           selCmd;
-   Selection           htmlDoc;                                    // Startsequence
-
-   YGP::ParseObject* _seqMetaName[11];
-   YGP::ParseObject* _seqMetaCmd[3];
-   YGP::ParseObject* _selMetaCmds[3];
-   YGP::ParseObject* _seqScript[5];
-   YGP::ParseObject* _selScriptContent[4];
-   YGP::ParseObject* _seqTitle[6];
-   YGP::ParseObject* _selCmd[6];
-   YGP::ParseObject* _selMetaTags[7];
-   YGP::ParseObject* _seqTag[4];
-   YGP::ParseObject* _htmlDoc[3];
-
-   Properties*  prop;
-   enum { NONE = -1, TITLE = 0, AUTHOR, COMMENT } actEntry;
 };
 
 #endif

@@ -19,16 +19,10 @@
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifdef _MSC_VER
-#pragma warning(disable:4786) // disable warning about truncating debug info
-#endif
-
 #include <map>
 #include <string>
 
-#include <YGP/Parse.h>
-
-#include "Selection.h"
+#include <YGP/XStream.h>
 
 struct Properties;
 
@@ -40,110 +34,25 @@ struct Properties;
  */
 class ParsePDF {
  public:
-   ParsePDF ();
-   ~ParsePDF ();
-
    static void parse (YGP::Xistream& stream, Properties& result);
 
  private:
+   ParsePDF ();
    ParsePDF (const ParsePDF& other);
    const ParsePDF& operator= (const ParsePDF& other);
 
-   // Callback-methods for type of parsed elementes
-   int foundValue (const char*, unsigned int);
-   int foundTitle (const char*, unsigned int);
-   int foundAuthor (const char*, unsigned int);
-   int foundComment (const char*, unsigned int);
-   int foundOffset (const char*, unsigned int);
-   int foundPrevOffset (const char*, unsigned int);
-   int foundNumber (const char*, unsigned int);
-   int foundStartNumber (const char*, unsigned int);
-   int foundObjOffset (const char*, unsigned int);
-   int foundObjectID (const char*, unsigned int);
-   int foundEndObj (const char*, unsigned int);
-   int foundObject (const char*, unsigned int);
-   int foundParenthesis (const char*, unsigned int);
-   int foundBracket (const char*, unsigned int);
-   int foundSlash (const char*, unsigned int);
+   /// Values of a (top-level) dictionary
+   struct Dictionary {
+      Dictionary () : strings (), others () { }
 
-   void parseInfoObject ();
+      std::map<std::string, std::string> strings;    ///< Entries with string values
+      std::map<std::string, std::string> others;     ///< Entries with other (simple) values
+   };
 
-   typedef YGP::OFParseExact<ParsePDF>   OMParseExact;
-   typedef YGP::OFParseTextEsc<ParsePDF> OMParseTextEsc;
-   typedef YGP::OFParseAttomic<ParsePDF> OMParseAttomic;
-
-   YGP::ParseExact startXRef;
-   OMParseAttomic  offXRef;
-   YGP::ParseExact skipS;
-   YGP::ParseText  skip;
-
-   YGP::ParseExact idXRef;
-   OMParseAttomic  nrStart;
-   OMParseAttomic  count;
-   OMParseAttomic  offObject;
-
-   YGP::ParseExact   tagTrailer;
-   OMParseExact      startObj;
-   YGP::ParseExact   objInfo;
-   YGP::ParseExact   objPrev;
-   OMParseAttomic    objOffPrev;
-   OMParseAttomic    idObject;
-   YGP::ParseExact   idObj;
-   YGP::ParseAttomic number;
-   YGP::ParseExact   tagObj;
-   OMParseExact      endObj;
-
-   OMParseExact    tagTitle;
-   OMParseExact    tagAuthor;
-   OMParseExact    tagComment;
-   OMParseTextEsc  value;
-
-   OMParseExact    startOfValue1;
-   OMParseExact    startOfValue2;
-   OMParseExact    startOfValue3;
-   YGP::ParseExact endOfValue;
-
-   Selection           selXRef;
-   YGP::ParseSequence  seqXRef;
-   YGP::ParseSequence  seqXRefTable;
-   YGP::ParseSequence  seqXRefSubsection;
-   YGP::ParseSequence  seqXRefTableEntries;
-   YGP::ParseSequence  seqTrailer;
-   Selection           selValues;
-   YGP::ParseSequence  seqSkipEntry;
-   YGP::ParseSequence  seqInfo;
-   YGP::ParseSequence  seqPrev;
-   YGP::ParseSequence  seqInfoObj;
-   YGP::ParseSequence  seqInfoValue;
-   Selection           selType;
-   Selection           selStartOfValue;
-   YGP::ParseSequence  seqFullValue;
-
-   YGP::ParseObject* _selXRef[4];
-   YGP::ParseObject* _seqXRef[4];
-   YGP::ParseObject* _seqXRefTable[4];
-   YGP::ParseObject* _seqXRefSubsection[4];
-   YGP::ParseObject* _seqXRefTableEntries[3];
-   YGP::ParseObject* _seqTrailer[4];
-   YGP::ParseObject* _selValues[5];
-   YGP::ParseObject* _seqSkipEntry[3];
-   YGP::ParseObject* _seqInfo[4];
-   YGP::ParseObject* _seqPrev[3];
-   YGP::ParseObject* _seqInfoObj[6];
-   YGP::ParseObject* _seqInfoValue[5];
-   YGP::ParseObject* _selType[6];
-   YGP::ParseObject* _selStartOfValue[4];
-   YGP::ParseObject* _seqFullValue[3];
-
-   Properties* prop;
-
-   enum { NONE = -1, TITLE = 0, AUTHOR, COMMENT } actEntry;
-   YGP::Xistream* file;
-   unsigned int offPrev;
-   unsigned int actObject;
-   unsigned int infoObject;
-   char* strInfoObject;
-   std::map <unsigned int, unsigned int> aOffsets;
+   static Dictionary parseXRefTable (const std::string& data, std::size_t offset,
+                                     std::map<unsigned int, std::size_t>& offsets);
+   static Dictionary parseObject (const std::string& data, std::size_t offset, unsigned int id);
+   static unsigned int parseReference (const std::string& reference);
 };
 
 #endif

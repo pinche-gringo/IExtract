@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IExtract V0.9 ($Revision$)\n"
 "Report-Msgid-Bugs-To: g17m0@users.sourceforge.net\n"
-"POT-Creation-Date: 2020-09-05 13:11+0200\n"
+"POT-Creation-Date: 2026-09-24 20:50+0200\n"
 "PO-Revision-Date: 2011-05-27 21:04+0200\n"
 "Last-Translator: Markus Schwab <g17m0@users.sourceforge.net>\n"
 "Language-Team: ESPAÑOL <g17m0@users.sourceforge.net>\n"
@@ -25,8 +25,8 @@ msgid ""
 msgstr ""
 "Compilado el %1 a las %2\n"
 "\n"
-"Copyright © 2002 - 2009 Markus Schwab; correo-e: g17m0@users.sourceforge."
-"net\n"
+"Copyright © 2002 - 2009 Markus Schwab; correo-e: "
+"g17m0@users.sourceforge.net\n"
 "Distribuido bajo los condiciones de la GNU Licensia General Público"
 
 #: src/IExtract.cpp:379
@@ -428,7 +428,7 @@ msgstr "-aviso: ¡Modo '%1' inválido! ¡Ignoro opción 'M'!\n"
 msgid "-warning: Ignoring invalid option `%1'\n"
 msgstr "-aviso: Ignoro opción inválida '%1'\n"
 
-#: src/IExtract.cpp:860 src/IExtract.cpp:984
+#: src/IExtract.cpp:860 src/IExtract.cpp:982
 msgid "-error: "
 msgstr ""
 
@@ -436,7 +436,7 @@ msgstr ""
 msgid "Unknown file-type"
 msgstr "Tipo del archivo desconocido"
 
-#: src/IExtract.cpp:965
+#: src/IExtract.cpp:963
 msgid ""
 "-error: File `%1' can't be opened!\n"
 "Reason: "
@@ -444,19 +444,19 @@ msgstr ""
 "-error: ¡No se puede abrir el archivo '%1'!\n"
 "Causa: "
 
-#: src/IExtract.cpp:987
+#: src/IExtract.cpp:985
 msgid "Error while processing: "
 msgstr "Error procesando: "
 
-#: src/IExtract.cpp:1228
+#: src/IExtract.cpp:1214
 msgid ""
-"-warning: The INI-file `%1' contains an invalid entry for the output style (`"
-"%2')! Using text\n"
+"-warning: The INI-file `%1' contains an invalid entry for the output style "
+"(`%2')! Using text\n"
 msgstr ""
 "-aviso: ¡El archivo por iniciar '%1' contiene una entrada inválida por el "
 "estilo de la salida ('%2')! Uso text\n"
 
-#: src/IExtract.cpp:1237
+#: src/IExtract.cpp:1223
 msgid ""
 "-warning: The INI-file `%1' contains an invalid mode to determine the file-"
 "type (`%2')! Using text\n"
@@ -464,762 +464,673 @@ msgstr ""
 "-aviso: ¡El archivo por iniciar '%1' contiene una entrada inválida por el "
 "estilo de la salida ('%2')! Uso text\n"
 
-#: src/IExtract.cpp:1249
+#: src/IExtract.cpp:1235
 msgid "Currently supported files are:"
 msgstr "Los documentos siguentos son procesados:"
 
-#: src/IExtract.cpp:1311 src/IExtract.cpp:1320
+#: src/IExtract.cpp:1297 src/IExtract.cpp:1306
 msgid "Invalid plug-in `%1'!\n"
 msgstr "¡Plug-in '%1' inválido!\n"
 
-#: src/IExtract.cpp:1331
+#: src/IExtract.cpp:1317
 msgid "-warning: "
 msgstr "-aviso: "
 
-#: src/ParsePDF.cpp:56
-msgid "Tag for offset of cross reference table"
-msgstr "ID por la posición de la tabla de la referencia"
-
-#: src/ParsePDF.cpp:57
-msgid "Offset of cross reference table"
-msgstr "Posición de la tabla de la referencia"
-
-#: src/ParsePDF.cpp:58
-msgid "First char of tag"
-msgstr "Primero caracter del identificador"
-
-#: src/ParsePDF.cpp:59
-msgid "Unused data"
-msgstr "Datos inutilizados"
-
-#: src/ParsePDF.cpp:60
-msgid "Tag for cross reference table"
-msgstr "ID por la tabla de la referencia"
-
-#: src/ParsePDF.cpp:61 src/ParsePDF.cpp:62
-msgid "Number of cross reference entries"
-msgstr "Número por las entradas de la referencia"
-
-#: src/ParsePDF.cpp:63
-msgid "Offset of object"
-msgstr "Posición del objeto"
-
-#: src/ParsePDF.cpp:64
-msgid "Tag for trailer"
-msgstr "ID por apéndice"
-
-#: src/ParsePDF.cpp:65
-msgid "Start of object"
-msgstr "Comienzo de objeto"
-
-#: src/ParsePDF.cpp:66
-msgid "Reference to info object"
-msgstr "Refenecia al object \"info\""
-
-#: src/ParsePDF.cpp:67
-msgid "Reference to other trailer"
-msgstr "Referencia a otros apéndice"
-
-#: src/ParsePDF.cpp:68
-msgid "Offset of /Prev entry"
-msgstr "Posición de la entrada \"/Prev\""
-
-#: src/ParsePDF.cpp:69
-msgid "ID of object"
-msgstr "ID del objeto"
-
-#: src/ParsePDF.cpp:70
-msgid "ID of object (repeated)"
-msgstr "ID del objeto (repitido)"
-
-#: src/ParsePDF.cpp:71
-msgid "Generation"
-msgstr "Generación"
-
-#: src/ParsePDF.cpp:72
-msgid "Tag for an object"
-msgstr "ID por un objeto"
-
-#: src/ParsePDF.cpp:73
-msgid "End of object"
-msgstr "Fin de un objeto"
-
-#: src/ParsePDF.cpp:74
-msgid "Tag for title"
-msgstr "ID por el título"
-
-#: src/ParsePDF.cpp:75
-msgid "Tag for author"
-msgstr "ID por el autor"
-
-#: src/ParsePDF.cpp:76
-msgid "Tag for comment (subject)"
-msgstr "ID por el comentario (subjeto)"
-
-#: src/ParsePDF.cpp:77 src/ParseHTML.cpp:56 src/ParseRTF.cpp:60
-msgid "Value of entry"
-msgstr "Valor de una entrada"
-
-#: src/ParsePDF.cpp:78
-msgid "Start of value ('(')"
-msgstr "Comienzo de un valor ('(')"
-
-#: src/ParsePDF.cpp:79
-msgid "Start of value ('<')"
-msgstr "Comienzo de un valor ('<')"
-
-#: src/ParsePDF.cpp:80
-msgid "Start of value ('/')"
-msgstr "Comienzo de un valor ('/')"
-
-#: src/ParsePDF.cpp:81
-msgid "End of value"
-msgstr "Fin de un valor"
-
-#: src/ParsePDF.cpp:82
-msgid "Pointer to position of cross reference table"
-msgstr "Referencia a la posición de la table de la referencia"
-
-#: src/ParsePDF.cpp:83
-msgid "Position of cross reference table"
-msgstr "Posición de la table de la referencia"
-
-#: src/ParsePDF.cpp:84
-msgid "Cross reference table"
-msgstr "Tabla de la referencia"
-
-#: src/ParsePDF.cpp:85
-msgid "Cross reference table subsection"
-msgstr "Subsección de la tabla de la referencia"
-
-#: src/ParsePDF.cpp:86
-msgid "Entries in cross reference table"
-msgstr "Entradas de la tabla de la referencia"
-
-#: src/ParsePDF.cpp:87
-msgid "Trailer"
-msgstr "Apéndice"
-
-#: src/ParsePDF.cpp:88
-msgid "Trailer values"
-msgstr "Valores del apéndice"
-
-#: src/ParsePDF.cpp:89
-msgid "Entry to skip"
-msgstr "Entrada de saltar"
-
-#: src/ParsePDF.cpp:90
-msgid "Info entry"
-msgstr "Entrada \"Info\""
-
-#: src/ParsePDF.cpp:91
-msgid "Prev entry"
-msgstr "Entrada \"Prev\""
-
-#: src/ParsePDF.cpp:92
-msgid "Info object"
-msgstr "Objeto \"Info\""
-
-#: src/ParsePDF.cpp:93
-msgid "Info values"
-msgstr "Valores de la información"
-
-#: src/ParsePDF.cpp:94
-msgid "Valid type"
-msgstr "Tipo válido"
-
-#: src/ParsePDF.cpp:95
-msgid "Start of values"
-msgstr "Comienzo de los valores"
-
-#: src/ParsePDF.cpp:96
-msgid "Full value"
-msgstr "Valor entero"
-
-#: src/ParsePDF.cpp:464
+#: src/ParsePDF.cpp:154
 msgid "Not a PDF document!"
 msgstr "¡No documento PDF!"
 
-#: src/ParsePDF.cpp:475
+#: src/ParsePDF.cpp:159
+#, fuzzy
+msgid "Document does not contain the offset of the cross reference table"
+msgstr "Referencia a la posición de la table de la referencia"
+
+#: src/ParsePDF.cpp:166
+#, fuzzy
+msgid "offset of cross reference table"
+msgstr "Posición de la tabla de la referencia"
+
+#: src/ParsePDF.cpp:176
+#, fuzzy
+msgid "Invalid /Prev entry"
+msgstr "Entrada \"Prev\""
+
+#: src/ParsePDF.cpp:188
 msgid "Document does not contain neither an /Info nor a /Prev entry"
 msgstr "Documento no contiene ni una entrada \"/Info\" ni \"/Prev\""
 
-#: src/ParseHTML.cpp:50
-msgid "Start of HTML-tag"
-msgstr "Comienzo de un tag HTML"
+#: src/ParsePDF.cpp:215
+#, fuzzy
+msgid "Invalid offset of cross reference table"
+msgstr "Posición de la tabla de la referencia"
 
-#: src/ParseHTML.cpp:50
-msgid "End of HTML-tag"
-msgstr "Fin de un tag HTML"
+#: src/ParsePDF.cpp:239
+#, fuzzy
+msgid "cross reference table"
+msgstr "Tabla de la referencia"
 
-#: src/ParseHTML.cpp:51
-msgid "Meta tag"
-msgstr "Tag \"meta\""
+#: src/ParsePDF.cpp:255
+#, fuzzy
+msgid "Invalid offset of info object"
+msgstr "Posición del objeto"
 
-#: src/ParseHTML.cpp:52 src/ParseHTML.cpp:53
-msgid "Title-tag"
-msgstr "Tag \"title\""
+#: src/ParsePDF.cpp:264
+#, fuzzy
+msgid "info object"
+msgstr "Objeto \"Info\""
 
-#: src/ParseHTML.cpp:54
-msgid "End of header"
-msgstr "Fin de la cabeza"
+#: src/ParsePDF.cpp:277
+#, fuzzy
+msgid "reference to /Info object"
+msgstr "Refenecia al object \"info\""
 
-#: src/ParseHTML.cpp:55
-msgid "Title of document"
-msgstr "Título del documento"
-
-#: src/ParseHTML.cpp:57
-msgid "Other HTML tag"
-msgstr "Otro tag HTML"
-
-#: src/ParseHTML.cpp:58
-msgid "Type of script"
-msgstr "Tipo del script"
-
-#: src/ParseHTML.cpp:59
-msgid "Other META entry"
-msgstr "Otro tag META"
-
-#: src/ParseHTML.cpp:60
-msgid "Unused information"
-msgstr "Datos inutilizados"
-
-#: src/ParseHTML.cpp:61
-msgid "Quote"
-msgstr "Comilla"
-
-#: src/ParseHTML.cpp:62
-msgid "Equal sign"
-msgstr "Signo de igualdad"
-
-#: src/ParseHTML.cpp:63
-msgid "Name of meta tag"
-msgstr "Nombre del tag \"meta\""
-
-#: src/ParseHTML.cpp:64
-msgid "Content specifier"
-msgstr "Especificador de contenido"
-
-#: src/ParseHTML.cpp:65
-msgid "Script tag"
-msgstr "Tag \"script\""
-
-#: src/ParseHTML.cpp:66
-msgid "End-Script tag"
-msgstr "Fin del tag \"script\""
-
-#: src/ParseHTML.cpp:67
-msgid "Description"
-msgstr "Descripción"
-
-#: src/ParseHTML.cpp:68
-msgid "Author"
-msgstr "Autor"
-
-#: src/ParseHTML.cpp:69
-msgid "Description in Dublin Core"
-msgstr "Descripción en el formato \"Dublin Core\""
-
-#: src/ParseHTML.cpp:70
-msgid "Author in Dublin Core"
-msgstr "Autor en el formato \"Dublin Core\""
-
-#: src/ParseHTML.cpp:71
-msgid "Title in Dublin Core"
-msgstr "Título en el formato \"Dublin Core\""
-
-#: src/ParseHTML.cpp:72
-msgid "Valid HTML tag"
-msgstr "Tag HTML válido"
-
-#: src/ParseHTML.cpp:73
-msgid "Title entry"
-msgstr "Entrada por el título"
-
-#: src/ParseHTML.cpp:74
-msgid "Meta entry"
-msgstr "Entrada \"meta\""
-
-#: src/ParseHTML.cpp:75
-msgid "Name entry for meta tag"
-msgstr "Entrada por el nombre del tag \"meta\""
-
-#: src/ParseHTML.cpp:76
-msgid "Script sequence"
-msgstr "Sequencia de script"
-
-#: src/ParseHTML.cpp:77
-msgid "Meta entries"
-msgstr "Entradas \"meta\""
-
-#: src/ParseHTML.cpp:78
-msgid "Recogniced meta tags"
-msgstr "Tag \"meta\" conocido"
-
-#: src/ParseHTML.cpp:79
-msgid "Script content"
-msgstr "Script"
-
-#: src/ParseHTML.cpp:80
-msgid "Valid HTML command"
-msgstr "Comando HTML válido"
-
-#: src/ParseHTML.cpp:81
+#: src/ParseHTML.cpp:94
 msgid "HTML document"
 msgstr "Documento HTML"
 
-#: src/ParseMP3.cpp:73
+#: src/ParseMP3.cpp:72
 msgid "MP3-ID not found"
 msgstr "No encontré la ID de un archivo MP3"
 
-#: src/ParseOOffice.cpp:66
-msgid "ID of local header"
-msgstr "ID de cabeza local"
+#: src/ParseOOffice.cpp:65
+msgid "ZIP archive"
+msgstr ""
 
-#: src/ParseOOffice.cpp:68
-msgid "ID of end of central directory record"
+#: src/ParseOOffice.cpp:67
+#, fuzzy
+msgid "Invalid end of central directory record"
 msgstr "ID del fin del directorio central"
 
-#: src/ParseOOffice.cpp:70
-msgid "Entries in the central directory record"
-msgstr "Entradas del directorio central"
+#: src/ParseOOffice.cpp:79
+#, fuzzy
+msgid "end of central directory record"
+msgstr "ID del fin del directorio central"
 
-#: src/ParseOOffice.cpp:72
-msgid "Offset of central directory record"
+#: src/ParseOOffice.cpp:100
+#, fuzzy
+msgid "Invalid offset of central directory"
 msgstr "Posición del directorio central"
 
-#: src/ParseOOffice.cpp:74
-msgid "ID of central file header"
-msgstr "ID de la cabeza del archivo central"
+#: src/ParseOOffice.cpp:102
+#, fuzzy
+msgid "central directory"
+msgstr "Posición del directorio central"
 
-#: src/ParseOOffice.cpp:75
-msgid "Length of file-name"
-msgstr "Tamaño del nombre del archivo"
+#: src/ParseOOffice.cpp:104
+#, fuzzy
+msgid "Document does not contain meta-information"
+msgstr "Documento no contiene ni una entrada \"/Info\" ni \"/Prev\""
 
-#: src/ParseOOffice.cpp:76
-msgid "Length"
-msgstr "Tamaño"
+#: src/ParseOOffice.cpp:106
+msgid "Compressed meta-information is not supported"
+msgstr ""
 
-#: src/ParseOOffice.cpp:77
-msgid "Filename"
-msgstr "Nombre del archivo"
-
-#: src/ParseOOffice.cpp:78
-msgid "Offset of meta-info"
+#: src/ParseOOffice.cpp:112
+#, fuzzy
+msgid "Invalid offset of meta-information"
 msgstr "Posición de la información \"meta\""
 
-#: src/ParseOOffice.cpp:82 src/ParseAbiword.cpp:63
-msgid "Metadata information"
-msgstr "Información \"meta\""
+#: src/ParseOOffice.cpp:119 src/ParseOOffice.cpp:151
+#, fuzzy
+msgid "meta-information"
+msgstr "Información de imágen"
 
-#: src/ParseOOffice.cpp:83 src/ParseAbiword.cpp:66
-msgid "Skip to end of line"
-msgstr "Salta al fin de la línea"
-
-#: src/ParseOOffice.cpp:84 src/ParseAbiword.cpp:67
-msgid "Tag"
-msgstr "Identificación"
-
-#: src/ParseOOffice.cpp:85 src/ParseAbiword.cpp:68
-msgid "Value"
-msgstr "Valor"
-
-#: src/ParseOOffice.cpp:87
-msgid "Central directory record entries"
-msgstr "Entradas del directorio central"
-
-#: src/ParseOOffice.cpp:88 src/ParseAbiword.cpp:70
-msgid "Metadata"
-msgstr "Tag \"meta\""
-
-#: src/ParseOOffice.cpp:89 src/ParseAbiword.cpp:71
-msgid "Entries"
-msgstr "Entradas"
-
-#: src/ParseOOffice.cpp:90
-msgid "OpenOffice document"
-msgstr "Documento de OpenOffice"
-
-#: src/ParseSOffice.cpp:53
-msgid "ID of office document"
-msgstr "ID de un Documento"
-
-#: src/ParseSOffice.cpp:54
-msgid "ID of StarOffice document"
-msgstr "ID de un documento de StarOffice"
-
-#: src/ParseSOffice.cpp:57
-msgid "Length of data-entry"
-msgstr "Tamaño de la entrada de datos"
-
-#: src/ParseSOffice.cpp:58
-msgid "Property-entry"
-msgstr "Entrada de los propiedades"
-
-#: src/ParseSOffice.cpp:59
+#: src/ParseSOffice.cpp:84
 msgid "StarOffice document"
 msgstr "Documento de StarOffice"
 
-#: src/ParseSOffice.cpp:60
-msgid "Entries of properties"
-msgstr "Entradas de los propiedades"
-
-#: src/ParseMSOffice.cpp:85
+#: src/ParseMSOffice.cpp:84
 msgid "Can't read document header!"
 msgstr "¡No pude leer la cabeza del documente!"
 
-#: src/ParseMSOffice.cpp:88
+#: src/ParseMSOffice.cpp:87
 msgid "Office identifier not found!"
 msgstr "¡No pude encontrar la identificación!"
 
-#: src/ParseMSOffice.cpp:95
+#: src/ParseMSOffice.cpp:94
 msgid "Values for blocksizes are not plausible!"
 msgstr "¡Los valores para el tamaño de los bloques no están plausibles!"
 
-#: src/ParseMSOffice.cpp:100
+#: src/ParseMSOffice.cpp:99
 msgid "Number of blocks for BAT not plausible!"
 msgstr "¡El número de bloques del BAT no está plausible!"
 
-#: src/ParseMSOffice.cpp:114
+#: src/ParseMSOffice.cpp:113
 msgid "Not a property block at offset %1!"
 msgstr "¡No encontré ningún bloque de propiedad en la posición %1!"
 
-#: src/ParseMSOffice.cpp:205
+#: src/ParseMSOffice.cpp:206
 msgid "Not an Information-Summary section!"
 msgstr "¡No encontré la sección de información!"
 
-#: src/ParseMSOffice.cpp:212
+#: src/ParseMSOffice.cpp:213
 msgid "Number of information entries not plausible!"
 msgstr "¡El número de entradas de información no está plausible!"
 
-#: src/ParseMSOffice.cpp:224
+#: src/ParseMSOffice.cpp:225
 msgid "Values of entry not plausible!"
 msgstr "¡Valor de entrada no está plausible!"
 
-#: src/ParseMSOffice.cpp:289
+#: src/ParseMSOffice.cpp:290
 msgid "Can't read block at offset %1"
 msgstr "¡No pude leer el bloque en posición %1!"
 
-#: src/ParseMSOffice.cpp:351
+#: src/ParseMSOffice.cpp:352
 msgid "BAT not valid!"
 msgstr "¡BAT inválida!"
 
-#: src/ParseJPG.cpp:77
-msgid "JPEG-ID"
-msgstr "ID JPEG"
-
-#: src/ParseJPG.cpp:78
-msgid "JPEG-Terminator"
-msgstr "Terminator de imágen JPEG"
-
-#: src/ParseJPG.cpp:79
-msgid "APP1 marker"
-msgstr "Marcador APP1"
-
-#: src/ParseJPG.cpp:80
-msgid "APPD maker"
-msgstr "Marcador APPD"
-
-#: src/ParseJPG.cpp:81
-msgid "Comment marker"
-msgstr "Marcador de comentario"
-
-#: src/ParseJPG.cpp:82
-msgid "Other marker"
-msgstr "Otro marcador"
-
-#: src/ParseJPG.cpp:83
-msgid "Image information"
-msgstr "Información de imágen"
-
-#: src/ParseJPG.cpp:85 src/ParsePNG.cpp:60 src/ParseGIF.cpp:55
-msgid "Comment"
-msgstr "Comentario"
-
-#: src/ParseJPG.cpp:86
-msgid "Comment values (Photoshop style)"
-msgstr "Valores de comentario (estilo Photoshop)"
-
-#: src/ParseJPG.cpp:87 src/ParsePNG.cpp:59
-msgid "Type of entry"
-msgstr "Tipo de la entrada"
-
-#: src/ParseJPG.cpp:88
-msgid "Number of records"
-msgstr "Número de las entradas"
-
-#: src/ParseJPG.cpp:89
-msgid "Length (LSB first)"
-msgstr "Tamaño (LSB primero)"
-
-#: src/ParseJPG.cpp:90 src/ParsePNG.cpp:58
-msgid "Length (MSB first)"
-msgstr "Tamaño (MSB primero)"
-
-#: src/ParseJPG.cpp:91
-msgid "Length (long - LSB first)"
-msgstr "Tamaño (LSB primero)"
-
-#: src/ParseJPG.cpp:92
-msgid "Length (long - MSB first)"
-msgstr "Tamaño (MSB primero)"
-
-#: src/ParseJPG.cpp:93
-msgid "Offset"
-msgstr "Posición"
-
-#: src/ParseJPG.cpp:94
-msgid "Byte order"
-msgstr "Sorteo de bytes"
-
-#: src/ParseJPG.cpp:98
-msgid "Marker"
-msgstr "Marcador"
-
-#: src/ParseJPG.cpp:99
-msgid "Comment entry 1"
-msgstr "Entrada de comentario 1"
-
-#: src/ParseJPG.cpp:100
-msgid "APP1 (EXIF)"
-msgstr ""
-
-#: src/ParseJPG.cpp:101
-msgid "APPD entry"
-msgstr "Entrada \"APPD\""
-
-#: src/ParseJPG.cpp:102
-msgid "Other entry"
-msgstr "Otra entrada"
-
-#: src/ParseJPG.cpp:104
-msgid "Image file directory"
-msgstr "Directorio del imagen"
-
-#: src/ParseJPG.cpp:105
+#: src/ParseJPG.cpp:112
 msgid "JPEG image"
 msgstr "Imagen JPG"
 
-#: src/ParseRTF.cpp:49
-msgid "ID of RTF document"
-msgstr "ID de un documento RTF"
+#: src/ParseJPG.cpp:159
+msgid "TIFF header"
+msgstr ""
 
-#: src/ParseRTF.cpp:50
-msgid "Start of block"
-msgstr "Comienzo de bloque"
+#: src/ParseJPG.cpp:161
+#, fuzzy
+msgid "Invalid offset of image file directory"
+msgstr "Directorio del imagen"
 
-#: src/ParseRTF.cpp:51
-msgid "End of block"
-msgstr "Fin de bloque"
+#: src/ParseJPG.cpp:168
+#, fuzzy
+msgid "image file directory"
+msgstr "Directorio del imagen"
 
-#: src/ParseRTF.cpp:52
-msgid "Info block"
-msgstr "Bloque \"Info\""
+#: src/ParseJPG.cpp:176
+msgid "Invalid byte order of EXIF information"
+msgstr ""
 
-#: src/ParseRTF.cpp:53
-msgid "End of info block"
-msgstr "Fin del bloque \"info\""
-
-#: src/ParseRTF.cpp:54
-msgid "Start of command"
-msgstr "Comienzo de comando"
-
-#: src/ParseRTF.cpp:55
-msgid "Command"
-msgstr "Comando"
-
-#: src/ParseRTF.cpp:56
-msgid "No special char"
-msgstr "Caracter no especial"
-
-#: src/ParseRTF.cpp:57
-msgid "Author-entry"
-msgstr "Entrada por el autor"
-
-#: src/ParseRTF.cpp:58
-msgid "Title-entry"
-msgstr "Entrada por el título"
-
-#: src/ParseRTF.cpp:59
-msgid "Description-entry"
-msgstr "Entrada por la descripción"
-
-#: src/ParseRTF.cpp:61
-msgid "Information block"
-msgstr "Bloque de información"
-
-#: src/ParseRTF.cpp:62
-msgid "Information block value"
-msgstr "Valor del bloque \"info\""
-
-#: src/ParseRTF.cpp:63
-msgid "Other command"
-msgstr "Otro comando"
-
-#: src/ParseRTF.cpp:64
-msgid "Value of command"
-msgstr "Valor de un comando"
-
-#: src/ParseRTF.cpp:65
-msgid "Entry"
-msgstr "Entrada"
-
-#: src/ParseRTF.cpp:66
-msgid "Valid RTF command"
-msgstr "Comando RTF válido"
-
-#: src/ParseRTF.cpp:67
-msgid "RTF block"
-msgstr "Bloque RTF"
-
-#: src/ParseRTF.cpp:68
+#: src/ParseRTF.cpp:105
 msgid "RTF document"
 msgstr "Documento RTF"
 
-#: src/ParseOGG.cpp:46
-msgid "OGG-ID"
-msgstr "ID OGG"
-
-#: src/ParseOGG.cpp:47
-msgid "Comment header"
-msgstr "Cabeza de comentario"
-
-#: src/ParseOGG.cpp:49
-msgid "Number of segments"
-msgstr "Número de partes"
-
-#: src/ParseOGG.cpp:50
-msgid "Length of vendor string"
-msgstr "Tamaño de la identificación del vendedor"
-
-#: src/ParseOGG.cpp:51
-msgid "Number of comments"
-msgstr "Número de entradas"
-
-#: src/ParseOGG.cpp:52
-msgid "Length of comment entry"
-msgstr "Tamaño de la entrada de datos"
-
-#: src/ParseOGG.cpp:53 src/ParseOGG.cpp:54
-msgid "Comment entry"
-msgstr "Comentario"
-
-#: src/ParseOGG.cpp:55
+#: src/ParseOGG.cpp:68
 msgid "OGG file"
 msgstr "Archivo OGG"
 
-#: src/ParseAbiword.cpp:62
-msgid "ID of an AbiWord document"
-msgstr "ID de un documento de AbiWord"
-
-#: src/ParseAbiword.cpp:64
-msgid "Start of Abiword ID"
-msgstr "Comienzo de bloque de información (Abiword)"
-
-#: src/ParseAbiword.cpp:65
-msgid "Unused contents"
-msgstr "Contento inutilizado"
-
-#: src/ParseAbiword.cpp:69
+#: src/ParseAbiword.cpp:73
 msgid "AbiWord document"
 msgstr "Documento de AbiWord"
 
-#: src/ParseAbiword.cpp:72
-msgid "AbiWord meta-info"
-msgstr "Información \"meta\" de AbiWord"
-
-#: src/ParsePNG.cpp:57
-msgid "PNG-ID"
-msgstr "ID PNG"
-
-#: src/ParsePNG.cpp:62
-msgid "CRC"
-msgstr "Còdige de correcciòn"
-
 #: src/ParsePNG.cpp:63
-msgid "Chunk"
-msgstr "Parte"
-
-#: src/ParsePNG.cpp:64
 msgid "PNG image"
 msgstr "Imagen PNG"
 
-#: src/ParseGIF.cpp:46
-msgid "GIF-ID"
-msgstr "GIF-ID"
-
-#: src/ParseGIF.cpp:49
-msgid "Info about colour table"
-msgstr "Información sobre la table de colores"
-
-#: src/ParseGIF.cpp:50
-msgid "End of GIF image"
-msgstr "Fin del imagen GIF"
-
-#: src/ParseGIF.cpp:51 src/ParseGIF.cpp:58
-msgid "Comment extension"
-msgstr "Extensión de comentario"
-
-#: src/ParseGIF.cpp:52
-msgid "Image separator"
-msgstr "Separator del imagen"
-
-#: src/ParseGIF.cpp:53
-msgid "Extension ID"
-msgstr "Identificación de la extención"
-
-#: src/ParseGIF.cpp:54
-msgid "Type of extension"
-msgstr "Tipo de la extención"
-
-#: src/ParseGIF.cpp:56
-msgid "Length of sub-block"
-msgstr "Tamaño del sub-bloque"
-
-#: src/ParseGIF.cpp:57
-msgid "Blocks"
-msgstr "Bloques"
-
-#: src/ParseGIF.cpp:59
-msgid "Image description"
-msgstr "Descripción del imagen"
-
-#: src/ParseGIF.cpp:60
-msgid "Extension"
-msgstr "Extensión"
-
-#: src/ParseGIF.cpp:61
-msgid "Comment blocks"
-msgstr "Bloque de comentario"
-
-#: src/ParseGIF.cpp:62
-msgid "Subblocks"
-msgstr "Sub-bloques"
-
-#: src/ParseGIF.cpp:63
+#: src/ParseGIF.cpp:74
 msgid "GIF image"
 msgstr "Imagen GIF"
 
-#: src/ParseOOXML.cpp:76
+#: src/ParseOOXML.cpp:75
 msgid "Archive contains an invalid file entry!"
 msgstr "¡El archivo contiene una entrada inválida!"
 
-#: src/ParseOOXML.cpp:98
+#: src/ParseOOXML.cpp:97
 msgid "Can't initialise zlib!"
 msgstr "¡No pude initialisar zlib!"
 
-#: src/ParseOOXML.cpp:124
+#: src/ParseOOXML.cpp:123
 msgid "Error inflating stream: Not a deflated file!"
 msgstr "Error decompresionando el archivo: ¡No está compresido!"
 
-#: src/ParseOOXML.cpp:128
+#: src/ParseOOXML.cpp:127
 msgid "Error inflating stream: Out of memory!"
 msgstr "Error decompresionando el archivo: ¡Falta de memoria!"
 
-#: src/ParseOOXML.cpp:154
+#: src/ParseOOXML.cpp:153
 msgid "Unexpected end of file!"
 msgstr "¡Archivo terminó inexpectadamente!"
 
-#: src/ParseOOXML.cpp:157
+#: src/ParseOOXML.cpp:156
 msgid "Not an OOXML document!"
 msgstr "¡No documento del tipo OOXML!"
+
+#: src/SpiritParser.h:179
+msgid "Invalid %1; expected: %2"
+msgstr ""
+
+#: src/SpiritParser.h:185
+#, fuzzy
+msgid "Invalid %1"
+msgstr "¡Plug-in '%1' inválido!\n"
+
+#~ msgid "Tag for offset of cross reference table"
+#~ msgstr "ID por la posición de la tabla de la referencia"
+
+#~ msgid "First char of tag"
+#~ msgstr "Primero caracter del identificador"
+
+#~ msgid "Unused data"
+#~ msgstr "Datos inutilizados"
+
+#~ msgid "Tag for cross reference table"
+#~ msgstr "ID por la tabla de la referencia"
+
+#~ msgid "Number of cross reference entries"
+#~ msgstr "Número por las entradas de la referencia"
+
+#~ msgid "Tag for trailer"
+#~ msgstr "ID por apéndice"
+
+#~ msgid "Start of object"
+#~ msgstr "Comienzo de objeto"
+
+#~ msgid "Reference to other trailer"
+#~ msgstr "Referencia a otros apéndice"
+
+#~ msgid "Offset of /Prev entry"
+#~ msgstr "Posición de la entrada \"/Prev\""
+
+#~ msgid "ID of object"
+#~ msgstr "ID del objeto"
+
+#~ msgid "ID of object (repeated)"
+#~ msgstr "ID del objeto (repitido)"
+
+#~ msgid "Generation"
+#~ msgstr "Generación"
+
+#~ msgid "Tag for an object"
+#~ msgstr "ID por un objeto"
+
+#~ msgid "End of object"
+#~ msgstr "Fin de un objeto"
+
+#~ msgid "Tag for title"
+#~ msgstr "ID por el título"
+
+#~ msgid "Tag for author"
+#~ msgstr "ID por el autor"
+
+#~ msgid "Tag for comment (subject)"
+#~ msgstr "ID por el comentario (subjeto)"
+
+#~ msgid "Value of entry"
+#~ msgstr "Valor de una entrada"
+
+#~ msgid "Start of value ('(')"
+#~ msgstr "Comienzo de un valor ('(')"
+
+#~ msgid "Start of value ('<')"
+#~ msgstr "Comienzo de un valor ('<')"
+
+#~ msgid "Start of value ('/')"
+#~ msgstr "Comienzo de un valor ('/')"
+
+#~ msgid "End of value"
+#~ msgstr "Fin de un valor"
+
+#~ msgid "Position of cross reference table"
+#~ msgstr "Posición de la table de la referencia"
+
+#~ msgid "Cross reference table subsection"
+#~ msgstr "Subsección de la tabla de la referencia"
+
+#~ msgid "Entries in cross reference table"
+#~ msgstr "Entradas de la tabla de la referencia"
+
+#~ msgid "Trailer"
+#~ msgstr "Apéndice"
+
+#~ msgid "Trailer values"
+#~ msgstr "Valores del apéndice"
+
+#~ msgid "Entry to skip"
+#~ msgstr "Entrada de saltar"
+
+#~ msgid "Info entry"
+#~ msgstr "Entrada \"Info\""
+
+#~ msgid "Info values"
+#~ msgstr "Valores de la información"
+
+#~ msgid "Valid type"
+#~ msgstr "Tipo válido"
+
+#~ msgid "Start of values"
+#~ msgstr "Comienzo de los valores"
+
+#~ msgid "Full value"
+#~ msgstr "Valor entero"
+
+#~ msgid "Start of HTML-tag"
+#~ msgstr "Comienzo de un tag HTML"
+
+#~ msgid "End of HTML-tag"
+#~ msgstr "Fin de un tag HTML"
+
+#~ msgid "Meta tag"
+#~ msgstr "Tag \"meta\""
+
+#~ msgid "Title-tag"
+#~ msgstr "Tag \"title\""
+
+#~ msgid "End of header"
+#~ msgstr "Fin de la cabeza"
+
+#~ msgid "Title of document"
+#~ msgstr "Título del documento"
+
+#~ msgid "Other HTML tag"
+#~ msgstr "Otro tag HTML"
+
+#~ msgid "Type of script"
+#~ msgstr "Tipo del script"
+
+#~ msgid "Other META entry"
+#~ msgstr "Otro tag META"
+
+#~ msgid "Unused information"
+#~ msgstr "Datos inutilizados"
+
+#~ msgid "Quote"
+#~ msgstr "Comilla"
+
+#~ msgid "Equal sign"
+#~ msgstr "Signo de igualdad"
+
+#~ msgid "Name of meta tag"
+#~ msgstr "Nombre del tag \"meta\""
+
+#~ msgid "Content specifier"
+#~ msgstr "Especificador de contenido"
+
+#~ msgid "Script tag"
+#~ msgstr "Tag \"script\""
+
+#~ msgid "End-Script tag"
+#~ msgstr "Fin del tag \"script\""
+
+#~ msgid "Description"
+#~ msgstr "Descripción"
+
+#~ msgid "Author"
+#~ msgstr "Autor"
+
+#~ msgid "Description in Dublin Core"
+#~ msgstr "Descripción en el formato \"Dublin Core\""
+
+#~ msgid "Author in Dublin Core"
+#~ msgstr "Autor en el formato \"Dublin Core\""
+
+#~ msgid "Title in Dublin Core"
+#~ msgstr "Título en el formato \"Dublin Core\""
+
+#~ msgid "Valid HTML tag"
+#~ msgstr "Tag HTML válido"
+
+#~ msgid "Title entry"
+#~ msgstr "Entrada por el título"
+
+#~ msgid "Meta entry"
+#~ msgstr "Entrada \"meta\""
+
+#~ msgid "Name entry for meta tag"
+#~ msgstr "Entrada por el nombre del tag \"meta\""
+
+#~ msgid "Script sequence"
+#~ msgstr "Sequencia de script"
+
+#~ msgid "Meta entries"
+#~ msgstr "Entradas \"meta\""
+
+#~ msgid "Recogniced meta tags"
+#~ msgstr "Tag \"meta\" conocido"
+
+#~ msgid "Script content"
+#~ msgstr "Script"
+
+#~ msgid "Valid HTML command"
+#~ msgstr "Comando HTML válido"
+
+#~ msgid "ID of local header"
+#~ msgstr "ID de cabeza local"
+
+#~ msgid "Entries in the central directory record"
+#~ msgstr "Entradas del directorio central"
+
+#~ msgid "ID of central file header"
+#~ msgstr "ID de la cabeza del archivo central"
+
+#~ msgid "Length of file-name"
+#~ msgstr "Tamaño del nombre del archivo"
+
+#~ msgid "Length"
+#~ msgstr "Tamaño"
+
+#~ msgid "Filename"
+#~ msgstr "Nombre del archivo"
+
+#~ msgid "Metadata information"
+#~ msgstr "Información \"meta\""
+
+#~ msgid "Skip to end of line"
+#~ msgstr "Salta al fin de la línea"
+
+#~ msgid "Tag"
+#~ msgstr "Identificación"
+
+#~ msgid "Value"
+#~ msgstr "Valor"
+
+#~ msgid "Central directory record entries"
+#~ msgstr "Entradas del directorio central"
+
+#~ msgid "Metadata"
+#~ msgstr "Tag \"meta\""
+
+#~ msgid "Entries"
+#~ msgstr "Entradas"
+
+#~ msgid "OpenOffice document"
+#~ msgstr "Documento de OpenOffice"
+
+#~ msgid "ID of office document"
+#~ msgstr "ID de un Documento"
+
+#~ msgid "ID of StarOffice document"
+#~ msgstr "ID de un documento de StarOffice"
+
+#~ msgid "Length of data-entry"
+#~ msgstr "Tamaño de la entrada de datos"
+
+#~ msgid "Property-entry"
+#~ msgstr "Entrada de los propiedades"
+
+#~ msgid "Entries of properties"
+#~ msgstr "Entradas de los propiedades"
+
+#~ msgid "JPEG-ID"
+#~ msgstr "ID JPEG"
+
+#~ msgid "JPEG-Terminator"
+#~ msgstr "Terminator de imágen JPEG"
+
+#~ msgid "APP1 marker"
+#~ msgstr "Marcador APP1"
+
+#~ msgid "APPD maker"
+#~ msgstr "Marcador APPD"
+
+#~ msgid "Comment marker"
+#~ msgstr "Marcador de comentario"
+
+#~ msgid "Other marker"
+#~ msgstr "Otro marcador"
+
+#~ msgid "Comment"
+#~ msgstr "Comentario"
+
+#~ msgid "Comment values (Photoshop style)"
+#~ msgstr "Valores de comentario (estilo Photoshop)"
+
+#~ msgid "Type of entry"
+#~ msgstr "Tipo de la entrada"
+
+#~ msgid "Number of records"
+#~ msgstr "Número de las entradas"
+
+#~ msgid "Length (LSB first)"
+#~ msgstr "Tamaño (LSB primero)"
+
+#~ msgid "Length (MSB first)"
+#~ msgstr "Tamaño (MSB primero)"
+
+#~ msgid "Length (long - LSB first)"
+#~ msgstr "Tamaño (LSB primero)"
+
+#~ msgid "Length (long - MSB first)"
+#~ msgstr "Tamaño (MSB primero)"
+
+#~ msgid "Offset"
+#~ msgstr "Posición"
+
+#~ msgid "Byte order"
+#~ msgstr "Sorteo de bytes"
+
+#~ msgid "Marker"
+#~ msgstr "Marcador"
+
+#~ msgid "Comment entry 1"
+#~ msgstr "Entrada de comentario 1"
+
+#~ msgid "APPD entry"
+#~ msgstr "Entrada \"APPD\""
+
+#~ msgid "Other entry"
+#~ msgstr "Otra entrada"
+
+#~ msgid "ID of RTF document"
+#~ msgstr "ID de un documento RTF"
+
+#~ msgid "Start of block"
+#~ msgstr "Comienzo de bloque"
+
+#~ msgid "End of block"
+#~ msgstr "Fin de bloque"
+
+#~ msgid "Info block"
+#~ msgstr "Bloque \"Info\""
+
+#~ msgid "End of info block"
+#~ msgstr "Fin del bloque \"info\""
+
+#~ msgid "Start of command"
+#~ msgstr "Comienzo de comando"
+
+#~ msgid "Command"
+#~ msgstr "Comando"
+
+#~ msgid "No special char"
+#~ msgstr "Caracter no especial"
+
+#~ msgid "Author-entry"
+#~ msgstr "Entrada por el autor"
+
+#~ msgid "Title-entry"
+#~ msgstr "Entrada por el título"
+
+#~ msgid "Description-entry"
+#~ msgstr "Entrada por la descripción"
+
+#~ msgid "Information block"
+#~ msgstr "Bloque de información"
+
+#~ msgid "Information block value"
+#~ msgstr "Valor del bloque \"info\""
+
+#~ msgid "Other command"
+#~ msgstr "Otro comando"
+
+#~ msgid "Value of command"
+#~ msgstr "Valor de un comando"
+
+#~ msgid "Entry"
+#~ msgstr "Entrada"
+
+#~ msgid "Valid RTF command"
+#~ msgstr "Comando RTF válido"
+
+#~ msgid "RTF block"
+#~ msgstr "Bloque RTF"
+
+#~ msgid "OGG-ID"
+#~ msgstr "ID OGG"
+
+#~ msgid "Comment header"
+#~ msgstr "Cabeza de comentario"
+
+#~ msgid "Number of segments"
+#~ msgstr "Número de partes"
+
+#~ msgid "Length of vendor string"
+#~ msgstr "Tamaño de la identificación del vendedor"
+
+#~ msgid "Number of comments"
+#~ msgstr "Número de entradas"
+
+#~ msgid "Length of comment entry"
+#~ msgstr "Tamaño de la entrada de datos"
+
+#~ msgid "Comment entry"
+#~ msgstr "Comentario"
+
+#~ msgid "ID of an AbiWord document"
+#~ msgstr "ID de un documento de AbiWord"
+
+#~ msgid "Start of Abiword ID"
+#~ msgstr "Comienzo de bloque de información (Abiword)"
+
+#~ msgid "Unused contents"
+#~ msgstr "Contento inutilizado"
+
+#~ msgid "AbiWord meta-info"
+#~ msgstr "Información \"meta\" de AbiWord"
+
+#~ msgid "PNG-ID"
+#~ msgstr "ID PNG"
+
+#~ msgid "CRC"
+#~ msgstr "Còdige de correcciòn"
+
+#~ msgid "Chunk"
+#~ msgstr "Parte"
+
+#~ msgid "GIF-ID"
+#~ msgstr "GIF-ID"
+
+#~ msgid "Info about colour table"
+#~ msgstr "Información sobre la table de colores"
+
+#~ msgid "End of GIF image"
+#~ msgstr "Fin del imagen GIF"
+
+#~ msgid "Comment extension"
+#~ msgstr "Extensión de comentario"
+
+#~ msgid "Image separator"
+#~ msgstr "Separator del imagen"
+
+#~ msgid "Extension ID"
+#~ msgstr "Identificación de la extención"
+
+#~ msgid "Type of extension"
+#~ msgstr "Tipo de la extención"
+
+#~ msgid "Length of sub-block"
+#~ msgstr "Tamaño del sub-bloque"
+
+#~ msgid "Blocks"
+#~ msgstr "Bloques"
+
+#~ msgid "Image description"
+#~ msgstr "Descripción del imagen"
+
+#~ msgid "Extension"
+#~ msgstr "Extensión"
+
+#~ msgid "Comment blocks"
+#~ msgstr "Bloque de comentario"
+
+#~ msgid "Subblocks"
+#~ msgstr "Sub-bloques"

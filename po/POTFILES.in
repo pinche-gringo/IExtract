@@ -17,3 +17,4 @@ src/ParseAbiword.cpp
 src/ParsePNG.cpp
 src/ParseGIF.cpp
 src/ParseOOXML.cpp
+src/SpiritParser.h

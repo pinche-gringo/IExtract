@@ -28,419 +28,222 @@
 
 #include <IExtract-cfg.h>
 
-#include <cstring>
-
-// Note TRACELEVEL 9 is not recomended as the title very likely contains
-// special characters!
-#include <YGP/Check.h>
 #include <YGP/Trace.h>
-#include <YGP/Utility.h>
+
+#include "SpiritParser.h"
 
 #include "ParseJPG.h"
 #include "Properties.h"
 
-#ifdef _MSC_VER
-#pragma warning(disable:4355) // disable warning about this in initlist
-#endif
 
-#ifdef WORDS_BIGENDIAN
-#  define TYPE_TITLE     0x9b9c0001
-#  define TYPE_COMMENT   0x9c9c0001
-#  define TYPE_AUTHOR    0x9d9c0001
+// Markers
+static const unsigned char M_TEM  (0x01);
+static const unsigned char M_RST0 (0xd0);
+static const unsigned char M_RST7 (0xd7);
+static const unsigned char M_EOI  (0xd9);
+static const unsigned char M_SOS  (0xda);
+static const unsigned char M_APP1 (0xe1);
+static const unsigned char M_APPD (0xed);
+static const unsigned char M_COM  (0xfe);
 
-#  define TYPE_TITLE2    0x1c026900
-#  define TYPE_COMMENT2  0x1c027800
-#  define TYPE_AUTHOR2   0x1c026e00
+// Tags in the EXIF information (Windows XP)
+static const unsigned int TAG_TITLE    (0x9c9b);
+static const unsigned int TAG_COMMENT  (0x9c9c);
+static const unsigned int TAG_AUTHOR   (0x9c9d);
+static const unsigned int TYPE_BYTE    (1);
 
-#  define ENTRY_BLOCK    0x3842494d
-#  define ENTRY_TYPE     0x6e000000
+// Resource-ID of the IPTC information in Photoshop's image resource blocks
+static const unsigned int RES_IPTC     (0x0404);
 
-#else
-#  define TYPE_TITLE     0x019c9b
-#  define TYPE_COMMENT   0x019c9c
-#  define TYPE_AUTHOR    0x019c9d
-
-#  define TYPE_TITLE2    0x69021c
-#  define TYPE_COMMENT2  0x78021c
-#  define TYPE_AUTHOR2   0x6e021c
-
-#  define ENTRY_BLOCK    0x4d494238
-#  define ENTRY_TYPE     0x6e
-
-#endif
+// Datasets (of record 2) in the IPTC information
+static const unsigned int IPTC_TITLE   (105);
+static const unsigned int IPTC_AUTHOR  (110);
+static const unsigned int IPTC_COMMENT (120);
 
 
 //-----------------------------------------------------------------------------
-/// (Default-)Constructor
+/// Parses the JPEG image; the markers up to the image data are inspected
+/// \param stream: Stream to parse
+/// \param result: Out: Found information
+/// \throw YGP::ParseError: In case of an invalid image
 //-----------------------------------------------------------------------------
-ParseJPEG::ParseJPEG ()
-   : idJPEG ("\xff\xd8", _("JPEG-ID"), false),
-     idEndJPEG ("\xff\xd9", _("JPEG-Terminator"), *this, &ParseJPEG::foundEndOfJPEG, false),
-     idAPP1 ("\xff\xe1", _("APP1 marker"), *this, &ParseJPEG::foundAPP1, false),
-     idAPPD ("\xff\xed", _("APPD maker"), false),
-     idComment ("\xff\xfe", _("Comment marker"), false),
-     idMarker ("\xff\\*", _("Other marker"), 2, 2, false),
-     image ("\\*", _("Image information"), *this, &ParseJPEG::foundImage, 1, 1, false),
+void ParseJPEG::parse (YGP::Xistream& stream, Properties& result) {
+   namespace x3 = boost::spirit::x3;
+   using SpiritParser::bytes;
 
-     title ("\\*", _("Comment"), *this, &ParseJPEG::foundTitle, 1, 1, false),
-     titlePhotoshop ("\\*", _("Comment values (Photoshop style)"), *this, &ParseJPEG::foundCommentPhotoShop, 1, 1, false),
-     type ("\\*", _("Type of entry"), *this, &ParseJPEG::foundType, 4, 4, false),
-     number ("\\*", _("Number of records"), *this, &ParseJPEG::foundNumber, 2, 2, false),
-     lengthLSB ("\\*", _("Length (LSB first)"), *this, &ParseJPEG::foundLengthLSB, 2, 2, false),
-     lengthMSB ("\\*", _("Length (MSB first)"), *this, &ParseJPEG::foundLengthMSB, 2, 2, false),
-     lengthLSB4 ("\\*", _("Length (long - LSB first)"), *this, &ParseJPEG::foundLengthLSB4, 4, 4, false),
-     lengthMSB4 ("\\*", _("Length (long - MSB first)"), *this, &ParseJPEG::foundLengthMSB4, 4, 4, false),
-     offset ("\\*", _("Offset"), *this, &ParseJPEG::foundOffset, 4, 4, false),
-     byteOrder ("\\*", _("Byte order"), *this, &ParseJPEG::foundByteOrder, 2, 2, false),
-     skip6 (6),
-     skipLen (0),
+   unsigned int marker (0);
+   std::size_t length (0);
+   bool done (false);
 
-     selMarker (_selMarker, _("Marker"), -1U, 1, false),
-     seqComment (_seqComment, _("Comment entry 1"), 1, 1, false),
-     seqEXIF (_seqEXIF, _("APP1 (EXIF)"), *this, &ParseJPEG::foundAPP1Exif, 1, 1, false),
-     seqAPPD (_seqAPPD, _("APPD entry"), 1, 1, false),
-     seqOther (_seqOther, _("Other entry"), 1, 1, false),
+   auto setMarker = [&marker](auto& ctx) { marker = x3::_attr (ctx); };
+   // Checks if the marker has a length (and data) following
+   auto hasLength = [&marker](auto& ctx) {
+      x3::_pass (ctx) = (marker != M_TEM) && ((marker < M_RST0) || (marker > M_RST7)); };
+   auto isEnd = [&marker, &done](auto& ctx) {
+      x3::_pass (ctx) = done || (marker == M_EOI) || (marker == M_SOS); };
+   auto setLength = [&length](auto& ctx) {
+      length = x3::_attr (ctx);
+      x3::_pass (ctx) = (length >= 2);
+      length -= 2; };
+   auto segment = [&](auto& ctx) {
+      const std::string& data (x3::_attr (ctx));
+      TRACE8 ("ParseJPEG::parse (YGP::Xistream&, Properties&) - Marker " << std::hex << marker
+              << std::dec << ": " << data.size () << " bytes");
+      switch (marker) {
+      case M_COM:
+         result.strComment = data;
+         done = !data.empty ();
+         break;
 
-     seqIFD (_seqIFD, _("Image file directory"), 1, 1, false),
-     jpegImage (_jpegImage, _("JPEG image"), 1, 1),
-     cRead (0), actEntry (TYPE_TITLE), cEntries (0), prop (NULL) {
+      case M_APP1:
+         done = parseEXIF (data, result);
+         break;
 
-   _jpegImage[0] = &idJPEG;
-   _jpegImage[1] = &selMarker;
-   _jpegImage[2] = NULL;
+      case M_APPD:
+         parsePhotoshop (data, result);
+         break;
+      } };
 
-   _selMarker[0] = &seqComment;
-   _selMarker[1] = &seqEXIF;
-   _selMarker[2] = &seqAPPD;
-   _selMarker[3] = &seqOther;
-   _selMarker[4] = &idEndJPEG;
-   _selMarker[5] = &image;
-   _selMarker[6] = NULL;
+   auto markerID = x3::lit ('\xff') >> *x3::lit ('\xff') >> x3::byte_[setMarker];
+   auto markerData = x3::eps[hasLength] >> x3::big_word[setLength] >> bytes (length)[segment];
+   auto image = x3::lit ("\xff\xd8")
+      >> *(markerID >> !x3::eps[isEnd] >> -markerData);
 
-   _seqComment[0] = &idComment;
-   _seqComment[1] = &lengthMSB;
-   _seqComment[2] = &title;
-   _seqComment[3] = NULL;
-
-   _seqEXIF[0] = &idAPP1;
-   _seqEXIF[1] = &lengthMSB;
-   _seqEXIF[2] = &skip6;
-   _seqEXIF[3] = &byteOrder;
-   _seqEXIF[4] = &skip6;
-   _seqEXIF[5] = &number;
-   _seqEXIF[6] = &seqIFD;
-   _seqEXIF[7] = &title;
-   _seqEXIF[8] = &skipLen;
-   _seqEXIF[9] = NULL;
-
-   _seqAPPD[0] = &idAPPD;
-   _seqAPPD[1] = &lengthLSB;
-   _seqAPPD[2] = &titlePhotoshop;
-   _seqAPPD[3] = NULL;
-
-   _seqOther[0] = &idMarker;
-   _seqOther[1] = &lengthMSB;
-   _seqOther[2] = &skipLen;
-   _seqOther[3] = NULL;
-
-   _seqIFD[0] = &type;
-   _seqIFD[1] = &lengthLSB4;
-   _seqIFD[2] = &offset;
-   _seqIFD[3] = NULL;
-
-   Check3 ((sizeof (offsets) / sizeof (offsets[0]))
-           == (sizeof (lengths) / sizeof (lengths[0])));
-   for (unsigned int i (0);
-        i < (sizeof (offsets) / sizeof (offsets[0])); ++i)
-      offsets[i] = lengths[i] = 0;
-}
-
-
-//-----------------------------------------------------------------------------
-/// Callback after a title was read
-/// \param pTitle Pointer to title
-/// \param len Length of title
-/// \returns \c int Status YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseJPEG::foundTitle (const char* pTitle, unsigned int len) {
-   Check3 (prop); Check3 (pTitle);
-   TRACE9 ("ParseJPEG::foundTitle (const char*, unsigned int) - Title: "
-          << std::string (pTitle, len) << " -> " << len << " chars");
-   if (len) {
-      TRACE8 ("ParseJPEG::foundTitle (const char*, unsigned int) - Skipping " << cRead);
-      static std::string Properties::* values[] = { &Properties::strTitle,
-						    &Properties::strComment,
-						    &Properties::strAuthor };
-      for (unsigned int i (0);
-	   i < (sizeof (values) / sizeof (values[0])); ++i)
-	 if (lengths[i]) {
-	    TRACE7 ("ParseJPEG::foundTitle (const char*, unsigned int) - " << i
-		    << ": Assigning " << offsets[i] - cRead << " - "
-		    << offsets[i] - cRead + lengths[i]);
-	    (prop->*(values[i])).assign (pTitle + offsets[i] - cRead, lengths[i]);
-	 }
-      selMarker.setMaxCard (1);
-   }
-   return YGP::ParseObject::PARSE_OK;
+   SpiritParser::parse (SpiritParser::readStream (stream), image, _("JPEG image"));
 }
 
 //-----------------------------------------------------------------------------
-/// Callback after a comment entry (Photoshop stlye) was read
-/// \param pTitle Pointer to title
-/// \param len Length of title
-/// \returns \c int Status: YGP::ParseObject::PARSE_OK
+/// Parses the EXIF information (of an APP1 marker) for the Windows XP tags
+/// for title, comment and author
+/// \param data: Data of the APP1 marker
+/// \param result: Out: Found information
+/// \returns bool: True, if the (first) image file directory contains entries
 //-----------------------------------------------------------------------------
-int ParseJPEG::foundCommentPhotoShop (const char* pTitle, unsigned int len) {
-   Check3 (prop); Check3 (pTitle);
-   TRACE9 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Title: "
-           << std::string (pTitle, len) << " -> " << len << " chars");
+bool ParseJPEG::parseEXIF (const std::string& data, Properties& result) {
+   namespace x3 = boost::spirit::x3;
+   using SpiritParser::skip;
 
-   const char* pAct = pTitle + strlen (pTitle) + 1;    // Skip leading comment
-   pTitle += len;
+   static const std::string ID_EXIF ("Exif\0\0", 6);
+   if (data.compare (0, ID_EXIF.size (), ID_EXIF))
+      return false;
+   const std::string tiff (data, ID_EXIF.size ());
 
-   TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Header: *"
-           << std::hex << (const void*)pAct << " = " << (*(unsigned int*)pAct) << std::dec);
+   // Parses the image file directory with the passed parsers for words and
+   // double words (of the byte order of the data)
+   auto parseIFD = [&tiff, &result](auto word, auto dword) {
+      std::size_t offset (0), count (0);
+      unsigned int tag (0), type (0);
+      std::size_t cValues (0);
 
-   if (*(unsigned int*)pAct == ENTRY_BLOCK) {
-      pAct += 6;
-      pAct += (unsigned int)*pAct;
+      auto setValue = [](auto& value) { return [&value](auto& ctx) { value = x3::_attr (ctx); }; };
+      auto entry = [&](auto& ctx) {
+         static const std::pair<unsigned int, std::string Properties::*> tags[] =
+            { { TAG_TITLE, &Properties::strTitle }, { TAG_COMMENT, &Properties::strComment },
+              { TAG_AUTHOR, &Properties::strAuthor } };
 
-      TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Entry: *"
-              << std::hex << (const void*)pAct << " = " << (*(unsigned int*)pAct) << std::dec);
+         // The value is stored in the entry, if it fits into the 4 bytes of the offset
+         std::size_t posValue ((cValues > 4) ? static_cast<std::size_t> (x3::_attr (ctx))
+                               : static_cast<std::size_t> (x3::_where (ctx).begin () - tiff.data ()));
+         TRACE8 ("ParseJPEG::parseEXIF (const std::string&, Properties&) - Tag " << std::hex << tag
+                 << std::dec << " (" << type << "): " << cValues << " @ " << posValue);
+         if (type != TYPE_BYTE)
+            return;
+         for (const auto& t : tags)
+            if ((t.first == tag) && (posValue < tiff.size ()))
+               result.*(t.second) = tiff.substr (posValue, cValues);
+      };
 
-      if (*(unsigned int*)pAct == ENTRY_TYPE) {
-         pAct += 4;
-         pTitle = (unsigned int)(*pAct & 0xff) + pAct + 1;
-	 ++pAct;
-         do {
-            TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Type: *"
-                    << std::hex << (const void*)pAct << " = " << YGP::get4BytesLSB (pAct) << std::dec);
+      SpiritParser::Iterator act (tiff.data ());
+      SpiritParser::parse (act, tiff.data () + tiff.size (),
+                           x3::repeat (2)[x3::byte_] >> word >> dword[setValue (offset)],
+                           _("TIFF header"));
+      if (offset >= tiff.size ())
+         throw YGP::ParseError (_("Invalid offset of image file directory"));
 
-            static std::string Properties::* values[] = { &Properties::strTitle,
-                                                          &Properties::strComment,
-                                                          &Properties::strAuthor };
-            static unsigned int aSupportedTypes[] = { TYPE_TITLE2, TYPE_COMMENT2,
-                                                      TYPE_AUTHOR2 };
+      act = tiff.data () + offset;
+      SpiritParser::parse (act, tiff.data () + tiff.size (),
+                           word[setValue (count)]
+                           >> SpiritParser::times (count)[word[setValue (tag)] >> word[setValue (type)]
+                                                          >> dword[setValue (cValues)] >> dword[entry]],
+                           _("image file directory"));
+      return count > 0;
+   };
 
-            for (unsigned int i (0);
-                 i < (sizeof (aSupportedTypes) / sizeof (aSupportedTypes[0])); ++i) {
-               if (*(unsigned int*)pAct == aSupportedTypes[i]) {
-                  pAct += 4;
-                  TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - " << i
-                          << ": Assigning " << (unsigned int)(*pAct) << " chars = "
-                          << pAct + 1);
-                  (prop->*(values[i])).assign (pAct + 1, (unsigned int)*pAct);
-                  pAct -= 4;
-                  break;
-               }
-            } // end-for
-
-            pAct += 4;
-            TRACE8 ("ParseJPEG::foundCommentPhotoShop (const char*, unsigned int) - Skipping "
-                    << ((unsigned int)*pAct) << " bytes");
-            pAct += (unsigned int)*pAct + 1;
-         } while (pAct < pTitle);
-      } // end-if comment part found
-   } // end-if header
-   return YGP::ParseObject::PARSE_OK;
+   if (!tiff.compare (0, 2, "II"))
+      return parseIFD (x3::little_word, x3::little_dword);
+   if (!tiff.compare (0, 2, "MM"))
+      return parseIFD (x3::big_word, x3::big_dword);
+   throw YGP::ParseError (_("Invalid byte order of EXIF information"));
 }
 
 //-----------------------------------------------------------------------------
-/// Callback after the length of the title was read (in LSB format)
-/// \param length Pointer to length
-/// \returns \c int Status: YGP::ParseObject::PARSE_OK
+/// Parses the image resource blocks of Photoshop (of an APPD marker) for the
+/// IPTC information
+/// \param data: Data of the APPD marker
+/// \param result: Out: Found information
 //-----------------------------------------------------------------------------
-int ParseJPEG::foundLengthLSB (const char* length, unsigned int) {
-   Check3 (length);
-   TRACE8 ("ParseJPEG::foundLengthLSB (const char*, unsigned int): " << lengths[1]
-	   << " = 0x" << std::hex << YGP::get2BytesLSB (length) << std::dec);
-   foundLength (YGP::get2BytesLSB (length) - 2);
-   return YGP::ParseObject::PARSE_OK;
+void ParseJPEG::parsePhotoshop (const std::string& data, Properties& result) {
+   namespace x3 = boost::spirit::x3;
+   using SpiritParser::bytes;
+   using SpiritParser::skip;
+
+   unsigned int id (0);
+   std::size_t length (0), padding (0);
+
+   auto setID = [&id](auto& ctx) { id = x3::_attr (ctx); };
+   // Name: Pascal string, padded to an even size (including its length)
+   auto setNameLength = [&length, &padding](auto& ctx) {
+      length = x3::_attr (ctx);
+      padding = !(length & 1); };
+   auto setLength = [&length, &padding](auto& ctx) {
+      length = x3::_attr (ctx);
+      padding = length & 1; };
+   auto resource = [&id, &result](auto& ctx) {
+      TRACE8 ("ParseJPEG::parsePhotoshop (const std::string&, Properties&) - Resource " << std::hex
+              << id << std::dec << ": " << x3::_attr (ctx).size () << " bytes");
+      if (id == RES_IPTC)
+         parseIPTC (x3::_attr (ctx), result); };
+
+   auto block = x3::lit ("8BIM") >> x3::big_word[setID]
+      >> x3::byte_[setNameLength] >> skip (length) >> skip (padding)
+      >> x3::big_dword[setLength] >> bytes (length)[resource] >> skip (padding);
+   auto resources = x3::lit (std::string ("Photoshop 3.0\0", 14)) >> *block;
+
+   SpiritParser::Iterator act (data.data ());
+   x3::parse (act, data.data () + data.size (), resources);
 }
 
 //-----------------------------------------------------------------------------
-/// Sets the length of the title to read
-/// \param length Length of title
-/// \returns \c unsigned long Status: YGP::ParseObject::PARSE_OK
+/// Parses the IPTC information for title, author and comment
+/// \param data: IPTC information
+/// \param result: Out: Found information
 //-----------------------------------------------------------------------------
-unsigned long ParseJPEG::foundLength (unsigned int length) {
-   skipLen.setOffset (lengths[1] = length);
-   TRACE8 ("ParseJPEG::foundLength (unsigned int): " << length << " = 0x" << std::hex << length << std::dec);
-   if (length) {
-      title.setMaxCard (length);
-      titlePhotoshop.setMaxCard (length);
-   }
-   return YGP::ParseObject::PARSE_OK;
-}
+void ParseJPEG::parseIPTC (const std::string& data, Properties& result) {
+   namespace x3 = boost::spirit::x3;
+   using SpiritParser::bytes;
 
-//-----------------------------------------------------------------------------
-/// Callback after the length of the title was read (in MSB format)
-/// \param length Pointer to length
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseJPEG::foundLengthMSB (const char* length, unsigned int) {
-   Check3 (length);
-   TRACE8 ("ParseJPEG::foundLengthMSB (const char*, unsigned int): " << lengths[1]
-	   << " = 0x" << std::hex << YGP::get2BytesMSB (length) << std::dec);
-   foundLength (YGP::get2BytesMSB (length) - 2);
-   return YGP::ParseObject::PARSE_OK;
-}
+   unsigned int record (0), dataset (0);
+   std::size_t length (0);
 
-//-----------------------------------------------------------------------------
-/// Checks if a supported type has been read and sets the length, if so
-/// \param length Pointer to length
-/// \returns \c int Status: YGP::ParseObject::PARSE_OK
-/// \pre actEnty must have been set before
-//-----------------------------------------------------------------------------
-bool ParseJPEG::supportedLength4 (unsigned int length) {
-   TRACE8 ("ParseJPEG::supportedLength4 (unsigned int) - " << length);
-   static unsigned int aSupportedTypes[] = { TYPE_TITLE, TYPE_COMMENT, TYPE_AUTHOR };
+   auto setRecord = [&record](auto& ctx) { record = x3::_attr (ctx); };
+   auto setDataset = [&dataset](auto& ctx) { dataset = x3::_attr (ctx); };
+   auto setLength = [&length](auto& ctx) {             // Extended datasets are not supported
+      length = x3::_attr (ctx);
+      x3::_pass (ctx) = !(length & 0x8000); };
+   auto value = [&](auto& ctx) {
+      TRACE8 ("ParseJPEG::parseIPTC (const std::string&, Properties&) - " << record << ':'
+              << dataset << " = " << x3::_attr (ctx));
+      if (record != 2)
+         return;
+      switch (dataset) {
+      case IPTC_TITLE: result.strTitle = x3::_attr (ctx); break;
+      case IPTC_AUTHOR: result.strAuthor = x3::_attr (ctx); break;
+      case IPTC_COMMENT: result.strComment = x3::_attr (ctx); break;
+      } };
 
-   for (unsigned int i (0);
-        i < (sizeof (aSupportedTypes) / sizeof (aSupportedTypes[0])); ++i)
-      if (actEntry == aSupportedTypes[i]) {
-         lengths[i] = length;
-         actEntry = i;
-         TRACE8 ("ParseJPEG::foundLength4 (unsigned int) - " << lengths[i]
-                 << " (0x" << std::hex << lengths[i] << std::dec << ')');
-	 return true;
-      }
-   actEntry = -1U;
-   return false;
-}
+   auto dataSet = x3::lit ('\x1c') >> x3::byte_[setRecord] >> x3::byte_[setDataset]
+      >> x3::big_word[setLength] >> bytes (length)[value];
 
-//-----------------------------------------------------------------------------
-/// Callback after the length of the title was read (in LSB format)
-/// \param length Pointer to length
-/// \returns \c int Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseJPEG::foundLengthLSB4 (const char* length, unsigned int) {
-   Check3 (length);
-   TRACE8 ("ParseJPEG::foundLengthLSB4 (const char*, unsigned int): " << YGP::get4BytesLSB (length)
-	   << " = 0x" << std::hex << YGP::get4BytesLSB (length) << std::dec);
-
-   supportedLength4 (YGP::get4BytesLSB (length));
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the length of the title was read (in MSB format)
-/// \param length Pointer to length
-/// \returns \c int Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseJPEG::foundLengthMSB4 (const char* length, unsigned int) {
-   Check3 (length);
-   TRACE8 ("ParseJPEG::foundLengthMSB4 (const char*, unsigned int): " << lengths[1]
-	   << " = 0x" << std::hex << YGP::get4BytesMSB (length) << std::dec);
-
-   supportedLength4 (YGP::get4BytesMSB (length));
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the number of entries has been read
-/// \param nr Pointer to number of entries
-/// \returns \c int Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseJPEG::foundNumber (const char* nr, unsigned int) {
-   Check3 (nr);
-   cEntries = ((_seqIFD[1] == &lengthMSB4) ? YGP::get2BytesMSB (nr) : YGP::get2BytesLSB (nr));
-   TRACE8 ("ParseJPEG::foundNumber (const char*, unsigned int): " << cEntries);
-
-   skipLen.setOffset (4);
-   seqIFD.setMaxCard (cEntries);
-   seqIFD.setMinCard (cEntries);
-
-   if (cEntries) {
-      lengths[1] = 0;
-      cRead = 10 + cEntries * 12;
-      title.setMaxCard (title.getMaxCard () - cRead);
-   }
-   else {
-      title.setMinCard (0);
-      title.setMaxCard (0);
-   }
-
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the type of an entry has been parsed
-/// \param pType Pointer to found type
-/// \returns \c int Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseJPEG::foundType (const char* pType, unsigned int) {
-   Check3 (pType);
-   actEntry = *(unsigned int*)pType;
-   TRACE8 ("ParseJPEG::foundType (const char*, unsigned int) - " << std::hex << actEntry << std::dec);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the offset of an entry has been parsed
-/// \param pOffset Pointer to found offset
-/// \param len Length of data
-/// \returns \c int Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseJPEG::foundOffset (const char* pOffset, unsigned int len) {
-   Check3 (pOffset);
-   if (actEntry != -1U) {
-      offsets[actEntry] = YGP::get4BytesLSB (pOffset);
-      TRACE8 ("ParseJPEG::foundOffset (const char*, unsigned int) - " << offsets[actEntry]
-              << " (0x" << std::hex << offsets[actEntry] << std::dec << ')');
-   }
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after an end-of-JPEG marker has been parsed
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseJPEG::foundEndOfJPEG (const char*, unsigned int) {
-   TRACE8 ("ParseJPEG::foundEndOfJPEG (const char*, unsigned int)");
-   selMarker.setMaxCard (1);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after an APP1 marker has been found
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseJPEG::foundAPP1 (const char*, unsigned int) {
-   TRACE8 ("ParseJPEG::foundAPP1 (const char*, unsigned int)");
-   skipLen.setOffset (0);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after an APP1 marker has been found
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseJPEG::foundImage (const char*, unsigned int) {
-   TRACE8 ("ParseJPEG::foundImage (const char*, unsigned int)");
-   selMarker.setMaxCard (1);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after an APP1 marker has been found
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseJPEG::foundByteOrder (const char* order, unsigned int) {
-   TRACE8 ("ParseJPEG::foundByteOrder (const char*, unsigned int) - " << *order << order[1]);
-   if ((*order == 'M') && (order[1] == 'M'))
-      _seqIFD[1] = &lengthMSB4;
-   else if ((*order != 'I') || (order[1] != 'I'))
-      return YGP::ParseObject::PARSE_CB_ABORT;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after an APP1 marker has been found
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseJPEG::foundAPP1Exif (const char*, unsigned int) {
-   TRACE8 ("ParseJPEG::foundApp1Exif (const char*, unsigned int)");
-   _seqIFD[1] = &lengthLSB4;
-   return YGP::ParseObject::PARSE_OK;
+   SpiritParser::Iterator act (data.data ());
+   x3::parse (act, data.data () + data.size (), *dataSet);
 }

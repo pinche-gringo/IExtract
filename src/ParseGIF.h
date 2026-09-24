@@ -19,9 +19,9 @@
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <YGP/Parse.h>
+#include <string>
 
-#include "Selection.h"
+#include <YGP/XStream.h>
 
 
 struct Properties;
@@ -31,61 +31,16 @@ struct Properties;
  */
 class ParseGIF {
  public:
-   ParseGIF (Properties& result);
-   virtual ~ParseGIF ();
+   ParseGIF (Properties& result) : prop (result) { }
+   ~ParseGIF () { }
 
-   void parse (YGP::Xistream& stream) {
-      gifImage.parse (stream); }
+   void parse (YGP::Xistream& stream);
 
  private:
    //@Section prohibited manager functions
    ParseGIF ();
    ParseGIF (const ParseGIF& other);
    const ParseGIF& operator= (const ParseGIF& other);
-
-   int foundComment (const char*, unsigned int);
-   int skipColourTable (const char*, unsigned int);
-   int foundImage (const char*, unsigned int);
-   int foundLength (const char*, unsigned int);
-   int foundEndGIF (const char*, unsigned int);
-
-   int foundSubblock (const char*, unsigned int);
-
-   typedef YGP::OFParseExact<ParseGIF>    OMParseExact;
-   typedef YGP::OFParseAttomic<ParseGIF>  OMParseAttomic;
-   typedef YGP::OFParseSequence<ParseGIF> OMParseSequence;
-
-   YGP::ParseExact   idGIF;
-   YGP::ParseSkip    skip;
-   YGP::ParseSkip    skip2;
-   OMParseAttomic    colourTable;
-   OMParseExact      idEndGIF;
-
-   YGP::ParseExact   idCommentExt;
-   OMParseExact      idImage;
-   YGP::ParseExact   idExtension;
-   YGP::ParseAttomic idTypeExtension;
-   OMParseAttomic    comment;
-   OMParseAttomic    lenBlock;
-
-   Selection           blocks;
-   YGP::ParseObject*   _blocks[5];
-
-   YGP::ParseSequence commentExt;
-   YGP::ParseObject*  _commentExt[3];
-
-   YGP::ParseSequence imageDesc;
-   YGP::ParseObject*  _imageDesc[7];
-   YGP::ParseSequence extension;
-   YGP::ParseObject*  _extension[4];
-
-   OMParseSequence    commentBlocks;
-   YGP::ParseObject*  _commentBlocks[3];
-   OMParseSequence    subblocks;
-   YGP::ParseObject*  _subblocks[3];
-
-   YGP::ParseSequence gifImage;
-   YGP::ParseObject*  _gifImage[7];
 
    Properties&  prop;
 };

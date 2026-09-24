@@ -21,58 +21,24 @@
 
 #include <string>
 
-#include <YGP/Parse.h>
-
-#include "Selection.h"
-
+#include <YGP/XStream.h>
 
 struct Properties;
 
 
+/**Class to extract the properties (title, author, description) of an
+ * AbiWord document
+ */
 class ParseAbiword {
  public:
-   ParseAbiword ();
-   ~ParseAbiword ();
+   ParseAbiword () { }
+   ~ParseAbiword () { }
 
-   void parse (YGP::Xistream& stream, Properties& result) {
-      prop = &result;
-      selDocument.parse (stream);
-   }
+   void parse (YGP::Xistream& stream, Properties& result);
 
  private:
-   // Prohibted manager functions
    ParseAbiword (const ParseAbiword& other);
    const ParseAbiword& operator= (const ParseAbiword& other);
-
-   // Callback-methods for type of parsed elementes
-   int foundTag (const char*, unsigned int);
-   int foundValue (const char*, unsigned int);
-
-   typedef YGP::OFParseText<ParseAbiword>    OMParseText;
-   typedef YGP::OFParseQuoted<ParseAbiword>  OMParseQuoted;
-
-   Properties*  prop;
-
-   YGP::ParseExact   idAbiword;
-   YGP::ParseExact   idMetadata;
-   YGP::ParseExact   skipIDStart;
-   YGP::ParseText    skipUnused;
-   YGP::ParseText    skipLine;
-   OMParseQuoted     tag;
-   OMParseText       value;
-
-   YGP::ParseSequence    seqAbiWord;
-   YGP::ParseSequence    seqMetadata;
-   YGP::ParseSequence    seqEntry;
-
-   Selection             selDocument;                         // Startsequence
-
-   YGP::ParseObject* _seqAbiWord[3];
-   YGP::ParseObject* _selDocument[4];
-   YGP::ParseObject* _seqMetadata[4];
-   YGP::ParseObject* _seqEntry[3];
-
-   std::string Properties::* pEntry;
 };
 
 #endif

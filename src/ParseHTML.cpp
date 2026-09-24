@@ -28,202 +28,68 @@
 
 #include <IExtract-cfg.h>
 
-#include <YGP/Check.h>
+#include <algorithm>
+
+#include <YGP/Trace.h>
+
+#include "SpiritParser.h"
 
 #include "ParseHTML.h"
 #include "Properties.h"
 
-static const unsigned LEN_TAG         = 5120;
-static const unsigned LEN_TITLE       = 512;
-static const unsigned LEN_COMMAND     = 1024;
-
-
-#ifdef _MSC_VER
-#pragma warning(disable:4355) // disable warning about this in initlist
-#endif
-
 
 //-----------------------------------------------------------------------------
-/// (Default-)Constructor
+/// Parses the header of the HTML document for its title and meta-information
+/// \param stream: Stream to parse
+/// \param result: Out: Found information
+/// \throw YGP::ParseError: In case of an invalid document
 //-----------------------------------------------------------------------------
-ParseHTML::ParseHTML ()
-   : startTag ("<", _("Start of HTML-tag")), endTag (">", _("End of HTML-tag"))
-     , tagMeta ("META", _("Meta tag"))
-     , tagTitle ("TITLE", _("Title-tag"), *this, &ParseHTML::foundTitle)
-     , tagEndTitle ("/TITLE", _("Title-tag"))
-     , tagEndHead ("/HEADER", _("End of header"), *this, &ParseHTML::foundEndOfHead, 7, 5)
-     , title ("<", _("Title of document"), *this, &ParseHTML::foundValue, LEN_TITLE, 0)
-     , value ("\">", _("Value of entry"), *this, &ParseHTML::foundValue, LEN_TITLE)
-     , otherTag (">", _("Other HTML tag"), LEN_TAG)
-     , scriptType (">", _("Type of script"), LEN_TAG, 0)
-     , otherMetaEntry (" \"", _("Other META entry"), LEN_TAG)
-     , ignore ("<", _("Unused information"), LEN_COMMAND, 1, true, false)
-     , quote ("\"", _("Quote"), *this, &ParseHTML::foundQuote, 1, 0, true)
-     , equal ("=", _("Equal sign"), 1, 0, true)
-     , name ("NAME", _("Name of meta tag"))
-     , content ("CONTENT", _("Content specifier"))
-     , script ("SCRIPT", _("Script tag"))
-     , endScript ("</SCRIPT", _("End-Script tag"), *this, &ParseHTML::foundEndScript)
-     , description ("DESCRIPTION", _("Description"), *this, &ParseHTML::foundComment)
-     , author ("AUTHOR", _("Author"), *this, &ParseHTML::foundAuthor)
-     , DCdescription  ("DC.DESCRIPTION", _("Description in Dublin Core"), *this, &ParseHTML::foundComment)
-     , DCauthor ("DC.CREATOR", _("Author in Dublin Core"), *this, &ParseHTML::foundAuthor)
-     , DCtitle ("DC.TITLE", _("Title in Dublin Core"), *this, &ParseHTML::foundTitle)
-     , seqTag (_seqTag, _("Valid HTML tag"))
-     , seqTitle (_seqTitle, _("Title entry"))
-     , seqMetaCmd (_seqMetaCmd, _("Meta entry"))
-     , seqMetaName (_seqMetaName, _("Name entry for meta tag"))
-     , seqScript (_seqScript, _("Script sequence"), *this, &ParseHTML::foundScript)
-     , selMetaCmds (_selMetaCmds, _("Meta entries"))
-     , selMetaTags (_selMetaTags, _("Recogniced meta tags"), 1, 0)
-     , selScriptContent (_selScriptContent, _("Script content"), -1U)
-     , selCmd (_selCmd, _("Valid HTML command"))
-     , htmlDoc (_htmlDoc, _("HTML document"), -1U, 1), prop (NULL), actEntry (NONE) {
+void ParseHTML::parse (YGP::Xistream& stream, Properties& result) {
+   namespace x3 = boost::spirit::x3;
+   using SpiritParser::nocase;
+   using SpiritParser::ws;
 
-   _seqMetaCmd[0] = &tagMeta;
-   _seqMetaCmd[1] = &selMetaCmds;
-   _seqMetaCmd[2] = NULL;
+   std::string Properties::* entry (nullptr);
+   bool endOfHead (false);
 
-   _selMetaCmds[0] = &seqMetaName;
-   _selMetaCmds[1] = &otherTag;
-   _selMetaCmds[2] = NULL;
+   auto metaName = [&entry](auto& ctx) {
+      std::string name (x3::_attr (ctx));
+      std::transform (name.begin (), name.end (), name.begin (),
+                      [](char ch) { return ((ch >= 'A') && (ch <= 'Z')) ? ch + 'a' - 'A' : ch; });
+      TRACE8 ("ParseHTML::parse (YGP::Xistream&, Properties&) - Meta: " << name);
+      entry = (((name == "description") || (name == "dc.description")) ? &Properties::strComment
+               : ((name == "author") || (name == "dc.creator")) ? &Properties::strAuthor
+               : (name == "dc.title") ? &Properties::strTitle : nullptr); };
+   auto metaValue = [&entry, &result](auto& ctx) {
+      if (entry)
+         result.*entry = x3::_attr (ctx);
+      entry = nullptr; };
+   auto title = [&result](auto& ctx) { result.strTitle = x3::_attr (ctx); };
+   auto notEndOfHead = [&endOfHead](auto& ctx) { x3::_pass (ctx) = !endOfHead; };
+   auto foundEndOfHead = [&endOfHead](auto&) { endOfHead = true; };
 
-   _seqMetaName[0] = &name;
-   _seqMetaName[1] = &equal;
-   _seqMetaName[2] = &quote;
-   _seqMetaName[3] = &selMetaTags;
-   _seqMetaName[4] = &quote;
-   _seqMetaName[5] = &content;
-   _seqMetaName[6] = &equal;
-   _seqMetaName[7] = &quote;
-   _seqMetaName[8] = &value;
-   _seqMetaName[9] = &quote;
-   _seqMetaName[10] = NULL;
+   auto restOfTag = x3::omit[*~x3::char_ ('>')];
+   auto equal = -(x3::lit ('=') >> ws);
+   auto quote = -(x3::lit ('"') >> ws);
 
-   _selMetaTags[0] = &description;
-   _selMetaTags[1] = &author;
-   _selMetaTags[2] = &DCdescription;
-   _selMetaTags[3] = &DCauthor;
-   _selMetaTags[4] = &DCtitle;
-   _selMetaTags[5] = &otherMetaEntry;
-   _selMetaTags[6] = NULL;
+   auto tagTitle = nocase ("title") >> restOfTag >> x3::lit ('>') >> ws
+      >> (*~x3::char_ ('<'))[title] >> x3::lit ('<') >> ws >> nocase ("/title");
 
-   _seqTitle[0] = &tagTitle;
-   _seqTitle[1] = &endTag;
-   _seqTitle[2] = &title;
-   _seqTitle[3] = &startTag;
-   _seqTitle[4] = &tagEndTitle;
-   _seqTitle[5] = NULL;
+   // <META NAME="name" CONTENT="value">; other meta-tags are ignored
+   auto nameValue = x3::rule<class MetaNameID, std::string> ("Name of meta tag")
+      = x3::lit ('"') >> ws >> *~x3::char_ ('"') >> x3::lit ('"')
+      | +~x3::char_ (" \t\n\r>");
+   auto metaEntry = nocase ("name") >> ws >> equal >> nameValue[metaName] >> ws
+      >> nocase ("content") >> ws >> equal >> quote >> (*~x3::char_ ("\">"))[metaValue] >> quote;
+   auto tagMeta = nocase ("meta") >> ws >> -metaEntry >> restOfTag;
 
-   _selCmd[0] = &seqTitle;
-   _selCmd[1] = &seqMetaCmd;
-   _selCmd[2] = &tagEndHead;
-   _selCmd[3] = &seqScript;
-   _selCmd[4] = &otherTag;
-   _selCmd[5] = NULL;
+   auto tagEndHead = nocase ("/head")[foundEndOfHead] >> restOfTag;
+   auto tagScript = nocase ("script") >> restOfTag >> x3::lit ('>') >> ws
+      >> x3::omit[*(x3::char_ - nocase ("</script"))] >> nocase ("</script") >> restOfTag;
 
-   _seqScript[0] = &script;
-   _seqScript[1] = &scriptType;
-   _seqScript[2] = &endTag;
-   _seqScript[3] = &selScriptContent;
-   _seqScript[4] = NULL;
+   auto tag = x3::lit ('<') >> ws >> (tagTitle | tagMeta | tagEndHead | tagScript | restOfTag)
+      >> x3::lit ('>') >> ws;
+   auto document = *(x3::eps[notEndOfHead] >> (tag | x3::omit[+~x3::char_ ('<')]));
 
-   _selScriptContent[0] = &endScript;
-   _selScriptContent[1] = &startTag;
-   _selScriptContent[2] = &ignore;
-   _selScriptContent[3] = NULL;
-
-   _seqTag[0] = &startTag;
-   _seqTag[1] = &selCmd;
-   _seqTag[2] = &endTag;
-   _seqTag[3] = NULL;
-
-   _htmlDoc[0] = &seqTag;
-   _htmlDoc[1] = &ignore;
-   _htmlDoc[2] = NULL;
-}
-
-
-//-----------------------------------------------------------------------------
-/// Callback after a title was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseHTML::foundValue (const char* pValue, unsigned int len) {
-   if (actEntry != NONE) {
-      static std::string Properties::* values[] =
-         { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
-
-      Check3 (prop);
-      (prop->*(values[actEntry])).assign (pValue, len);
-   }
-   actEntry = NONE;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after a title tag was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseHTML::foundTitle (const char*, unsigned int) {
-   actEntry = TITLE;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after an author-tag was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseHTML::foundAuthor (const char*, unsigned int) {
-   actEntry = AUTHOR;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after a comment tag was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseHTML::foundComment (const char*, unsigned int) {
-   actEntry = COMMENT;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the end of the header was found
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseHTML::foundEndOfHead (const char*, unsigned int) {
-   htmlDoc.setMaxCard (1);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the end-of-script tag was found
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseHTML::foundEndScript (const char*, unsigned int) {
-   selScriptContent.setMaxCard (1);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the end of a script was found
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseHTML::foundScript (const char*, unsigned int) {
-   selScriptContent.setMaxCard (-1U);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after a quote was found
-/// \param pValue: Found quote character
-/// \param len: Length of value
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseHTML::foundQuote (const char* pValue, unsigned int len) {
-   Check3 (pValue);
-   Check3 (len ? (*pValue == '"') : !*pValue);
-
-   otherMetaEntry.setValue (len ? "\"" : " ");
-   return YGP::ParseObject::PARSE_OK;
+   SpiritParser::parse (SpiritParser::readStream (stream), document, _("HTML document"));
 }

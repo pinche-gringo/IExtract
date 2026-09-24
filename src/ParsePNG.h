@@ -19,7 +19,7 @@
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <YGP/Parse.h>
+#include <YGP/XStream.h>
 
 
 struct Properties;
@@ -33,11 +33,10 @@ struct Properties;
  */
 class ParsePNG {
  public:
-   ParsePNG (Properties& result);
-   virtual ~ParsePNG ();
+   ParsePNG (Properties& result) : prop (result) { }
+   ~ParsePNG () { }
 
-   void parse (YGP::Xistream& stream) {
-      pngImage.parse (stream); }
+   void parse (YGP::Xistream& stream);
 
  private:
    //@Section prohibited manager functions
@@ -45,24 +44,7 @@ class ParsePNG {
    ParsePNG (const ParsePNG& other);
    const ParsePNG& operator= (const ParsePNG& other);
 
-   int foundType (const char*, unsigned int);
-   int foundLength (const char*, unsigned int);
-   int foundComment (const char*, unsigned int);
-
-   typedef YGP::OFParseAttomic<ParsePNG>  OMParseAttomic;
-
-   YGP::ParseExact   idPNG;
-   OMParseAttomic    length;
-   OMParseAttomic    type;
-   OMParseAttomic    comment;
-   YGP::ParseSkip    skip;
-   YGP::ParseAttomic crc;
-
-   YGP::ParseSequence chunk;
-   YGP::ParseObject*  _chunk[5];
-
-   YGP::ParseSequence pngImage;
-   YGP::ParseObject*  _pngImage[3];
+   void foundChunk (unsigned int type, const std::string& data);
 
    Properties&  prop;
 };

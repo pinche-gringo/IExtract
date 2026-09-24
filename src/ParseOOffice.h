@@ -21,73 +21,26 @@
 
 #include <string>
 
-#include <YGP/Parse.h>
-
+#include <YGP/XStream.h>
 
 struct Properties;
 
 
+/**Class to extract the properties (title, author, description) of an
+ * OpenOffice.org document
+ */
 class ParseOpenOffice {
  public:
-   ParseOpenOffice ();
-   ~ParseOpenOffice ();
+   ParseOpenOffice () { }
+   ~ParseOpenOffice () { }
 
-   void parse (YGP::Xistream& stream, Properties& result) {
-      prop = &result;
-      seqDocument.parse (stream);
-   }
+   void parse (YGP::Xistream& stream, Properties& result);
 
  private:
-   // Prohibted manager functions
    ParseOpenOffice (const ParseOpenOffice& other);
    const ParseOpenOffice& operator= (const ParseOpenOffice& other);
 
-   // Callback-methods for type of parsed elementes
-   int foundTag (const char*, unsigned int);
-   int foundValue (const char*, unsigned int);
-   int foundNrEntries (const char*, unsigned int);
-   int foundName (const char*, unsigned int);
-   int foundLength (const char*, unsigned int);
-   int foundLenName (const char*, unsigned int);
-   int foundOffsetCDR (const char*, unsigned int);
-   int foundOffsetFile (const char*, unsigned int);
-
-   typedef YGP::OFParseText<ParseOpenOffice>    OMParseText;
-   typedef YGP::OFParseQuoted<ParseOpenOffice>  OMParseQuoted;
-   typedef YGP::OFParseAttomic<ParseOpenOffice> OMParseAttomic;
-
-   Properties*  prop;
-
-   YGP::ParseExact   idZipEntry;
-   YGP::ParseSkip    skip;
-   YGP::ParseExact   idCDR;
-   YGP::ParseSkip    skip2;
-   OMParseAttomic    nrCDREntries;
-   OMParseAttomic    offCDR;
-   YGP::ParseExact   idCFileHdr;
-   OMParseAttomic    lenName;
-   OMParseAttomic    len;
-   OMParseAttomic    name;
-   OMParseAttomic    posFile;
-   YGP::ParseSkip    posMetaInfo;
-
-   YGP::ParseExact   idMetadata;
-   YGP::ParseText    skipLine;
-   OMParseQuoted     tag;
-   OMParseText       value;
-
-   YGP::ParseSequence    seqCDREntries;
-   YGP::ParseSequence    seqMetadata;
-   YGP::ParseSequence    seqEntry;
-
-   YGP::ParseSequence    seqDocument;                         // Startsequence
-
-   YGP::ParseObject* _seqDocument[14];
-   YGP::ParseObject* _seqCDREntries[9];
-   YGP::ParseObject* _seqMetadata[4];
-   YGP::ParseObject* _seqEntry[3];
-
-   std::string Properties::* pEntry;
+   static void parseMetaInfo (const std::string& metaInfo, Properties& result);
 };
 
 #endif

@@ -28,457 +28,252 @@
 
 #include <IExtract-cfg.h>
 
-#ifdef _MSC_VER
-#pragma warning(disable:4355) // disable warning about this in initlist
-#pragma warning(disable:4786) // disable warning about truncating debug info
-#endif
+#include <set>
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-
-#include <YGP/Check.h>
 #include <YGP/Trace.h>
-#include <YGP/Utility.h>
+
+#include "SpiritParser.h"
 
 #include "Properties.h"
 
 #include "ParsePDF.h"
 
-#define ID1 "s"
-#define ID ID1 "tartxref"
 
+namespace {
 
-//-----------------------------------------------------------------------------
-/// (Default-)Constructor
-//-----------------------------------------------------------------------------
-ParsePDF::ParsePDF ()
-   : startXRef (ID, _("Tag for offset of cross reference table")),
-     offXRef ("\\9", _("Offset of cross reference table"), *this, &ParsePDF::foundOffset, 10, 1),
-     skipS (ID1, _("First char of tag"), 20, 1, true),
-     skip (ID1, _("Unused data"), 256, 1, true, false),
-     idXRef ("xref", _("Tag for cross reference table")),
-     nrStart ("\\9", _("Number of cross reference entries"), *this, &ParsePDF::foundStartNumber, 10),
-     count ("\\9", _("Number of cross reference entries"), *this, &ParsePDF::foundNumber, 10),
-     offObject ("\\9", _("Offset of object"), *this, &ParsePDF::foundObjOffset, 10, 1, false),
-     tagTrailer ("trailer", _("Tag for trailer")),
-     startObj ("<<", _("Start of object"), *this, &ParsePDF::foundObject),
-     objInfo ("/Info", _("Reference to info object")),
-     objPrev ("/Prev", _("Reference to other trailer")),
-     objOffPrev ("\\9", _("Offset of /Prev entry"), *this, &ParsePDF::foundPrevOffset, 10, 1),
-     idObject ("\\9", _("ID of object"), *this, &ParsePDF::foundObjectID, 10),
-     idObj ("1", _("ID of object (repeated)")),
-     number ("\\9", _("Generation"), 10),
-     tagObj ("obj", _("Tag for an object")),
-     endObj (">>", _("End of object"), *this, &ParsePDF::foundEndObj),
-     tagTitle ("/Title", _("Tag for title"), *this, &ParsePDF::foundTitle),
-     tagAuthor ("/Author", _("Tag for author"), *this, &ParsePDF::foundAuthor),
-     tagComment ("/Subject", _("Tag for comment (subject)"), *this, &ParsePDF::foundComment),
-     value (")>", _("Value of entry"), *this, &ParsePDF::foundValue, 512, 0),
-     startOfValue1 ("(", _("Start of value ('(')"), *this, &ParsePDF::foundParenthesis),
-     startOfValue2 ("<", _("Start of value ('<')"), *this, &ParsePDF::foundBracket),
-     startOfValue3 ("/", _("Start of value ('/')"), *this, &ParsePDF::foundSlash),
-     endOfValue (")", _("End of value")),
-     selXRef (_selXRef, _("Pointer to position of cross reference table"), -1U, 0),
-     seqXRef (_seqXRef, _("Position of cross reference table")),
-     seqXRefTable (_seqXRefTable, _("Cross reference table")),
-     seqXRefSubsection (_seqXRefSubsection, _("Cross reference table subsection"), -1U),
-     seqXRefTableEntries (_seqXRefTableEntries, _("Entries in cross reference table"), 0, 0),
-     seqTrailer (_seqTrailer, _("Trailer")),
-     selValues (_selValues, _("Trailer values"), -1U, 0),
-     seqSkipEntry (_seqSkipEntry, _("Entry to skip")),
-     seqInfo (_seqInfo, _("Info entry")),
-     seqPrev (_seqPrev, _("Prev entry")),
-     seqInfoObj (_seqInfoObj, _("Info object")),
-     seqInfoValue (_seqInfoValue, _("Info values"), -1U, 0),
-     selType (_selType, _("Valid type")),
-     selStartOfValue (_selStartOfValue, _("Start of values")),
-     seqFullValue (_seqFullValue, _("Full value"), 1, 1),
-     prop (NULL), actEntry (NONE), file (NULL), offPrev (0), actObject (0),
-     infoObject (-1U), strInfoObject (NULL), aOffsets () {
-   _selXRef[0] = &seqXRef;
-   _selXRef[1] = &skipS;
-   _selXRef[2] = &skip;
-   _selXRef[3] = NULL;
+namespace x3 = boost::spirit::x3;
 
-   _seqXRef[0] = &startXRef;
-   _seqXRef[1] = &offXRef;
-   _seqXRef[2] = &seqXRefTable;
-   _seqXRef[3] = NULL;
+/// State while parsing a dictionary
+struct State {
+   unsigned int depth;                   ///< Nesting level of dictionaries
+   std::string  key;                     ///< Key of the actual top-level entry
+   std::map<std::string, std::string>& strings;
+   std::map<std::string, std::string>& others;
+};
+struct StateTag;
 
-   _seqXRefTable[0] = &idXRef;
-   _seqXRefTable[1] = &seqXRefSubsection;
-   _seqXRefTable[2] = &seqTrailer;
-   _seqXRefTable[3] = NULL;
+State& state (const auto& ctx) { return x3::get<StateTag> (ctx).get (); }
 
-   _seqXRefSubsection[0] = &nrStart;
-   _seqXRefSubsection[1] = &count;
-   _seqXRefSubsection[2] = &seqXRefTableEntries;
-   _seqXRefSubsection[3] = NULL;
-
-   _seqXRefTableEntries[0] = &offObject;
-   _seqXRefTableEntries[1] = &skip;
-   _seqXRefTableEntries[2] = NULL;
-
-   _seqTrailer[0] = &tagTrailer;
-   _seqTrailer[1] = &startObj;
-   _seqTrailer[2] = &selValues;
-   _seqTrailer[3] = NULL;
-
-   _selValues[0] = &seqInfo;
-   _selValues[1] = &seqPrev;
-   _selValues[2] = &endObj;
-   _selValues[3] = &seqSkipEntry;
-   _selValues[4] = NULL;
-
-   _seqInfo[0] = &objInfo;
-   _seqInfo[1] = &idObject;
-   _seqInfo[2] = &skip;
-   _seqInfo[3] = NULL;
-
-   _seqPrev[0] = &objPrev;
-   _seqPrev[1] = &objOffPrev;
-   _seqPrev[2] = NULL;
-
-   _seqSkipEntry[0] = &skipS;
-   _seqSkipEntry[1] = &skip;
-   _seqSkipEntry[2] = NULL;
-
-   _seqInfoObj[0] = &idObj;
-   _seqInfoObj[1] = &number;
-   _seqInfoObj[2] = &tagObj;
-   _seqInfoObj[3] = &startObj;
-   _seqInfoObj[4] = &seqInfoValue;
-   _seqInfoObj[5] = NULL;
-
-   _seqInfoValue[0] = &selType;
-   _seqInfoValue[1] = &selStartOfValue;
-   _seqInfoValue[2] = &seqFullValue;
-   _seqInfoValue[3] = &endOfValue;
-   _seqInfoValue[4] = NULL;
-
-   _selType[0] = &tagTitle;
-   _selType[1] = &tagAuthor;
-   _selType[2] = &tagComment;
-   _selType[3] = &endObj;
-   _selType[4] = &skip;
-   _selType[5] = NULL;
-
-   _seqFullValue[0] = &value;
-   _seqFullValue[1] = NULL;
-   _seqFullValue[2] = NULL;
-
-   _selStartOfValue[0] = &startOfValue1;
-   _selStartOfValue[1] = &startOfValue2;
-   _selStartOfValue[2] = &startOfValue3;
-   _selStartOfValue[3] = NULL;
-}
-
-//-----------------------------------------------------------------------------
-/// Destructor
-//-----------------------------------------------------------------------------
-ParsePDF::~ParsePDF () {
-   delete strInfoObject;
-}
-
-
-//-----------------------------------------------------------------------------
-/// Callback after the offset of /Prev entry was read
-/// \param pLength: Pointer to offset
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundPrevOffset (const char* pOffset, unsigned int) {
-   TRACE9 ("ParsePDF::foundPrevOffset (const char*, unsigned int) - " << pOffset);
-   Check3 (pOffset);
-   offPrev = atoi (pOffset);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the offset of the cross reference table was read
-/// \param pLength: Pointer to offset
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundOffset (const char* pOffset, unsigned int) {
-   TRACE9 ("ParsePDF::foundOffset (const char*, unsigned int) - " << pOffset);
-   Check3 (pOffset); Check3 (file);
-
-   file->seekg (atoi (pOffset), std::ios::beg);
-   selXRef.setMaxCard (0);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the start number of the entries in the cross reference
-/// table was read
-/// \param pNumber: Pointer to startnumber of objects
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundStartNumber (const char* pNumber, unsigned int) {
-   TRACE5 ("ParsePDF::foundStartNumber (const char*, unsigned int) - " << pNumber);
-   Check3 (pNumber); Check3 (file);
-
-   actObject = atoi (pNumber);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the number of the entries in the cross reference table was
-/// read
-/// \param pNumber: Pointer to number of objects
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundNumber (const char* pNumber, unsigned int) {
-   TRACE5 ("ParsePDF::foundNumber (const char*, unsigned int) - " << pNumber);
-   Check3 (pNumber); Check3 (file);
-
-   seqXRefTableEntries.setMaxCard (atoi (pNumber));
-   skip.setValue ("\x0d\x0a");
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the offset of an object was read
-/// \param pLength: Pointer to offset
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundObjOffset (const char* pOffset, unsigned int) {
-   TRACE9 ("ParsePDF::foundObjOffset (const char*, unsigned int) - " << pOffset
-           << " for object " << actObject);
-   Check3 (pOffset); Check3 (file);
-
-   aOffsets[actObject++] = atoi (pOffset);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Parses the info object
-//-----------------------------------------------------------------------------
-void ParsePDF::parseInfoObject () {
-   Check3 (infoObject != -1U);
-   Check3 (aOffsets.find (infoObject) != aOffsets.end ());
-
-   TRACE5 ("ParsePDF::parseInfoObject () - Going to pos " << aOffsets[infoObject]
-           << "; searching for " << strInfoObject);
-
-   file->seekg (aOffsets[infoObject], std::ios::beg);
-
-   idObj.setValue (strInfoObject);
-   idObj.setMaxCard (strlen (strInfoObject));
-   idObj.setMinCard (idObj.getMaxCard ());
-   skip.setValue ("\\ (<");
-
-   Check3 (file);
-   seqInfoObj.parse (*file);
-}
-
-
-//-----------------------------------------------------------------------------
-/// Callback after the ID of an object was read
-/// \param pLength: Pointer to ID
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundObjectID (const char* pID, unsigned int len) {
-   TRACE5 ("ParsePDF::foundObjectID (const char*, unsigned int) - " << pID);
-   Check3 (pID); Check3 (file);
-
-   strInfoObject = new char [len + 1];
-   memcpy (strInfoObject, pID, len);
-   strInfoObject[len] = '\0';
-   infoObject = atoi (pID);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after an end-of-object tag was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundEndObj (const char*, unsigned int) {
-   TRACE9 ("ParsePDF::foundEndObj (const char*, unsigned int) - " << infoObject << ' ' << selValues.getMaxCard ());
-   seqInfoValue.setMaxCard (0);
-   _seqInfoValue[1] = NULL;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after an end-of-object tag was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundObject (const char*, unsigned int) {
-   TRACE9 ("ParsePDF::foundObject (const char*, unsigned int)");
-   if (infoObject == -1U)
-      skip.setValue ("/>");
-   skipS.setValue ("/>");
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the title was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundTitle (const char* pTitle, unsigned int) {
-   TRACE5 ("ParsePDF::foundTitle (const char*, unsigned int)");
-   actEntry = TITLE;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the author was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundAuthor (const char*, unsigned int) {
-   TRACE5 ("ParsePDF::foundAuthor (const char*, unsigned int)");
-   actEntry = AUTHOR;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the comment was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundComment (const char*, unsigned int) {
-   TRACE5 ("ParsePDF::foundComment (const char*, unsigned int)");
-   actEntry = COMMENT;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the start of a hex-value was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundBracket (const char*, unsigned int) {
-   TRACE5 ("ParsePDF::foundBracket (const char*, unsigned int)");
-   endOfValue.setValue (">");
-   value.setValue (">");
-   value.setSkipWS (true);
-   _seqInfoValue[3] = &endOfValue;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the start of a string value was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundParenthesis (const char*, unsigned int) {
-   TRACE5 ("ParsePDF::foundParenthesis (const char*, unsigned int)");
-   endOfValue.setValue (")");
-   value.setValue (")");
-   value.setSkipWS (true);
-   _seqInfoValue[3] = &endOfValue;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the start of a name-value was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundSlash (const char*, unsigned int) {
-   TRACE5 ("ParsePDF::foundBracket (const char*, unsigned int)");
-   endOfValue.setValue (" ");
-   value.setValue ("\r\n ");
-   value.setSkipWS (false);
-   _seqInfoValue[3] = NULL;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the value for an entry was read
-/// \param pLength: Pointer to value
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePDF::foundValue (const char* pValue, unsigned int len) {
-   TRACE9 ("ParsePDF::foundValue (const char*, unsigned int) - " << pValue);
-   Check3 (pValue);
-
-   std::string tmp;
-   if (actEntry != NONE) {
-      TRACE9 ("ParsePDF::foundValue (const char*, unsigned int) - Assigning: " << pValue);
-
-      static std::string Properties::* values[] =
-         { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
-
-      Check3 (prop);
-      Check3 ((sizeof (values) / sizeof (values[0])) > (unsigned int)actEntry);
-
-      if (*value.getValue () == ')') {
-	 if ((prop->*(values[actEntry])).size ())
-	    (prop->*(values[actEntry])) += *value.getValue ();
-         (prop->*(values[actEntry])) += std::string (pValue, len);
-      }
-      else {
-         Check1 (!(len & 1));
-	 // Skip MS-header for Unicode
-         if (YGP::get4BytesLSB (pValue) == 0x46464546) {
-            pValue += 4;
-            len -= 4;
-         }
-         while (len) {
-            unsigned int ch;
-            sscanf (pValue, "%2X", &ch);
-            if (ch)
-               prop->*(values[actEntry]) += (char)ch;
-            pValue += 2;
-            len -= 2;
-         }
-      }
-      tmp = prop->*(values[actEntry]);
+// Actions
+auto append = [](auto& ctx) { x3::_val (ctx) += x3::_attr (ctx); };
+auto appendOctal = [](auto& ctx) {
+   unsigned int ch (0);
+   for (char digit : x3::_attr (ctx))
+      ch = (ch << 3) + (digit - '0');
+   x3::_val (ctx) += static_cast<char> (ch); };
+auto appendEscaped = [](auto& ctx) {
+   char ch (x3::_attr (ctx));
+   switch (ch) {
+   case 'n': ch = '\n'; break;
+   case 'r': ch = '\r'; break;
+   case 't': ch = '\t'; break;
+   case 'b': ch = '\b'; break;
+   case 'f': ch = '\f'; break;
    }
-   else
-      tmp = std::string (pValue, len);
+   x3::_val (ctx) += ch; };
+auto decodeHex = [](auto& ctx) {
+   std::string digits;
+   for (char ch : x3::_attr (ctx))
+      if (((ch >= '0') && (ch <= '9')) || ((ch >= 'a') && (ch <= 'f')) || ((ch >= 'A') && (ch <= 'F')))
+         digits += ch;
+   if (digits.size () & 1)
+      digits += '0';
 
-   unsigned int openedBrackets (0);
-   unsigned int closedBrackets (0);
-   char openVal (((*value.getValue () == ')') ? '(' : '<'));
-   for (std::string::const_iterator i (tmp.begin ()); i != tmp.end (); ++i) {
-      if (*i == *value.getValue ())
-	 ++closedBrackets;
-      else if (*i == openVal)
-	 ++openedBrackets;
+   std::string& value (x3::_val (ctx));
+   for (std::size_t i (0); i < digits.size (); i += 2) {
+      char ch (static_cast<char> (std::stoi (digits.substr (i, 2), nullptr, 16)));
+      if (ch)                              // Drop zeros (of UTF-16 characters)
+         value += ch;
    }
-   TRACE9 ("ParsePDF::foundValue (const char*, unsigned int) - Delimiters: "
-	   << openVal << " -> " << openedBrackets << '/' << closedBrackets);
-   if (openedBrackets != closedBrackets) {
-      seqFullValue.setMaxCard (seqFullValue.getMaxCard () + 1);
-      seqFullValue.setMinCard (seqFullValue.getMaxCard ());
-      _seqFullValue[1] = &endOfValue;
-   }
-   else {
-      seqFullValue.setMaxCard (1);
-      seqFullValue.setMinCard (1);
-      _seqFullValue[1] = NULL;
-      actEntry = NONE;
-   }
-   return YGP::ParseObject::PARSE_OK;
+   if (!value.compare (0, 2, "\xfe\xff"))  // Skip BOM of UTF-16
+      value.erase (0, 2); };
+auto enter = [](auto& ctx) { ++state (ctx).depth; };
+auto leave = [](auto& ctx) { --state (ctx).depth; };
+auto setKey = [](auto& ctx) {
+   if (state (ctx).depth == 1)
+      state (ctx).key = x3::_attr (ctx); };
+auto storeString = [](auto& ctx) {
+   State& st (state (ctx));
+   if (st.depth == 1)
+      st.strings[st.key] = x3::_attr (ctx); };
+auto storeOther = [](auto& ctx) {
+   State& st (state (ctx));
+   if (st.depth == 1)
+      st.others[st.key] = std::string (x3::_attr (ctx).begin (), x3::_attr (ctx).end ()); };
+
+// Lexical elements
+auto const white = x3::char_ (" \t\r\n\f") | x3::lit ('\0');
+auto const ws = x3::omit[*(white | x3::lit ('%') >> *~x3::char_ ("\r\n"))];
+auto const regular = ~x3::char_ (" \t\r\n\f()<>[]{}/%") - x3::lit ('\0');
+auto const digit = x3::char_ ('0', '9');
+auto const number = -x3::char_ ("+-") >> (+digit >> -(x3::char_ ('.') >> *digit)
+                                          | x3::char_ ('.') >> +digit);
+auto const reference = +digit >> ws >> +digit >> ws >> x3::lit ('R');
+auto const name = x3::rule<class NameID, std::string> ("Name") = x3::lit ('/') >> *regular;
+auto const keyword = +x3::char_ ("a-zA-Z");
+
+x3::rule<class LiteralID, std::string> const literal ("Literal string");
+x3::rule<class NestedID, std::string> const nested ("Nested string");
+x3::rule<class HexID, std::string> const hex ("Hexadecimal string");
+x3::rule<class DictionaryID> const dictionary ("Dictionary");
+x3::rule<class ArrayID> const array ("Array");
+x3::rule<class ObjectID> const object ("Object");
+
+// Content of a literal string: Escape-sequences, balanced parenthesis, other characters
+auto const content = *(x3::lit ('\\') >> (x3::repeat (1, 3)[x3::char_ ('0', '7')][appendOctal]
+                                           | x3::lit ("\r\n") | x3::lit ('\r') | x3::lit ('\n')
+                                           | x3::char_[appendEscaped])
+                       | nested[append]
+                       | (~x3::char_ ("()\\"))[append]);
+auto const literal_def = x3::lit ('(') >> content >> x3::lit (')');
+auto const nested_def = x3::char_ ('(')[append] >> content >> x3::char_ (')')[append];
+auto const hex_def = x3::lit ('<') >> !x3::lit ('<') >> (*~x3::char_ ('>'))[decodeHex] >> x3::lit ('>');
+
+auto const value = literal[storeString] | hex[storeString] | x3::raw[reference][storeOther]
+   | x3::raw[number][storeOther] | x3::raw[name][storeOther] | object;
+auto const dictionary_def = x3::lit ("<<")[enter] >> ws
+   >> *(name[setKey] >> ws >> value >> ws) >> x3::lit (">>")[leave];
+auto const array_def = x3::lit ('[') >> ws >> *(object >> ws) >> x3::lit (']');
+auto const object_def = dictionary | array | x3::omit[literal] | x3::omit[hex] | reference
+   | number | x3::omit[name] | keyword;
+
+BOOST_SPIRIT_DEFINE (literal, nested, hex, dictionary, array, object)
+
 }
 
+
 //-----------------------------------------------------------------------------
-/// Method to parse a PDF object
+/// Method to parse a PDF document
 /// \param stream: Stream to parse
 /// \param result: Result where to store found data
+/// \throw YGP::ParseError: In case of an invalid document
 //-----------------------------------------------------------------------------
 void ParsePDF::parse (YGP::Xistream& stream, Properties& result) {
-   char buffer[5];
-   stream.read (buffer, sizeof (buffer));
-   if (memcmp (buffer, "%PDF-", sizeof (buffer)))
-      throw (YGP::ParseError (_("Not a PDF document!")));
-   stream.seekg (-40, std::ios::end);
+   const std::string data (SpiritParser::readStream (stream));
+   if (data.compare (0, 5, "%PDF-"))
+      throw YGP::ParseError (_("Not a PDF document!"));
 
-   ParsePDF obj;
-   obj.prop = &result;
-   obj.file = &stream;
+   // Offset of the (last) cross reference table
+   std::size_t pos (data.rfind ("startxref"));
+   if (pos == std::string::npos)
+      throw YGP::ParseError (_("Document does not contain the offset of the cross reference table"));
 
-   // Now parse first cross reference table (including trailer)
-   unsigned int rc (obj.selXRef.parse (stream));
-   while (!(rc || obj.aOffsets[obj.infoObject])) {
-      if (!obj.offPrev)
-         throw (YGP::ParseError (_("Document does not contain neither an /Info"
-				   " nor a /Prev entry")));
+   std::size_t offset (0);
+   SpiritParser::Iterator act (data.data () + pos);
+   SpiritParser::parse (act, data.data () + data.size (),
+                        x3::lit ("startxref") >> ws
+                        >> x3::ulong_[([&offset](auto& ctx) { offset = x3::_attr (ctx); })],
+                        _("offset of cross reference table"));
 
-      stream.seekg (obj.offPrev, std::ios::beg);
-      obj.offPrev = 0;
-      rc = obj.seqXRefTable.parse (stream);
+   // Parse the cross reference tables (following the /Prev entries of the
+   // trailers) until the offset of the /Info object is known
+   std::map<unsigned int, std::size_t> offsets;
+   std::set<std::size_t> parsed;
+   unsigned int info (0);
+   bool infoFound (false);
+   while (!(infoFound && (offsets.find (info) != offsets.end ()))) {
+      if (!parsed.insert (offset).second)
+         throw YGP::ParseError (_("Invalid /Prev entry"));
+
+      Dictionary trailer (parseXRefTable (data, offset, offsets));
+      if (!infoFound && (trailer.others.find ("Info") != trailer.others.end ())) {
+         info = parseReference (trailer.others["Info"]);
+         infoFound = true;
+         TRACE5 ("ParsePDF::parse (YGP::Xistream&, Properties&) - Info: " << info);
+      }
+
+      if (infoFound && (offsets.find (info) != offsets.end ()))
+         break;
+      if (trailer.others.find ("Prev") == trailer.others.end ())
+         throw YGP::ParseError (_("Document does not contain neither an /Info nor a /Prev entry"));
+      offset = std::stoul (trailer.others["Prev"]);
    }
-   if (obj.aOffsets[obj.infoObject])
-      obj.parseInfoObject ();
+
+   Dictionary values (parseObject (data, offsets[info], info));
+   static const std::pair<const char*, std::string Properties::*> entries[] =
+      { { "Title", &Properties::strTitle }, { "Author", &Properties::strAuthor },
+        { "Subject", &Properties::strComment } };
+   for (const auto& entry : entries) {
+      auto i (values.strings.find (entry.first));
+      if (i != values.strings.end ())
+         result.*(entry.second) = i->second;
+   }
 }
 
+//-----------------------------------------------------------------------------
+/// Parses a cross reference table and its trailer
+/// \param data: Contents of the document
+/// \param offset: Offset of the cross reference table
+/// \param offsets: In/Out: Offsets of the objects; already known ones are not changed
+/// \returns Dictionary: Values of the trailer
+/// \throw YGP::ParseError: In case of an invalid table
+//-----------------------------------------------------------------------------
+ParsePDF::Dictionary ParsePDF::parseXRefTable (const std::string& data, std::size_t offset,
+                                               std::map<unsigned int, std::size_t>& offsets) {
+   TRACE5 ("ParsePDF::parseXRefTable (const std::string&, std::size_t, std::map&) - " << offset);
+   if (offset >= data.size ())
+      throw YGP::ParseError (_("Invalid offset of cross reference table"));
+
+   unsigned int actObject (0);
+   std::size_t count (0);
+   std::size_t objOffset (0);
+
+   auto setStart = [&actObject](auto& ctx) { actObject = x3::_attr (ctx); };
+   auto setCount = [&count](auto& ctx) { count = x3::_attr (ctx); };
+   auto setOffset = [&objOffset](auto& ctx) { objOffset = x3::_attr (ctx); };
+   auto entry = [&](auto& ctx) {
+      if (x3::_attr (ctx) == 'n')
+         offsets.emplace (actObject, objOffset);
+      ++actObject; };
+
+   Dictionary trailer;
+   State st { 0, std::string (), trailer.strings, trailer.others };
+   auto table = x3::lit ("xref") >> ws
+      >> +(x3::uint_[setStart] >> ws >> x3::uint_[setCount] >> ws
+           >> SpiritParser::times (count)[x3::ulong_[setOffset] >> ws >> +digit >> ws
+                                          >> x3::char_ ("nf")[entry] >> ws])
+      >> x3::lit ("trailer") >> ws >> dictionary;
+
+   SpiritParser::Iterator act (data.data () + offset);
+   SpiritParser::parse (act, data.data () + data.size (), x3::with<StateTag> (std::ref (st))[table],
+                        _("cross reference table"));
+   return trailer;
+}
+
+//-----------------------------------------------------------------------------
+/// Parses an object, which must be a dictionary
+/// \param data: Contents of the document
+/// \param offset: Offset of the object
+/// \param id: Expected number of the object
+/// \returns Dictionary: Values of the object
+/// \throw YGP::ParseError: In case of an invalid object
+//-----------------------------------------------------------------------------
+ParsePDF::Dictionary ParsePDF::parseObject (const std::string& data, std::size_t offset, unsigned int id) {
+   TRACE5 ("ParsePDF::parseObject (const std::string&, std::size_t, unsigned int) - " << id
+           << " @ " << offset);
+   if (offset >= data.size ())
+      throw YGP::ParseError (_("Invalid offset of info object"));
+
+   Dictionary values;
+   State st { 0, std::string (), values.strings, values.others };
+   auto checkID = [id](auto& ctx) { x3::_pass (ctx) = (x3::_attr (ctx) == id); };
+   auto obj = x3::uint_[checkID] >> ws >> x3::uint_ >> ws >> x3::lit ("obj") >> ws >> dictionary;
+
+   SpiritParser::Iterator act (data.data () + offset);
+   SpiritParser::parse (act, data.data () + data.size (), x3::with<StateTag> (std::ref (st))[obj],
+                        _("info object"));
+   return values;
+}
+
+//-----------------------------------------------------------------------------
+/// Parses an indirect reference to an object
+/// \param reference: Reference (in the format <object> <generation> R)
+/// \returns unsigned int: Number of the referenced object
+/// \throw YGP::ParseError: In case of an invalid reference
+//-----------------------------------------------------------------------------
+unsigned int ParsePDF::parseReference (const std::string& reference) {
+   unsigned int id (0);
+   SpiritParser::parse (reference, x3::uint_[([&id](auto& ctx) { id = x3::_attr (ctx); })]
+                        >> ws >> x3::uint_ >> ws >> x3::lit ('R'), _("reference to /Info object"));
+   return id;
+}

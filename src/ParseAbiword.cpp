@@ -26,126 +26,49 @@
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <cstring>
+#include <IExtract-cfg.h>
 
-#include <iostream>
-
-#include <YGP/Check.h>
 #include <YGP/Trace.h>
 
-#include <IExtract-cfg.h>
+#include "SpiritParser.h"
 
 #include "Properties.h"
 #include "ParseAbiword.h"
 
 
-#ifdef _MSC_VER
-#pragma warning(disable:4355) // disable warning about this in initlist
-#endif
-
-
-#define ID_METASTART      "<"
-static const char* ID_METAINFO   (ID_METASTART "metadata>");
 static const char* ID_TITLE      ("m key=\"dc.title\"");
 static const char* ID_COMMENT    ("m key=\"dc.description\"");
 static const char* ID_AUTHOR     ("m key=\"dc.creator\"");
-static const char* ID_END        ("</metadata>");
-static const char* ID_ABIWORD    ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE abiword PUBLIC \"-//ABISOURCE//DTD AWML");
 
 
+//-----------------------------------------------------------------------------
+/// Parses the AbiWord document
+/// \param stream: Stream to parse
+/// \param result: Out: Found information
+/// \throw YGP::ParseError: In case of an invalid document
+//-----------------------------------------------------------------------------
+void ParseAbiword::parse (YGP::Xistream& stream, Properties& result) {
+   namespace x3 = boost::spirit::x3;
+   using SpiritParser::ws;
 
-//----------------------------------------------------------------------------
-/// Default constructor
-//----------------------------------------------------------------------------
-ParseAbiword::ParseAbiword ()
-   : prop (NULL),
-     idAbiword (ID_ABIWORD, _("ID of an AbiWord document")),
-     idMetadata (ID_METAINFO, _("Metadata information"), true, true),
-     skipIDStart (ID_METASTART, _("Start of Abiword ID"), 256, 1, false, true),
-     skipUnused (ID_METASTART, _("Unused contents"), 1024, 1, true, true),
-     skipLine ("\n\r", _("Skip to end of line"), 1024, 1, true, true),
-     tag ('<', _("Tag"), *this, &ParseAbiword::foundTag, 1024),
-     value ("<", _("Value"), *this, &ParseAbiword::foundValue, 1024, 0),
-     seqAbiWord (_seqAbiWord, _("AbiWord document")),
-     seqMetadata (_seqMetadata, _("Metadata"), 1, 1, true),
-     seqEntry (_seqEntry, _("Entries"), -1U, 1, true),
-     selDocument (_selDocument, _("AbiWord meta-info"), -1U, 1, true),
-     pEntry (NULL)
-{
-   _seqAbiWord[0] = &idAbiword;
-   _seqAbiWord[1] = &selDocument;
-   _seqAbiWord[2] = NULL;
+   std::string Properties::* entry (nullptr);
 
-   _selDocument[0] = &seqMetadata;
-   _selDocument[1] = &skipIDStart;
-   _selDocument[2] = &skipUnused;
-   _selDocument[3] = NULL;
+   auto tag = [&entry](auto& ctx) {
+      const std::string& tag (x3::_attr (ctx));
+      TRACE8 ("ParseAbiword::parse (YGP::Xistream&, Properties&) - Tag: " << tag);
+      entry = ((tag == ID_TITLE) ? &Properties::strTitle
+               : (tag == ID_COMMENT) ? &Properties::strComment
+               : (tag == ID_AUTHOR) ? &Properties::strAuthor : nullptr); };
+   auto value = [&entry, &result](auto& ctx) {
+      if (entry)
+         result.*entry = x3::_attr (ctx);
+      entry = nullptr; };
 
-   _seqMetadata[0] = &idMetadata;
-   _seqMetadata[1] = &skipLine;
-   _seqMetadata[2] = &seqEntry;
-   _seqMetadata[3] = NULL;
+   auto endMetadata = x3::lit ("</metadata>");
+   auto metaEntry = x3::lit ('<') >> (*~x3::char_ ('>'))[tag] >> x3::lit ('>') >> ws
+      >> (*~x3::char_ ('<'))[value];
+   auto metadata = x3::lit ("<metadata>") >> ws >> *(!endMetadata >> metaEntry) >> endMetadata;
+   auto document = *(x3::char_ - x3::lit ("<metadata>")) >> -metadata;
 
-   _seqEntry[0] = &tag;
-   _seqEntry[1] = &value;
-   _seqEntry[2] = NULL;
-}
-
-//----------------------------------------------------------------------------
-/// Destructor
-//----------------------------------------------------------------------------
-ParseAbiword::~ParseAbiword () {
-}
-
-
-//----------------------------------------------------------------------------
-/// Callback after finding an XML tag in the document
-/// \param pTag: Pointer to text holding the found tag
-/// \param len: Length of text
-/// \returns \c YGP::ParseObject::ParseOK
-//----------------------------------------------------------------------------
-int ParseAbiword::foundTag (const char* pTag, unsigned int len) {
-   TRACE1 ("ParseAbiword::foundTag (const char*, unsigned int) - Tag: "
-           << pTag);
-   Check1 (pTag); Check1 (len);
-
-   Check3 (!pEntry);
-
-   if (strcmp (pTag, ID_TITLE))
-      if (strcmp (pTag, ID_COMMENT))
-         if (strcmp (pTag, ID_AUTHOR)) {
-             if (!strcmp (pTag, ID_END)) {
-                seqEntry.setMaxCard (0);
-                selDocument.setMaxCard (0);
-                _seqEntry[1] = NULL;
-             }
-             pEntry = NULL;
-         }
-         else
-            pEntry = &Properties::strAuthor;
-      else
-         pEntry = &Properties::strComment;
-   else
-      pEntry = &Properties::strTitle;
-
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//----------------------------------------------------------------------------
-/// Callback after finding a value of an XML tag in the document.
-/// \param pTag: Pointer to text holding the found value
-/// \param len: Length of text
-/// \returns \c YGP::ParseObject::ParseOK
-//----------------------------------------------------------------------------
-int ParseAbiword::foundValue (const char* pValue, unsigned int len) {
-   TRACE1 ("ParseAbiword::foundValue (const char*, unsigned int) - Value: "
-           << pValue);
-   Check1 (pValue);
-   Check3 (prop);
-
-   if (pEntry) {
-      (prop->*pEntry).assign (pValue, len);
-      pEntry = NULL;
-   }
-   return YGP::ParseObject::PARSE_OK;
+   SpiritParser::parse (SpiritParser::readStream (stream), document, _("AbiWord document"));
 }

@@ -28,112 +28,61 @@
 
 #include <IExtract-cfg.h>
 
-#include <cstring>
-
-#include <YGP/Check.h>
 #include <YGP/Trace.h>
-#include <YGP/Utility.h>
+
+#include "SpiritParser.h"
 
 #include "ParsePNG.h"
 #include "Properties.h"
 
 
-#ifdef WORDS_BIGENDIAN
-
-#define TYPE_TEXT 0x74584574
-
-#else
-
-#define TYPE_TEXT 0x74455874
-
-#endif
+static const unsigned int TYPE_TEXT (0x74455874);                    // "tEXt"
 
 
 //-----------------------------------------------------------------------------
-/// Constructor
-/// \param result: Structure to store the parsed values
+/// Parses the PNG image
+/// \param stream: Stream to parse
+/// \throw YGP::ParseError: In case of an invalid image
 //-----------------------------------------------------------------------------
-ParsePNG::ParsePNG (Properties& result)
-   : idPNG ("\x89PNG\x0d\x0a\x1a\x0a", _("PNG-ID"), false)
-     , length ("\\*", _("Length (MSB first)"), *this, &ParsePNG::foundLength, 4, 4, false)
-     , type ("\\*", _("Type of entry"), *this, &ParsePNG::foundType, 4, 4, false)
-     , comment ("\\*", _("Comment"), *this, &ParsePNG::foundComment, 0, 0, false)
-     , skip (0)
-     , crc ("\\*", _("CRC"), 4, 4, false)
-     , chunk (_chunk, _("Chunk"), -1U, 2, false)
-     , pngImage (_pngImage, _("PNG image"), 1, 1, false)
-     , prop (result) {
-   TRACE9 ("ParsePNG::ParsePNG (Properties&)");
+void ParsePNG::parse (YGP::Xistream& stream) {
+   namespace x3 = boost::spirit::x3;
+   using SpiritParser::bytes;
 
-   _chunk[0] = &length;
-   _chunk[1] = &type;
-   _chunk[2] = &skip;
-   _chunk[3] = &crc;
-   _chunk[4] = NULL;
+   std::size_t length (0);
+   unsigned int type (0);
 
-   _pngImage[0] = &idPNG;
-   _pngImage[1] = &chunk;
-   _pngImage[2] = NULL;
+   auto setLength = [&length](auto& ctx) { length = x3::_attr (ctx); };
+   auto setType = [&type](auto& ctx) { type = x3::_attr (ctx); };
+   auto chunkData = [this, &type](auto& ctx) { foundChunk (type, x3::_attr (ctx)); };
+
+   // Chunk: Length (MSB first), type, data, CRC
+   auto chunk = x3::big_dword[setLength] >> x3::big_dword[setType]
+      >> bytes (length)[chunkData] >> x3::omit[x3::big_dword];
+   auto image = x3::lit ("\x89PNG\x0d\x0a\x1a\x0a") >> x3::repeat (2, x3::inf)[chunk];
+
+   SpiritParser::parse (SpiritParser::readStream (stream), image, _("PNG image"));
 }
 
 //-----------------------------------------------------------------------------
-/// Destructor
+/// Handles a chunk of the image; stores the information of known text-chunks
+/// \param type: Type of the chunk
+/// \param data: Data of the chunk; for text-chunks: <keyword>\0<value>
 //-----------------------------------------------------------------------------
-ParsePNG::~ParsePNG () {
-   TRACE9 ("ParsePNG::~ParsePNG ()");
-}
+void ParsePNG::foundChunk (unsigned int type, const std::string& data) {
+   TRACE8 ("ParsePNG::foundChunk (unsigned int, const std::string&) - " << std::hex
+           << type << std::dec << ": " << data.size () << " bytes");
+   if (type != TYPE_TEXT)
+      return;
 
+   std::string::size_type pos (data.find ('\0'));
+   if (pos == std::string::npos)
+      return;
 
-//-----------------------------------------------------------------------------
-/// Callback after the type of a chunk was read
-/// \param length: Pointer to length
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePNG::foundType (const char* type, unsigned int) {
-   Check2 (type);
-   TRACE9 ("ParsePNG::foundType (const char*, unsigned int) - " << std::hex
-	   << YGP::get4BytesMSB (type) << std::dec);
-   Check2 (_chunk[2] == &skip);
-
-   if (YGP::get4BytesMSB (type) == TYPE_TEXT) {
-      _chunk[2] = &comment;
-      comment.setMinCard (skip.getOffset ());
-      comment.setMaxCard (skip.getOffset ());
-   }
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after the length of a chunk was read
-/// \param length: Pointer to length
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePNG::foundLength (const char* length, unsigned int) {
-   Check2 (length);
-   Check3 (!(*length & 0x80));
-   TRACE8 ("ParsePNG::foundLength (const char*, unsigned int) - " << YGP::get4BytesMSB (length));
-
-   skip.setOffset (YGP::get4BytesMSB (length));
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after a comment was read
-/// \param comment: Pointer to comment in the format <keyword>\0<value>
-/// \param len: Length of data
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParsePNG::foundComment (const char* comment, unsigned int len) {
-   Check2 (comment);
-   TRACE8 ("ParsePNG::foundComment (const char*, unsigned int) - " << comment << " (" << len << ')');
-
-   _chunk[2] = &skip;
-   if (!strcmp (comment, "Title"))
-      prop.strTitle.assign (comment + 6, len - 6);
-   else if (!strcmp (comment, "Author"))
-      prop.strAuthor.assign (comment + 7, len - 7);
-   else if (!strcmp (comment, "Description"))
-      prop.strComment.assign (comment + 12, len - 12);
-
-   return YGP::ParseObject::PARSE_OK;
+   std::string key (data, 0, pos);
+   if (key == "Title")
+      prop.strTitle.assign (data, pos + 1);
+   else if (key == "Author")
+      prop.strAuthor.assign (data, pos + 1);
+   else if (key == "Description")
+      prop.strComment.assign (data, pos + 1);
 }

@@ -28,137 +28,63 @@
 
 #include <IExtract-cfg.h>
 
-#include <cstring>
-
 #include <YGP/Trace.h>
-#include <YGP/Utility.h>
+
+#include "SpiritParser.h"
 
 #include "ParseOGG.h"
 #include "Properties.h"
 
 
 //-----------------------------------------------------------------------------
-/// Constructor
-/// \param result: Properties, where the found data is stored
-//-----------------------------------------------------------------------------
-ParseOGG::ParseOGG (Properties& result)
-   : prop (result),
-     txtOGG ("OggS", _("OGG-ID"), false),
-     idCommentHeader ("\x03vorbis", _("Comment header"), false),
-     skip (0x50),
-     nrSegments ("\\*", _("Number of segments"), *this, &ParseOGG::foundNrSegments, 1, 1, false),
-     lenVendorStr ("\\*", _("Length of vendor string"), *this, &ParseOGG::foundLenVendorString, 4, 4, false),
-     nrComments ("\\*", _("Number of comments"), *this, &ParseOGG::foundNrComments, 4, 4, false),
-     lenEntry ("\\*", _("Length of comment entry"), *this, &ParseOGG::foundLenComment, 4, 4, false),
-     txtEntry ("\\*", _("Comment entry"), *this, &ParseOGG::foundComment, 0, 0, false),
-     seqComment (_seqComment, _("Comment entry"), 0, 0, false),
-     seqOGG (_seqOGG, _("OGG file")) {
-   _seqOGG[0] = &txtOGG;
-   _seqOGG[1] = &skip;
-   _seqOGG[2] = &nrSegments;
-   _seqOGG[3] = &skip;
-   _seqOGG[4] = &idCommentHeader;
-   _seqOGG[5] = &lenVendorStr;
-   _seqOGG[6] = &skip;
-   _seqOGG[7] = &nrComments;
-   _seqOGG[8] = &seqComment;
-   _seqOGG[9] = NULL;
-
-   _seqComment[0] = &lenEntry;
-   _seqComment[1] = &txtEntry;
-   _seqComment[2] = NULL;
-
-   result.strComment = result.strTitle = result.strAuthor = "";
-}
-
-//-----------------------------------------------------------------------------
-/// Destructor
-//-----------------------------------------------------------------------------
-ParseOGG::~ParseOGG () {
-}
-
-
-//-----------------------------------------------------------------------------
 /// Method to actually parse the OGG-file
 /// \param stream: OGG-file to analyze
 /// \param result: Out: Found information
+/// \throw YGP::ParseError: In case of an invalid file
 //-----------------------------------------------------------------------------
 void ParseOGG::parse (YGP::Xistream& stream, Properties& result) {
-   ParseOGG obj (result);
+   namespace x3 = boost::spirit::x3;
+   using SpiritParser::bytes;
+   using SpiritParser::skip;
 
-   obj.seqOGG.parse (stream);
+   result.strComment = result.strTitle = result.strAuthor = "";
+
+   std::size_t length (0);
+   std::size_t count (0);
+
+   auto setLength = [&length](auto& ctx) { length = x3::_attr (ctx); };
+   auto setCount = [&count](auto& ctx) { count = x3::_attr (ctx); };
+   auto comment = [&result](auto& ctx) { foundComment (x3::_attr (ctx), result); };
+
+   // Skip the first page (holding the identification header) and the start
+   // of the header of the second page, which holds the comment header
+   auto ogg = x3::lit ("OggS") >> x3::repeat (0x50)[x3::byte_]
+      >> x3::byte_[setLength] >> skip (length)                // Segment table
+      >> x3::lit ("\x03vorbis")
+      >> x3::little_dword[setLength] >> skip (length)         // Vendor string
+      >> x3::little_dword[setCount]
+      >> SpiritParser::times (count)[x3::little_dword[setLength] >> bytes (length)[comment]];
+
+   SpiritParser::parse (SpiritParser::readStream (stream), ogg, _("OGG file"));
 }
 
 //-----------------------------------------------------------------------------
-/// Callback after the number of segments has been parse
-/// \param nr: Pointer to number of segments
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+/// Stores the found comment-entry, if it is of interest
+/// \param comment: Found comment entry (in the format <key>=<value>)
+/// \param result: Out: Found information
 //-----------------------------------------------------------------------------
-int ParseOGG::foundNrSegments (const char* nr, unsigned int) {
-   Check1 (nr);
-   TRACE8 ("ParseOGG::foundNrSegments (const char*, unsigned int): " << (unsigned int)*nr);
-   skip.setOffset (*nr);
-   return YGP::ParseObject::PARSE_OK;
-}
+void ParseOGG::foundComment (const std::string& comment, Properties& result) {
+   TRACE8 ("ParseOGG::foundComment (const std::string&, Properties&) - " << comment);
 
-//-----------------------------------------------------------------------------
-/// Callback after the length-entry of vendor string has been parsed
-/// \param nr: Pointer to number of entries
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseOGG::foundLenVendorString (const char* nr, unsigned int) {
-   Check1 (nr);
-   TRACE8 ("ParseOGG::foundLenVendorString (const char*, unsigned int): " << YGP::get4BytesLSB (nr));
-   skip.setOffset (YGP::get4BytesLSB (nr));
-   return YGP::ParseObject::PARSE_OK;
-}
+   std::string::size_type pos (comment.find ('='));
+   if ((pos == std::string::npos) || (pos == (comment.size () - 1)))
+      return;
 
-//-----------------------------------------------------------------------------
-/// Callback after the number-of-comments entry has been parsed
-/// \param nr: Pointer to number of entries
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseOGG::foundNrComments (const char* nr, unsigned int) {
-   Check1 (nr);
-   unsigned int len (YGP::get4BytesLSB (nr));
-   TRACE8 ("ParseOGG::foundNrComments (const char*, unsigned int): " << len);
-   seqComment.setMaxCard (len);
-   seqComment.setMinCard (len);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after a lenght-of-comment entry has been parsed
-/// \param nr: Pointer to number of entries
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseOGG::foundLenComment (const char* nr, unsigned int) {
-   Check1 (nr);
-   unsigned int len (YGP::get4BytesLSB (nr));
-   TRACE8 ("ParseOGG::foundLenComment (const char*, unsigned int): " << len);
-   txtEntry.setMaxCard (len);
-   txtEntry.setMinCard (len);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after a comment-entry has been found
-/// \param comment: Found comment entry
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseOGG::foundComment (const char* comment, unsigned int len) {
-   TRACE9 ("ParseOGG::foundComment (const char*, unsigned int) - " << comment);
-   Check1 (comment); Check1 (len);
-
-   if (len > 6) {
-      if (!(strncmp (comment, "TITLE=", 6) && strncmp (comment, "title=", 6)))
-	 prop.strTitle.append (comment + 6, len - 6);
-      else if (!(strncmp (comment, "ALBUM=", 6) && strncmp (comment, "album=", 6)))
-	 prop.strComment.append (comment + 6, len - 6);
-      else if (!(strncmp (comment, "ARTIST=", 7) && strncmp (comment, "artist=", 7)))
-	 prop.strAuthor.append (comment + 7, len - 7);
-   }
-   txtEntry.setMaxCard (0);
-   txtEntry.setMinCard (0);
-   return YGP::ParseObject::PARSE_OK;
+   std::string key (comment, 0, pos);
+   if ((key == "TITLE") || (key == "title"))
+      result.strTitle.append (comment, pos + 1);
+   else if ((key == "ALBUM") || (key == "album"))
+      result.strComment.append (comment, pos + 1);
+   else if ((key == "ARTIST") || (key == "artist"))
+      result.strAuthor.append (comment, pos + 1);
 }

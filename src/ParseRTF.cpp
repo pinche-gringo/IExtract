@@ -28,139 +28,79 @@
 
 #include <IExtract-cfg.h>
 
-#include <YGP/Check.h>
+#include <YGP/Trace.h>
+
+#include "SpiritParser.h"
 
 #include "ParseRTF.h"
 #include "Properties.h"
 
-static const unsigned LEN_VALUE         = 256;
-static const unsigned LEN_COMMAND       = 64;
 
+namespace {
 
-#ifdef _MSC_VER
-#pragma warning(disable:4355) // disable warning about this in initlist
-#endif
+namespace x3 = boost::spirit::x3;
+using SpiritParser::ws;
 
+/// State while parsing a document
+struct State {
+   Properties& prop;
+   std::string Properties::* entry;            ///< Entry to store the next value
+   bool        done;                           ///< Info block completely parsed
+};
+struct StateTag;
 
-//-----------------------------------------------------------------------------
-/// (Default-)Constructor
-//-----------------------------------------------------------------------------
-ParseRTF::ParseRTF ()
-   : idRTFDoc ("{\\rtf1", _("ID of RTF document")),
-     startBlock ("{", _("Start of block")),
-     endBlock ("}", _("End of block")),
-     info ("\\info", _("Info block")),
-     endInfoBlock ("}", _("End of info block"), *this, &ParseRTF::finish),
-     startCmd ("\\", _("Start of command")),
-     otherCmd (" \t\n\r\\{}", _("Command"), LEN_COMMAND),
-     noSpecialChar ("\\!\\\\{}", _("No special char")),
-     author ("\\author", _("Author-entry"), *this, &ParseRTF::foundAuthor),
-     title ("\\title", _("Title-entry"), *this, &ParseRTF::foundTitle),
-     description ("\\doccomm", _("Description-entry"), *this, &ParseRTF::foundComment),
-     value ("}>", _("Value of entry"), *this, &ParseRTF::foundValue, LEN_VALUE, 0),
-     seqInfo (_seqInfo, _("Information block")),
-     seqInfoValue (_seqInfoValue, _("Information block value"), -1U),
-     seqOtherCmd (_seqOtherCmd, _("Other command")),
-     seqValue (_seqValue, _("Value of command"), 1, 0),
-     selEntry (_selEntry, _("Entry")),
-     selCmd (_selCmd, _("Valid RTF command"), -1U),
-     block (_block, _("RTF block"), -1U),
-     docRTF (_docRTF, _("RTF document")),
-     prop (NULL), actEntry (NONE) {
+State& state (const auto& ctx) { return x3::get<StateTag> (ctx).get (); }
 
-   _seqInfo[0] = &info;
-   _seqInfo[1] = &seqInfoValue;
-   _seqInfo[2] = &endInfoBlock;
-   _seqInfo[3] = NULL;
+// Actions
+auto notDone = [](auto& ctx) { x3::_pass (ctx) = !state (ctx).done; };
+auto isDone = [](auto& ctx) { x3::_pass (ctx) = state (ctx).done; };
+auto finish = [](auto& ctx) { state (ctx).done = true; };
+auto title = [](auto& ctx) { state (ctx).entry = &Properties::strTitle; };
+auto author = [](auto& ctx) { state (ctx).entry = &Properties::strAuthor; };
+auto comment = [](auto& ctx) { state (ctx).entry = &Properties::strComment; };
+auto value = [](auto& ctx) {
+   State& st (state (ctx));
+   TRACE8 ("ParseRTF::parse (YGP::Xistream&, Properties&) - Value: " << x3::_attr (ctx));
+   if (st.entry)
+      st.prop.*(st.entry) = x3::_attr (ctx);
+   st.entry = nullptr; };
 
-   _seqInfoValue[0] = &startBlock;
-   _seqInfoValue[1] = &selEntry;
-   _seqInfoValue[2] = &value;
-   _seqInfoValue[3] = &endBlock;
-   _seqInfoValue[4] = NULL;
+// Value of a command (escaped characters are taken literally)
+auto const text = x3::rule<class TextID, std::string> ("Value of entry")
+   = *(x3::lit ('\\') >> x3::char_ | ~x3::char_ ("}>")) >> ws;
+// Text following a command (its first character is ignored)
+auto const cmdValue = ~x3::char_ ("\\{}") >> ws >> text;
+auto const otherCmd = x3::rule<class CommandID> ("Command")
+   = x3::lit ('\\') >> +~x3::char_ (" \t\n\r\\{}") >> ws >> -cmdValue;
 
-   _seqOtherCmd[0] = &startCmd;
-   _seqOtherCmd[1] = &otherCmd;
-   _seqOtherCmd[2] = &seqValue;
-   _seqOtherCmd[3] = NULL;
+auto const entry = x3::lit ('{') >> ws
+   >> (x3::lit ("\\author")[author] | x3::lit ("\\title")[title]
+       | x3::lit ("\\doccomm")[comment] | otherCmd) >> ws
+   >> text[value] >> x3::lit ('}') >> ws;
+auto const info = x3::lit ("\\info") >> ws >> +entry >> x3::lit ('}')[finish] >> ws;
 
-   _seqValue[0] = &noSpecialChar;
-   _seqValue[1] = &value;
-   _seqValue[2] = NULL;
+x3::rule<class CommandsID> const commands ("RTF commands");
+x3::rule<class BlockID> const block ("RTF block");
 
-   _selEntry[0] = &author;
-   _selEntry[1] = &title;
-   _selEntry[2] = &description;
-   _selEntry[3] = &seqOtherCmd;
-   _selEntry[4] = NULL;
+auto const commands_def = *(x3::eps[notDone] >> (info | block | otherCmd | (+~x3::char_ ("\\{}") >> ws)));
+auto const block_def = x3::lit ('{') >> ws >> commands
+   >> (x3::eps[isDone] | x3::lit ('}') >> ws >> -(x3::eps[notDone] >> cmdValue));
 
-   _selCmd[0] = &seqInfo;
-   _selCmd[1] = &block;
-   _selCmd[2] = &seqOtherCmd;
-   _selCmd[3] = NULL;
+BOOST_SPIRIT_DEFINE (commands, block)
 
-   _block[0] = &startBlock;
-   _block[1] = &selCmd;
-   _block[2] = &endBlock;
-   _block[3] = &seqValue;
-   _block[4] = NULL;
+auto const document = ws >> x3::lit ("{\\rtf1") >> ws >> commands;
 
-   _docRTF[0] = &idRTFDoc;
-   _docRTF[1] = &selCmd;
-   _docRTF[2] = NULL;
 }
 
 
 //-----------------------------------------------------------------------------
-/// Callback after a title was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
+/// Parses the RTF document
+/// \param stream: Stream to parse
+/// \param result: Out: Found information
+/// \throw YGP::ParseError: In case of an invalid document
 //-----------------------------------------------------------------------------
-int ParseRTF::foundValue (const char* pValue, unsigned int len) {
-   if (actEntry != NONE) {
-      static std::string Properties::* values[] =
-         { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
-
-      Check3 (prop);
-      (prop->*(values[actEntry])).assign (pValue, len);
-   }
-   actEntry = NONE;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after a title tag was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseRTF::foundTitle (const char*, unsigned int) {
-   actEntry = TITLE;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after an author-tag was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseRTF::foundAuthor (const char*, unsigned int) {
-   actEntry = AUTHOR;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after a comment tag was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseRTF::foundComment (const char*, unsigned int) {
-   actEntry = COMMENT;
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//-----------------------------------------------------------------------------
-/// Callback after a title tag was read
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseRTF::finish (const char*, unsigned int) {
-   block.setMaxCard (1);
-   _block[2] = NULL;
-   selCmd.setMaxCard (1);
-   return YGP::ParseObject::PARSE_OK;
+void ParseRTF::parse (YGP::Xistream& stream, Properties& result) {
+   State st { result, nullptr, false };
+   SpiritParser::parse (SpiritParser::readStream (stream),
+                        x3::with<StateTag> (std::ref (st))[document], _("RTF document"));
 }

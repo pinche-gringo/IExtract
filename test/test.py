@@ -24,7 +24,7 @@ class TestExtract(unittest.TestCase):
     def test(self):
         output = self.run_extract("test")[0].strip().splitlines()
 
-        expected = ("abiword.abw - Title Author Description", "releasenotes.pdf -      ",
+        expected = ("abiword.abw - Title Author Description", "releasenotes.pdf -   OpenJade Project  ",
                     "Excel2007.xlsx - Titel Markus Schwab Kommentar",
                     "artsaudiomanager.png - Made with Sodipodi Unknown abcdefghijklmnopqr",
                     "PowerPoint.pptx - Titel Markus Schwab Kommentar",

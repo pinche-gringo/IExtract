@@ -28,91 +28,58 @@
 
 #include <IExtract-cfg.h>
 
-#include <YGP/Check.h>
 #include <YGP/Trace.h>
-#include <YGP/Utility.h>
+
+#include "SpiritParser.h"
 
 #include "Properties.h"
 #include "ParseSOffice.h"
 
 
-#ifdef _MSC_VER
-#pragma warning(disable:4355) // disable warning about this in initlist
-#endif
-
-
-// Tag for StarOffice document
-static const char* ID ("\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1");
-static const char* IDSTAROFFICE ("\x0F\0SfxDocumentInfo");
+static const char ID[] = "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1";
+static const char IDSTAROFFICE[] = "\x0F\0SfxDocumentInfo";
+static const std::size_t POS_DOCINFO (0x8c0);
 
 
 //-----------------------------------------------------------------------------
-/// (Default-)Constructor
+/// Parses the StarOffice document
+/// \param stream: Stream to parse
+/// \param result: Out: Found information
+/// \throw YGP::ParseError: In case of an invalid document
 //-----------------------------------------------------------------------------
-ParseStarOffice::ParseStarOffice ()
-   : idOffice (ID, _("ID of office document"), false),
-     idDocInfo (IDSTAROFFICE, _("ID of StarOffice document"), 17, 17, false),
-     skip (0x8c0, std::ios::beg),
-     skip2 (7),
-     length ("\\*", _("Length of data-entry"), *this, &ParseStarOffice::foundLength, 2, 2, false),
-     value ("\\*", _("Property-entry"), *this, &ParseStarOffice::foundValue, 1, 0, false),
-     seqDocument (_seqDocument, _("StarOffice document"), 1, 1),
-     seqEntries (_seqEntries, _("Entries of properties"), 4, 4, false),
-     prop (NULL), actEntry (NONE) {
+void ParseStarOffice::parse (YGP::Xistream& stream, Properties& result) {
+   namespace x3 = boost::spirit::x3;
+   using SpiritParser::bytes;
+   using SpiritParser::skip;
 
-   _seqDocument[0] = &idOffice;
-   _seqDocument[1] = &skip;
-   _seqDocument[2] = &idDocInfo;
-   _seqDocument[3] = &seqEntries;
-   _seqDocument[4] = NULL;
-
-   _seqEntries[0] = &skip2;
-   _seqEntries[1] = &length;
-   _seqEntries[2] = &value;
-   _seqEntries[3] = NULL;
-}
-
-
-//-----------------------------------------------------------------------------
-/// Callback after a value was read
-/// \param pLength: Pointer to value
-/// \param len: Length of data
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseStarOffice::foundValue (const char* pTitle, unsigned int len) {
-   TRACE1 ("ParseStarOffice::foundValue (const char*, unsigned int) - "
-           << len << " byte = " << pTitle);
-
-   Check3 (actEntry != NONE);
-
-   static struct {
+   // Entries of the document info; each followed by the offset of the next
+   static const struct {
       std::string Properties::* value;
-      unsigned int offset;
-   } entries[] = { { &Properties::strAuthor, 39 },
+      std::size_t offset;
+   } entries[] = { { &Properties::strAuthor, 39 },                  // Creator
                    { &Properties::strAuthor, 80 },
                    { &Properties::strTitle,  128 },
                    { &Properties::strComment,  0 } };
-   Check3 (actEntry <= (sizeof (entries) / sizeof (entries[0])));
+   const std::size_t cEntries (sizeof (entries) / sizeof (entries[0]));
 
-   if (len) {
-      Check3 (prop);
-      (prop->*(entries[actEntry].value)).assign (pTitle, len);
-   }
+   const std::size_t posDocInfo (POS_DOCINFO - (sizeof (ID) - 1));
+   std::size_t offset (7);
+   std::size_t length (0);
+   std::size_t actEntry (0);
 
-   skip2.setOffset (entries[actEntry].offset - len);
-   return YGP::ParseObject::PARSE_OK;
-}
+   auto setLength = [&length](auto& ctx) { length = x3::_attr (ctx); };
+   auto value = [&](auto& ctx) {
+      const std::string& val (x3::_attr (ctx));
+      TRACE5 ("ParseStarOffice::parse (YGP::Xistream&, Properties&) - " << actEntry << ": " << val);
+      if (val.size ())
+         result.*(entries[actEntry].value) = val;
+      offset = entries[actEntry].offset - val.size ();
+      ++actEntry; };
 
-//-----------------------------------------------------------------------------
-/// Callback after the length of the next value was read
-/// \param pLength: Pointer to length
-/// \returns \c int: Status: YGP::ParseObject::PARSE_OK
-//-----------------------------------------------------------------------------
-int ParseStarOffice::foundLength (const char* pLength, unsigned int) {
-   TRACE5 ("ParseStarOffice::foundLength (const char*, unsigned int) - "
-           << YGP::get2BytesLSB (pLength));
-   Check3 (pLength);
-   actEntry = (enum types)((int)actEntry + 1);
-   value.setMaxCard (YGP::get2BytesLSB (pLength));
-   return YGP::ParseObject::PARSE_OK;
+   auto document = x3::lit (ID) >> skip (posDocInfo)
+      >> x3::lit (std::string (IDSTAROFFICE, sizeof (IDSTAROFFICE) - 1))
+      >> SpiritParser::times (cEntries)[skip (offset) >> x3::little_word[setLength]
+                                        >> bytes (length)[value]];
+
+   SpiritParser::parse (SpiritParser::readStream (stream), document, _("StarOffice document"));
 }

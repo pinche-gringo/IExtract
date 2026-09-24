@@ -937,8 +937,6 @@ void* Application::processThread (void* pThread) {
       }
    } // end-while
 
-   YGP::ParseObject::freeBuffer ();
-
    LOCKTHREADS
    Check3 (find (aThreads.begin (), aThreads.end (), pThread) != aThreads.end ());
    aThreads.erase (find (aThreads.begin (), aThreads.end (), pThread));

@@ -1,4 +1,4 @@
-#ifndef PARSSOFFICE_H
+#ifndef PARSESOFFICE_H
 #define PARSESOFFICE_H
 
 //$Id$
@@ -18,9 +18,10 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
+
 #include <string>
 
-#include <YGP/Parse.h>
+#include <YGP/XStream.h>
 
 struct Properties;
 
@@ -28,40 +29,14 @@ struct Properties;
 // Class to extract the properties of a StarOffice document
 class ParseStarOffice  {
  public:
-   ParseStarOffice ();
+   ParseStarOffice () { }
    ~ParseStarOffice () { }
 
-   void parse (YGP::Xistream& stream, Properties& result) {
-      prop = &result;
-      seqDocument.parse (stream); }
+   void parse (YGP::Xistream& stream, Properties& result);
 
  private:
    ParseStarOffice (const ParseStarOffice&);
    ParseStarOffice& operator= (const ParseStarOffice&);
-
-   // Callback-methods for type of parsed elementes
-   int foundLength (const char*, unsigned int);
-   int foundValue (const char*, unsigned int);
-   int foundProps (const char*, unsigned int);
-
-   typedef YGP::OFParseAttomic<ParseStarOffice>  OMParseAttomic;
-   typedef YGP::OFParseSequence<ParseStarOffice> OMParseSequence;
-
-   YGP::ParseExact idOffice;
-   YGP::ParseExact idDocInfo;
-   YGP::ParseSkip  skip;
-   YGP::ParseSkip  skip2;
-   OMParseAttomic  length;
-   OMParseAttomic  value;
-
-   YGP::ParseSequence seqDocument;                            // Startsequence
-   YGP::ParseSequence seqEntries;
-
-   YGP::ParseObject* _seqDocument[5];
-   YGP::ParseObject* _seqEntries[4];
-
-   Properties*  prop;
-   enum types { NONE = -1, CREATOR = 0, AUTHOR, TITLE, COMMENT } actEntry;
 };
 
 #endif

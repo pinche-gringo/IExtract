@@ -21,9 +21,7 @@
 
 #include <string>
 
-#include <YGP/Parse.h>
-
-#include "Selection.h"
+#include <YGP/XStream.h>
 
 struct Properties;
 
@@ -31,63 +29,14 @@ struct Properties;
 // Class to extract the title of a RTF-document
 class ParseRTF  {
  public:
-   ParseRTF ();
+   ParseRTF () { }
    ~ParseRTF () { }
 
-   void parse (YGP::Xistream& stream, Properties& result) {
-      prop = &result;
-      block.skipWS (stream);
-      docRTF.parse (stream); }
+   void parse (YGP::Xistream& stream, Properties& result);
 
  private:
    ParseRTF (const ParseRTF&);
    ParseRTF& operator= (const ParseRTF&);
-
-   // Callback-methods for type of parsed elementes
-   int foundTitle (const char*, unsigned int);
-   int foundAuthor (const char*, unsigned int);
-   int foundComment (const char*, unsigned int);
-   int foundValue (const char*, unsigned int);
-   int finish (const char*, unsigned int);
-
-   typedef YGP::OFParseTextEsc<ParseRTF> OMParseTextEsc;
-   typedef YGP::OFParseExact<ParseRTF> OMParseExact;
-
-   YGP::ParseExact   idRTFDoc;
-   YGP::ParseExact   startBlock;
-   YGP::ParseExact   endBlock;
-   YGP::ParseExact   info;
-   OMParseExact      endInfoBlock;
-   YGP::ParseExact   startCmd;
-   YGP::ParseText    otherCmd;
-   YGP::ParseAttomic noSpecialChar;
-
-   // Supported content
-   OMParseExact   author;
-   OMParseExact   title;
-   OMParseExact   description;
-   OMParseTextEsc value;
-
-   YGP::ParseSequence  seqInfo;
-   YGP::ParseSequence  seqInfoValue;
-   YGP::ParseSequence  seqOtherCmd;
-   YGP::ParseSequence  seqValue;
-   Selection           selEntry;
-   Selection           selCmd;
-   YGP::ParseSequence  block;
-   YGP::ParseSequence  docRTF;
-
-   YGP::ParseObject* _seqInfo[4];
-   YGP::ParseObject* _seqInfoValue[5];
-   YGP::ParseObject* _seqOtherCmd[4];
-   YGP::ParseObject* _seqValue[3];
-   YGP::ParseObject* _selEntry[5];
-   YGP::ParseObject* _selCmd[4];
-   YGP::ParseObject* _block[5];
-   YGP::ParseObject* _docRTF[3];
-
-   Properties*  prop;
-   enum { NONE = -1, TITLE = 0, AUTHOR, COMMENT } actEntry;
 };
 
 #endif

@@ -21,53 +21,24 @@
 
 #include <string>
 
-#include <YGP/Parse.h>
 #include <YGP/XStream.h>
 
 struct Properties;
 
 
-// Extracts the information out of OGG files
-//  - The title is returned in strTitle
-//  - The artist is returned in strAuthor
-//  - The album is returned in strComment
+/**Class to extract the comments (title, artist, album) of OGG/Vorbis files
+ */
 class ParseOGG {
  public:
    static void parse (YGP::Xistream& stream, Properties& result);
 
  private:
-   ParseOGG (Properties& result);
-   ~ParseOGG ();
-
    // Prohibited manager functions
    ParseOGG ();
    ParseOGG (const ParseOGG& other);
    const ParseOGG& operator= (const ParseOGG& other);
 
-   int foundNrSegments (const char* nr, unsigned int);
-   int foundLenVendorString (const char* nr, unsigned int);
-   int foundNrComments (const char* nr, unsigned int);
-   int foundComment (const char* comment, unsigned int len);
-   int foundLenComment (const char* nr, unsigned int);
-
-   Properties& prop;
-
-   typedef YGP::OFParseAttomic<ParseOGG>  OMParseAttomic;
-
-   YGP::ParseExact     txtOGG;
-   YGP::ParseExact     idCommentHeader;
-   YGP::ParseSkip      skip;
-   OMParseAttomic      nrSegments;
-   OMParseAttomic      lenVendorStr;
-   OMParseAttomic      nrComments;
-   OMParseAttomic      lenEntry;
-   OMParseAttomic      txtEntry;
-
-   YGP::ParseSequence  seqComment;
-   YGP::ParseSequence  seqOGG;
-
-   YGP::ParseObject*   _seqComment[3];
-   YGP::ParseObject*   _seqOGG[10];
+   static void foundComment (const std::string& comment, Properties& result);
 };
 
 #endif

@@ -26,253 +26,127 @@
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <cstring>
+#include <IExtract-cfg.h>
 
-#include <iostream>
-
-#include <YGP/Check.h>
 #include <YGP/Trace.h>
 
-#include <IExtract-cfg.h>
-#include <YGP/Utility.h>
+#include "SpiritParser.h"
 
 #include "Properties.h"
 #include "ParseOOffice.h"
 
 
-#ifdef _MSC_VER
-#pragma warning(disable:4355) // disable warning about this in initlist
-#endif
-
-
-// IDs of OpenOffice's meta-info
-static const char* ID_METAINFO ("meta.xml<?xml version=\"");
+static const char* ID_METAINFO ("meta.xml");
 static const char* ID_TITLE    ("dc:title");
 static const char* ID_COMMENT  ("dc:description");
 static const char* ID_AUTHOR   ("dc:creator");
-static const char* ID_END      ("/office:document-meta");
-
-// IDs of ZIP fiele
 static const char* ID_LOCALHDR ("PK\03\04");
 static const char* ID_ENDCDR   ("PK\05\06");
 static const char* ID_CFILEHDR ("PK\01\02");
 
+static const std::size_t LEN_ENDCDR (22);    // Length of end of central dir record
 
-//----------------------------------------------------------------------------
-/// Default constructor
-//----------------------------------------------------------------------------
-ParseOpenOffice::ParseOpenOffice ()
-   : prop (NULL),
-     idZipEntry (ID_LOCALHDR, _("ID of local header"), false),
-     skip (-22, std::ios::end),
-     idCDR (ID_ENDCDR, _("ID of end of central directory record"), false),
-     skip2 (6),
-     nrCDREntries ("\\*", _("Entries in the central directory record"), *this,
-		   &ParseOpenOffice::foundNrEntries, 2, 2, false),
-     offCDR ("\\*", _("Offset of central directory record"), *this,
-	     &ParseOpenOffice::foundOffsetCDR, 4, 4, false),
-     idCFileHdr (ID_CFILEHDR, _("ID of central file header"), false),
-     lenName ("\\*", _("Length of file-name"), *this, &ParseOpenOffice::foundLenName, 2, 2, false),
-     len ("\\*", _("Length"), *this, &ParseOpenOffice::foundLength, 2, 2, false),
-     name ("\\*", _("Filename"), *this, &ParseOpenOffice::foundName, 1, 1, false),
-     posFile ("\\*", _("Offset of meta-info"), *this,
-	     &ParseOpenOffice::foundOffsetFile, 4, 4, false),
-     posMetaInfo (0, std::ios::beg),
 
-     idMetadata (ID_METAINFO, _("Metadata information"), true, true),
-     skipLine ("\n\r", _("Skip to end of line"), 1024, 1, true, true),
-     tag ('<', _("Tag"), *this, &ParseOpenOffice::foundTag, 1024),
-     value ("<", _("Value"), *this, &ParseOpenOffice::foundValue, 1024, 0),
+//-----------------------------------------------------------------------------
+/// Parses the OpenOffice document (a ZIP archive) for its meta-information
+/// \param stream: Stream to parse
+/// \param result: Out: Found information
+/// \throw YGP::ParseError: In case of an invalid document
+//-----------------------------------------------------------------------------
+void ParseOpenOffice::parse (YGP::Xistream& stream, Properties& result) {
+   namespace x3 = boost::spirit::x3;
+   using SpiritParser::bytes;
+   using SpiritParser::skip;
 
-     seqCDREntries (_seqCDREntries, _("Central directory record entries"), 1, 1, false),
-     seqMetadata (_seqMetadata, _("Metadata"), 1, 1, true),
-     seqEntry (_seqEntry, _("Entries"), -1U, 1, true  ),
-     seqDocument (_seqDocument, _("OpenOffice document"), 1, 1, true),
-     pEntry (NULL)
-{
-   _seqDocument[0] = &idZipEntry;
-   _seqDocument[1] = &skip;
-   _seqDocument[2] = &idCDR;
-   _seqDocument[3] = &skip2;
-   _seqDocument[4] = &nrCDREntries;
-   _seqDocument[5] = &skip2;
-   _seqDocument[6] = &offCDR;
-   _seqDocument[7] = &skip;
-   _seqDocument[8] = &seqCDREntries;
-   _seqDocument[9] = &posMetaInfo;
-   _seqDocument[10] = &idZipEntry;
-   _seqDocument[11] = &skip;
-   _seqDocument[12] = &seqMetadata;
-   _seqDocument[13] = NULL;
+   const std::string data (SpiritParser::readStream (stream));
+   const char* const end (data.data () + data.size ());
+   const char* act (data.data ());
 
-   _seqCDREntries[0] = &idCFileHdr;
-   _seqCDREntries[1] = &skip2;
-   _seqCDREntries[2] = &lenName;
-   _seqCDREntries[3] = &len;
-   _seqCDREntries[4] = &len;
-   _seqCDREntries[5] = &skip;
-   _seqCDREntries[6] = &posFile;
-   _seqCDREntries[7] = &name;
-   _seqCDREntries[8] = NULL;
+   SpiritParser::parse (act, end, x3::lit (ID_LOCALHDR), _("ZIP archive"));
+   if (data.size () < LEN_ENDCDR)
+      throw YGP::ParseError (_("Invalid end of central directory record"));
 
-   _seqMetadata[0] = &idMetadata;
-   _seqMetadata[1] = &skipLine;
-   _seqMetadata[2] = &seqEntry;
-   _seqMetadata[3] = NULL;
+   // End of central directory record: Number of entries and offset of the directory
+   std::size_t cEntries (0);
+   std::size_t offset (0);
+   auto setEntries = [&cEntries](auto& ctx) { cEntries = x3::_attr (ctx); };
+   auto setOffset = [&offset](auto& ctx) { offset = x3::_attr (ctx); };
 
-   _seqEntry[0] = &tag;
-   _seqEntry[1] = &value;
-   _seqEntry[2] = NULL;
+   act = end - LEN_ENDCDR;
+   SpiritParser::parse (act, end, x3::lit (ID_ENDCDR) >> x3::repeat (6)[x3::byte_]
+                        >> x3::little_word[setEntries] >> x3::repeat (4)[x3::byte_]
+                        >> x3::little_dword[setOffset],
+                        _("end of central directory record"));
+
+   // Central directory: Search the entry for the meta-information
+   std::size_t method (0), size (0), lenName (0), lenExtra (0), lenComment (0);
+   std::size_t posEntry (0);
+   bool found (false);
+   auto set = [](std::size_t& value) { return [&value](auto& ctx) { value = x3::_attr (ctx); }; };
+   auto entry = x3::lit (ID_CFILEHDR) >> x3::repeat (6)[x3::byte_]
+      >> x3::little_word[([&](auto& ctx) { if (!found) method = x3::_attr (ctx); })]
+      >> x3::repeat (8)[x3::byte_]
+      >> x3::little_dword[([&](auto& ctx) { if (!found) size = x3::_attr (ctx); })]
+      >> x3::repeat (4)[x3::byte_]
+      >> x3::little_word[set (lenName)] >> x3::little_word[set (lenExtra)]
+      >> x3::little_word[set (lenComment)] >> x3::repeat (8)[x3::byte_]
+      >> x3::little_dword[([&](auto& ctx) { if (!found) posEntry = x3::_attr (ctx); })]
+      >> bytes (lenName)[([&](auto& ctx) {
+            if (x3::_attr (ctx) == ID_METAINFO)
+               found = true; })]
+      >> skip (lenExtra) >> skip (lenComment);
+
+   if (offset >= data.size ())
+      throw YGP::ParseError (_("Invalid offset of central directory"));
+   act = data.data () + offset;
+   SpiritParser::parse (act, end, SpiritParser::times (cEntries)[entry], _("central directory"));
+   if (!found)
+      throw YGP::ParseError (_("Document does not contain meta-information"));
+   if (method)
+      throw YGP::ParseError (_("Compressed meta-information is not supported"));
+   TRACE5 ("ParseOpenOffice::parse (YGP::Xistream&, Properties&) - Meta-info at " << posEntry
+           << "; " << size << " bytes");
+
+   // Local header of the meta-information, followed by its data
+   if (posEntry >= data.size ())
+      throw YGP::ParseError (_("Invalid offset of meta-information"));
+   std::string metaInfo;
+   act = data.data () + posEntry;
+   SpiritParser::parse (act, end, x3::lit (ID_LOCALHDR) >> x3::repeat (22)[x3::byte_]
+                        >> x3::little_word[set (lenName)] >> x3::little_word[set (lenExtra)]
+                        >> skip (lenName) >> skip (lenExtra)
+                        >> bytes (size)[([&metaInfo](auto& ctx) { metaInfo = x3::_attr (ctx); })],
+                        _("meta-information"));
+   parseMetaInfo (metaInfo, result);
 }
 
-//----------------------------------------------------------------------------
-/// Destructor
-//----------------------------------------------------------------------------
-ParseOpenOffice::~ParseOpenOffice () {
-}
+//-----------------------------------------------------------------------------
+/// Parses the meta-information (an XML-file) of the document
+/// \param metaInfo: Contents of the meta-information
+/// \param result: Out: Found information
+/// \throw YGP::ParseError: In case of invalid meta-information
+//-----------------------------------------------------------------------------
+void ParseOpenOffice::parseMetaInfo (const std::string& metaInfo, Properties& result) {
+   namespace x3 = boost::spirit::x3;
+   using SpiritParser::ws;
 
+   std::string Properties::* entry (nullptr);
 
-//----------------------------------------------------------------------------
-/// Callback after finding an XML tag in the document
-/// \param pTag: Pointer to text holding the found tag
-/// \param len: Length of text
-/// \returns \c YGP::ParseObject::ParseOK
-//----------------------------------------------------------------------------
-int ParseOpenOffice::foundTag (const char* pTag, unsigned int len) {
-   TRACE1 ("ParseOpenOffice::foundTag (const char*, unsigned int) - Tag: "
-           << pTag);
-   Check1 (pTag); Check1 (len);
+   auto tag = [&entry](auto& ctx) {
+      const std::string& tag (x3::_attr (ctx));
+      TRACE8 ("ParseOpenOffice::parseMetaInfo (const std::string&, Properties&) - Tag: " << tag);
+      entry = ((tag == ID_TITLE) ? &Properties::strTitle
+               : (tag == ID_COMMENT) ? &Properties::strComment
+               : (tag == ID_AUTHOR) ? &Properties::strAuthor : nullptr); };
+   auto value = [&entry, &result](auto& ctx) {
+      if (entry)
+         result.*entry = x3::_attr (ctx);
+      entry = nullptr; };
 
-   Check3 (!pEntry);
+   auto declaration = x3::lit ("<?xml") >> *(x3::char_ - x3::lit ("?>")) >> x3::lit ("?>") >> ws;
+   auto element = x3::lit ('<') >> (*~x3::char_ ('>'))[tag] >> x3::lit ('>') >> ws
+      >> (*~x3::char_ ('<'))[value];
+   auto document = ws >> declaration >> *element;
 
-   if (strcmp (pTag, ID_TITLE))
-      if (strcmp (pTag, ID_COMMENT))
-         if (strcmp (pTag, ID_AUTHOR)) {
-             if (!strcmp (pTag, ID_END)) {
-                seqEntry.setMaxCard (0);
-                seqDocument.setMaxCard (0);
-                _seqEntry[1] = NULL;
-             }
-             pEntry = NULL;
-         }
-         else
-            pEntry = &Properties::strAuthor;
-      else
-         pEntry = &Properties::strComment;
-   else
-      pEntry = &Properties::strTitle;
-
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//----------------------------------------------------------------------------
-/// Callback after finding a value of an XML tag in the document.
-/// \param pTag: Pointer to text holding the found value
-/// \param len: Length of text
-/// \returns \c YGP::ParseObject::ParseOK
-//----------------------------------------------------------------------------
-int ParseOpenOffice::foundValue (const char* pValue, unsigned int len) {
-   TRACE1 ("ParseOpenOffice::foundValue (const char*, unsigned int) - Value: "
-           << pValue);
-   Check1 (pValue);
-   Check3 (prop);
-
-   if (pEntry) {
-      (prop->*pEntry).assign (pValue, len);
-      pEntry = NULL;
-   }
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//----------------------------------------------------------------------------
-/// Callback after finding the offset of the CDR
-/// \param pTag: Pointer to text holding the found value
-/// \param len: Length of text
-/// \returns \c YGP::ParseObject::ParseOK
-//----------------------------------------------------------------------------
-int ParseOpenOffice::foundOffsetCDR (const char* pValue, unsigned int len) {
-   Check1 (pValue);
-   TRACE5 ("ParseOpenOffice::foundOffsetCBR (const char*, unsigned int) - Value: "
-           << std::hex << YGP::get4BytesLSB (pValue) << std::dec);
-
-   skip.setOffset (YGP::get4BytesLSB (pValue));
-   skip.setWay (std::ios::beg);
-   skip2.setOffset (24);
-   skip2.setWay (std::ios::cur);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//----------------------------------------------------------------------------
-/// Callback after finding the number of entries in the CDR
-/// \param pTag: Pointer to text holding the found value
-/// \param len: Length of text
-/// \returns \c YGP::ParseObject::ParseOK
-//----------------------------------------------------------------------------
-int ParseOpenOffice::foundNrEntries (const char* pValue, unsigned int len) {
-   Check1 (pValue);
-   TRACE5 ("ParseOpenOffice::foundNrEntries (const char*, unsigned int) - Value: " << YGP::get2BytesLSB (pValue));
-   seqCDREntries.setMaxCard (YGP::get2BytesLSB (pValue));
-   skip2.setOffset (4);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//----------------------------------------------------------------------------
-/// Callback after finding the length of a file-name
-/// \param pTag: Pointer to text holding the found value
-/// \param len: Length of text
-/// \returns \c YGP::ParseObject::ParseOK
-//----------------------------------------------------------------------------
-int ParseOpenOffice::foundLenName (const char* pValue, unsigned int len) {
-   Check1 (pValue);
-   TRACE5 ("ParseOpenOffice::foundLenName (const char*, unsigned int) - Value: " << YGP::get2BytesLSB (pValue));
-   len = YGP::get2BytesLSB (pValue);
-   name.setMinCard (len);
-   name.setMaxCard (len);
-   skip.setOffset (8);
-   skip.setWay (std::ios::cur);
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//----------------------------------------------------------------------------
-/// Callback after finding a length
-/// \param pTag: Pointer to text holding the found value
-/// \param len: Length of text
-/// \returns \c YGP::ParseObject::ParseOK
-//----------------------------------------------------------------------------
-int ParseOpenOffice::foundLength (const char* pValue, unsigned int len) {
-   Check1 (pValue);
-   TRACE5 ("ParseOpenOffice::foundLength (const char*, unsigned int) - Value: " << YGP::get2BytesLSB (pValue));
-   skip.setOffset (YGP::get2BytesLSB (pValue) + skip.getOffset ());
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//----------------------------------------------------------------------------
-/// Callback after finding a file-name
-/// \param pTag: Pointer to text holding the found value
-/// \param len: Length of text
-/// \returns \c YGP::ParseObject::ParseOK
-//----------------------------------------------------------------------------
-int ParseOpenOffice::foundName (const char* pValue, unsigned int len) {
-   Check1 (pValue);
-   TRACE5 ("ParseOpenOffice::foundName (const char*, unsigned int) - Value: " << pValue);
-   if ((len == 8) && !memcmp (pValue, "meta.xml", len)) {
-      seqCDREntries.setMinCard (1);
-      seqCDREntries.setMaxCard (1);
-      skip.setOffset (26);
-   }
-   return YGP::ParseObject::PARSE_OK;
-}
-
-//----------------------------------------------------------------------------
-/// Callback after finding the offset of a file in the ZIP-archive
-/// \param pTag: Pointer to text holding the found value
-/// \param len: Length of text
-/// \returns \c YGP::ParseObject::ParseOK
-//----------------------------------------------------------------------------
-int ParseOpenOffice::foundOffsetFile (const char* pValue, unsigned int len) {
-   Check1 (pValue);
-   TRACE5 ("ParseOpenOffice::foundOffsetFile (const char*, unsigned int) - "
-           << std::hex << YGP::get4BytesLSB (pValue) << std::dec);
-   posMetaInfo.setOffset (YGP::get4BytesLSB (pValue));
-   return YGP::ParseObject::PARSE_OK;
+   SpiritParser::parse (metaInfo, document, _("meta-information"));
 }
