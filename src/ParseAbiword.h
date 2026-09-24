@@ -18,26 +18,24 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <string>
 
 #include <istream>
 
 struct Properties;
 
-
 /**Class to extract the properties (title, author, description) of an
  * AbiWord document
  */
 class ParseAbiword {
- public:
-   ParseAbiword () = default;
+public:
+  ParseAbiword() = default;
 
-   void parse (std::istream& stream, Properties& result);
+  void parse(std::istream &stream, Properties &result);
 
- private:
-   ParseAbiword (const ParseAbiword& other) = delete;
-   const ParseAbiword& operator= (const ParseAbiword& other) = delete;
+private:
+  ParseAbiword(const ParseAbiword &other) = delete;
+  const ParseAbiword &operator=(const ParseAbiword &other) = delete;
 };
 
 #endif

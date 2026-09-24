@@ -18,30 +18,28 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <string>
 
 #include <istream>
 
 struct Properties;
 
-
 /**Class to extract the properties of JPEG images; out of either a comment,
  * the EXIF information (Windows XP tags) or the IPTC data (stored by Photoshop)
  */
-class ParseJPEG  {
- public:
-   ParseJPEG () = default;
+class ParseJPEG {
+public:
+  ParseJPEG() = default;
 
-   void parse (std::istream& stream, Properties& result);
+  void parse(std::istream &stream, Properties &result);
 
- private:
-   ParseJPEG (const ParseJPEG&) = delete;
-   ParseJPEG& operator= (const ParseJPEG&) = delete;
+private:
+  ParseJPEG(const ParseJPEG &) = delete;
+  ParseJPEG &operator=(const ParseJPEG &) = delete;
 
-   static bool parseEXIF (const std::string& data, Properties& result);
-   static void parsePhotoshop (const std::string& data, Properties& result);
-   static void parseIPTC (const std::string& data, Properties& result);
+  static bool parseEXIF(const std::string &data, Properties &result);
+  static void parsePhotoshop(const std::string &data, Properties &result);
+  static void parseIPTC(const std::string &data, Properties &result);
 };
 
 #endif

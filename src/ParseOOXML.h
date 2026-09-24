@@ -18,23 +18,21 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
-
-#include <istream>
 #include <YGP/Exception.h>
+#include <istream>
 
 struct Properties;
 
-
 // Class to extract the title (of the properties) of a Microsoft office document
-class ParseOOXML  {
- public:
-   ParseOOXML () = default;
+class ParseOOXML {
+public:
+  ParseOOXML() = default;
 
-   void parse (std::istream& stream, Properties& result);
+  void parse(std::istream &stream, Properties &result);
 
- private:
-   ParseOOXML (const ParseOOXML&) = delete;
-   ParseOOXML& operator= (const ParseOOXML&) = delete;
+private:
+  ParseOOXML(const ParseOOXML &) = delete;
+  ParseOOXML &operator=(const ParseOOXML &) = delete;
 };
 
 #endif

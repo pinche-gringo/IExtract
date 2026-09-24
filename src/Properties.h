@@ -18,15 +18,13 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <string>
-
 
 // Structure holding the properties of a file
 struct Properties {
-   std::string strTitle;
-   std::string strComment;
-   std::string strAuthor;
+  std::string strTitle;
+  std::string strComment;
+  std::string strAuthor;
 };
 
 #endif

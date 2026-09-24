@@ -18,24 +18,22 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <string>
 
 #include <istream>
 
 struct Properties;
 
-
 // Class to extract the title of a RTF-document
-class ParseRTF  {
- public:
-   ParseRTF () = default;
+class ParseRTF {
+public:
+  ParseRTF() = default;
 
-   void parse (std::istream& stream, Properties& result);
+  void parse(std::istream &stream, Properties &result);
 
- private:
-   ParseRTF (const ParseRTF&) = delete;
-   ParseRTF& operator= (const ParseRTF&) = delete;
+private:
+  ParseRTF(const ParseRTF &) = delete;
+  ParseRTF &operator=(const ParseRTF &) = delete;
 };
 
 #endif

@@ -18,24 +18,22 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <string>
 
 #include <istream>
 
 struct Properties;
 
-
 // Class to extract the properties of a StarOffice document
-class ParseStarOffice  {
- public:
-   ParseStarOffice () = default;
+class ParseStarOffice {
+public:
+  ParseStarOffice() = default;
 
-   void parse (std::istream& stream, Properties& result);
+  void parse(std::istream &stream, Properties &result);
 
- private:
-   ParseStarOffice (const ParseStarOffice&) = delete;
-   ParseStarOffice& operator= (const ParseStarOffice&) = delete;
+private:
+  ParseStarOffice(const ParseStarOffice &) = delete;
+  ParseStarOffice &operator=(const ParseStarOffice &) = delete;
 };
 
 #endif

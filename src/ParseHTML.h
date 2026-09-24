@@ -18,24 +18,23 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <string>
 
 #include <istream>
 
 struct Properties;
 
+// Class to extract the properties (title, author, description) of a
+// HTML-document
+class ParseHTML {
+public:
+  ParseHTML() = default;
 
-// Class to extract the properties (title, author, description) of a HTML-document
-class ParseHTML  {
- public:
-   ParseHTML () = default;
+  void parse(std::istream &stream, Properties &result);
 
-   void parse (std::istream& stream, Properties& result);
-
- private:
-   ParseHTML (const ParseHTML&) = delete;
-   ParseHTML& operator= (const ParseHTML&) = delete;
+private:
+  ParseHTML(const ParseHTML &) = delete;
+  ParseHTML &operator=(const ParseHTML &) = delete;
 };
 
 #endif

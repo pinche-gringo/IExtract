@@ -18,30 +18,27 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <string>
 
 #include <istream>
 
-
 struct Properties;
-
 
 /**Class to extract the comments out of GIF images
  */
 class ParseGIF {
- public:
-   ParseGIF (Properties& result) : prop (result) { }
+public:
+  ParseGIF(Properties &result) : prop(result) {}
 
-   void parse (std::istream& stream);
+  void parse(std::istream &stream);
 
- private:
-   //@Section prohibited manager functions
-   ParseGIF () = delete;
-   ParseGIF (const ParseGIF& other) = delete;
-   const ParseGIF& operator= (const ParseGIF& other) = delete;
+private:
+  //@Section prohibited manager functions
+  ParseGIF() = delete;
+  ParseGIF(const ParseGIF &other) = delete;
+  const ParseGIF &operator=(const ParseGIF &other) = delete;
 
-   Properties&  prop;
+  Properties &prop;
 };
 
 #endif

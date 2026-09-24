@@ -18,12 +18,9 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <istream>
 
-
 struct Properties;
-
 
 /**Class to extract the comments out of PNG images
  *
@@ -32,20 +29,20 @@ struct Properties;
  *  http://www.w3.org/TR/REC-png
  */
 class ParsePNG {
- public:
-   ParsePNG (Properties& result) : prop (result) { }
+public:
+  ParsePNG(Properties &result) : prop(result) {}
 
-   void parse (std::istream& stream);
+  void parse(std::istream &stream);
 
- private:
-   //@Section prohibited manager functions
-   ParsePNG () = delete;
-   ParsePNG (const ParsePNG& other) = delete;
-   const ParsePNG& operator= (const ParsePNG& other) = delete;
+private:
+  //@Section prohibited manager functions
+  ParsePNG() = delete;
+  ParsePNG(const ParsePNG &other) = delete;
+  const ParsePNG &operator=(const ParsePNG &other) = delete;
 
-   void foundChunk (unsigned int type, const std::string& data);
+  void foundChunk(unsigned int type, const std::string &data);
 
-   Properties&  prop;
+  Properties &prop;
 };
 
 #endif

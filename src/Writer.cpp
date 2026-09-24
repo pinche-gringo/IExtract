@@ -1,14 +1,14 @@
 //$Id$
 
-//PROJECT     : Extract
-//SUBSYSTEM   : Writer
-//REFERENCES  :
-//TODO        :
-//BUGS        :
-//REVISION    : $Revision$
-//AUTHOR      : Markus Schwab
-//CREATED     : 13.10.2002
-//COPYRIGHT   : Copyright (C) 2002 - 2005, 2007 - 2009, 2011, 2024
+// PROJECT     : Extract
+// SUBSYSTEM   : Writer
+// REFERENCES  :
+// TODO        :
+// BUGS        :
+// REVISION    : $Revision$
+// AUTHOR      : Markus Schwab
+// CREATED     : 13.10.2002
+// COPYRIGHT   : Copyright (C) 2002 - 2005, 2007 - 2009, 2011, 2024
 
 // This file is part of IExtract.
 //
@@ -26,8 +26,8 @@
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include <ctime>
 #include <clocale>
+#include <ctime>
 
 #include <iostream>
 #include <string_view>
@@ -35,13 +35,12 @@
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
 
-#include <YGP/File.h>
-#include <YGP/ATStamp.h>
 #include <YGP/ANumeric.h>
+#include <YGP/ATStamp.h>
+#include <YGP/File.h>
 
-#include "Writer.h"
 #include "Properties.h"
-
+#include "Writer.h"
 
 //-----------------------------------------------------------------------------
 /// Constructor
@@ -58,20 +57,21 @@
 /// \param sepHdrCol String terminating columns of the header of the table
 /// \param defColumns Definition of the columns
 //-----------------------------------------------------------------------------
-Writer::Writer (const std::string& format, const std::string& New, unsigned long age,
-		const char* startRow, const char* endRow, const char* sepColumn,
-		const char* startTab, const char* endTab, const char* sepTab,
-		const char* rowStartHdr, const char* rowEndHdr,
-		const char* sepHdrCol, const char* defColumns)
-   : YGP::TableWriter (format, startRow, endRow, sepColumn, startTab, endTab, sepTab, rowStartHdr, rowEndHdr, sepHdrCol, defColumns),
-     strNew (New), limit (std::time (nullptr) - age) {
-   Check3 (strNew.size () ? age : 1);
+Writer::Writer(const std::string &format, const std::string &New,
+               unsigned long age, const char *startRow, const char *endRow,
+               const char *sepColumn, const char *startTab, const char *endTab,
+               const char *sepTab, const char *rowStartHdr,
+               const char *rowEndHdr, const char *sepHdrCol,
+               const char *defColumns)
+    : YGP::TableWriter(format, startRow, endRow, sepColumn, startTab, endTab,
+                       sepTab, rowStartHdr, rowEndHdr, sepHdrCol, defColumns),
+      strNew(New), limit(std::time(nullptr) - age) {
+  Check3(strNew.size() ? age : 1);
 }
 
 //-----------------------------------------------------------------------------
 /// Destructor
 //-----------------------------------------------------------------------------
-
 
 //-----------------------------------------------------------------------------
 /// Prints a separating text between directories. The following characters are
@@ -88,46 +88,59 @@ Writer::Writer (const std::string& format, const std::string& New, unsigned long
 /// \param data Text to print for separation
 /// \param title Text to print as header for every new dir
 //-----------------------------------------------------------------------------
-void Writer::printSeparator (std::ostream& out, const YGP::File& file,
-                             const std::string& data, const std::string& title) const {
-   std::size_t pos (0), oldPos (0);
-   while (pos < data.size ()) {
-      if ((pos = data.find ('%', oldPos)) == std::string::npos) {
-	 pos = data.size ();
-	 break;
-      }
-      TRACE9 ("printSeparator (ostream&, const YGP::File, const string&) - Inspecting "
-             << data[pos + 1]);
-      out << data.substr (oldPos, pos - oldPos );
+void Writer::printSeparator(std::ostream &out, const YGP::File &file,
+                            const std::string &data,
+                            const std::string &title) const {
+  std::size_t pos(0), oldPos(0);
+  while (pos < data.size()) {
+    if ((pos = data.find('%', oldPos)) == std::string::npos) {
+      pos = data.size();
+      break;
+    }
+    TRACE9("printSeparator (ostream&, const YGP::File, const string&) - "
+           "Inspecting "
+           << data[pos + 1]);
+    out << data.substr(oldPos, pos - oldPos);
 
-      switch (data[++pos]) {
-      case 'e': printEnd (out); break;
+    switch (data[++pos]) {
+    case 'e':
+      printEnd(out);
+      break;
 
-      case 's': printStart (out, title); break;
+    case 's':
+      printStart(out, title);
+      break;
 
-      case 'n': out << file.name (); break;
+    case 'n':
+      out << file.name();
+      break;
 
-      case 'N': out << file.path () << file.name (); break;
+    case 'N':
+      out << file.path() << file.name();
+      break;
 
-      case 'p': out << file.path (); break;
+    case 'p':
+      out << file.path();
+      break;
 
-      case 'P':
-      case 'U': {
-         std::string path (file.path ());
+    case 'P':
+    case 'U': {
+      std::string path(file.path());
 #if SYSTEM != UNIX
-         std::size_t ps (0);
-         while ((ps = path.find (YGP::File::DIRSEPARATOR, ps)) != std::string::npos)
-            path.replace (ps, 1, 1, '/');
+      std::size_t ps(0);
+      while ((ps = path.find(YGP::File::DIRSEPARATOR, ps)) != std::string::npos)
+        path.replace(ps, 1, 1, '/');
 #endif
 
-         if (data[pos] == 'U')
-            path += file.name ();
-	 out << path;
-         break; }
-      }
-      oldPos = pos + 1;
-   }
-   out << data.substr (oldPos, pos - oldPos);
+      if (data[pos] == 'U')
+        path += file.name();
+      out << path;
+      break;
+    }
+    }
+    oldPos = pos + 1;
+  }
+  out << data.substr(oldPos, pos - oldPos);
 }
 
 //-----------------------------------------------------------------------------
@@ -153,77 +166,84 @@ void Writer::printSeparator (std::ostream& out, const YGP::File& file,
 /// \param extend Flag, if special formatting of substitute is wanted
 /// \returns std::string String with which to replace the character
 //-----------------------------------------------------------------------------
-std::string Writer::getSubstitute (char ctrl, bool extend) const {
-   Check3 (prop_); Check3 (file_);
+std::string Writer::getSubstitute(char ctrl, bool extend) const {
+  Check3(prop_);
+  Check3(file_);
 
-   std::string subst;
-   switch (ctrl) {
-   case 'a':
-      subst = extend ? prop_->strAuthor : changeSpecialChars (prop_->strAuthor);
-      break;
+  std::string subst;
+  switch (ctrl) {
+  case 'a':
+    subst = extend ? prop_->strAuthor : changeSpecialChars(prop_->strAuthor);
+    break;
 
-   case 'c':
-      subst = extend ? prop_->strAuthor : changeSpecialChars (prop_->strComment);
-      break;
+  case 'c':
+    subst = extend ? prop_->strAuthor : changeSpecialChars(prop_->strComment);
+    break;
 
-   case 'D':
-   case 'd': {
-      YGP::ATimestamp stamp (file_->time ());
-      subst = (ctrl == 'D') ? stamp.ADate::toString () : stamp.toString ();
-      break; }
+  case 'D':
+  case 'd': {
+    YGP::ATimestamp stamp(file_->time());
+    subst = (ctrl == 'D') ? stamp.ADate::toString() : stamp.toString();
+    break;
+  }
 
-   case 'e':
-   case 'E': {
-      const std::string_view name (file_->name ());
-      const std::size_t pos (name.rfind ('.'));
-      const std::string part ((ctrl == 'e') ? ((pos == name.npos) ? "" : name.substr (pos + 1))
-                              : name.substr (0, pos));
-      subst = extend ? changeSpecialFileChars (part) : part;
-      break;
-   }
+  case 'e':
+  case 'E': {
+    const std::string_view name(file_->name());
+    const std::size_t pos(name.rfind('.'));
+    const std::string part(
+        (ctrl == 'e') ? ((pos == name.npos) ? "" : name.substr(pos + 1))
+                      : name.substr(0, pos));
+    subst = extend ? changeSpecialFileChars(part) : part;
+    break;
+  }
 
-   case 'n': subst = changeSpecialFileChars (file_->name ()); break;
+  case 'n':
+    subst = changeSpecialFileChars(file_->name());
+    break;
 
-   case 'N':
-      subst = extend ? changeSpecialFileChars (file_->path ()) : file_->path ();
-      subst += extend ? changeSpecialFileChars (file_->name ()) : file_->name ();
-      break;
+  case 'N':
+    subst = extend ? changeSpecialFileChars(file_->path()) : file_->path();
+    subst += extend ? changeSpecialFileChars(file_->name()) : file_->name();
+    break;
 
-   case 'p':
-      subst = extend ? changeSpecialFileChars (file_->path ()) : file_->path ();
-      break;
+  case 'p':
+    subst = extend ? changeSpecialFileChars(file_->path()) : file_->path();
+    break;
 
-   case 't':
-      subst = extend ? prop_->strTitle : changeSpecialChars (prop_->strTitle);
-      break;
+  case 't':
+    subst = extend ? prop_->strTitle : changeSpecialChars(prop_->strTitle);
+    break;
 
-   case 'P':
-   case 'U': {
-      subst = extend ? changeSpecialFileChars (file_->path ()) : file_->path ();
+  case 'P':
+  case 'U': {
+    subst = extend ? changeSpecialFileChars(file_->path()) : file_->path();
 #if SYSTEM != UNIX
-      std::size_t ps (0);
-      while ((ps = subst.find (YGP::File::DIRSEPARATOR, ps)) != std::string::npos)
-         subst.replace (ps, 1, 1, '/');
+    std::size_t ps(0);
+    while ((ps = subst.find(YGP::File::DIRSEPARATOR, ps)) != std::string::npos)
+      subst.replace(ps, 1, 1, '/');
 #endif
 
-      if (ctrl == 'U')
-         subst += extend ? changeSpecialFileChars (file_->name ()) : file_->name ();
-      break;
-   }
+    if (ctrl == 'U')
+      subst += extend ? changeSpecialFileChars(file_->name()) : file_->name();
+    break;
+  }
 
-   case 's':
-   case 'S': {
-      subst = ((ctrl == 'S') ? convertToHumanString (file_->size ())
-               : YGP::ANumeric::toString (file_->size ()));
-      break; }
+  case 's':
+  case 'S': {
+    subst = ((ctrl == 'S') ? convertToHumanString(file_->size())
+                           : YGP::ANumeric::toString(file_->size()));
+    break;
+  }
 
-   default:
-      subst = ctrl;
-   }
+  default:
+    subst = ctrl;
+  }
 
-   TRACE9 ("Writer::getSubstitute (char, const YGP::TableWriter*, std::string&) - Replacing '"
-           << ctrl << "' with " << subst);
-   return subst;
+  TRACE9("Writer::getSubstitute (char, const YGP::TableWriter*, std::string&) "
+         "- Replacing '"
+         << ctrl << "' with " << subst);
+  return subst;
 }
 
 //-----------------------------------------------------------------------------
@@ -231,8 +251,8 @@ std::string Writer::getSubstitute (char ctrl, bool extend) const {
 /// \param value Value to change
 /// \returns std::string Changed valaue
 //-----------------------------------------------------------------------------
-std::string Writer::changeSpecialChars (const std::string& value) const {
-   return value;
+std::string Writer::changeSpecialChars(const std::string &value) const {
+  return value;
 }
 
 //-----------------------------------------------------------------------------
@@ -240,37 +260,36 @@ std::string Writer::changeSpecialChars (const std::string& value) const {
 /// \param value Value to change
 /// \returns std::string Changed valaue
 //-----------------------------------------------------------------------------
-std::string Writer::changeSpecialFileChars (const std::string& value) const {
-   return changeSpecialChars (value);
+std::string Writer::changeSpecialFileChars(const std::string &value) const {
+  return changeSpecialChars(value);
 }
 
 //-----------------------------------------------------------------------------
 /// Returns the next token; special characters are expanded
 /// \returns \c std::string: Next (expanded) token
 //-----------------------------------------------------------------------------
-std::string Writer::convertToHumanString (unsigned long value) {
-   if (value < 1000)
-      return YGP::ANumeric::toString (value);
+std::string Writer::convertToHumanString(unsigned long value) {
+  if (value < 1000)
+    return YGP::ANumeric::toString(value);
 
-   std::string tString (1, 'k');
+  std::string tString(1, 'k');
 
-   if (value > 1000000) {
-      tString = 'M';
-      value >>= 10;
-   }
+  if (value > 1000000) {
+    tString = 'M';
+    value >>= 10;
+  }
 
-   if (value < 10000) {
-      static const std::lconv* loc = std::localeconv ();
-      value += 50;
-      double temp (value);
-      temp /= 102.4;
-      tString = static_cast<char> ((static_cast<int> (temp) % 10) + '0') + tString;
-      value = static_cast<unsigned long> (temp / 10);
-      tString = loc->decimal_point + tString;
-   }
-   else
-      value >>= 10;
-   return YGP::ANumeric::toString (value) + tString;
+  if (value < 10000) {
+    static const std::lconv *loc = std::localeconv();
+    value += 50;
+    double temp(value);
+    temp /= 102.4;
+    tString = static_cast<char>((static_cast<int>(temp) % 10) + '0') + tString;
+    value = static_cast<unsigned long>(temp / 10);
+    tString = loc->decimal_point + tString;
+  } else
+    value >>= 10;
+  return YGP::ANumeric::toString(value) + tString;
 }
 
 //-----------------------------------------------------------------------------
@@ -278,9 +297,9 @@ std::string Writer::convertToHumanString (unsigned long value) {
 /// \param out Stream where to put the output
 /// \param title Title information
 //-----------------------------------------------------------------------------
-void Writer::printHeaderTail (std::ostream& out) const {
-   if (strNew.size ())
-      out << colHdrSeparator;
+void Writer::printHeaderTail(std::ostream &out) const {
+  if (strNew.size())
+    out << colHdrSeparator;
 }
 
 //-----------------------------------------------------------------------------
@@ -289,26 +308,26 @@ void Writer::printHeaderTail (std::ostream& out) const {
 /// \param file File whose data should be printed
 /// \param prop Properties of the file
 //-----------------------------------------------------------------------------
-void Writer::printFile (std::ostream& out, const YGP::File& file, const Properties& prop) {
-   TRACE9 ("Writer::printFile (std::ostream&, const std::string&) const");
+void Writer::printFile(std::ostream &out, const YGP::File &file,
+                       const Properties &prop) {
+  TRACE9("Writer::printFile (std::ostream&, const std::string&) const");
 
-   out << rowStart;
-   if (strNew.size ()) {
-      if (isNew (file))
-         out << strNew;
-      out << colHdrSeparator;
-   }
+  out << rowStart;
+  if (strNew.size()) {
+    if (isNew(file))
+      out << strNew;
+    out << colHdrSeparator;
+  }
 
-   file_ = &file;
-   prop_ = &prop;
+  file_ = &file;
+  prop_ = &prop;
 
-   std::string node (getNextNode ());
-   out << node;
-   while (!((node = getNextNode ()).empty ()))
-      out << colSeparator << node;
-   out << rowEnd;
+  std::string node(getNextNode());
+  out << node;
+  while (!((node = getNextNode()).empty()))
+    out << colSeparator << node;
+  out << rowEnd;
 }
-
 
 //-----------------------------------------------------------------------------
 /// Constructor
@@ -316,14 +335,13 @@ void Writer::printFile (std::ostream& out, const YGP::File& file, const Properti
 /// \param strNew String to display for new entries
 /// \param age Maximal age (in days) for entries to be considered as new
 //-----------------------------------------------------------------------------
-TextWriter::TextWriter (const std::string& format, const std::string& strNew, unsigned long age)
-   : Writer (format, strNew, age, TBLW_TEXT_PARAMS) {
- }
+TextWriter::TextWriter(const std::string &format, const std::string &strNew,
+                       unsigned long age)
+    : Writer(format, strNew, age, TBLW_TEXT_PARAMS) {}
 
 //-----------------------------------------------------------------------------
 /// Destructor
 //-----------------------------------------------------------------------------
-
 
 //-----------------------------------------------------------------------------
 /// Prints a message
@@ -331,13 +349,12 @@ TextWriter::TextWriter (const std::string& format, const std::string& strNew, un
 /// \param file File to which the message should be print
 /// \param msg Message to print (not NULL)
 //-----------------------------------------------------------------------------
-void TextWriter::printMessage (std::ostream& out, const YGP::File& file,
-                               const std::string& msg) const {
-   if (strNew.size () && isNew (file))
-      out << "!!" << ": ";
-   out << file.name () << " - " << msg << '\n';
+void TextWriter::printMessage(std::ostream &out, const YGP::File &file,
+                              const std::string &msg) const {
+  if (strNew.size() && isNew(file))
+    out << "!!" << ": ";
+  out << file.name() << " - " << msg << '\n';
 }
-
 
 //-----------------------------------------------------------------------------
 /// Constructor
@@ -345,22 +362,22 @@ void TextWriter::printMessage (std::ostream& out, const YGP::File& file,
 /// \param strNew String to display for new entries
 /// \param age Maximal age (in days) for entries to be considered as new
 //-----------------------------------------------------------------------------
-QuotedTextWriter::QuotedTextWriter (const std::string& format, const std::string& strNew, unsigned long age)
-   : Writer (format, strNew, age, TBLW_QUOTEDTEXT_PARAMS) {
- }
+QuotedTextWriter::QuotedTextWriter(const std::string &format,
+                                   const std::string &strNew, unsigned long age)
+    : Writer(format, strNew, age, TBLW_QUOTEDTEXT_PARAMS) {}
 
 //-----------------------------------------------------------------------------
 /// Destructor
 //-----------------------------------------------------------------------------
-
 
 //-----------------------------------------------------------------------------
 /// Change characters with special meanings to ones understood by the writer
 /// \param value Value to change
 /// \returns std::string Changed valaue
 //-----------------------------------------------------------------------------
-std::string QuotedTextWriter::changeSpecialChars (const std::string& value) const {
-   return YGP::TableWriter::changeQuotedSpecialChars (value);
+std::string
+QuotedTextWriter::changeSpecialChars(const std::string &value) const {
+  return YGP::TableWriter::changeQuotedSpecialChars(value);
 }
 
 //-----------------------------------------------------------------------------
@@ -369,13 +386,12 @@ std::string QuotedTextWriter::changeSpecialChars (const std::string& value) cons
 /// \param file File to which the message should be printed
 /// \param msg Message to print (not NULL)
 //-----------------------------------------------------------------------------
-void QuotedTextWriter::printMessage (std::ostream& out, const YGP::File& file,
-				     const std::string& msg) const {
-   if (strNew.size () && isNew (file))
-      out << "\"!!\"" << ": ";
-   out << file.name () << ", \"" << msg << "\"\n";
+void QuotedTextWriter::printMessage(std::ostream &out, const YGP::File &file,
+                                    const std::string &msg) const {
+  if (strNew.size() && isNew(file))
+    out << "\"!!\"" << ": ";
+  out << file.name() << ", \"" << msg << "\"\n";
 }
-
 
 //-----------------------------------------------------------------------------
 /// Constructor
@@ -383,22 +399,21 @@ void QuotedTextWriter::printMessage (std::ostream& out, const YGP::File& file,
 /// \param strNew String to display for new entries
 /// \param age Maximal age (in days) for entries to be considered as new
 //-----------------------------------------------------------------------------
-HTMLWriter::HTMLWriter (const std::string& format, const std::string& strNew, unsigned long age)
-   : Writer (format, strNew, age, TBLW_HTML_PARAMS) {
- }
+HTMLWriter::HTMLWriter(const std::string &format, const std::string &strNew,
+                       unsigned long age)
+    : Writer(format, strNew, age, TBLW_HTML_PARAMS) {}
 
 //-----------------------------------------------------------------------------
 /// Destructor
 //-----------------------------------------------------------------------------
-
 
 //-----------------------------------------------------------------------------
 /// Change characters with special meanings to ones understood by the writer
 /// \param value Value to change
 /// \returns std::string Changed valaue
 //-----------------------------------------------------------------------------
-std::string HTMLWriter::changeSpecialChars (const std::string& value) const {
-   return YGP::TableWriter::changeHTMLSpecialChars (value);
+std::string HTMLWriter::changeSpecialChars(const std::string &value) const {
+  return YGP::TableWriter::changeHTMLSpecialChars(value);
 }
 
 //-----------------------------------------------------------------------------
@@ -406,8 +421,8 @@ std::string HTMLWriter::changeSpecialChars (const std::string& value) const {
 /// \param value Value to change
 /// \returns std::string Changed valaue
 //-----------------------------------------------------------------------------
-std::string HTMLWriter::changeSpecialFileChars (const std::string& value) const {
-   return YGP::TableWriter::changeHTMLSpecialFileChars (value);
+std::string HTMLWriter::changeSpecialFileChars(const std::string &value) const {
+  return YGP::TableWriter::changeHTMLSpecialFileChars(value);
 }
 
 //-----------------------------------------------------------------------------
@@ -416,17 +431,16 @@ std::string HTMLWriter::changeSpecialFileChars (const std::string& value) const 
 /// \param file File to which the message should be print
 /// \param msg Message to print (not NULL)
 //-----------------------------------------------------------------------------
-void HTMLWriter::printMessage (std::ostream& out, const YGP::File& file,
-                               const std::string& msg) const {
-   out << rowStart;
-   if (strNew.size ()) {
-      out << "!!" << colSeparator;
-   }
+void HTMLWriter::printMessage(std::ostream &out, const YGP::File &file,
+                              const std::string &msg) const {
+  out << rowStart;
+  if (strNew.size()) {
+    out << "!!" << colSeparator;
+  }
 
-   out << "<a href=\"" << file.path () << file.name () << "\">" << file.name ()
-       << "</a></td><td colspan=" << (columns () - 1) << '>' << msg << rowEnd;
+  out << "<a href=\"" << file.path() << file.name() << "\">" << file.name()
+      << "</a></td><td colspan=" << (columns() - 1) << '>' << msg << rowEnd;
 }
-
 
 //-----------------------------------------------------------------------------
 /// Constructor
@@ -434,22 +448,21 @@ void HTMLWriter::printMessage (std::ostream& out, const YGP::File& file,
 /// \param strNew String to display for new entries
 /// \param age Maximal age (in days) for entries to be considered as new
 //-----------------------------------------------------------------------------
-LaTeXWriter::LaTeXWriter (const std::string& format, const std::string& strNew, unsigned long age)
-   : Writer (format, strNew, age, TBLW_LATEX_PARAMS) {
- }
+LaTeXWriter::LaTeXWriter(const std::string &format, const std::string &strNew,
+                         unsigned long age)
+    : Writer(format, strNew, age, TBLW_LATEX_PARAMS) {}
 
 //-----------------------------------------------------------------------------
 /// Destructor
 //-----------------------------------------------------------------------------
-
 
 //-----------------------------------------------------------------------------
 /// Prints the start of the table header
 /// \param out Stream where to put the output
 /// \param title Title information
 //-----------------------------------------------------------------------------
-void LaTeXWriter::printHeaderLead (std::ostream& out) const {
-   YGP::TableWriter::printLaTeXHeaderLead (out, columns ());
+void LaTeXWriter::printHeaderLead(std::ostream &out) const {
+  YGP::TableWriter::printLaTeXHeaderLead(out, columns());
 }
 
 //-----------------------------------------------------------------------------
@@ -457,8 +470,8 @@ void LaTeXWriter::printHeaderLead (std::ostream& out) const {
 /// \param value Value to change
 /// \returns std::string Changed valaue
 //-----------------------------------------------------------------------------
-std::string LaTeXWriter::changeSpecialChars (const std::string& value) const {
-   return YGP::TableWriter::changeLaTeXSpecialChars (value);
+std::string LaTeXWriter::changeSpecialChars(const std::string &value) const {
+  return YGP::TableWriter::changeLaTeXSpecialChars(value);
 }
 
 //-----------------------------------------------------------------------------
@@ -467,18 +480,17 @@ std::string LaTeXWriter::changeSpecialChars (const std::string& value) const {
 /// \param file File to which the message should be print
 /// \param msg Message to print (not NULL)
 //-----------------------------------------------------------------------------
-void LaTeXWriter::printMessage (std::ostream& out, const YGP::File& file,
-                                const std::string& msg) const {
-   if (strNew.size ()) {
-      if (isNew (file))
-         out << "!!";
-      out << '&';
-   }
+void LaTeXWriter::printMessage(std::ostream &out, const YGP::File &file,
+                               const std::string &msg) const {
+  if (strNew.size()) {
+    if (isNew(file))
+      out << "!!";
+    out << '&';
+  }
 
-   out << file.name () << "&{\\multicolumn{" << (columns () - 1) << "}l{"
-       << msg << rowEnd;
+  out << file.name() << "&{\\multicolumn{" << (columns() - 1) << "}l{" << msg
+      << rowEnd;
 }
-
 
 //-----------------------------------------------------------------------------
 /// Destructor
@@ -490,8 +502,9 @@ void LaTeXWriter::printMessage (std::ostream& out, const YGP::File& file,
 /// \param file File to which the message should be print
 /// \param msg Message to print (not NULL)
 //-----------------------------------------------------------------------------
-void XMLWriter::printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const {
-   out << "<Error><File>" << file.path () << file.name () << "</File>"
-       << "<Name>" << file.name () << "<Name>"
-       << "<Description>" << msg << "</Description></Error>\n";
+void XMLWriter::printMessage(std::ostream &out, const YGP::File &file,
+                             const std::string &msg) const {
+  out << "<Error><File>" << file.path() << file.name() << "</File>"
+      << "<Name>" << file.name() << "<Name>"
+      << "<Description>" << msg << "</Description></Error>\n";
 }

@@ -18,32 +18,29 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <string>
 
 #include <YGP/Entity.h>
 
-
 class Options : public YGP::Entity {
-   friend class Application;
+  friend class Application;
 
- public:
-   Options ();
-   ~Options ();
+public:
+  Options();
+  ~Options();
 
- private:
-   Options (const Options& other) = delete;
-   const Options& operator= (const Options& other) = delete;
+private:
+  Options(const Options &other) = delete;
+  const Options &operator=(const Options &other) = delete;
 
-   std::string  format;        // %attrib%; Format
-   std::string  title;         // %attrib%; Title
-   std::string  newText;       // %attrib%; TextForNewFiles
-   unsigned int ageOfNewFiles; // %attrib%; MaxAgeForNewFiles; 0
-   std::string  style;         // %attrib%; Style
-   std::string  separate;      // %attrib%; DirSeparatorText
-   unsigned int sort;          // %attrib%; SortFiles; 0
+  std::string format;         // %attrib%; Format
+  std::string title;          // %attrib%; Title
+  std::string newText;        // %attrib%; TextForNewFiles
+  unsigned int ageOfNewFiles; // %attrib%; MaxAgeForNewFiles; 0
+  std::string style;          // %attrib%; Style
+  std::string separate;       // %attrib%; DirSeparatorText
+  unsigned int sort;          // %attrib%; SortFiles; 0
 };
-
 
 #include "Options.meta"
 

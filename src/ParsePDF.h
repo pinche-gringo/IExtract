@@ -18,7 +18,6 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <map>
 #include <string>
 
@@ -26,31 +25,33 @@
 
 struct Properties;
 
-
 /**Class to extract the properties of a PDF document.
  *
  * The PDF-specification can be found at
  * http://www.adobe.com/devnet/acrobat/pdfs/pdf_reference.pdf
  */
 class ParsePDF {
- public:
-   static void parse (std::istream& stream, Properties& result);
+public:
+  static void parse(std::istream &stream, Properties &result);
 
- private:
-   ParsePDF () = delete;
-   ParsePDF (const ParsePDF& other) = delete;
-   const ParsePDF& operator= (const ParsePDF& other) = delete;
+private:
+  ParsePDF() = delete;
+  ParsePDF(const ParsePDF &other) = delete;
+  const ParsePDF &operator=(const ParsePDF &other) = delete;
 
-   /// Values of a (top-level) dictionary
-   struct Dictionary {
-      std::map<std::string, std::string> strings;    ///< Entries with string values
-      std::map<std::string, std::string> others;     ///< Entries with other (simple) values
-   };
+  /// Values of a (top-level) dictionary
+  struct Dictionary {
+    std::map<std::string, std::string> strings; ///< Entries with string values
+    std::map<std::string, std::string>
+        others; ///< Entries with other (simple) values
+  };
 
-   static Dictionary parseXRefTable (const std::string& data, std::size_t offset,
-                                     std::map<unsigned int, std::size_t>& offsets);
-   static Dictionary parseObject (const std::string& data, std::size_t offset, unsigned int id);
-   static unsigned int parseReference (const std::string& reference);
+  static Dictionary
+  parseXRefTable(const std::string &data, std::size_t offset,
+                 std::map<unsigned int, std::size_t> &offsets);
+  static Dictionary parseObject(const std::string &data, std::size_t offset,
+                                unsigned int id);
+  static unsigned int parseReference(const std::string &reference);
 };
 
 #endif

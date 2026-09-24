@@ -18,30 +18,29 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <string>
 
 #include <istream>
 
 struct Properties;
 
-
 // Extracts the information out of MP3 files
 //  - The title is returned in strTitle
 //  - The artist is returned in strAuthor
 //  - The album is returned in strComment
 class ParseMP3 {
- public:
-   static void parse (std::istream& stream, Properties& result);
+public:
+  static void parse(std::istream &stream, Properties &result);
 
- private:
-   ParseMP3 () = delete;
-   ParseMP3 (const ParseMP3& other) = delete;
-   const ParseMP3& operator= (const ParseMP3& other) = delete;
+private:
+  ParseMP3() = delete;
+  ParseMP3(const ParseMP3 &other) = delete;
+  const ParseMP3 &operator=(const ParseMP3 &other) = delete;
 
-   static std::string strip (const std::string& value, unsigned int pos, unsigned int len);
-   static unsigned int getLength (const char* value);
-   static std::string getString (const char* value, unsigned int length);
+  static std::string strip(const std::string &value, unsigned int pos,
+                           unsigned int len);
+  static unsigned int getLength(const char *value);
+  static std::string getString(const char *value, unsigned int length);
 };
 
 #endif

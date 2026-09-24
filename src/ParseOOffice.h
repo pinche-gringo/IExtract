@@ -18,28 +18,26 @@
 // You should have received a copy of the GNU General Public License
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <string>
 
 #include <istream>
 
 struct Properties;
 
-
 /**Class to extract the properties (title, author, description) of an
  * OpenOffice.org document
  */
 class ParseOpenOffice {
- public:
-   ParseOpenOffice () = default;
+public:
+  ParseOpenOffice() = default;
 
-   void parse (std::istream& stream, Properties& result);
+  void parse(std::istream &stream, Properties &result);
 
- private:
-   ParseOpenOffice (const ParseOpenOffice& other) = delete;
-   const ParseOpenOffice& operator= (const ParseOpenOffice& other) = delete;
+private:
+  ParseOpenOffice(const ParseOpenOffice &other) = delete;
+  const ParseOpenOffice &operator=(const ParseOpenOffice &other) = delete;
 
-   static void parseMetaInfo (const std::string& metaInfo, Properties& result);
+  static void parseMetaInfo(const std::string &metaInfo, Properties &result);
 };
 
 #endif
