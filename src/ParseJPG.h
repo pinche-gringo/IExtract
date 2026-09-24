@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include <YGP/XStream.h>
+#include <istream>
 
 struct Properties;
 
@@ -31,14 +31,13 @@ struct Properties;
  */
 class ParseJPEG  {
  public:
-   ParseJPEG () { }
-   ~ParseJPEG () { }
+   ParseJPEG () = default;
 
-   void parse (YGP::Xistream& stream, Properties& result);
+   void parse (std::istream& stream, Properties& result);
 
  private:
-   ParseJPEG (const ParseJPEG&);
-   ParseJPEG& operator= (const ParseJPEG&);
+   ParseJPEG (const ParseJPEG&) = delete;
+   ParseJPEG& operator= (const ParseJPEG&) = delete;
 
    static bool parseEXIF (const std::string& data, Properties& result);
    static void parsePhotoshop (const std::string& data, Properties& result);

@@ -19,7 +19,7 @@
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <YGP/XStream.h>
+#include <istream>
 #include <YGP/Exception.h>
 
 struct Properties;
@@ -28,10 +28,13 @@ struct Properties;
 // Class to extract the title (of the properties) of a Microsoft office document
 class ParseOOXML  {
  public:
-   ParseOOXML ();
-   ~ParseOOXML () { }
+   ParseOOXML () = default;
 
-   void parse (YGP::Xistream& stream, Properties& result);
+   void parse (std::istream& stream, Properties& result);
+
+ private:
+   ParseOOXML (const ParseOOXML&) = delete;
+   ParseOOXML& operator= (const ParseOOXML&) = delete;
 };
 
 #endif

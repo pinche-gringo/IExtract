@@ -22,7 +22,7 @@
 #include <map>
 #include <string>
 
-#include <YGP/XStream.h>
+#include <istream>
 
 struct Properties;
 
@@ -34,17 +34,15 @@ struct Properties;
  */
 class ParsePDF {
  public:
-   static void parse (YGP::Xistream& stream, Properties& result);
+   static void parse (std::istream& stream, Properties& result);
 
  private:
-   ParsePDF ();
-   ParsePDF (const ParsePDF& other);
-   const ParsePDF& operator= (const ParsePDF& other);
+   ParsePDF () = delete;
+   ParsePDF (const ParsePDF& other) = delete;
+   const ParsePDF& operator= (const ParsePDF& other) = delete;
 
    /// Values of a (top-level) dictionary
    struct Dictionary {
-      Dictionary () : strings (), others () { }
-
       std::map<std::string, std::string> strings;    ///< Entries with string values
       std::map<std::string, std::string> others;     ///< Entries with other (simple) values
    };

@@ -32,7 +32,10 @@
 
 #include <zlib.h>
 
-#include <cstring>
+#include <array>
+#include <fstream>
+#include <cstdint>
+#include <memory>
 
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
@@ -41,119 +44,95 @@
 #include "ParseOOXML.h"
 #include "Properties.h"
 
-static const unsigned int ID_PKZIP_LOCALHDR       (0x04034b50);
-static const unsigned int ID_PKZIP_END_CDR        (0x06054B50);
-static const unsigned int ID_PKZIP_CENTRALFILEHDR (0x02014b50);
+static constexpr unsigned int ID_PKZIP_LOCALHDR (0x04034b50);
 
-
-//-----------------------------------------------------------------------------
-/// (Default-)Constructor
-//-----------------------------------------------------------------------------
-ParseOOXML::ParseOOXML () {
-}
 
 //-----------------------------------------------------------------------------
 /// Tries to parse an Office Open XML document
 /// \param stream: Stream to read from
 /// \param result: Structure to hold the found information
 //-----------------------------------------------------------------------------
-void ParseOOXML::parse (YGP::Xistream& stream, Properties& result) {
-   UINT32 posFile;
-   stream.read ((char*)&posFile, sizeof (posFile));
-   posFile = YGP::getFileOffsetInArchive ((std::ifstream&)stream, (char*)&posFile, "docProps/core.xml", 17);
-   if (posFile) {
-      TRACE1 ("ParseOOXML::parse (YGP::Xistream&, Properties&) - Skipping to " << posFile);
+void ParseOOXML::parse (std::istream& stream, Properties& result) {
+   std::uint32_t posFile;
+   stream.read (reinterpret_cast<char*> (&posFile), sizeof (posFile));
+   posFile = YGP::getFileOffsetInArchive (dynamic_cast<std::ifstream&> (stream),
+                                          reinterpret_cast<char*> (&posFile), "docProps/core.xml", 17);
+   if (!posFile)
+      throw YGP::ParseError (_("Not an OOXML document!"));
 
-      stream.seekg (posFile, std::ios::beg);
-      unsigned char output[1024];
-      stream.read ((char*)output, 30);
-      TRACE9 ("Hdr: " << YGP::get4BytesLSB ((char*)output) << "; Compr: " << YGP::get2BytesLSB ((char*)output + 8)
-	      << "; Len: " << YGP::get2BytesLSB ((char*)output + 26));
-      if ((YGP::get4BytesLSB ((char*)output) != ID_PKZIP_LOCALHDR)
-	  || (YGP::get2BytesLSB ((char*)output + 8) != 8)
-	  || (YGP::get2BytesLSB ((char*)output + 26) != 17))
-	 throw (YGP::ParseError (_("Archive contains an invalid file entry!")));
+   TRACE1 ("ParseOOXML::parse (std::istream&, Properties&) - Skipping to " << posFile);
+   stream.seekg (posFile, std::ios::beg);
 
-      // Skip over filename and extra field
-      TRACE9 ("ParseOOXML::parse (YGP::Xistream&, Properties&) - Skipping "
-	      << YGP::get2BytesLSB ((char*)output + 28));
-      stream.seekg (YGP::get2BytesLSB ((char*)output + 28) + 17, std::ios::cur);
+   std::array<char, 1024> output;
+   stream.read (output.data (), 30);
+   TRACE9 ("Hdr: " << YGP::get4BytesLSB (output.data ()) << "; Compr: " << YGP::get2BytesLSB (output.data () + 8)
+           << "; Len: " << YGP::get2BytesLSB (output.data () + 26));
+   if ((YGP::get4BytesLSB (output.data ()) != ID_PKZIP_LOCALHDR)
+       || (YGP::get2BytesLSB (output.data () + 8) != 8)
+       || (YGP::get2BytesLSB (output.data () + 26) != 17))
+      throw YGP::ParseError (_("Archive contains an invalid file entry!"));
 
-      // Read the number of bytes stored in the header
-      std::string props;
-      unsigned int size (YGP::get4BytesLSB ((char*)output + 18));
-      TRACE9 ("ParseOOXML::parse (YGP::Xistream&, Properties&) - Size: " << size);
+   // Skip over filename and extra field
+   TRACE9 ("ParseOOXML::parse (std::istream&, Properties&) - Skipping "
+           << YGP::get2BytesLSB (output.data () + 28));
+   stream.seekg (YGP::get2BytesLSB (output.data () + 28) + 17, std::ios::cur);
 
-      unsigned char input[1024];
-      z_stream zStream;
+   // Read the number of bytes stored in the header
+   std::string props;
+   unsigned int size (YGP::get4BytesLSB (output.data () + 18));
+   TRACE9 ("ParseOOXML::parse (std::istream&, Properties&) - Size: " << size);
 
-      zStream.zalloc = Z_NULL;                        // Allocate inflate state
-      zStream.zfree = Z_NULL;
-      zStream.opaque = Z_NULL;
-      zStream.avail_in = 0;
-      zStream.next_in = Z_NULL;
-      int rc (inflateInit2 (&zStream, -MAX_WBITS));
-      if (rc != Z_OK)
-	 throw (YGP::ParseError (_("Can't initialise zlib!")));
+   z_stream zStream {};                              // Allocate inflate state
+   int rc (inflateInit2 (&zStream, -MAX_WBITS));
+   if (rc != Z_OK)
+      throw YGP::ParseError (_("Can't initialise zlib!"));
+   const std::unique_ptr<z_stream, decltype (&inflateEnd)> cleanup (&zStream, &inflateEnd);
 
-      while (stream && size) {
-	 stream.read ((char*)input, (size > sizeof (input)) ? sizeof (input) : size);
-	 TRACE6 ("ParseOOXML::parse (YGP::Xistream&, Properties&) - Bytes read: " << stream.gcount ());
+   std::array<char, 1024> input;
+   while (stream && size) {
+      stream.read (input.data (), (size > input.size ()) ? input.size () : size);
+      TRACE6 ("ParseOOXML::parse (std::istream&, Properties&) - Bytes read: " << stream.gcount ());
 
-	 TRACE1 (std::hex);
-	 for (unsigned int x (0); x < 8; ++x)
-	    TRACE1 ((unsigned int)input[x] << ' ');
-	 TRACE1 (std::hex);
+      zStream.avail_in = stream.gcount ();
+      if (!zStream.avail_in)
+         break;
+      zStream.next_in = reinterpret_cast<Bytef*> (input.data ());
+      size -= zStream.avail_in;
 
-	 zStream.avail_in = stream.gcount ();
-	 if (!zStream.avail_in)
-	    break;
-	 zStream.next_in = input;
-	 size -= zStream.avail_in;
+      // Run inflate() on input until output buffer is full
+      do {
+         zStream.avail_out = output.size ();
+         zStream.next_out = reinterpret_cast<Bytef*> (output.data ());
 
-	 // Run inflate() on input until output buffer is full
-	 do {
-	    zStream.avail_out = sizeof (output);
-            zStream.next_out = output;
+         switch (rc = inflate (&zStream, Z_NO_FLUSH)) {
+         case Z_NEED_DICT:
+         case Z_DATA_ERROR:
+            throw YGP::ParseError (_("Error inflating stream: Not a deflated file!"));
 
-	    switch (rc = inflate (&zStream, Z_NO_FLUSH)) {
-	    case Z_NEED_DICT:
-	    case Z_DATA_ERROR:
-	       inflateEnd (&zStream);
-	       throw (YGP::ParseError (_("Error inflating stream: Not a deflated file!")));
+         case Z_MEM_ERROR:
+            throw YGP::ParseError (_("Error inflating stream: Out of memory!"));
+         }
 
-            case Z_MEM_ERROR:
-	       inflateEnd (&zStream);
-	       throw (YGP::ParseError (_("Error inflating stream: Out of memory!")));
-	    }
+         props.append (output.data (), output.size () - zStream.avail_out);
+      } while (!zStream.avail_out);
 
-	    props.append ((char*)output, sizeof (output) - zStream.avail_out);
-	 } while (!zStream.avail_out);
-
-	 if (rc == Z_STREAM_END) {
-	    inflateEnd (&zStream);
-	    std::string values[] = { "dc:title>", "dc:creator>", "dc:description>" };
-	    std::string Properties::* dest[] =
-	       { &Properties::strTitle, &Properties::strAuthor, &Properties::strComment };
-	    for (unsigned int i (0); i < (sizeof (values) / sizeof (values[0])); ++i) {
-	       size_t start (props.find (std::string (1, '<') + values[i]));
-	       if (start != std::string::npos) {
-		  size_t end (props.find (std::string ("</") + values[i],
-					  start + 1 + values[i].length ()));
-		  if (end != std::string::npos) {
-		     start += 1 + values[i].length ();
-		     result.*(dest[i]) = props.substr (start, end - start);
-		  }
-	       }
-	    }
-	    return;
-	 }
+      if (rc == Z_STREAM_END) {
+         static const std::pair<std::string, std::string Properties::*> entries[] =
+            { { "dc:title>", &Properties::strTitle }, { "dc:creator>", &Properties::strAuthor },
+              { "dc:description>", &Properties::strComment } };
+         for (const auto& [tag, value] : entries) {
+            std::size_t start (props.find ('<' + tag));
+            if (start != std::string::npos) {
+               start += 1 + tag.length ();
+               std::size_t end (props.find ("</" + tag, start));
+               if (end != std::string::npos)
+                  result.*value = props.substr (start, end - start);
+            }
+         }
+         return;
       }
-      inflateEnd (&zStream);
-      throw (YGP::ParseError (_("Unexpected end of file!")));
    }
-   else
-      throw (YGP::ParseError (_("Not an OOXML document!")));
+   throw YGP::ParseError (_("Unexpected end of file!"));
 }
 
 /* File docProps/core.xml

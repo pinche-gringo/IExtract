@@ -32,8 +32,8 @@ class Options : public YGP::Entity {
    ~Options ();
 
  private:
-   Options (const Options& other);
-   const Options& operator= (const Options& other);
+   Options (const Options& other) = delete;
+   const Options& operator= (const Options& other) = delete;
 
    std::string  format;        // %attrib%; Format
    std::string  title;         // %attrib%; Title

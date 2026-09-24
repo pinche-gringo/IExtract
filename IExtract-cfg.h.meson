@@ -31,9 +31,6 @@
 // Installation directories
 #mesondefine LOCALEDIR
 
-// Define if the target is big-endian
-#mesondefine WORDS_BIGENDIAN
-
 // Define if national language support is enabled
 #mesondefine ENABLE_NLS
 #mesondefine HAVE_GETTEXT

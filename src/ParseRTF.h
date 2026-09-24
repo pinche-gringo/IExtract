@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include <YGP/XStream.h>
+#include <istream>
 
 struct Properties;
 
@@ -29,14 +29,13 @@ struct Properties;
 // Class to extract the title of a RTF-document
 class ParseRTF  {
  public:
-   ParseRTF () { }
-   ~ParseRTF () { }
+   ParseRTF () = default;
 
-   void parse (YGP::Xistream& stream, Properties& result);
+   void parse (std::istream& stream, Properties& result);
 
  private:
-   ParseRTF (const ParseRTF&);
-   ParseRTF& operator= (const ParseRTF&);
+   ParseRTF (const ParseRTF&) = delete;
+   ParseRTF& operator= (const ParseRTF&) = delete;
 };
 
 #endif

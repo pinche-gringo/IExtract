@@ -53,7 +53,7 @@ static const std::size_t LEN_ENDCDR (22);    // Length of end of central dir rec
 /// \param result: Out: Found information
 /// \throw YGP::ParseError: In case of an invalid document
 //-----------------------------------------------------------------------------
-void ParseOpenOffice::parse (YGP::Xistream& stream, Properties& result) {
+void ParseOpenOffice::parse (std::istream& stream, Properties& result) {
    namespace x3 = boost::spirit::x3;
    using SpiritParser::bytes;
    using SpiritParser::skip;
@@ -104,7 +104,7 @@ void ParseOpenOffice::parse (YGP::Xistream& stream, Properties& result) {
       throw YGP::ParseError (_("Document does not contain meta-information"));
    if (method)
       throw YGP::ParseError (_("Compressed meta-information is not supported"));
-   TRACE5 ("ParseOpenOffice::parse (YGP::Xistream&, Properties&) - Meta-info at " << posEntry
+   TRACE5 ("ParseOpenOffice::parse (std::istream&, Properties&) - Meta-info at " << posEntry
            << "; " << size << " bytes");
 
    // Local header of the meta-information, followed by its data

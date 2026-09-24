@@ -34,11 +34,19 @@
 #include <ygp-cfg.h>
 
 #include <cctype>
+#include <cstdio>
 #include <cstdlib>
-#include <cstring>
 
+#include <array>
+#include <charconv>
+#include <fstream>
 #include <map>
+#include <memory>
+#include <mutex>
+#include <optional>
 #include <string>
+#include <string_view>
+#include <utility>
 
 #include <boost/tokenizer.hpp>
 
@@ -46,36 +54,23 @@
 #include <YGP/Trace.h>
 
 #ifdef ENABLE_PLUGINS
-#  include <YGP/Module.h>
+#  include <type_traits>
+#  include <vector>
 
-const char* PLUGIN_PROCESS ("processFile");
-const char* PLUGIN_CHECKTYPE ("getFileType");
+#  include <boost/dll/shared_library.hpp>
+
+static constexpr const char* PLUGIN_PROCESS ("processFile");
+static constexpr const char* PLUGIN_CHECKTYPE ("getFileType");
 #endif
 
 #ifdef ENABLE_THREADS
 #  include <queue>
+#  include <thread>
 #  include <vector>
-#  include <algorithm>
-
-#  include <YGP/Mutex.h>
-#  include <YGP/Thread.h>
-#  define LOCKFILES     { ((Application*)this)->mxListFiles.lock (); }
-#  define UNLOCKFILES   { ((Application*)this)->mxListFiles.unlock (); }
-#  define LOCKTHREADS   { ((Application*)this)->mxThreads.lock (); }
-#  define UNLOCKTHREADS { ((Application*)this)->mxThreads.unlock (); }
-#  define LOCKOUTPUT    { ((Application*)this)->mxOutput.lock (); }
-#  define UNLOCKOUTPUT  { ((Application*)this)->mxOutput.unlock (); }
-#else
-#  define LOCKFILES
-#  define UNLOCKFILES
-#  define LOCKTHREADS
-#  define UNLOCKTHREADS
-#  define LOCKOUTPUT
-#  define UNLOCKOUTPUT
+#  include <condition_variable>
 #endif
 
 #include <YGP/Path.h>
-#include <YGP/XStream.h>
 #include <YGP/INIFile.h>
 #include <YGP/DirSrch.h>
 #include <YGP/XDirSrch.h>
@@ -125,152 +120,141 @@ const char* PLUGIN_CHECKTYPE ("getFileType");
 #  include "ParseSOffice.h"
 #endif
 
-#if SYSTEM == UNIX
-#  include <unistd.h>
-#elif SYSTEM == WINDOWS
-#  define WIN32_LEAN_AND_MEAN
-#  include <windows.h>
 
-#  define strcasecmp stricmp
-#  define sleep      Sleep
-#endif
-
-
-static const char* const DEFAULT_FORMAT = "%n|-|%t|%a|%c|%d";
-static const char* const DEFAULT_XML_FORMAT = "<tr><td>%n</td><td>%t</td>"
-                                              "<td>%a</td><td>%c</td><td>%d</td></tr>";
+static constexpr const char* DEFAULT_FORMAT = "%n|-|%t|%a|%c|%d";
+static constexpr const char* DEFAULT_XML_FORMAT = "<tr><td>%n</td><td>%t</td>"
+                                                  "<td>%a</td><td>%c</td><td>%d</td></tr>";
 
 
 // Class to run Extract-Application
 class Application : public YGP::IVIOApplication {
  public:
    Application (const int argc, const char* argv[]);
-   ~Application ();
+   ~Application () override = default;
 
  protected:
-   virtual void readINIFile (const char* pFile);
-   virtual bool handleOption (const char option);
+   void readINIFile (const char* pFile) override;
+   bool handleOption (const char option) override;
 
    // Program-handling
-   virtual bool        shallShowInfo () const { return false; }
-   virtual int         perform (int argc, const char* argv[]);
-   virtual const char* name () const { return PACKAGE; }
-   virtual const char* description () const {
-      static std::string version (PACKAGE " V" VERSION " - ");
-      version += (_("Compiled on %1 at %2\n\nCopyright (C) 2002 - 2009 Markus Schwab; email: g17m0@users.sourceforge.net\nDistributed under the terms of the GNU General Public License"));
-      version.replace (version.find ("%1"), 2, __DATE__);
-      version.replace (version.find ("%2"), 2, __TIME__);
+   bool        shallShowInfo () const override { return false; }
+   int         perform (int argc, const char* argv[]) override;
+   const char* name () const override { return PACKAGE; }
+   const char* description () const override {
+      static const std::string version ([] {
+            std::string version (PACKAGE " V" VERSION " - ");
+            version += (_("Compiled on %1 at %2\n\nCopyright (C) 2002 - 2009 Markus Schwab; email: g17m0@users.sourceforge.net\nDistributed under the terms of the GNU General Public License"));
+            version.replace (version.find ("%1"), 2, __DATE__);
+            version.replace (version.find ("%2"), 2, __TIME__);
+            return version; } ());
       return version.c_str (); }
 
    // Help-handling
-   virtual void showHelp () const;
+   void showHelp () const override;
 
  private:
    // Prohobited manager functions
-   Application ();
-   Application (const Application&);
-   const Application& operator= (const Application&);
+   Application () = delete;
+   Application (const Application&) = delete;
+   const Application& operator= (const Application&) = delete;
 
-   typedef void (*HANDLER) (YGP::Xistream& hFile, Properties& result);
+   using HANDLER = void (*) (std::istream& hFile, Properties& result);
    HANDLER getFileTypeHandler (const char* file) const;
 
-   typedef std::map<unsigned int, HANDLER> handlerMap;
-   typedef std::pair<unsigned int, HANDLER> handlerValue;
-   handlerMap handlers;
+   std::map<unsigned int, HANDLER> handlers;
 
    bool setMode (const std::string& mode);
 
    static void convertFromWideChar (Properties& prop);
 
-   void handleFiles (const char* pFile) const;
+   void handleFiles (const char* pFile);
    void processFile (const YGP::File& file, HANDLER fnc) const;
 #ifdef ENABLE_THREADS
-   void* processThread (void*);
+   void processThread (std::stop_token stop);
 #endif
 
 #ifdef SUPPORT_MP3
-   static void processMP3 (YGP::Xistream& hFile, Properties& result);
+   static void processMP3 (std::istream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_OGG
-   static void processOGG (YGP::Xistream& hFile, Properties& result);
+   static void processOGG (std::istream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_PDF
-   static void processPDF (YGP::Xistream& hFile, Properties& result);
+   static void processPDF (std::istream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_JPEG
-   static void processJPG (YGP::Xistream& hFile, Properties& result);
+   static void processJPG (std::istream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_PNG
-   static void processPNG (YGP::Xistream& hFile, Properties& result);
+   static void processPNG (std::istream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_GIF
-   static void processGIF (YGP::Xistream& hFile, Properties& result);
+   static void processGIF (std::istream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_HTML
-   static void processHTML (YGP::Xistream& hFile, Properties& result);
+   static void processHTML (std::istream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_RTF
-   static void processRTF (YGP::Xistream& hFile, Properties& result);
+   static void processRTF (std::istream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_MSOFFICE
-   static void processMSOffice (YGP::Xistream& hFile, Properties& result);
+   static void processMSOffice (std::istream& hFile, Properties& result);
 #  ifdef SUPPORT_OOXML
-   static void processOOXML (YGP::Xistream& hFile, Properties& result);
+   static void processOOXML (std::istream& hFile, Properties& result);
 #  endif
 #endif
 #ifdef SUPPORT_OO
-   static void processOpenOffice (YGP::Xistream& hFile, Properties& result);
-   static void processStarOffice (YGP::Xistream& hFile, Properties& result);
+   static void processOpenOffice (std::istream& hFile, Properties& result);
+   static void processStarOffice (std::istream& hFile, Properties& result);
 #endif
 #ifdef SUPPORT_ABIWORD
-   static void processAbiword (YGP::Xistream& hFile, Properties& result);
+   static void processAbiword (std::istream& hFile, Properties& result);
 #endif
 
    void showSupportedTypes () const;
 
-   enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4, TRUNC_EXTENSION = 0x8, TERMINATE = 0x10 };
+   enum { RECURSIVE = 0x1, SHOW_ALL = 0x2, SHOW_ERRORS = 0x4, TRUNC_EXTENSION = 0x8 };
 
-   unsigned int options;
+   unsigned int options {0};
 
-   unsigned int chgFlag;
+   unsigned int chgFlag {0};
    Options iniOpts;
 
-   Writer* writer;
+   std::unique_ptr<Writer> writer;
    std::string filelist;
    std::string append, prepend;
 
-   enum { TEXT = 0, QUOTED, HTML, LATEX, XML } outputStyle;
+   enum class OutputStyle { TEXT, QUOTED, HTML, LATEX, XML };
+   OutputStyle outputStyle {OutputStyle::TEXT};
+   static std::optional<OutputStyle> getOutputStyle (std::string_view style);
 
-   YGP::FileTypeChecker* ftchk;
+   std::unique_ptr<YGP::FileTypeChecker> ftchk;
 
    static const longOptions lo[];
 
+   mutable std::mutex mxOutput;
+
 #ifdef ENABLE_THREADS
-   std::vector<YGP::Thread*> aThreads;
-   YGP::Mutex                mxThreads;
-   YGP::Mutex                mxOutput;
+   /// File to process (with its handler)
+   struct FileFunction : public YGP::File {
+      FileFunction (const YGP::File& file, HANDLER fnc) : YGP::File (file), fnc (fnc) { }
 
-   typedef struct FileFunction : public YGP::File {
       HANDLER fnc;
-      FileFunction () : YGP::File (), fnc (NULL) { }
-      FileFunction (const YGP::File& file) : YGP::File (file), fnc (NULL) { }
-      FileFunction (const struct FileFunction& ffnc) : YGP::File (ffnc)
-         , fnc (ffnc.fnc) { }
+   };
 
-      const struct FileFunction& operator= (const struct FileFunction& ffnc) {
-         if (this != &ffnc) {
-            YGP::File::operator= (ffnc);
-            fnc = ffnc.fnc;
-         }
-         return *this; }
-   } FILEFNC;
-   YGP::Mutex           mxListFiles;
-   std::queue<FILEFNC>  listFiles;
+   static constexpr std::size_t MAX_PENDING_FILES = 100;
+
+   unsigned int                cThreads {1};
+   std::vector<std::jthread>   threads;
+   std::mutex                  mxListFiles;
+   std::condition_variable_any cvListFiles;         ///< Signals changes of listFiles or cActive
+   std::queue<FileFunction>    listFiles;           ///< Files to process
+   unsigned int                cActive {0};         ///< Number of files being processed
 #endif
 
 #ifdef ENABLE_PLUGINS
    std::map<std::string, std::string> dynHandlers;
-   std::vector<YGP::Module*> modules;
+   std::vector<boost::dll::shared_library> modules;
 
    void setPlugins ();
 #endif
@@ -300,11 +284,11 @@ const YGP::IVIOApplication::longOptions Application::lo[] = {
    { "sort", 'S' },
    { "mode", 'M' },
    { "list-types", 'l' },
-   { NULL, '\0' } };
+   { nullptr, '\0' } };
 
 
 
-typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+using tokenizer = boost::tokenizer<boost::char_separator<char>>;
 
 
 //----------------------------------------------------------------------------
@@ -313,18 +297,9 @@ typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 /// \param argv Array holding (pointer to) arguments
 //----------------------------------------------------------------------------
 Application::Application (const int argc, const char* argv[])
-   : YGP::IVIOApplication (argc, argv, lo), handlers (), options (0), chgFlag (0),
-     iniOpts (), writer (NULL), filelist (), append (), prepend (),
-     outputStyle (TEXT), ftchk (NULL)
-#ifdef ENABLE_THREADS
-    , aThreads (0)
-#endif
-{
+   : YGP::IVIOApplication (argc, argv, lo) {
    iniOpts.format = DEFAULT_FORMAT;
    iniOpts.ageOfNewFiles = 30 * 24 * 60 * 60;
-#ifdef ENABLE_THREADS
-   aThreads.reserve (1);
-#endif
 
 #ifdef SUPPORT_ABIWORD
    handlers[YGP::FileTypeChecker::ABIWORD] = &Application::processAbiword;
@@ -363,12 +338,6 @@ Application::Application (const int argc, const char* argv[])
 #ifdef SUPPORT_RTF
    handlers[YGP::FileTypeChecker::RTF] = &Application::processRTF;
 #endif
-}
-
-//----------------------------------------------------------------------------
-/// Destructor
-//----------------------------------------------------------------------------
-Application::~Application () {
 }
 
 
@@ -468,7 +437,7 @@ void Application::showHelp () const {
 /// Checks the validity of the passed option
 /// \param option Actual option
 /// \returns \c bool Status; false: Invalid option/option-value Require :
-///     option not '\0´'
+///     option not '\0'
 //-----------------------------------------------------------------------------
 bool Application::handleOption (const char option) {
    Check3 (option != '\0');
@@ -484,36 +453,31 @@ bool Application::handleOption (const char option) {
          std::cerr << PACKAGE << error;
          break; } }
       // Don't add a break in OK case, as -s implies -r!
+      [[fallthrough]];
 
    case 'r': options |= RECURSIVE; break;
 
    case 'o': {
       const char* pType = getOptionValue ();
-      if (!pType
-          || ((outputStyle = HTML, strcmp (pType, "HTML"))
-              && (outputStyle = TEXT, strcmp (pType, "text"))
-              && (outputStyle = QUOTED, strcmp (pType, "quoted"))
-              && (outputStyle = XML, strcmp (pType, "XML"))
-              && (outputStyle = LATEX, strcmp (pType, "LaTeX")))) {
-         outputStyle = TEXT;
+      std::optional<OutputStyle> style (pType ? getOutputStyle (pType) : std::nullopt);
+      outputStyle = style.value_or (OutputStyle::TEXT);
+      if (!style) {
          std::string error (_("-warning: Style of output `%1' is not valid! Using text\n"));
-         error.replace (error.find ("%1"), 2, pType);
+         error.replace (error.find ("%1"), 2, pType ? pType : "");
          std::cerr << PACKAGE << error;
       }
       break; }
 
 #ifdef ENABLE_THREADS
    case 't': {
-      const char* pThreads = getOptionValue ();
-      unsigned int cThreads (0);
-      char* pEnd = NULL;
-      if (!pThreads
-          || (!(cThreads = strtoul (pThreads, &pEnd, 10)))
-          || (!pEnd || *pEnd)) {
+      const char* pThreads (getOptionValue ());
+      const std::string_view threads (pThreads ? pThreads : "");
+      unsigned int count (0);
+      auto [end, rc] (std::from_chars (threads.data (), threads.data () + threads.size (), count));
+      if ((rc != std::errc ()) || (end != (threads.data () + threads.size ())) || !count)
          std::cerr << PACKAGE << _("-warning: Invalid number of threads!\n");
-      }
       else
-         aThreads.reserve (cThreads);
+         cThreads = count;
       break; }
 #endif
 
@@ -545,27 +509,30 @@ bool Application::handleOption (const char option) {
 
    case 'n': {
       const char* pNew = getOptionValue ();
-      char* pEnd = NULL;
-      unsigned int time (0);
       if (!pNew) {
          std::string error (_("-warning: Option `%1' needs an argument! Ignoring option!\n"));
          error.replace (error.find ("%1"), 2, 1, option);
          std::cerr << PACKAGE << error;
+         break;
       }
-      else if ((time = strtoul (pNew, &pEnd, 10)),
-               (!pEnd || ((*pEnd != ':') && (*pEnd != 'm')))) {
+
+      // Format: [DAYS[m]]:TEXT
+      const std::string_view value (pNew);
+      unsigned int time (0);
+      const char* pos (std::from_chars (value.data (), value.data () + value.size (), time).ptr);
+      if ((pos != (value.data () + value.size ())) && (*pos == 'm')) {
+         ++pos;
+         time *= 30;
+      }
+      if ((pos == (value.data () + value.size ())) || (*pos != ':')) {
          std::string error (_("-warning: Argument for new files `%1' is not valid! Ignoring option `n'\n"));
          error.replace (error.find ("%1"), 2, pNew);
          std::cerr << PACKAGE << error;
       }
       else {
-         if (*pEnd == 'm') {
-            ++pEnd;
-            time *= 30;
-         }
          if (time)
             iniOpts.ageOfNewFiles = time * 24 * 60 * 60;
-         iniOpts.newText = pEnd + 1;
+         iniOpts.newText = pos + 1;
       }
       break; }
 
@@ -576,9 +543,9 @@ bool Application::handleOption (const char option) {
          std::string lFiles (files);
 	 tokenizer list (lFiles, boost::char_separator<char> (YGP::Path::SEPARATOR_STR));
 
-	 for (tokenizer::iterator i (list.begin ()); i != list.end (); ++i) {
+	 for (const auto& file : list) {
             filelist += option;
-            filelist += *i;
+            filelist += file;
             filelist += YGP::Path::SEPARATOR;
          }
       }
@@ -628,12 +595,11 @@ bool Application::handleOption (const char option) {
          else {
             std::string& target = (option == 'P') ? prepend : append;
 
-            static const unsigned int bufLen (512);
-            char buffer[bufLen];
+            std::array<char, 512> buffer;
 
             // Read as long as there is data/or an error occurs
-            while (input.read (buffer, bufLen), input.gcount ())
-               target.append (buffer, input.gcount ());
+            while (input.read (buffer.data (), buffer.size ()), input.gcount ())
+               target.append (buffer.data (), input.gcount ());
          }
       }
       else {
@@ -660,9 +626,9 @@ bool Application::handleOption (const char option) {
 
    case 'l':
       showSupportedTypes ();
-      exit (0);
+      std::exit (0);
 
-   case 'V': std::cout << description () << '\n'; exit (0);
+   case 'V': std::cout << description () << '\n'; std::exit (0);
 
    default: {
       std::string error (_("-warning: Ignoring invalid option `%1'\n"));
@@ -684,33 +650,45 @@ bool Application::handleOption (const char option) {
 /// \returns bool True, if the passed mode is invalid
 //-----------------------------------------------------------------------------
 bool Application::setMode (const std::string& mode) {
-   YGP::FileTypeChecker* newFtchk (NULL);
    if (mode == "Ext") {
-      newFtchk = new YGP::FileTypeCheckerByExtension;
+      ftchk = std::make_unique<YGP::FileTypeCheckerByExtension> ();
       options &= ~TRUNC_EXTENSION;
    }
    else if (mode == "AllExt") {
-      newFtchk = new YGP::FileTypeCheckerByExtension;
+      ftchk = std::make_unique<YGP::FileTypeCheckerByExtension> ();
       options |= TRUNC_EXTENSION;
    }
    else if (mode == "EXT") {
-      newFtchk = new YGP::FileTypeCheckerByCaseExt;
+      ftchk = std::make_unique<YGP::FileTypeCheckerByCaseExt> ();
       options &= ~TRUNC_EXTENSION;
    }
    else if (mode == "AllEXT") {
-      newFtchk = new YGP::FileTypeCheckerByCaseExt;
+      ftchk = std::make_unique<YGP::FileTypeCheckerByCaseExt> ();
       options |= TRUNC_EXTENSION;
    }
    else if (mode == "Content") {
-      newFtchk = new YGP::FileTypeCheckerByContent;
+      ftchk = std::make_unique<YGP::FileTypeCheckerByContent> ();
       options &= ~TRUNC_EXTENSION;
    }
    else
       return true;
-
-   delete ftchk;
-   ftchk = newFtchk;
    return false;
+}
+
+//-----------------------------------------------------------------------------
+/// Returns the output style for the passed name
+/// \param style Name of the style
+/// \returns std::optional<OutputStyle> The style, if the passed name is valid
+//-----------------------------------------------------------------------------
+std::optional<Application::OutputStyle> Application::getOutputStyle (std::string_view style) {
+   static constexpr std::pair<std::string_view, OutputStyle> styles[] =
+      { { "text", OutputStyle::TEXT }, { "quoted", OutputStyle::QUOTED },
+        { "HTML", OutputStyle::HTML }, { "LaTeX", OutputStyle::LATEX },
+        { "XML", OutputStyle::XML } };
+   for (const auto& [name, value] : styles)
+      if (name == style)
+         return value;
+   return std::nullopt;
 }
 
 //-----------------------------------------------------------------------------
@@ -725,26 +703,25 @@ int Application::perform (int argc, const char* argv[]) {
       return -1;
    }
 
-   if ((outputStyle == XML) && !(chgFlag & 1))
+   if ((outputStyle == OutputStyle::XML) && !(chgFlag & 1))
       iniOpts.format = DEFAULT_XML_FORMAT;
    Check3 (iniOpts.format.size ());
 
    if (!ftchk)
-      ftchk = new YGP::FileTypeCheckerByExtension;
+      ftchk = std::make_unique<YGP::FileTypeCheckerByExtension> ();
    Check3 (ftchk);
 
-   typedef Writer* (*CREATEWRITER) (const std::string&, const std::string&,
-                                    unsigned long);
+   using CreateWriter = std::unique_ptr<Writer> (*) (const std::string&, const std::string&,
+                                                     unsigned long);
 
-   // This declaration must be in the same order as the outputStyle enum
-   CREATEWRITER fnc[] = { (CREATEWRITER)&TextWriter::create,
-                          (CREATEWRITER)&QuotedTextWriter::create,
-                          (CREATEWRITER)&HTMLWriter::create,
-                          (CREATEWRITER)&LaTeXWriter::create,
-                          (CREATEWRITER)&XMLWriter::create };
+   // This declaration must be in the same order as the OutputStyle enum
+   static constexpr CreateWriter fnc[] = { &TextWriter::create, &QuotedTextWriter::create,
+                                           &HTMLWriter::create, &LaTeXWriter::create,
+                                           &XMLWriter::create };
+   static_assert (std::size (fnc) == (std::to_underlying (OutputStyle::XML) + 1));
 
-   Check3 (outputStyle < (sizeof (fnc) / sizeof (fnc[0])));
-   writer = fnc[outputStyle] (iniOpts.format, iniOpts.newText, iniOpts.ageOfNewFiles);
+   writer = fnc[std::to_underlying (outputStyle)] (iniOpts.format, iniOpts.newText,
+                                                   iniOpts.ageOfNewFiles);
    Check3 (writer);
 
    if (prepend.size ())
@@ -760,7 +737,7 @@ int Application::perform (int argc, const char* argv[]) {
    for (int j (0); j < argc; ++j) {
       file = argv[j];
       if (YGP::DirectorySearch::isValid (argv[j])) {
-         if (file[file.size () - 1] != YGP::File::DIRSEPARATOR)
+         if (file.back () != YGP::File::DIRSEPARATOR)
             file += YGP::File::DIRSEPARATOR;
          file += "*";
       }
@@ -768,32 +745,15 @@ int Application::perform (int argc, const char* argv[]) {
    }
 
 #ifdef ENABLE_THREADS
-   ((Application*)this)->options |= TERMINATE;
-
-   // Wait for threads to terminate
-   LOCKTHREADS
-   while (aThreads.size ()) {
-      TRACE9 ("Application::handleFiles (const char*) - Wait for thread "
-              << aThreads[0]->getID ());
-      unsigned long id (aThreads[0]->getID ());
-      UNLOCKTHREADS
-      YGP::Thread::waitForThread (id);
-      LOCKTHREADS
-   }
-   UNLOCKTHREADS
+   // Terminate the threads (all files have been processed)
+   threads.clear ();
 #endif
 
    writer->printEnd (std::cout);
-   delete writer;
+   writer.reset ();
 
    if (append.size ())
       std::cout << append;
-
-#ifdef ENABLE_PLUGINS
-   for (std::vector<YGP::Module*>::const_iterator i (modules.begin ());
-	i != modules.end (); ++i)
-      delete (*i);
-#endif
    return 0;
 }
 
@@ -802,21 +762,23 @@ int Application::perform (int argc, const char* argv[]) {
 /// \param pFile Filespecification; may contain wildcards
 /// \pre pFile not NULL
 //-----------------------------------------------------------------------------
-void Application::handleFiles (const char* pFile) const {
+void Application::handleFiles (const char* pFile) {
    Check3 (pFile);
-   TRACE5 ("Application::handleFiles (const char*) const - " << pFile);
+   TRACE5 ("Application::handleFiles (const char*) - " << pFile);
 
-   YGP::ExtDirectorySearch& ds
-      (iniOpts.sort
-       ? *new YGP::SortedDirSearch<YGP::ExtDirectorySearch> (pFile)
-       : *new YGP::ExtDirectorySearch (pFile));
+   std::unique_ptr<YGP::ExtDirectorySearch> search;
+   if (iniOpts.sort)
+      search = std::make_unique<YGP::SortedDirSearch<YGP::ExtDirectorySearch>> (pFile);
+   else
+      search = std::make_unique<YGP::ExtDirectorySearch> (pFile);
+   YGP::ExtDirectorySearch& ds (*search);
 
    tokenizer list (filelist, boost::char_separator<char> (YGP::Path::SEPARATOR_STR));
 
-   for (tokenizer::iterator i (list.begin ()); i != list.end (); ++i)
-      (i->at (0) == 'i')
-	 ? ds.addFilesToInclude (i->substr (1))
-	 : ds.addFilesToExclude (i->substr (1));
+   for (const auto& entry : list)
+      (entry.at (0) == 'i')
+	 ? ds.addFilesToInclude (entry.substr (1))
+	 : ds.addFilesToExclude (entry.substr (1));
 
    const YGP::File* file = ds.find (YGP::IDirectorySearch::FILE_NORMAL);
    std::string name;
@@ -828,61 +790,45 @@ void Application::handleFiles (const char* pFile) const {
       // Unknown type; try second to-last extension (if option passed)
       if ((options & TRUNC_EXTENSION) && !fnc) {
 	 do {
-	    size_t pos (name.rfind ('.'));
+	    std::size_t pos (name.rfind ('.'));
 	    if (pos == std::string::npos)
 	       break;
 	    else {
-	       name.replace (name.begin () + pos, name.end (), 0, '\0');
+	       name.erase (pos);
 	       fnc = getFileTypeHandler (name.c_str ());
 	    }
 	 } while (!fnc);
       }
       if (fnc) {
 #ifdef ENABLE_THREADS
-         LOCKFILES
-         while (listFiles.size () > 100) {
-            UNLOCKFILES
-            sleep (0);
-            LOCKFILES
+         {
+            std::unique_lock lock (mxListFiles);
+            cvListFiles.wait (lock, [this] { return listFiles.size () < MAX_PENDING_FILES; });
+            listFiles.emplace (*file, fnc);
          }
-         ((Application*)this)->listFiles.push (*file);
-         ((Application*)this)->listFiles.back ().fnc = fnc;
-         UNLOCKFILES
+         cvListFiles.notify_all ();
 
-         LOCKTHREADS
-         if (aThreads.size () < aThreads.capacity ())
-            try {
-               ((Application*)this)->aThreads.push_back (
-                  YGP::OThread<Application>::create2 ((Application*)this,
-                                                      &Application::processThread, NULL));
-            }
-            catch (YGP::ExecError& err) {
-               std::cerr << PACKAGE << _("-error: ") << err.what () << '\n';
-            }
-         UNLOCKTHREADS
+         if (threads.size () < cThreads)
+            threads.emplace_back ([this] (std::stop_token stop) { processThread (stop); });
 #else
          processFile (*file, fnc);
 #endif
       } // endif handler found
       else
          if (options & SHOW_ALL) {
-            LOCKOUTPUT
+            std::scoped_lock lock (mxOutput);
             writer->printMessage (std::cout, *file,
 				  (options & SHOW_ERRORS) ? _("Unknown file-type") : "");
-            UNLOCKOUTPUT
          }
       file = ds.next ();
    } // end-while
 
 #ifdef ENABLE_THREADS
-   // Wait for threads to handle all pending files
-   LOCKFILES
-   while (listFiles.size ()) {
-      UNLOCKFILES
-      sleep (0);
-      LOCKFILES
+   // Wait for threads to process all pending files (before handling subdirectories)
+   {
+      std::unique_lock lock (mxListFiles);
+      cvListFiles.wait (lock, [this] { return listFiles.empty () && !cActive; });
    }
-   UNLOCKFILES
 #endif
 
    // Now handle subdirectories (if specified)
@@ -892,9 +838,10 @@ void Application::handleFiles (const char* pFile) const {
       file = ds.find (ds.getDirectory () + "*", YGP::DirectorySearch::FILE_DIRECTORY);
       while (file) {
          if (!YGP::IDirectorySearch::isSpecial (file->name ())) {
-            LOCKOUTPUT
-            writer->printSeparator (std::cout, *file, iniOpts.separate, iniOpts.title);
-            UNLOCKOUTPUT
+            {
+               std::scoped_lock lock (mxOutput);
+               writer->printSeparator (std::cout, *file, iniOpts.separate, iniOpts.title);
+            }
             std::string strFile (file->path ());
             strFile += file->name ();
             strFile += YGP::File::DIRSEPARATOR;
@@ -904,44 +851,35 @@ void Application::handleFiles (const char* pFile) const {
          file = ds.next ();
       }
    }
-
-   delete &ds;
 }
 
 #ifdef ENABLE_THREADS
 //-----------------------------------------------------------------------------
-/// Threadfunction to process files (as long as the filelist is full)
+/// Threadfunction to process files (until the thread is requested to stop)
+/// \param stop Token signaling the thread to terminate
 //-----------------------------------------------------------------------------
-void* Application::processThread (void* pThread) {
-   Check3 (pThread);
-   FILEFNC file;
-
+void Application::processThread (std::stop_token stop) {
    while (true) {
-      LOCKFILES
-      if (listFiles.size ()) {
-         file = listFiles.front ();
-         listFiles.pop ();
-         UNLOCKFILES
-         TRACE1 ("Application::processThread (void*) - File " << file.name ()
-                  << "; Remaining: " << listFiles.size ());
-         Check3 (file.fnc);
-         Check3 (file.fnc == getFileTypeHandler (strrchr (file.name (), '.') + 1));
-         processFile (file, file.fnc);
-      }
-      else {
-         UNLOCKFILES
-	 if (options & TERMINATE)
-	    break;
-	 else
-	    sleep (1);
-      }
-   } // end-while
+      std::unique_lock lock (mxListFiles);
+      if (!cvListFiles.wait (lock, stop, [this] { return !listFiles.empty (); }))
+         break;                                         // Stop requested; no files left
 
-   LOCKTHREADS
-   Check3 (find (aThreads.begin (), aThreads.end (), pThread) != aThreads.end ());
-   aThreads.erase (find (aThreads.begin (), aThreads.end (), pThread));
-   UNLOCKTHREADS
-   return NULL;
+      FileFunction file (std::move (listFiles.front ()));
+      listFiles.pop ();
+      ++cActive;
+      TRACE1 ("Application::processThread (std::stop_token) - File " << file.name ()
+              << "; Remaining: " << listFiles.size ());
+      lock.unlock ();
+      cvListFiles.notify_all ();
+
+      Check3 (file.fnc);
+      processFile (file, file.fnc);
+
+      lock.lock ();
+      --cActive;
+      lock.unlock ();
+      cvListFiles.notify_all ();
+   } // end-while
 }
 #endif
 
@@ -956,29 +894,24 @@ void Application::processFile (const YGP::File& file, HANDLER fnc) const {
    std::string strFile (file.path ());
    strFile += file.name ();
 
-   YGP::Xifstream ifile;
-   ifile.open (strFile.c_str (), std::ios::in | std::ios::binary);
+   std::ifstream ifile (strFile, std::ios::in | std::ios::binary);
    if (!ifile) {
-      LOCKOUTPUT;
+      std::scoped_lock lock (mxOutput);
       std::string error (_("-error: File `%1' can't be opened!\nReason: "));
       error.replace (error.find ("%1"), 2, strFile);
       std::cerr << PACKAGE << error;
-      perror ("");
-      UNLOCKOUTPUT
+      std::perror ("");
    }
    else {
-      ifile.init ();
-
       try {
          Properties prop;
-         fnc ((YGP::Xistream&)ifile, prop);
+         fnc (ifile, prop);
          convertFromWideChar (prop);
-         LOCKOUTPUT
+         std::scoped_lock lock (mxOutput);
          writer->printFile (std::cout, file, prop);
-         UNLOCKOUTPUT
       }
-      catch (YGP::ParseError& err) {
-         LOCKOUTPUT;
+      catch (const YGP::ParseError& err) {
+         std::scoped_lock lock (mxOutput);
          std::cerr << PACKAGE << _("-error: ") << err.what () << '\n';
 	 std::string msg;
 	 if (options & SHOW_ERRORS) {
@@ -986,7 +919,6 @@ void Application::processFile (const YGP::File& file, HANDLER fnc) const {
 	    msg += err.what ();
 	 }
          writer->printMessage (std::cout, file, msg);
-         UNLOCKOUTPUT
       } // end-catch
    } // end-else file could be opened
 }
@@ -997,7 +929,7 @@ void Application::processFile (const YGP::File& file, HANDLER fnc) const {
 /// \param hFile File to processs
 /// \param result Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processHTML (YGP::Xistream& hFile, Properties& result) {
+void Application::processHTML (std::istream& hFile, Properties& result) {
    ParseHTML ().parse (hFile, result);
 }
 #endif
@@ -1008,7 +940,7 @@ void Application::processHTML (YGP::Xistream& hFile, Properties& result) {
 /// \param hFile File to processs
 /// \param result Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processPDF (YGP::Xistream& hFile, Properties& result) {
+void Application::processPDF (std::istream& hFile, Properties& result) {
    ParsePDF::parse (hFile, result);
 }
 #endif
@@ -1019,7 +951,7 @@ void Application::processPDF (YGP::Xistream& hFile, Properties& result) {
 /// \param hFile File to processs
 /// \param result Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processMP3 (YGP::Xistream& hFile, Properties& result) {
+void Application::processMP3 (std::istream& hFile, Properties& result) {
    ParseMP3::parse (hFile, result);
 }
 #endif
@@ -1030,7 +962,7 @@ void Application::processMP3 (YGP::Xistream& hFile, Properties& result) {
 /// \param hFile File to processs
 /// \param result Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processOGG (YGP::Xistream& hFile, Properties& result) {
+void Application::processOGG (std::istream& hFile, Properties& result) {
    ParseOGG::parse (hFile, result);
 }
 #endif
@@ -1041,7 +973,7 @@ void Application::processOGG (YGP::Xistream& hFile, Properties& result) {
 /// \param hFile File to processs
 /// \param result Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) {
+void Application::processStarOffice (std::istream& hFile, Properties& result) {
    ParseStarOffice ().parse (hFile, result);
 }
 
@@ -1050,7 +982,7 @@ void Application::processStarOffice (YGP::Xistream& hFile, Properties& result) {
 /// \param hFile File to processs
 /// \param result Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) {
+void Application::processOpenOffice (std::istream& hFile, Properties& result) {
    ParseOpenOffice ().parse (hFile, result);
 }
 #endif
@@ -1061,7 +993,7 @@ void Application::processOpenOffice (YGP::Xistream& hFile, Properties& result) {
 /// \param hFile File to processs
 /// \param result Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processAbiword (YGP::Xistream& hFile, Properties& result) {
+void Application::processAbiword (std::istream& hFile, Properties& result) {
    ParseAbiword ().parse (hFile, result);
 }
 #endif
@@ -1072,7 +1004,7 @@ void Application::processAbiword (YGP::Xistream& hFile, Properties& result) {
 /// \param hFile File to processs
 /// \param result Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processRTF (YGP::Xistream& hFile, Properties& result) {
+void Application::processRTF (std::istream& hFile, Properties& result) {
    TRACE9 ("Parsing RTF");
    ParseRTF ().parse (hFile, result);
 }
@@ -1084,7 +1016,7 @@ void Application::processRTF (YGP::Xistream& hFile, Properties& result) {
 /// \param hFile File to processs
 /// \param result Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) {
+void Application::processMSOffice (std::istream& hFile, Properties& result) {
    ParseMSOffice ().parse (hFile, result);
 }
 
@@ -1094,7 +1026,7 @@ void Application::processMSOffice (YGP::Xistream& hFile, Properties& result) {
 /// \param hFile File to processs
 /// \param result Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processOOXML (YGP::Xistream& hFile, Properties& result) {
+void Application::processOOXML (std::istream& hFile, Properties& result) {
    ParseOOXML ().parse (hFile, result);
 }
 #  endif
@@ -1106,7 +1038,7 @@ void Application::processOOXML (YGP::Xistream& hFile, Properties& result) {
 /// \param hFile File to processs
 /// \param result Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processJPG (YGP::Xistream& hFile, Properties& result) {
+void Application::processJPG (std::istream& hFile, Properties& result) {
    ParseJPEG ().parse (hFile, result);
 }
 #endif
@@ -1117,7 +1049,7 @@ void Application::processJPG (YGP::Xistream& hFile, Properties& result) {
 /// \param hFile File to processs
 /// \param result Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processPNG (YGP::Xistream& hFile, Properties& result) {
+void Application::processPNG (std::istream& hFile, Properties& result) {
    ParsePNG (result).parse (hFile);
 }
 #endif
@@ -1128,7 +1060,7 @@ void Application::processPNG (YGP::Xistream& hFile, Properties& result) {
 /// \param hFile File to processs
 /// \param result Result of parsing
 //-----------------------------------------------------------------------------
-void Application::processGIF (YGP::Xistream& hFile, Properties& result) {
+void Application::processGIF (std::istream& hFile, Properties& result) {
    ParseGIF (result).parse (hFile);
 }
 #endif
@@ -1136,18 +1068,17 @@ void Application::processGIF (YGP::Xistream& hFile, Properties& result) {
 //-----------------------------------------------------------------------------
 /// Returns a handling function to a filetype
 /// \param file Filename
-/// \returns \c HANDLER Method to handle this filetype; NULL in case of error
+/// \returns \c HANDLER Method to handle this filetype; nullptr in case of error
 //-----------------------------------------------------------------------------
 Application::HANDLER Application::getFileTypeHandler (const char* file) const {
    TRACE9 ("Application::getFileTypeHandler (const std::string&) - " << file);
    Check1 (ftchk);
 
    unsigned int type (ftchk->getType (file));
-   if (type != YGP::FileTypeChecker::UNKNOWN) {
-      handlerMap::const_iterator i (handlers.find (type));
-      return (i != handlers.end ()) ? i->second : NULL;
-   }
-   return NULL;
+   if (type != YGP::FileTypeChecker::UNKNOWN)
+      if (auto i (handlers.find (type)); i != handlers.end ())
+         return i->second;
+   return nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -1155,18 +1086,15 @@ Application::HANDLER Application::getFileTypeHandler (const char* file) const {
 /// \param prop Properties to convert
 //-----------------------------------------------------------------------------
 void Application::convertFromWideChar (Properties& prop) {
-   static std::string Properties::* values[] = { &Properties::strTitle,
-                                                 &Properties::strComment,
-                                                 &Properties::strAuthor};
-
-   for (unsigned int i (0); i < (sizeof (values) / sizeof (values[0])); ++i)
-      if (((prop.*values[i]).size () > 1) && iscntrl ((prop.*values[i])[1])
-          && (!((prop.*values[i]).size () & 1))) {
-         for (unsigned int j (1); j < ((prop.*values[i]).size () >> 1); ++j)
-            (prop.*values[i])[j] = (prop.*values[i])[j << 1];
-         (prop.*values [i]).replace ((prop.*values [i]).size () >> 1,
-                                     (prop.*values [i]).size (), 0, '\0');
+   for (auto member : { &Properties::strTitle, &Properties::strComment, &Properties::strAuthor }) {
+      std::string& value (prop.*member);
+      if ((value.size () > 1) && std::iscntrl (static_cast<unsigned char> (value[1]))
+          && !(value.size () & 1)) {
+         for (std::size_t i (1); i < (value.size () >> 1); ++i)
+            value[i] = value[i << 1];
+         value.resize (value.size () >> 1);
       }
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -1191,8 +1119,8 @@ void Application::readINIFile (const char* pFile) {
 #endif
       INIFILE_READ ();
    }
-   catch (YGP::FileError&) { }
-   catch (std::exception& error) {
+   catch (const YGP::FileError&) { }
+   catch (const std::exception& error) {
       std::string err ("-warning: Error reading INI-file `%1'! %2\n");
       err.replace (err.find ("%1"), 2, pFile);
       err.replace (err.find ("%2"), 2, error.what ());
@@ -1200,22 +1128,13 @@ void Application::readINIFile (const char* pFile) {
    }
 
    if (iniOpts.style.size ()) {
-      if (iniOpts.style == "HTML")
-         outputStyle = HTML;
-      else if (iniOpts.style == "LaTeX")
-         outputStyle = LATEX;
-      else if (iniOpts.style == "XML")
-         outputStyle = XML;
-      else if (iniOpts.style == "quoted")
-         outputStyle = QUOTED;
-      else {
-         outputStyle = TEXT;
-         if (iniOpts.style != "text") {
-            std::string error (_("-warning: The INI-file `%1' contains an invalid entry for the output style (`%2')! Using text\n"));
-            error.replace (error.find ("%1"), 2, pFile);
-            error.replace (error.find ("%2"), 2, iniOpts.style);
-            std::cerr << PACKAGE << error;
-         }
+      std::optional<OutputStyle> style (getOutputStyle (iniOpts.style));
+      outputStyle = style.value_or (OutputStyle::TEXT);
+      if (!style) {
+         std::string error (_("-warning: The INI-file `%1' contains an invalid entry for the output style (`%2')! Using text\n"));
+         error.replace (error.find ("%1"), 2, pFile);
+         error.replace (error.find ("%2"), 2, iniOpts.style);
+         std::cerr << PACKAGE << error;
       }
    }
 
@@ -1286,34 +1205,28 @@ void Application::showSupportedTypes () const {
 void Application::setPlugins () {
    TRACE1 ("Application::setPlugins (std::map<std::string, std::string>&): " << dynHandlers.size ());
 
+   using MatchFunction = std::remove_pointer_t<YGP::FileTypeCheckerByContent::MATCHFNC>;
+
    unsigned int offset (YGP::FileTypeChecker::LAST);
-   for (std::map<std::string, std::string>::const_iterator i (dynHandlers.begin ());
-	i != dynHandlers.end (); ++i) {
+   for (const auto& [extension, library] : dynHandlers) {
       try {
-	 YGP::Module* mod (new YGP::Module (i->second.c_str ()));
-	 modules.push_back (mod);
-	 void* fnProcess (mod->getSymbol (PLUGIN_PROCESS));
-	 if (!fnProcess) {
+	 boost::dll::shared_library plugin (library);
+	 auto* byContent (dynamic_cast<YGP::FileTypeCheckerByContent*> (ftchk.get ()));
+	 if (!plugin.has (PLUGIN_PROCESS) || (byContent && !plugin.has (PLUGIN_CHECKTYPE))) {
 	    std::string error (_("Invalid plug-in `%1'!\n"));
-	    error.replace (error.find ("%1"), 2, i->second);
+	    error.replace (error.find ("%1"), 2, library);
 	    throw YGP::FileError (error);
 	 }
 
 	 // Add handling method
-	 if (typeid (*ftchk) == typeid (YGP::FileTypeCheckerByContent)) {
-	    void* fnCheckType (mod->getSymbol (PLUGIN_CHECKTYPE));
-	    if (!fnCheckType) {
-	       std::string error (_("Invalid plug-in `%1'!\n"));
-	       error.replace (error.find ("%1"), 2, i->second);
-	       throw YGP::FileError (error);
-	    }
-	    ((YGP::FileTypeCheckerByContent*)ftchk)->addType (offset, (YGP::FileTypeCheckerByContent::MATCHFNC)fnCheckType);
-	 }
+	 if (byContent)
+	    byContent->addType (offset, &plugin.get<MatchFunction> (PLUGIN_CHECKTYPE));
 	 else
-	    ((YGP::FileTypeCheckerByExtension*)ftchk)->addType (i->first.c_str (), offset);
-	 handlers[offset++] = (HANDLER)fnProcess;
+	    dynamic_cast<YGP::FileTypeCheckerByExtension&> (*ftchk).addType (extension.c_str (), offset);
+	 handlers[offset++] = &plugin.get<std::remove_pointer_t<HANDLER>> (PLUGIN_PROCESS);
+	 modules.push_back (std::move (plugin));
       }
-      catch (YGP::FileError& e) {
+      catch (const std::exception& e) {
 	 std::cerr << PACKAGE << _("-warning: ") << e.what () << '\n';
       }
    }
@@ -1328,9 +1241,7 @@ void Application::setPlugins () {
 /// \returns \c int Status
 //-----------------------------------------------------------------------------
 int main (int argc, const char* argv[]) {
-   YGP::IVIOApplication::initI18n (PACKAGE, LOCALEDIR),
-
-   Application::initI18n ();
+   YGP::IVIOApplication::initI18n (PACKAGE, LOCALEDIR);
    Application appl (argc, argv);
    return appl.run ();
 }

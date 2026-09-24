@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include <YGP/XStream.h>
+#include <istream>
 
 struct Properties;
 
@@ -29,14 +29,13 @@ struct Properties;
 // Class to extract the properties (title, author, description) of a HTML-document
 class ParseHTML  {
  public:
-   ParseHTML () { }
-   ~ParseHTML () { }
+   ParseHTML () = default;
 
-   void parse (YGP::Xistream& stream, Properties& result);
+   void parse (std::istream& stream, Properties& result);
 
  private:
-   ParseHTML (const ParseHTML&);
-   ParseHTML& operator= (const ParseHTML&);
+   ParseHTML (const ParseHTML&) = delete;
+   ParseHTML& operator= (const ParseHTML&) = delete;
 };
 
 #endif

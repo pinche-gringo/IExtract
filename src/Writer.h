@@ -19,8 +19,7 @@
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <string.h>
-
+#include <memory>
 #include <string>
 
 #include <YGP/TableWriter.h>
@@ -37,23 +36,21 @@ struct Properties;
  */
 class Writer : public YGP::TableWriter {
  public:
-   typedef std::string (*CHANGECHARS)(const std::string&);
-
    Writer (const std::string& format, const std::string& New, unsigned long age = 0,
 	   const char* startRow = "", const char* endRow = "", const char* sepColumn = " ",
 	   const char* startTab = "", const char* endTab = "", const char* sepTab = " ",
-	   const char* rowStartHdr = NULL, const char* rowEndHdr = NULL,
-	   const char* sepHdrCol = NULL, const char* defColumns = NULL);
-   virtual ~Writer ();
+	   const char* rowStartHdr = nullptr, const char* rowEndHdr = nullptr,
+	   const char* sepHdrCol = nullptr, const char* defColumns = nullptr);
+   ~Writer () override = default;
 
-   virtual std::string getSubstitute (char ctrl, bool extend = false) const override;
+   std::string getSubstitute (char ctrl, bool extend = false) const override;
 
    void printFile (std::ostream& out, const YGP::File& file, const Properties& prop);
    void printSeparator (std::ostream& out, const YGP::File& file,
 			const std::string& data, const std::string& title) const;
 
    virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const = 0;
-   virtual void printHeaderTail (std::ostream& out) const;
+   void printHeaderTail (std::ostream& out) const override;
 
    virtual std::string changeSpecialChars (const std::string& value) const;
    virtual std::string changeSpecialFileChars (const std::string& value) const;
@@ -67,12 +64,12 @@ class Writer : public YGP::TableWriter {
 
    static std::string convertToHumanString (unsigned long value);
 
-   const YGP::File* file_;
-   const Properties* prop_;
+   const YGP::File* file_ {nullptr};
+   const Properties* prop_ {nullptr};
 
  private:
-   Writer (const Writer&);
-   Writer& operator= (const Writer&);
+   Writer (const Writer&) = delete;
+   Writer& operator= (const Writer&) = delete;
 };
 
 
@@ -81,19 +78,19 @@ class Writer : public YGP::TableWriter {
 class TextWriter : public Writer {
  public:
    TextWriter (const std::string& format, const std::string& strNew, unsigned long age = 0);
-   virtual ~TextWriter ();
+   ~TextWriter () override = default;
 
-   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
+   void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
 
    /// Creates a text writer
    /// \param format: Format how to display entries
-   static TextWriter* create (const std::string& format, const std::string& strNew,
-                              unsigned long age = 0) {
-      return new TextWriter (format, strNew, age); }
+   static std::unique_ptr<Writer> create (const std::string& format, const std::string& strNew,
+                                          unsigned long age = 0) {
+      return std::make_unique<TextWriter> (format, strNew, age); }
 
  private:
-   TextWriter (const TextWriter&);
-   TextWriter& operator= (const TextWriter&);
+   TextWriter (const TextWriter&) = delete;
+   TextWriter& operator= (const TextWriter&) = delete;
 };
 
 
@@ -102,21 +99,21 @@ class TextWriter : public Writer {
 class QuotedTextWriter : public Writer {
  public:
    QuotedTextWriter (const std::string& format, const std::string& strNew, unsigned long age = 0);
-   virtual ~QuotedTextWriter ();
+   ~QuotedTextWriter () override = default;
 
-   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
+   void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
 
-   virtual std::string changeSpecialChars (const std::string& value) const override;
+   std::string changeSpecialChars (const std::string& value) const override;
 
    /// Creates a text writer
    /// \param format: Format how to display entries
-   static QuotedTextWriter* create (const std::string& format, const std::string& strNew,
-				    unsigned long age = 0) {
-      return new QuotedTextWriter (format, strNew, age); }
+   static std::unique_ptr<Writer> create (const std::string& format, const std::string& strNew,
+                                          unsigned long age = 0) {
+      return std::make_unique<QuotedTextWriter> (format, strNew, age); }
 
  private:
-   QuotedTextWriter (const QuotedTextWriter&);
-   QuotedTextWriter& operator= (const QuotedTextWriter&);
+   QuotedTextWriter (const QuotedTextWriter&) = delete;
+   QuotedTextWriter& operator= (const QuotedTextWriter&) = delete;
 };
 
 
@@ -125,22 +122,22 @@ class QuotedTextWriter : public Writer {
 class HTMLWriter : public Writer {
  public:
    HTMLWriter (const std::string& format, const std::string& strNew, unsigned long age = 0);
-   virtual ~HTMLWriter ();
+   ~HTMLWriter () override = default;
 
-   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
+   void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
 
-   virtual std::string changeSpecialChars (const std::string& value) const override;
-   virtual std::string changeSpecialFileChars (const std::string& value) const override;
+   std::string changeSpecialChars (const std::string& value) const override;
+   std::string changeSpecialFileChars (const std::string& value) const override;
 
    /// Creates an HTML writer
    /// \param format: Format how to display entries
-   static HTMLWriter* create (const std::string& format, const std::string& strNew,
-                              unsigned long age = 0) {
-      return new HTMLWriter (format, strNew, age); }
+   static std::unique_ptr<Writer> create (const std::string& format, const std::string& strNew,
+                                          unsigned long age = 0) {
+      return std::make_unique<HTMLWriter> (format, strNew, age); }
 
  private:
-   HTMLWriter (const HTMLWriter&);
-   HTMLWriter& operator= (const HTMLWriter&);
+   HTMLWriter (const HTMLWriter&) = delete;
+   HTMLWriter& operator= (const HTMLWriter&) = delete;
 };
 
 
@@ -150,19 +147,19 @@ class XMLWriter : public HTMLWriter {
  public:
    XMLWriter (const std::string& format, const std::string& strNew,
 	      unsigned long age = 0) : HTMLWriter (format, strNew, age) { }
-   virtual ~XMLWriter ();
+   ~XMLWriter () override = default;
 
-   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
+   void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
 
    /// Creates an XML writer
    /// \param format: Format how to display entries
-   static XMLWriter* create (const std::string& format, const std::string& strNew,
-                              unsigned long age = 0) {
-      return new XMLWriter (format, strNew, age); }
+   static std::unique_ptr<Writer> create (const std::string& format, const std::string& strNew,
+                                          unsigned long age = 0) {
+      return std::make_unique<XMLWriter> (format, strNew, age); }
 
  private:
-   XMLWriter (const XMLWriter&);
-   XMLWriter& operator= (const XMLWriter&);
+   XMLWriter (const XMLWriter&) = delete;
+   XMLWriter& operator= (const XMLWriter&) = delete;
 };
 
 
@@ -171,22 +168,22 @@ class XMLWriter : public HTMLWriter {
 class LaTeXWriter : public Writer {
  public:
    LaTeXWriter (const std::string& format, const std::string& strNew, unsigned long age = 0);
-   virtual ~LaTeXWriter ();
+   ~LaTeXWriter () override = default;
 
-   virtual void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
-   virtual void printHeaderLead (std::ostream& out) const;
+   void printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const override;
+   void printHeaderLead (std::ostream& out) const override;
 
-   virtual std::string changeSpecialChars (const std::string& value) const override;
+   std::string changeSpecialChars (const std::string& value) const override;
 
    /// Creates a LaTeX writer
    /// \param format: Format how to display entries
-   static LaTeXWriter* create (const std::string& format, const std::string& strNew,
-                               unsigned long age = 0) {
-      return new LaTeXWriter (format, strNew, age); }
+   static std::unique_ptr<Writer> create (const std::string& format, const std::string& strNew,
+                                          unsigned long age = 0) {
+      return std::make_unique<LaTeXWriter> (format, strNew, age); }
 
  private:
-   LaTeXWriter (const LaTeXWriter&);
-   LaTeXWriter& operator= (const LaTeXWriter&);
+   LaTeXWriter (const LaTeXWriter&) = delete;
+   LaTeXWriter& operator= (const LaTeXWriter&) = delete;
 };
 
 

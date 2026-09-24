@@ -47,7 +47,7 @@ static const char* ID_AUTHOR     ("m key=\"dc.creator\"");
 /// \param result: Out: Found information
 /// \throw YGP::ParseError: In case of an invalid document
 //-----------------------------------------------------------------------------
-void ParseAbiword::parse (YGP::Xistream& stream, Properties& result) {
+void ParseAbiword::parse (std::istream& stream, Properties& result) {
    namespace x3 = boost::spirit::x3;
    using SpiritParser::ws;
 
@@ -55,7 +55,7 @@ void ParseAbiword::parse (YGP::Xistream& stream, Properties& result) {
 
    auto tag = [&entry](auto& ctx) {
       const std::string& tag (x3::_attr (ctx));
-      TRACE8 ("ParseAbiword::parse (YGP::Xistream&, Properties&) - Tag: " << tag);
+      TRACE8 ("ParseAbiword::parse (std::istream&, Properties&) - Tag: " << tag);
       entry = ((tag == ID_TITLE) ? &Properties::strTitle
                : (tag == ID_COMMENT) ? &Properties::strComment
                : (tag == ID_AUTHOR) ? &Properties::strAuthor : nullptr); };

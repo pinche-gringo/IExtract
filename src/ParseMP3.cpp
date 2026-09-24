@@ -26,10 +26,12 @@
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <cstring>
-
 #include <IExtract-cfg.h>
 
+#include <array>
+#include <string_view>
+
+#include <YGP/Check.h>
 #include <YGP/Trace.h>
 #include <YGP/Exception.h>
 #include <YGP/Utility.h>
@@ -39,20 +41,7 @@
 #include "ParseMP3.h"
 
 
-static const unsigned int ID_MP3 (0xE0FF);
-
-
-//-----------------------------------------------------------------------------
-/// (Default-)Constructor
-//-----------------------------------------------------------------------------
-ParseMP3::ParseMP3 () {
-}
-
-//-----------------------------------------------------------------------------
-/// Destructor
-//-----------------------------------------------------------------------------
-ParseMP3::~ParseMP3 () {
-}
+static constexpr unsigned int ID_MP3 (0xE0FF);
 
 
 //-----------------------------------------------------------------------------
@@ -60,30 +49,31 @@ ParseMP3::~ParseMP3 () {
 /// \param stream: MP3-file to analyze
 /// \param result: Out: Found information
 //-----------------------------------------------------------------------------
-void ParseMP3::parse (YGP::Xistream& stream, Properties& result) {
+void ParseMP3::parse (std::istream& stream, Properties& result) {
    result.strTitle.clear ();
    result.strAuthor.clear ();
    result.strComment.clear ();
 
-   char buffer[10] = "\0";
-   stream.read (buffer, sizeof (buffer));
-   if (memcmp (buffer, "ID3", 3)) {
-      if ((YGP::get2BytesLSB (buffer) & ID_MP3) != ID_MP3)
+   std::array<char, 10> buffer {};
+   stream.read (buffer.data (), buffer.size ());
+   if (std::string_view (buffer.data (), 3) != "ID3") {
+      if ((YGP::get2BytesLSB (buffer.data ()) & ID_MP3) != ID_MP3)
 	 throw YGP::ParseError (_("MP3-ID not found"));
    }
    else {
-      unsigned int lenID3 (getLength (buffer + 6));
-      TRACE5 ("ParseMP3::parse (Xistream&, Properties&) - Len of ID3: " << lenID3);
-      char* id3 (new char [lenID3]);
+      unsigned int lenID3 (getLength (buffer.data () + 6));
+      TRACE5 ("ParseMP3::parse (std::istream&, Properties&) - Len of ID3: " << lenID3);
+      std::string data (lenID3, '\0');
+      char* const id3 (data.data ());
       const char* pos (id3);
 
       // Check for ID3v2.3 or above
-      if (YGP::get2BytesLSB (buffer + 3) > 0x02) {
+      if (YGP::get2BytesLSB (buffer.data () + 3) > 0x02) {
 	 // Check if an extended header is present
 	 if ((buffer[5] & 0x40) == 0x40) {
-	    stream.read (buffer, 4);
-	    unsigned int cExtHdr (getLength (buffer) - 4);
-	    TRACE9 ("ParseMP3::parse (Xistream&, Properties&) - Skipping ext. header: " << cExtHdr);
+	    stream.read (buffer.data (), 4);
+	    unsigned int cExtHdr (getLength (buffer.data ()) - 4);
+	    TRACE9 ("ParseMP3::parse (std::istream&, Properties&) - Skipping ext. header: " << cExtHdr);
 
 	    // Only handle extended header, if its size is plausible, else ignore
 	    // to be able to handle badly written ID3 tags
@@ -118,7 +108,7 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) {
 	    } // end-switch
 
 	    pos += len + 10;
-	    TRACE7 ("ParseMP3::parse (Xistream&, Properties&) - Used: " << (pos - id3) << "; Left: " << (lenID3 - (pos - id3)));
+	    TRACE7 ("ParseMP3::parse (std::istream&, Properties&) - Used: " << (pos - id3) << "; Left: " << (lenID3 - (pos - id3)));
 	 } // end-while
       } // endif ID3v2.3 or above
       else {
@@ -126,25 +116,22 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) {
 
 	 while (static_cast<unsigned int> (pos - id3) < lenID3) {
 	    unsigned int len ((pos[3] << 14) + (pos[4] << 7) + pos[5]);
-	    TRACE7 ("ParseMP3::parse (Xistream&, Properties&) - Frame: " << std::string (pos, 3));
-	    TRACE3 ("ParseMP3::parse (Xistream&, Properties&) - Len of frame: " << std::hex << len << std::dec << " (" << len << ')');
+	    TRACE7 ("ParseMP3::parse (std::istream&, Properties&) - Frame: " << std::string (pos, 3));
+	    TRACE3 ("ParseMP3::parse (std::istream&, Properties&) - Len of frame: " << std::hex << len << std::dec << " (" << len << ')');
 	    if (len > (lenID3 - (pos - id3)))
 	       break;
 
-	    if (memcmp (pos, "TP1", 3))
-	       if (memcmp (pos, "TAL", 3)) {
-		  if (!memcmp (pos, "TT2", 3))
-		     result.strTitle = getString (pos + 6, len);
-	       }
-	       else
-		  result.strComment = getString (pos + 6, len);
-	    else
+	    const std::string_view frame (pos, 3);
+	    if (frame == "TT2")
+	       result.strTitle = getString (pos + 6, len);
+	    else if (frame == "TAL")
+	       result.strComment = getString (pos + 6, len);
+	    else if (frame == "TP1")
 	       result.strAuthor = getString (pos + 6, len);
 
 	    pos += len + 6;
 	 } // end-while
       }
-      delete id3;
       if (result.strTitle.size () || result.strAuthor.size () || result.strComment.size ())
 	 return;
    }
@@ -152,7 +139,7 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) {
 
    std::string value;
    std::getline (stream, value, '\xff');
-   TRACE9 ("ParseMP3::parse (Xistream&, Properties&) - Found: " << value
+   TRACE9 ("ParseMP3::parse (std::istream&, Properties&) - Found: " << value
 	   << "; Length: " << value.size ());
    if ((value[0] == 'T') && (value[1] == 'A') && (value[2] == 'G')) {
       result.strComment = strip (value, 63, 29);
@@ -167,7 +154,7 @@ void ParseMP3::parse (YGP::Xistream& stream, Properties& result) {
 /// \param pos: Starting pos inside the string
 /// \param len: Maximal length of string
 //-----------------------------------------------------------------------------
-std::string ParseMP3::strip (std::string& value, unsigned int pos, unsigned int len) {
+std::string ParseMP3::strip (const std::string& value, unsigned int pos, unsigned int len) {
    len += pos;
    while (len > pos) {
       TRACE9 ("ParseMP3::strip (std::string&, unsigned int, unsigned int) - "
@@ -189,10 +176,10 @@ unsigned int ParseMP3::getLength (const char* value) {
    Check1 (value);
    TRACE5 ("ParseMP3::getLength (const char*) - " << std::hex << YGP::get4BytesLSB (value) << std::dec);
 
-   unsigned int rc ((unsigned char)*value);
+   unsigned int rc (static_cast<unsigned char> (*value));
    for (unsigned int i (0); i < 3; ++i) {
       rc <<= 7;
-      rc += (unsigned char)*++value;
+      rc += static_cast<unsigned char> (*++value);
    }
    return rc;
 }

@@ -148,7 +148,7 @@ BOOST_SPIRIT_DEFINE (literal, nested, hex, dictionary, array, object)
 /// \param result: Result where to store found data
 /// \throw YGP::ParseError: In case of an invalid document
 //-----------------------------------------------------------------------------
-void ParsePDF::parse (YGP::Xistream& stream, Properties& result) {
+void ParsePDF::parse (std::istream& stream, Properties& result) {
    const std::string data (SpiritParser::readStream (stream));
    if (data.compare (0, 5, "%PDF-"))
       throw YGP::ParseError (_("Not a PDF document!"));
@@ -179,7 +179,7 @@ void ParsePDF::parse (YGP::Xistream& stream, Properties& result) {
       if (!infoFound && (trailer.others.find ("Info") != trailer.others.end ())) {
          info = parseReference (trailer.others["Info"]);
          infoFound = true;
-         TRACE5 ("ParsePDF::parse (YGP::Xistream&, Properties&) - Info: " << info);
+         TRACE5 ("ParsePDF::parse (std::istream&, Properties&) - Info: " << info);
       }
 
       if (infoFound && (offsets.find (info) != offsets.end ()))

@@ -19,36 +19,37 @@
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#ifdef _MSC_VER
-#pragma warning(disable:4355) // disable warning about this in initlist
-#pragma warning(disable:4786) // disable warning about truncating debug info
-#endif
+#include <cstdint>
 
+#include <vector>
 
-#include <map>
-
-#include <YGP/XStream.h>
+#include <istream>
 #include <YGP/Exception.h>
 
 struct Properties;
 
 
-// Class to extract the title (of the properties) of a Microsoft office document
+// Class to extract the properties of Microsoft Office documents (OLE compound files)
 class ParseMSOffice  {
  public:
-   ParseMSOffice ();
-   ~ParseMSOffice () { }
+   ParseMSOffice () = default;
 
-   void parse (YGP::Xistream& stream, Properties& result);
+   void parse (std::istream& stream, Properties& result);
 
  private:
-   static void readBAT (YGP::Xistream& stream, char* pBAT, const char* pBATBlocks,
-			unsigned int cBlocks, unsigned int sizeBlock);
-   static void readBlock (YGP::Xistream& stream, unsigned int offBlock,
+   ParseMSOffice (const ParseMSOffice&) = delete;
+   ParseMSOffice& operator= (const ParseMSOffice&) = delete;
+
+   using BAT = std::vector<std::uint32_t>;           ///< Block allocation table
+
+   static BAT readBAT (std::istream& stream, const char* pBATBlocks,
+                       unsigned int cBlocks, unsigned int sizeBlock);
+   static void readBlock (std::istream& stream, unsigned int offBlock,
 			  char* block, unsigned int sizeBlock);
-   static char* readFile (YGP::Xistream& stream, unsigned int offBlock,
-			  void* pBAT, unsigned int blocks, unsigned int sizeBlock);
-   static int getBlock (void* pBAT, unsigned int start, unsigned int nr);
+   static std::vector<char> readFile (std::istream& stream, unsigned int offBlock,
+                                      const BAT& bat, unsigned int blocks, unsigned int sizeBlock);
+   static unsigned int nextBlock (const BAT& bat, unsigned int block);
+   static unsigned int getBlock (const BAT& bat, unsigned int start, unsigned int nr);
 };
 
 #endif

@@ -19,6 +19,7 @@
 
 #include <cstddef>
 
+#include <istream>
 #include <iterator>
 #include <string>
 #include <type_traits>
@@ -26,7 +27,7 @@
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/binary.hpp>
 
-#include <YGP/XStream.h>
+#include <istream>
 #include <YGP/Exception.h>
 
 #include <IExtract-cfg.h>
@@ -38,7 +39,7 @@ namespace SpiritParser {
 namespace x3 = boost::spirit::x3;
 
 /// Iterator the parsers work with
-typedef const char* Iterator;
+using Iterator = const char*;
 
 
 /// Parser consuming a number of bytes, which is only known while parsing
@@ -46,8 +47,8 @@ typedef const char* Iterator;
 /// exposed as attribute (a std::string).
 template <bool Store>
 struct Bytes : x3::parser<Bytes<Store>> {
-   typedef std::conditional_t<Store, std::string, x3::unused_type> attribute_type;
-   static const bool has_attribute = Store;
+   using attribute_type = std::conditional_t<Store, std::string, x3::unused_type>;
+   static constexpr bool has_attribute = Store;
 
    /// Constructor
    /// \param count Reference to the number of bytes to consume; evaluated while parsing
@@ -79,9 +80,9 @@ Bytes<false> skip (std::size_t&&) = delete;
 /// known while parsing. The attribute of the subject is ignored.
 template <typename Subject>
 struct Times : x3::unary_parser<Subject, Times<Subject>> {
-   typedef x3::unary_parser<Subject, Times<Subject>> base_type;
-   typedef x3::unused_type attribute_type;
-   static const bool has_attribute = false;
+   using base_type = x3::unary_parser<Subject, Times<Subject>>;
+   using attribute_type = x3::unused_type;
+   static constexpr bool has_attribute = false;
 
    Times (const Subject& subject, const std::size_t& count) : base_type (subject), count (count) { }
 
@@ -120,8 +121,8 @@ TimesGen times (std::size_t&&) = delete;
 /// characters are converted). Contrary to x3::no_case it can also be used
 /// with text containing (signed) characters above 0x7f.
 struct NoCase : x3::parser<NoCase> {
-   typedef x3::unused_type attribute_type;
-   static const bool has_attribute = false;
+   using attribute_type = x3::unused_type;
+   static constexpr bool has_attribute = false;
 
    /// Constructor
    /// \param text Text to parse (must be lower-case)
@@ -159,7 +160,7 @@ inline const auto ws = x3::omit[*x3::char_ (" \t\n\r\f\v")];
 /// Reads the (rest of the) stream into memory
 /// \param stream Stream to read
 /// \returns std::string Read data
-inline std::string readStream (YGP::Xistream& stream) {
+inline std::string readStream (std::istream& stream) {
    return std::string (std::istreambuf_iterator<char> (stream), std::istreambuf_iterator<char> ());
 }
 

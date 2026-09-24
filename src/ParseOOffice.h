@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include <YGP/XStream.h>
+#include <istream>
 
 struct Properties;
 
@@ -31,14 +31,13 @@ struct Properties;
  */
 class ParseOpenOffice {
  public:
-   ParseOpenOffice () { }
-   ~ParseOpenOffice () { }
+   ParseOpenOffice () = default;
 
-   void parse (YGP::Xistream& stream, Properties& result);
+   void parse (std::istream& stream, Properties& result);
 
  private:
-   ParseOpenOffice (const ParseOpenOffice& other);
-   const ParseOpenOffice& operator= (const ParseOpenOffice& other);
+   ParseOpenOffice (const ParseOpenOffice& other) = delete;
+   const ParseOpenOffice& operator= (const ParseOpenOffice& other) = delete;
 
    static void parseMetaInfo (const std::string& metaInfo, Properties& result);
 };

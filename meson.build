@@ -1,8 +1,8 @@
 project('IExtract', 'cpp',
         version: '0.9.31',
         license: 'GPL-2.0-or-later',
-        meson_version: '>= 1.1',
-        default_options: ['cpp_std=c++23', 'warning_level=2',
+        meson_version: '>= 1.5.0',
+        default_options: ['cpp_std=c++26', 'warning_level=2',
                           'buildtype=debugoptimized'])
 
 bugreport = 'g17m0@users.sourceforge.net'
@@ -25,9 +25,9 @@ conf.set_quoted('PACKAGE_BUGREPORT', bugreport)
 conf.set_quoted('VERSION', version)
 conf.set_quoted('RELEASE', release)
 conf.set_quoted('LOCALEDIR', prefix / localedir)
-conf.set('WORDS_BIGENDIAN', host_machine.endian() == 'big')
 
-add_project_arguments('-D_GNU_SOURCE', '-Weffc++', language: 'cpp')
+add_project_arguments('-D_GNU_SOURCE', '-Woverloaded-virtual', '-Wsuggest-override',
+                      language: 'cpp')
 
 debug_level = get_option('debug-level')
 if debug_level >= 0
@@ -64,7 +64,9 @@ if get_option('threads')
   add_project_arguments('-DENABLE_THREADS', language: 'cpp')
 endif
 if get_option('plugins')
-  add_project_arguments('-DENABLE_PLUGINS', language: 'cpp')
+  # Plug-ins are loaded with Boost.DLL (using std::filesystem)
+  deps += dependency('dl', required: false)
+  add_project_arguments('-DENABLE_PLUGINS', '-DBOOST_DLL_USE_STD_FS', language: 'cpp')
 endif
 
 # Supported file types

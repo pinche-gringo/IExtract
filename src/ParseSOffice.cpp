@@ -47,7 +47,7 @@ static const std::size_t POS_DOCINFO (0x8c0);
 /// \param result: Out: Found information
 /// \throw YGP::ParseError: In case of an invalid document
 //-----------------------------------------------------------------------------
-void ParseStarOffice::parse (YGP::Xistream& stream, Properties& result) {
+void ParseStarOffice::parse (std::istream& stream, Properties& result) {
    namespace x3 = boost::spirit::x3;
    using SpiritParser::bytes;
    using SpiritParser::skip;
@@ -60,7 +60,7 @@ void ParseStarOffice::parse (YGP::Xistream& stream, Properties& result) {
                    { &Properties::strAuthor, 80 },
                    { &Properties::strTitle,  128 },
                    { &Properties::strComment,  0 } };
-   const std::size_t cEntries (sizeof (entries) / sizeof (entries[0]));
+   const std::size_t cEntries (std::size (entries));
 
    const std::size_t posDocInfo (POS_DOCINFO - (sizeof (ID) - 1));
    std::size_t offset (7);
@@ -70,7 +70,7 @@ void ParseStarOffice::parse (YGP::Xistream& stream, Properties& result) {
    auto setLength = [&length](auto& ctx) { length = x3::_attr (ctx); };
    auto value = [&](auto& ctx) {
       const std::string& val (x3::_attr (ctx));
-      TRACE5 ("ParseStarOffice::parse (YGP::Xistream&, Properties&) - " << actEntry << ": " << val);
+      TRACE5 ("ParseStarOffice::parse (std::istream&, Properties&) - " << actEntry << ": " << val);
       if (val.size ())
          result.*(entries[actEntry].value) = val;
       offset = entries[actEntry].offset - val.size ();

@@ -44,7 +44,7 @@
 /// \param result: Out: Found information
 /// \throw YGP::ParseError: In case of an invalid document
 //-----------------------------------------------------------------------------
-void ParseHTML::parse (YGP::Xistream& stream, Properties& result) {
+void ParseHTML::parse (std::istream& stream, Properties& result) {
    namespace x3 = boost::spirit::x3;
    using SpiritParser::nocase;
    using SpiritParser::ws;
@@ -56,7 +56,7 @@ void ParseHTML::parse (YGP::Xistream& stream, Properties& result) {
       std::string name (x3::_attr (ctx));
       std::transform (name.begin (), name.end (), name.begin (),
                       [](char ch) { return ((ch >= 'A') && (ch <= 'Z')) ? ch + 'a' - 'A' : ch; });
-      TRACE8 ("ParseHTML::parse (YGP::Xistream&, Properties&) - Meta: " << name);
+      TRACE8 ("ParseHTML::parse (std::istream&, Properties&) - Meta: " << name);
       entry = (((name == "description") || (name == "dc.description")) ? &Properties::strComment
                : ((name == "author") || (name == "dc.creator")) ? &Properties::strAuthor
                : (name == "dc.title") ? &Properties::strTitle : nullptr); };

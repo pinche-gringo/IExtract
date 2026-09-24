@@ -42,7 +42,7 @@
 /// \param stream: Stream to parse
 /// \throw YGP::ParseError: In case of an invalid image
 //-----------------------------------------------------------------------------
-void ParseGIF::parse (YGP::Xistream& stream) {
+void ParseGIF::parse (std::istream& stream) {
    namespace x3 = boost::spirit::x3;
    using SpiritParser::bytes;
    using SpiritParser::skip;
@@ -53,7 +53,7 @@ void ParseGIF::parse (YGP::Xistream& stream) {
    auto colourTable = x3::byte_[([&length](auto& ctx) {
          unsigned int flag (x3::_attr (ctx));
          length = (flag & 0x80) ? (1 << ((flag & 0x7) + 1)) * 3 : 0;
-         TRACE8 ("ParseGIF::parse (YGP::Xistream&) - Colour table: " << length << " bytes"); })];
+         TRACE8 ("ParseGIF::parse (std::istream&) - Colour table: " << length << " bytes"); })];
    auto setLength = [&length](auto& ctx) { length = x3::_attr (ctx); };
    auto addComment = [this](auto& ctx) { prop.strComment += x3::_attr (ctx).c_str (); };
 

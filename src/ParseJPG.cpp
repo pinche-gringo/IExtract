@@ -67,7 +67,7 @@ static const unsigned int IPTC_COMMENT (120);
 /// \param result: Out: Found information
 /// \throw YGP::ParseError: In case of an invalid image
 //-----------------------------------------------------------------------------
-void ParseJPEG::parse (YGP::Xistream& stream, Properties& result) {
+void ParseJPEG::parse (std::istream& stream, Properties& result) {
    namespace x3 = boost::spirit::x3;
    using SpiritParser::bytes;
 
@@ -87,7 +87,7 @@ void ParseJPEG::parse (YGP::Xistream& stream, Properties& result) {
       length -= 2; };
    auto segment = [&](auto& ctx) {
       const std::string& data (x3::_attr (ctx));
-      TRACE8 ("ParseJPEG::parse (YGP::Xistream&, Properties&) - Marker " << std::hex << marker
+      TRACE8 ("ParseJPEG::parse (std::istream&, Properties&) - Marker " << std::hex << marker
               << std::dec << ": " << data.size () << " bytes");
       switch (marker) {
       case M_COM:

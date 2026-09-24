@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include <YGP/XStream.h>
+#include <istream>
 
 struct Properties;
 
@@ -29,14 +29,13 @@ struct Properties;
 // Class to extract the properties of a StarOffice document
 class ParseStarOffice  {
  public:
-   ParseStarOffice () { }
-   ~ParseStarOffice () { }
+   ParseStarOffice () = default;
 
-   void parse (YGP::Xistream& stream, Properties& result);
+   void parse (std::istream& stream, Properties& result);
 
  private:
-   ParseStarOffice (const ParseStarOffice&);
-   ParseStarOffice& operator= (const ParseStarOffice&);
+   ParseStarOffice (const ParseStarOffice&) = delete;
+   ParseStarOffice& operator= (const ParseStarOffice&) = delete;
 };
 
 #endif

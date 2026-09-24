@@ -44,7 +44,7 @@ static const unsigned int TYPE_TEXT (0x74455874);                    // "tEXt"
 /// \param stream: Stream to parse
 /// \throw YGP::ParseError: In case of an invalid image
 //-----------------------------------------------------------------------------
-void ParsePNG::parse (YGP::Xistream& stream) {
+void ParsePNG::parse (std::istream& stream) {
    namespace x3 = boost::spirit::x3;
    using SpiritParser::bytes;
 

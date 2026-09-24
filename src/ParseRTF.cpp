@@ -60,7 +60,7 @@ auto author = [](auto& ctx) { state (ctx).entry = &Properties::strAuthor; };
 auto comment = [](auto& ctx) { state (ctx).entry = &Properties::strComment; };
 auto value = [](auto& ctx) {
    State& st (state (ctx));
-   TRACE8 ("ParseRTF::parse (YGP::Xistream&, Properties&) - Value: " << x3::_attr (ctx));
+   TRACE8 ("ParseRTF::parse (std::istream&, Properties&) - Value: " << x3::_attr (ctx));
    if (st.entry)
       st.prop.*(st.entry) = x3::_attr (ctx);
    st.entry = nullptr; };
@@ -99,7 +99,7 @@ auto const document = ws >> x3::lit ("{\\rtf1") >> ws >> commands;
 /// \param result: Out: Found information
 /// \throw YGP::ParseError: In case of an invalid document
 //-----------------------------------------------------------------------------
-void ParseRTF::parse (YGP::Xistream& stream, Properties& result) {
+void ParseRTF::parse (std::istream& stream, Properties& result) {
    State st { result, nullptr, false };
    SpiritParser::parse (SpiritParser::readStream (stream),
                         x3::with<StateTag> (std::ref (st))[document], _("RTF document"));

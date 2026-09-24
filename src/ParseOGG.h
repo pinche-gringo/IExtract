@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include <YGP/XStream.h>
+#include <istream>
 
 struct Properties;
 
@@ -30,13 +30,13 @@ struct Properties;
  */
 class ParseOGG {
  public:
-   static void parse (YGP::Xistream& stream, Properties& result);
+   static void parse (std::istream& stream, Properties& result);
 
  private:
    // Prohibited manager functions
-   ParseOGG ();
-   ParseOGG (const ParseOGG& other);
-   const ParseOGG& operator= (const ParseOGG& other);
+   ParseOGG () = delete;
+   ParseOGG (const ParseOGG& other) = delete;
+   const ParseOGG& operator= (const ParseOGG& other) = delete;
 
    static void foundComment (const std::string& comment, Properties& result);
 };

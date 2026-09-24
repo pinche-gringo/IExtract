@@ -19,7 +19,7 @@
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#include <YGP/XStream.h>
+#include <istream>
 
 
 struct Properties;
@@ -34,15 +34,14 @@ struct Properties;
 class ParsePNG {
  public:
    ParsePNG (Properties& result) : prop (result) { }
-   ~ParsePNG () { }
 
-   void parse (YGP::Xistream& stream);
+   void parse (std::istream& stream);
 
  private:
    //@Section prohibited manager functions
-   ParsePNG ();
-   ParsePNG (const ParsePNG& other);
-   const ParsePNG& operator= (const ParsePNG& other);
+   ParsePNG () = delete;
+   ParsePNG (const ParsePNG& other) = delete;
+   const ParsePNG& operator= (const ParsePNG& other) = delete;
 
    void foundChunk (unsigned int type, const std::string& data);
 

@@ -27,10 +27,10 @@
 //
 
 #include <ctime>
-#include <cstring>
 #include <clocale>
 
 #include <iostream>
+#include <string_view>
 
 #include <YGP/Check.h>
 #include <YGP/Trace.h>
@@ -64,15 +64,13 @@ Writer::Writer (const std::string& format, const std::string& New, unsigned long
 		const char* rowStartHdr, const char* rowEndHdr,
 		const char* sepHdrCol, const char* defColumns)
    : YGP::TableWriter (format, startRow, endRow, sepColumn, startTab, endTab, sepTab, rowStartHdr, rowEndHdr, sepHdrCol, defColumns),
-     strNew (New), limit (time (NULL) - age), file_ (NULL), prop_ (NULL) {
+     strNew (New), limit (std::time (nullptr) - age) {
    Check3 (strNew.size () ? age : 1);
 }
 
 //-----------------------------------------------------------------------------
 /// Destructor
 //-----------------------------------------------------------------------------
-Writer::~Writer () {
-}
 
 
 //-----------------------------------------------------------------------------
@@ -92,7 +90,7 @@ Writer::~Writer () {
 //-----------------------------------------------------------------------------
 void Writer::printSeparator (std::ostream& out, const YGP::File& file,
                              const std::string& data, const std::string& title) const {
-   size_t pos (0), oldPos (0);
+   std::size_t pos (0), oldPos (0);
    while (pos < data.size ()) {
       if ((pos = data.find ('%', oldPos)) == std::string::npos) {
 	 pos = data.size ();
@@ -117,7 +115,7 @@ void Writer::printSeparator (std::ostream& out, const YGP::File& file,
       case 'U': {
          std::string path (file.path ());
 #if SYSTEM != UNIX
-         size_t ps (0);
+         std::size_t ps (0);
          while ((ps = path.find (YGP::File::DIRSEPARATOR, ps)) != std::string::npos)
             path.replace (ps, 1, 1, '/');
 #endif
@@ -174,24 +172,13 @@ std::string Writer::getSubstitute (char ctrl, bool extend) const {
       subst = (ctrl == 'D') ? stamp.ADate::toString () : stamp.toString ();
       break; }
 
-   case 'e': {
-	  const char* ext = strrchr (file_->name (), '.');
-      ext = ext ? ext + 1 : "";
-      subst = extend ? changeSpecialFileChars (ext) : ext;
-      break;
-   }
-
+   case 'e':
    case 'E': {
-      std::string tmp;
-      const char* ext = strrchr (file_->name (), '.');
-      if (ext) {
-         tmp = file_->name ();
-         tmp.erase (ext - file_->name ());
-         ext = tmp.c_str ();
-      }
-      else
-         ext = file_->name ();
-      subst = extend ? changeSpecialFileChars (ext) : ext;
+      const std::string_view name (file_->name ());
+      const std::size_t pos (name.rfind ('.'));
+      const std::string part ((ctrl == 'e') ? ((pos == name.npos) ? "" : name.substr (pos + 1))
+                              : name.substr (0, pos));
+      subst = extend ? changeSpecialFileChars (part) : part;
       break;
    }
 
@@ -214,19 +201,18 @@ std::string Writer::getSubstitute (char ctrl, bool extend) const {
    case 'U': {
       subst = extend ? changeSpecialFileChars (file_->path ()) : file_->path ();
 #if SYSTEM != UNIX
-      size_t ps (0);
+      std::size_t ps (0);
       while ((ps = subst.find (YGP::File::DIRSEPARATOR, ps)) != std::string::npos)
          subst.replace (ps, 1, 1, '/');
 #endif
 
       if (ctrl == 'U')
          subst += extend ? changeSpecialFileChars (file_->name ()) : file_->name ();
-         break;
+      break;
    }
 
    case 's':
    case 'S': {
-      YGP::ANumeric size (file_->size ());
       subst = ((ctrl == 'S') ? convertToHumanString (file_->size ())
                : YGP::ANumeric::toString (file_->size ()));
       break; }
@@ -274,12 +260,12 @@ std::string Writer::convertToHumanString (unsigned long value) {
    }
 
    if (value < 10000) {
-      static struct lconv* loc = localeconv ();
+      static const std::lconv* loc = std::localeconv ();
       value += 50;
       double temp (value);
       temp /= 102.4;
-      tString = (char ((int (temp) % 10) + '0')) + tString;
-      value = (unsigned long)(temp / 10);
+      tString = static_cast<char> ((static_cast<int> (temp) % 10) + '0') + tString;
+      value = static_cast<unsigned long> (temp / 10);
       tString = loc->decimal_point + tString;
    }
    else
@@ -337,8 +323,6 @@ TextWriter::TextWriter (const std::string& format, const std::string& strNew, un
 //-----------------------------------------------------------------------------
 /// Destructor
 //-----------------------------------------------------------------------------
-TextWriter::~TextWriter () {
-}
 
 
 //-----------------------------------------------------------------------------
@@ -369,8 +353,6 @@ QuotedTextWriter::QuotedTextWriter (const std::string& format, const std::string
 //-----------------------------------------------------------------------------
 /// Destructor
 //-----------------------------------------------------------------------------
-QuotedTextWriter::~QuotedTextWriter () {
-}
 
 
 //-----------------------------------------------------------------------------
@@ -410,8 +392,6 @@ HTMLWriter::HTMLWriter (const std::string& format, const std::string& strNew, un
 //-----------------------------------------------------------------------------
 /// Destructor
 //-----------------------------------------------------------------------------
-HTMLWriter::~HTMLWriter () {
-}
 
 
 //-----------------------------------------------------------------------------
@@ -447,7 +427,7 @@ void HTMLWriter::printMessage (std::ostream& out, const YGP::File& file,
       out << "!!" << colSeparator;
    }
 
-   out << "<a href=\"" << file_->path () << file_->name () << "\">" << file_->name ()
+   out << "<a href=\"" << file.path () << file.name () << "\">" << file.name ()
        << "</a></td><td colspan=" << (columns () - 1) << '>' << msg << rowEnd;
 }
 
@@ -465,8 +445,6 @@ LaTeXWriter::LaTeXWriter (const std::string& format, const std::string& strNew, 
 //-----------------------------------------------------------------------------
 /// Destructor
 //-----------------------------------------------------------------------------
-LaTeXWriter::~LaTeXWriter () {
-}
 
 
 //-----------------------------------------------------------------------------
@@ -511,8 +489,6 @@ void LaTeXWriter::printMessage (std::ostream& out, const YGP::File& file,
 //-----------------------------------------------------------------------------
 /// Destructor
 //-----------------------------------------------------------------------------
-XMLWriter::~XMLWriter () {
-}
 
 //-----------------------------------------------------------------------------
 /// Prints a message in XML-format (inside the table)
@@ -525,5 +501,5 @@ void XMLWriter::printMessage (std::ostream& out, const YGP::File& file, const st
 
    out << "<Error><File>" << file.path () << file.name () << "</File>"
        << "<Name>" << file.name () << "<Name>"
-       << "<Description>" << msg << "</Desription></Error>\n";
+       << "<Description>" << msg << "</Description></Error>\n";
 }

@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include <YGP/XStream.h>
+#include <istream>
 
 
 struct Properties;
@@ -32,15 +32,14 @@ struct Properties;
 class ParseGIF {
  public:
    ParseGIF (Properties& result) : prop (result) { }
-   ~ParseGIF () { }
 
-   void parse (YGP::Xistream& stream);
+   void parse (std::istream& stream);
 
  private:
    //@Section prohibited manager functions
-   ParseGIF ();
-   ParseGIF (const ParseGIF& other);
-   const ParseGIF& operator= (const ParseGIF& other);
+   ParseGIF () = delete;
+   ParseGIF (const ParseGIF& other) = delete;
+   const ParseGIF& operator= (const ParseGIF& other) = delete;
 
    Properties&  prop;
 };

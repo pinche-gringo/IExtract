@@ -21,7 +21,7 @@
 
 #include <string>
 
-#include <YGP/XStream.h>
+#include <istream>
 
 struct Properties;
 
@@ -31,14 +31,13 @@ struct Properties;
  */
 class ParseAbiword {
  public:
-   ParseAbiword () { }
-   ~ParseAbiword () { }
+   ParseAbiword () = default;
 
-   void parse (YGP::Xistream& stream, Properties& result);
+   void parse (std::istream& stream, Properties& result);
 
  private:
-   ParseAbiword (const ParseAbiword& other);
-   const ParseAbiword& operator= (const ParseAbiword& other);
+   ParseAbiword (const ParseAbiword& other) = delete;
+   const ParseAbiword& operator= (const ParseAbiword& other) = delete;
 };
 
 #endif

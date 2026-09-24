@@ -3,7 +3,7 @@ Prerequisites
 
 The following packages are needed
 
-  - A C++ compiler supporting C++23
+  - A C++ compiler supporting C++26 (tested with GCC 16)
   - Boost (only the header-only Boost.Tokenizer is used)
   - zlib (optional; to handle Office Open XML documents)
   - The libYGP library. Also available as a Sourceforge project. Get it from
@@ -15,7 +15,7 @@ How to build Extract (UNIX-style)
 
 Additional prerequisite software:
 
-  - Meson (>= 1.1) and Ninja
+  - Meson (>= 1.5) and Ninja
   - mgeni.pl (from the YGP library)
   - GNU gettext (for national language support)
 

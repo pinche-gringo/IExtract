@@ -27,15 +27,16 @@
 
 #include <cctype>
 #include <fstream>
+#include <string>
 
-#include <YGP/XStream.h>
+#include <istream>
 #include <YGP/Exception.h>
 
 #include <IExtract/Properties.h>
 
 
 extern "C" {
-   void processFile (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError);
+   void processFile (std::istream& hFile, Properties& result);
    bool getFileType (char* buffer, const char* text,
 		     unsigned int length, std::ifstream& stream);
 }
@@ -47,23 +48,19 @@ extern "C" {
 /// \param result: Result of parsing
 /// \throw YGP::ParseError: In case of an error
 //-----------------------------------------------------------------------------
-void processFile (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseError) {
-   char line[80];
+void processFile (std::istream& hFile, Properties& result) {
+   static constexpr std::string::size_type MAX_LENGTH (79);
 
-   hFile.getline (line, sizeof (line));
-   if (!hFile)
-      throw (YGP::ParseError ("Title too long!"));
-   result.strTitle = line;
-
-   hFile.getline (line, sizeof (line));
-   if (!hFile)
-      throw (YGP::ParseError ("Comment too long!"));
-   result.strComment = line;
-
-   hFile.getline (line, sizeof (line));
-   if (!hFile)
-      throw (YGP::ParseError ("Author too long!"));
-   result.strAuthor = line;
+   static const std::pair<std::string Properties::*, const char*> lines[] =
+      { { &Properties::strTitle, "Title too long!" },
+        { &Properties::strComment, "Comment too long!" },
+        { &Properties::strAuthor, "Author too long!" } };
+   for (const auto& [value, error] : lines) {
+      std::string line;
+      if (!std::getline (hFile, line) || (line.size () > MAX_LENGTH))
+         throw YGP::ParseError (error);
+      result.*value = line;
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -74,7 +71,6 @@ void processFile (YGP::Xistream& hFile, Properties& result) throw (YGP::ParseErr
 /// \param stream: Stream from where to read more characters
 /// \returns bool: True, if the text matches
 //-----------------------------------------------------------------------------
-bool getFileType (char* buffer, const char* text,
-		  unsigned int length, std::ifstream& stream) {
-   return isalnum (*buffer);
+bool getFileType (char* buffer, const char*, unsigned int, std::ifstream&) {
+   return std::isalnum (static_cast<unsigned char> (*buffer));
 }

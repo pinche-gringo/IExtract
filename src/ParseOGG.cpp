@@ -42,7 +42,7 @@
 /// \param result: Out: Found information
 /// \throw YGP::ParseError: In case of an invalid file
 //-----------------------------------------------------------------------------
-void ParseOGG::parse (YGP::Xistream& stream, Properties& result) {
+void ParseOGG::parse (std::istream& stream, Properties& result) {
    namespace x3 = boost::spirit::x3;
    using SpiritParser::bytes;
    using SpiritParser::skip;
