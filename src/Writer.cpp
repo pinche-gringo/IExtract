@@ -177,7 +177,7 @@ std::string Writer::getSubstitute(char ctrl, bool extend) const {
     break;
 
   case 'c':
-    subst = extend ? prop_->strAuthor : changeSpecialChars(prop_->strComment);
+    subst = extend ? prop_->strComment : changeSpecialChars(prop_->strComment);
     break;
 
   case 'D':
