@@ -15,7 +15,7 @@ class TestExtract(unittest.TestCase):
         return info.decode("utf-8"), error.decode("utf-8")
 
     def run_extract(self, *args):
-        return self.execute(os.path.join("src", "IExtract"), *args)
+        return self.execute(os.environ.get("IEXTRACT", os.path.join("src", "IExtract")), *args)
 
     def test(self):
         output = self.run_extract("test")[0].strip().splitlines()

@@ -1,91 +1,60 @@
 Prerequisites
 -------------
 
-* The libYGP library. Also available as a Sourceforge project. Get it from
-  libymp.sourceforge.net (how inconsistently).
+The following packages are needed
+
+  - A C++ compiler supporting C++23
+  - Boost (only the header-only Boost.Tokenizer is used)
+  - zlib (optional; to handle Office Open XML documents)
+  - The libYGP library. Also available as a Sourceforge project. Get it from
+    libymp.sourceforge.net (how inconsistently).
 
 
 How to build Extract (UNIX-style)
 ---------------------------------
 
-./configure [options - see below]
-make [options - see below]
+Additional prerequisite software:
+
+  - Meson (>= 1.1) and Ninja
+  - mgeni.pl (from the YGP library)
+  - GNU gettext (for national language support)
+
+Inside the directory containing the source code type
+
+  meson setup build [meson-options]
+  meson compile -C build
+  meson install -C build
 
 
-* Common options for configure
+Common options for meson
+------------------------
 
-  --help                        # Overwhelming help to configure
-  --help=short                  # Reduces the output of configure --help
+Options are passed to "meson setup" (or later to "meson configure build")
+as -D<option>=<value>; "meson configure build" lists them all.
+
   --prefix=<path>               # default: /usr/local
-  --disable-nls                 # Disable national language support
-  --enable-plugins		# Enable plug-ins (libraries, which extract
-				# information from file-types)
-  --enable-threads              # Enable thread support - Note that this
-                                # can actually even slow down the search.
-				# Use only on multi-processor systems
-  --disable-<filetype>          # To disable supporting certain files
+  -Dnls=disabled                # Disable national language support
+  -Dplugins=true                # Enable plug-ins (libraries, which extract
+                                  information from file-types)
+  -Dthreads=true                # Enable thread support - Note that this
+                                  can actually even slow down the search.
+                                  Use only on multi-processor systems
+  -Dchecks=<level>              # Adds asserts and Checks
+  -Ddebug-level=<level>         # Sets tracelevel & generation of debuginfo
+  -D<filetype>=false            # To disable supporting certain files (html,
+                                  jpeg, png, gif, mp3, ogg, pdf, oo, abiword,
+                                  rtf, msoffice)
 
-If you're using `csh' on an old version of System V, you might need to type
-`sh ./configure' instead to prevent `csh' from trying to execute `configure'
-itself.
+Common commands
+---------------
 
-Running `configure' takes awhile.  While running, it prints some messages
-telling which features it is checking for.
-
-
-Compilers and Options
-
-     Some systems require unusual options for compilation or linking that
-  the `configure' script does not know about.  You can give `configure'
-  initial values for variables by setting them in the environment.  Using
-  a Bourne-compatible shell, you can do that on the command line like
-  this:
-       CC=c89 CFLAGS=-O2 LIBS=-lposix ./configure
-
-  Or on systems that have the `env' program, you can do it like this:
-       env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure
-
-  Compiling For Multiple Architectures
-
-     You can compile the package for more than one kind of computer at the
-  same time, by placing the object files for each architecture in their
-  own directory.  To do this, you must use a version of `make' that
-  supports the `VPATH' variable, such as GNU `make'.  `cd' to the
-  directory where you want the object files and executables to go and run
-  the `configure' script.  `configure' automatically checks for the
-  source code in the directory that `configure' is in and in `..'.
-
-     If you have to use a `make' that does not supports the `VPATH'
-  variable, you have to compile the package for one architecture at a time
-  in the source code directory.  After you have installed the package for
-  one architecture, use `make distclean' before reconfiguring for another
-  architecture.
-
-  Installation Names
-
-     By default, `make install' will install the package's files in
-  `/usr/local/bin', `/usr/local/man', etc.  You can specify an
-  installation prefix other than `/usr/local' by giving `configure' the
-  option `--prefix=PATH'.
-
-     You can specify separate installation prefixes for
-  architecture-specific files and architecture-independent files.  If you
-  give `configure' the option `--exec-prefix=PATH', the package will use
-  PATH as the prefix for installing programs and libraries.
-  Documentation and other data files will still use the regular prefix.
-
-     In addition, if you use an unusual directory layout you can give
-  options like `--bindir=PATH' to specify different values for particular
-  kinds of files.  Run `configure --help' for a list of the directories
-  you can set and what kinds of files go in them.
-
-
-* Common options/targets for make:
-
-  - install                     # Installs the whole thing
-  - clean                       # Deletes the files created during the make
-  - uninstall                   # Uninstalls (after you found out what crap
+  meson test -C build           # Runs the tests
+  meson install -C build        # Installs the whole thing
+  ninja -C build clean          # Deletes the files created during the build
+  ninja -C build uninstall      # Uninstalls (after you found out what crap
                                   this package actually contains)
+  ninja -C build check_code     # Checks the sources with cppcheck
+  ninja -C build IExtract-update-po  # Updates the translations in po/
 
 
 How to build Extract (Windows)

@@ -1,0 +1,34 @@
+option('nls', type: 'feature', value: 'auto',
+       description: 'National language support')
+option('threads', type: 'boolean', value: false,
+       description: 'Enables threads for parsing')
+option('plugins', type: 'boolean', value: false,
+       description: 'Enables adding new types of handled files')
+
+option('debug-level', type: 'integer', min: -1, max: 9, value: -1,
+       description: 'Enables additional traces with the passed level (-1: disabled)')
+option('checks', type: 'integer', min: -1, max: 9, value: -1,
+       description: 'Enables additional (internal) checks with the passed level (-1: disabled)')
+
+option('html', type: 'boolean', value: true,
+       description: 'Handle HTML-files')
+option('jpeg', type: 'boolean', value: true,
+       description: 'Handle JPEG-images')
+option('png', type: 'boolean', value: true,
+       description: 'Handle PNG-images')
+option('gif', type: 'boolean', value: true,
+       description: 'Handle GIF-images')
+option('mp3', type: 'boolean', value: true,
+       description: 'Handle MP3-audio files')
+option('ogg', type: 'boolean', value: true,
+       description: 'Handle OGG-audio files')
+option('pdf', type: 'boolean', value: true,
+       description: 'Handle PDF-documents')
+option('oo', type: 'boolean', value: true,
+       description: 'Handle OpenOffice.org-documents')
+option('abiword', type: 'boolean', value: true,
+       description: 'Handle AbiWord-documents')
+option('rtf', type: 'boolean', value: true,
+       description: 'Handle RTF-documents')
+option('msoffice', type: 'boolean', value: true,
+       description: 'Handle MS-Office-documents (and OOXML, if zlib is available)')

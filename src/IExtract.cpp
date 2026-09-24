@@ -1162,7 +1162,8 @@ void Application::convertFromWideChar (Properties& prop) {
                                                  &Properties::strAuthor};
 
    for (unsigned int i (0); i < (sizeof (values) / sizeof (values[0])); ++i)
-      if (iscntrl ((prop.*values[i])[1]) && (!((prop.*values[i]).size () & 1))) {
+      if (((prop.*values[i]).size () > 1) && iscntrl ((prop.*values[i])[1])
+          && (!((prop.*values[i]).size () & 1))) {
          for (unsigned int j (1); j < ((prop.*values[i]).size () >> 1); ++j)
             (prop.*values[i])[j] = (prop.*values[i])[j << 1];
          (prop.*values [i]).replace ((prop.*values [i]).size () >> 1,
