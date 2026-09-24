@@ -333,7 +333,6 @@ TextWriter::TextWriter (const std::string& format, const std::string& strNew, un
 //-----------------------------------------------------------------------------
 void TextWriter::printMessage (std::ostream& out, const YGP::File& file,
                                const std::string& msg) const {
-   Check3 (!msg.empty ());
    if (strNew.size () && isNew (file))
       out << "!!" << ": ";
    out << file.name () << " - " << msg << '\n';
@@ -372,7 +371,6 @@ std::string QuotedTextWriter::changeSpecialChars (const std::string& value) cons
 //-----------------------------------------------------------------------------
 void QuotedTextWriter::printMessage (std::ostream& out, const YGP::File& file,
 				     const std::string& msg) const {
-   Check3 (!msg.empty ());
    if (strNew.size () && isNew (file))
       out << "\"!!\"" << ": ";
    out << file.name () << ", \"" << msg << "\"\n";
@@ -420,8 +418,6 @@ std::string HTMLWriter::changeSpecialFileChars (const std::string& value) const 
 //-----------------------------------------------------------------------------
 void HTMLWriter::printMessage (std::ostream& out, const YGP::File& file,
                                const std::string& msg) const {
-   Check3 (!msg.empty ());
-
    out << rowStart;
    if (strNew.size ()) {
       out << "!!" << colSeparator;
@@ -473,8 +469,6 @@ std::string LaTeXWriter::changeSpecialChars (const std::string& value) const {
 //-----------------------------------------------------------------------------
 void LaTeXWriter::printMessage (std::ostream& out, const YGP::File& file,
                                 const std::string& msg) const {
-   Check3 (!msg.empty ());
-
    if (strNew.size ()) {
       if (isNew (file))
          out << "!!";
@@ -497,8 +491,6 @@ void LaTeXWriter::printMessage (std::ostream& out, const YGP::File& file,
 /// \param msg Message to print (not NULL)
 //-----------------------------------------------------------------------------
 void XMLWriter::printMessage (std::ostream& out, const YGP::File& file, const std::string& msg) const {
-   Check3 (!msg.empty ());
-
    out << "<Error><File>" << file.path () << file.name () << "</File>"
        << "<Name>" << file.name () << "<Name>"
        << "<Description>" << msg << "</Description></Error>\n";
