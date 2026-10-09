@@ -1,6 +1,8 @@
-Overview of changes in version 0.9.31:
+Overview of changes in version 0.9.40:
 
-  - Compiles without warnings with GCC 4.6 (except generated code)
+  - Updated to C++-26
+  - Use boot::spirit for parsing
+  - Updated Build System to Meson
 
 
 Overview of changes in version 0.9.30:
