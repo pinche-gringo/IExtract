@@ -5,7 +5,8 @@ project('IExtract', 'cpp',
         default_options: ['cpp_std=c++26', 'warning_level=2',
                           'buildtype=debugoptimized'])
 
-bugreport = 'g17m0@users.sourceforge.net'
+package_name = 'Extract'
+bugreport = 'pelotudo.gringo@gmail.com'
 version = meson.project_version()
 version_parts = version.split('.')
 release = '@0@.@1@'.format(version_parts[0], version_parts[1])
@@ -17,7 +18,7 @@ localedir = get_option('localedir')
 
 conf = configuration_data()
 conf.set_quoted('PACKAGE', meson.project_name())
-conf.set_quoted('PACKAGE_NAME', meson.project_name())
+conf.set_quoted('PACKAGE_NAME', package_name)
 conf.set_quoted('PACKAGE_TARNAME', meson.project_name())
 conf.set_quoted('PACKAGE_VERSION', version)
 conf.set_quoted('PACKAGE_STRING', meson.project_name() + ' ' + version)
