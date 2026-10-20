@@ -1,23 +1,216 @@
+# CI/CD for IExtract
+#
+# - Every push (and manually started pipelines) builds the project, runs the tests
+#   and checks the code (cppcheck)
+# - Pushing a tag named Extract_V<major>.<minor>.<patch> additionally
+#     1. creates the source-tarball (meson dist) and uploads it to the package registry
+#     2. builds the RPMs (IExtract.spec) from that tarball and uploads them as well
+#     3. creates a GitLab release for the tag (notes taken from NEWS)
+#
+# Tags matching Extract_V* should be protected, so the protected variable is available.
+#
+# The jobs run in an image with all dependencies (ci/Dockerfile), stored in the
+# container registry of the project. It's (re)built only if ci/Dockerfile changes
+# (e.g. a newer libYGP is used) or the pipeline is started manually (Build ->
+# Pipelines -> Run pipeline); do the latter once to create the image initially.
+# libYGP is installed from the RPMs of its release (package registry of libYGP),
+# downloaded with the job token, so this project must be allowed to access the
+# libYGP project (libYGP: Settings -> CI/CD -> Job token permissions).
+
 stages:
+  - image
   - test
+  - release
 
-.something: &prepare_repo
-  - export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
-  - meson setup build
+variables:
+  RELEASE_TAG_REGEX: '/^Extract_V\d+\.\d+\.\d+$/'
+  TAG_PREFIX: Extract_V
+  PACKAGE_NAME: IExtract
+  YGP_PACKAGES: $CI_API_V4_URL/projects/casa%2Fygp/packages/generic/libYGP
+  CI_IMAGE: $CI_REGISTRY_IMAGE/ci-base:latest
 
-code_check:
-  stage: test
-  before_script:
-    *prepare_repo
+default:
+  image: $CI_IMAGE
+
+.get_version: &get_version
+  - |
+    VERSION=$(sed -n "s/^ *version: *'\([0-9][0-9.]*\)'.*/\1/p" meson.build | head -n 1)
+  - echo "Project version $VERSION"
+
+# Builds the base image with the dependencies (with buildah, so no privileged
+# runner or docker-daemon is needed)
+build_image:
+  stage: image
+  image: quay.io/buildah/stable:latest
+  variables:
+    STORAGE_DRIVER: vfs
+    BUILDAH_ISOLATION: chroot
   script:
-    ninja -C build check_code
-  only:
-    - master
+    - buildah login --tls-verify=false --username "$CI_REGISTRY_USER" --password "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - printf '%s' "$CI_JOB_TOKEN" > "$CI_BUILDS_DIR/job_token"
+    - buildah build --ulimit nofile=524288:524288 --layers
+        --secret id=job_token,src="$CI_BUILDS_DIR/job_token"
+        --build-arg YGP_PACKAGES="$YGP_PACKAGES"
+        --tag "$CI_IMAGE" ci/
+    - buildah push --tls-verify=false "$CI_IMAGE"
+  after_script:
+    - rm -f "$CI_BUILDS_DIR/job_token"
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "push"
+      changes:
+        - ci/Dockerfile
 
+.needs_image: &needs_image
+  - job: build_image
+    optional: true
+
+# Builds with the default options and runs the tests
 test:
   stage: test
-  before_script:
-    - *prepare_repo
-    - meson compile -C build
+  needs: *needs_image
   script:
+    - meson setup build
+    - meson compile -C build
     - meson test -C build --print-errorlogs
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - build/meson-logs/
+    reports:
+      junit: build/meson-logs/testlog.junit.xml
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "web"
+
+# Checks that the optional features (disabled by default) still compile
+build_features:
+  stage: test
+  needs: *needs_image
+  script:
+    - meson setup build -Dthreads=true -Dplugins=true -Dchecks=1 -Ddebug-level=1
+    - meson compile -C build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "web"
+
+# Static analysis; findings don't fail the pipeline, but mark it with a warning
+cppcheck:
+  stage: test
+  needs: *needs_image
+  script:
+    - meson setup build
+    # Options.meta is generated (by mgeni.pl) during the build
+    - meson compile -C build
+    - cppcheck --project=build/compile_commands.json --enable=warning,performance,portability
+        --inline-suppr --suppress=missingIncludeSystem -i build/ --error-exitcode=1 --quiet
+  allow_failure: true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "web"
+
+# Builds the source-tarball, uploads it to the generic package registry and
+# prepares the release-notes
+dist:
+  stage: release
+  needs: [test]
+  script:
+    - *get_version
+    - |
+      if [ "$CI_COMMIT_TAG" != "${TAG_PREFIX}${VERSION}" ]; then
+        echo "Tag $CI_COMMIT_TAG doesn't match the project version $VERSION in meson.build"
+        exit 1
+      fi
+    - meson setup build
+    - meson dist -C build --no-tests --formats xztar
+    - TARBALL="${PACKAGE_NAME}-${VERSION}.tar.xz"
+    - |
+      curl --fail --silent --show-error --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+           --upload-file "build/meson-dist/$TARBALL" \
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/${TARBALL}"
+    # Release notes: The section of this version in NEWS; else the tag message
+    - |
+      awk -v ver="$VERSION" '
+        tolower($0) ~ "^overview of changes in version " ver ":" { found = 1; next }
+        found && /^Overview of / { exit }
+        found { print }' NEWS > release-notes.md
+      if ! grep -q '[^[:space:]]' release-notes.md; then
+        echo "${CI_COMMIT_TAG_MESSAGE:-Release $VERSION}" > release-notes.md
+      fi
+    - echo "VERSION=$VERSION" > release.env
+    - echo "TARBALL=$TARBALL" >> release.env
+  artifacts:
+    paths:
+      - build/meson-dist/
+      - release-notes.md
+    reports:
+      dotenv: release.env
+  rules:
+    - if: $CI_COMMIT_TAG =~ $RELEASE_TAG_REGEX
+
+# Builds the (source-)RPMs from the tarball of the dist-job and uploads them to
+# the generic package registry
+rpm:
+  stage: release
+  needs:
+    - job: dist
+      artifacts: true
+  script:
+    - TOPDIR="$CI_PROJECT_DIR/rpmbuild"
+    - mkdir -p "$TOPDIR/SOURCES"
+    - cp "build/meson-dist/$TARBALL" "$TOPDIR/SOURCES/"
+    - rpmbuild -ba --define "_topdir $TOPDIR" --define "iextract_version $VERSION" IExtract.spec
+    # Upload all packages; remember the names of the (non-debug) ones for the release
+    - |
+      : > rpm.env
+      for rpm in "$TOPDIR"/RPMS/*/*.rpm "$TOPDIR"/SRPMS/*.rpm; do
+        file=$(basename "$rpm")
+        curl --fail --silent --show-error --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+             --upload-file "$rpm" \
+             "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/${file}"
+        case "$file" in
+          *.src.rpm) echo "SRPM=$file" >> rpm.env ;;
+          *-debuginfo-*|*-debugsource-*) ;;
+          *) echo "RPM_$(rpm -qp --queryformat '%{NAME}' "$rpm" | tr 'a-z-' 'A-Z_')=$file" >> rpm.env ;;
+        esac
+      done
+      cat rpm.env
+  artifacts:
+    paths:
+      - rpmbuild/RPMS/
+      - rpmbuild/SRPMS/
+    reports:
+      dotenv: rpm.env
+  rules:
+    - if: $CI_COMMIT_TAG =~ $RELEASE_TAG_REGEX
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs:
+    - job: dist
+      artifacts: true
+    - job: rpm
+      artifacts: true
+  script:
+    - echo "Creating release $VERSION for tag $CI_COMMIT_TAG"
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: '$PACKAGE_NAME $VERSION'
+    description: release-notes.md
+    assets:
+      links:
+        - name: $TARBALL
+          url: '${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/${TARBALL}'
+          link_type: package
+        - name: $RPM_IEXTRACT
+          url: '${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/${RPM_IEXTRACT}'
+          link_type: package
+        - name: $RPM_IEXTRACT_DEVEL
+          url: '${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/${RPM_IEXTRACT_DEVEL}'
+          link_type: package
+        - name: $SRPM
+          url: '${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/${SRPM}'
+          link_type: package
+  rules:
+    - if: $CI_COMMIT_TAG =~ $RELEASE_TAG_REGEX
