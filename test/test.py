@@ -41,8 +41,7 @@ class TestExtract(unittest.TestCase):
                     "rtf.rtf - RTF-Test title Markus Schwab Document for testing RTF-Parser (of IExtract)",
                     "exif.jpg -     EXIF-Image (comment)")
 
-        # self.assertEqual(len(output), len(expected), output)
-        for check, expect in zip(output, expected):
-            check = check.rsplit(" ", 2)[0]
-            self.assertEqual(check, expect)
+        # Directory order depends on the filesystem, so compare independent of order
+        output = sorted(line.rsplit(" ", 2)[0] for line in output)
+        self.assertEqual(output, sorted(expected))
 
