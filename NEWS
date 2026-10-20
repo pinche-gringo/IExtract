@@ -1,3 +1,8 @@
+Overview of changes in version 0.9.41:
+
+  - Build & Release handling with Gitlab
+  - Release handling with Gitlab
+
 Overview of changes in version 0.9.40:
 
   - Updated to C++-26
