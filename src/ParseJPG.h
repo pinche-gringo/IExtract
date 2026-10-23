@@ -22,8 +22,10 @@
 
 struct Properties;
 
-/**Class to extract the properties of JPEG images; out of either a comment,
- * the EXIF information (Windows XP tags) or the IPTC data (stored by Photoshop)
+/**Class to extract the properties of JPEG images; out of a comment, the EXIF
+ * information (see ParseTIFF), the IPTC data (stored by Photoshop) or an XMP
+ * packet. If a property is stored several times, the first one found is used
+ * (XMP is only used for still empty properties).
  */
 class ParseJPEG {
   public:

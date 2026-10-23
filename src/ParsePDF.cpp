@@ -24,13 +24,19 @@
 
 #include <IExtract-cfg.h>
 
+#include <charconv>
+#include <optional>
 #include <set>
 
 #include <YGP/Trace.h>
 
 #include "SpiritParser.h"
 
+#include "ParseXMP.h"
 #include "Properties.h"
+#ifdef HAVE_LIBZ
+#    include "ZipArchive.h"
+#endif
 
 #include "ParsePDF.h"
 
@@ -149,7 +155,8 @@ BOOST_SPIRIT_DEFINE(literal, nested, hex, dictionary, array, object)
 } // namespace
 
 //-----------------------------------------------------------------------------
-/// Method to parse a PDF document
+/// Method to parse a PDF document; the document information dictionary is
+/// inspected and (for still empty properties) the XMP metadata of the catalog
 /// \param stream: Stream to parse
 /// \param result: Result where to store found data
 /// \throw YGP::ParseError: In case of an invalid document
@@ -171,37 +178,108 @@ void ParsePDF::parse(std::istream& stream, Properties& result) {
                         _("offset of cross reference table"));
 
     // Parse the cross reference tables (following the /Prev entries of the
-    // trailers) until the offset of the /Info object is known
+    // trailers) until the offsets of the /Info and the /Root object are known
     std::map<unsigned int, std::size_t> offsets;
     std::set<std::size_t> parsed;
-    unsigned int info(0);
-    bool infoFound(false);
-    while (!(infoFound && (offsets.find(info) != offsets.end()))) {
+    std::optional<unsigned int> info, root;
+    auto isKnown = [&offsets](const std::optional<unsigned int>& id) { return id && offsets.contains(*id); };
+    while (!(isKnown(info) && isKnown(root))) {
         if (!parsed.insert(offset).second)
             throw YGP::ParseError(_("Invalid /Prev entry"));
 
         Dictionary trailer(parseXRefTable(data, offset, offsets));
-        if (!infoFound && (trailer.others.find("Info") != trailer.others.end())) {
+        if (!info && trailer.others.contains("Info")) {
             info = parseReference(trailer.others["Info"]);
-            infoFound = true;
-            TRACE5("ParsePDF::parse (std::istream&, Properties&) - Info: " << info);
+            TRACE5("ParsePDF::parse (std::istream&, Properties&) - Info: " << *info);
         }
+        if (!root && trailer.others.contains("Root"))
+            root = parseReference(trailer.others["Root"]);
 
-        if (infoFound && (offsets.find(info) != offsets.end()))
+        if (isKnown(info) && isKnown(root))
             break;
-        if (trailer.others.find("Prev") == trailer.others.end())
+        if (!trailer.others.contains("Prev")) {
+            if (isKnown(info) || isKnown(root))
+                break;
             throw YGP::ParseError(_("Document does not contain neither an /Info nor a /Prev entry"));
+        }
         offset = std::stoul(trailer.others["Prev"]);
     }
 
-    Dictionary values(parseObject(data, offsets[info], info));
-    static const std::pair<const char*, std::string Properties::*> entries[] = {
-        {"Title", &Properties::strTitle}, {"Author", &Properties::strAuthor}, {"Subject", &Properties::strComment}};
-    for (const auto& entry : entries) {
-        auto i(values.strings.find(entry.first));
-        if (i != values.strings.end())
-            result.*(entry.second) = i->second;
+    if (isKnown(info)) {
+        Dictionary values(parseObject(data, offsets[*info], *info, _("info object")));
+        static const std::pair<const char*, std::string Properties::*> entries[] = {
+            {"Title", &Properties::strTitle}, {"Author", &Properties::strAuthor}, {"Subject", &Properties::strComment}};
+        for (const auto& entry : entries) {
+            auto i(values.strings.find(entry.first));
+            if (i != values.strings.end())
+                result.*(entry.second) = i->second;
+        }
     }
+
+    // Use the metadata stream (XMP) of the catalog for still empty values
+    if (isKnown(root) && (result.strTitle.empty() || result.strAuthor.empty() || result.strComment.empty())) {
+        try {
+            parseMetadata(data, offsets, *root, result);
+        }
+        catch (const YGP::ParseError& err) {
+            if (!isKnown(info))
+                throw;
+            TRACE1("ParsePDF::parse (std::istream&, Properties&) - Ignoring metadata: " << err.what());
+        }
+    }
+}
+
+//-----------------------------------------------------------------------------
+/// Parses the metadata stream (holding XMP data) referenced by the catalog;
+/// only empty properties are set
+/// \param data: Contents of the document
+/// \param offsets: Offsets of the objects
+/// \param root: Number of the catalog object
+/// \param result: In/Out: Found information
+/// \throw YGP::ParseError: In case of an invalid object
+//-----------------------------------------------------------------------------
+void ParsePDF::parseMetadata(const std::string& data, const std::map<unsigned int, std::size_t>& offsets, unsigned int root,
+                             Properties& result) {
+    Dictionary catalog(parseObject(data, offsets.at(root), root, _("catalog")));
+    if (!catalog.others.contains("Metadata"))
+        return;
+    unsigned int id(parseReference(catalog.others["Metadata"]));
+    auto offset(offsets.find(id));
+    if (offset == offsets.end())
+        return;
+
+    std::size_t end(0);
+    Dictionary metadata(parseObject(data, offset->second, id, _("metadata stream"), &end));
+
+    // The data of the stream follows the keyword stream and an end of line
+    SpiritParser::Iterator act(data.data() + end);
+    SpiritParser::parse(act, data.data() + data.size(), ws >> x3::lit("stream") >> -x3::lit('\r') >> x3::lit('\n'),
+                        _("metadata stream"));
+    std::size_t start(act - data.data());
+    std::size_t length(data.find("endstream", start));
+    if (length == std::string::npos)
+        throw YGP::ParseError(_("Invalid metadata stream"));
+    length -= start;
+    if (auto i(metadata.others.find("Length")); i != metadata.others.end()) {
+        // Use the length only if it is a (direct) number
+        std::size_t value(0);
+        auto [ptr, ec] = std::from_chars(i->second.data(), i->second.data() + i->second.size(), value);
+        if ((ec == std::errc()) && (ptr == (i->second.data() + i->second.size())))
+            length = std::min(length, value);
+    }
+    std::string xmp(data, start, length);
+
+    if (auto filter(metadata.others.find("Filter")); filter != metadata.others.end()) {
+#ifdef HAVE_LIBZ
+        if (filter->second != "/FlateDecode")
+            return;
+        xmp = ZipArchive::inflate(xmp, false);
+#else
+        return;
+#endif
+    }
+    TRACE5("ParsePDF::parseMetadata (...) - " << xmp.size() << " bytes");
+    ParseXMP::parse(xmp, result);
 }
 
 //-----------------------------------------------------------------------------
@@ -249,13 +327,16 @@ ParsePDF::Dictionary ParsePDF::parseXRefTable(const std::string& data, std::size
 /// \param data: Contents of the document
 /// \param offset: Offset of the object
 /// \param id: Expected number of the object
+/// \param description: Description of the object (for error messages)
+/// \param end: Out: If not null, the offset after the dictionary is stored
 /// \returns Dictionary: Values of the object
 /// \throw YGP::ParseError: In case of an invalid object
 //-----------------------------------------------------------------------------
-ParsePDF::Dictionary ParsePDF::parseObject(const std::string& data, std::size_t offset, unsigned int id) {
+ParsePDF::Dictionary ParsePDF::parseObject(const std::string& data, std::size_t offset, unsigned int id, const char* description,
+                                           std::size_t* end) {
     TRACE5("ParsePDF::parseObject (const std::string&, std::size_t, unsigned int) - " << id << " @ " << offset);
     if (offset >= data.size())
-        throw YGP::ParseError(_("Invalid offset of info object"));
+        throw YGP::ParseError(_("Invalid offset of object"));
 
     Dictionary values;
     State st{0, std::string(), values.strings, values.others};
@@ -263,7 +344,9 @@ ParsePDF::Dictionary ParsePDF::parseObject(const std::string& data, std::size_t 
     auto obj = x3::uint_[checkID] >> ws >> x3::uint_ >> ws >> x3::lit("obj") >> ws >> dictionary;
 
     SpiritParser::Iterator act(data.data() + offset);
-    SpiritParser::parse(act, data.data() + data.size(), x3::with<StateTag>(std::ref(st))[obj], _("info object"));
+    SpiritParser::parse(act, data.data() + data.size(), x3::with<StateTag>(std::ref(st))[obj], description);
+    if (end)
+        *end = act - data.data();
     return values;
 }
 
@@ -277,6 +360,6 @@ unsigned int ParsePDF::parseReference(const std::string& reference) {
     unsigned int id(0);
     SpiritParser::parse(reference,
                         x3::uint_[([&id](auto& ctx) { id = x3::_attr(ctx); })] >> ws >> x3::uint_ >> ws >> x3::lit('R'),
-                        _("reference to /Info object"));
+                        _("reference to object"));
     return id;
 }

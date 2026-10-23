@@ -1,7 +1,13 @@
+Overview of changes in version 0.9.50:
+
+  - Support new file types: EPUB, FLAC, MP4, SVG, TIFF, WebP
+
+
 Overview of changes in version 0.9.41:
 
   - Build & Release handling with Gitlab
   - Release handling with Gitlab
+
 
 Overview of changes in version 0.9.40:
 

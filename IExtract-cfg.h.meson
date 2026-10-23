@@ -40,10 +40,13 @@
 
 // Define for the handled file types
 #mesondefine SUPPORT_ABIWORD
+#mesondefine SUPPORT_EPUB
+#mesondefine SUPPORT_FLAC
 #mesondefine SUPPORT_GIF
 #mesondefine SUPPORT_HTML
 #mesondefine SUPPORT_JPEG
 #mesondefine SUPPORT_MP3
+#mesondefine SUPPORT_MP4
 #mesondefine SUPPORT_MSOFFICE
 #mesondefine SUPPORT_OGG
 #mesondefine SUPPORT_OO
@@ -51,6 +54,9 @@
 #mesondefine SUPPORT_PDF
 #mesondefine SUPPORT_PNG
 #mesondefine SUPPORT_RTF
+#mesondefine SUPPORT_SVG
+#mesondefine SUPPORT_TIFF
+#mesondefine SUPPORT_WEBP
 
 #if defined (HAVE_GETTEXT) && defined (ENABLE_NLS)
 #  include <libintl.h>

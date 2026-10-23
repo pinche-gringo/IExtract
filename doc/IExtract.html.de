@@ -77,8 +77,11 @@
       <dd><p>PNG-Bilder k&ouml;nnen Text-Eintr&auml;ge mit Werten im Format
           <em>Schl&uuml;sselwort</em> - <em>Wert</em> enthalten.</p>
 
-	<p>Die (unkomprimierten) Werte der Eintr&auml;ge <em>Title</em>,
-	  <em>Author</em> und <em>Description</em> werden ausgelesen.</p></dd>
+	<p>Die Werte der Eintr&auml;ge <em>Title</em>, <em>Author</em> und
+	  <em>Description</em> werden ausgelesen (aus einfachen,
+	  komprimierten oder internationalen Text-Eintr&auml;gen; komprimierte
+	  nur, wenn die zlib verf&uuml;gbar ist). Nicht gefundene Werte werden
+	  einem XMP-Paket entnommen.</p></dd>
 
       <dt><b>GIF</b></dt>
       <dd><p>GIF-Bilder k&ouml;nnen Kommentar-Eintr&auml;ge (in sogenannten
@@ -87,9 +90,28 @@
 
       <dt><b>JPEG</b></dt>
       <dd><p>Es werden Kommentare nach einem "comment marker" (0xFFFE),
-          in einem APP1 Exif marker (wie von Windows XP geschrieben) und
+          in einem APP1 Exif marker (die von Windows XP geschriebenen Tags
+          oder <em>ImageDescription</em> und <em>Artist</em>) und
 	  in einem APPD marker (wie sie scheinbar einige Versionen von
-          PhotoShop erzeugen) erkannt)</p></dd>
+          PhotoShop erzeugen) erkannt.</p>
+
+        <p>Nicht gefundene Werte werden einem XMP-Paket entnommen
+          (<em>dc:title</em>, <em>dc:creator</em> und
+          <em>dc:description</em>).</p></dd>
+
+      <dt><b>TIFF</b></dt>
+      <dd><p>Das erste "Image File Directory" wird (wie die Exif-Daten von
+          JPEG-Bildern) ausgewertet; zus&auml;tzlich ein eingebettetes
+          XMP-Paket.</p></dd>
+
+      <dt><b>WebP</b></dt>
+      <dd><p>Die Exif-Daten (siehe TIFF) und das XMP-Paket werden
+          ausgelesen.</p></dd>
+
+      <dt><b>SVG</b></dt>
+      <dd><p>Liest den Inhalt der Elemente <code>&lt;title&gt;</code> und
+          <code>&lt;desc&gt;</code>. Der Autor wird den (Dublin Core)
+          Metadaten entnommen, wie sie z.B. Inkscape schreibt.</p></dd>
 
       <dt><b>Microsoft Office Dokumente</b></dt>
       <dd><p>Sucht nach dem Inhalt des "Eigenschaften" Dialogs.</p>
@@ -100,19 +122,44 @@
           korrekt bearbeitet werden k&ouml;nnen (ev. mit der Ausname
           von Dokumenten gr&ouml;&szlig;er als 6,8 MB).</p></dd>
 
+      <dt><b>Microsoft Office Open XML Dokumente</b></dt>
+      <dd><p>Liest die Eintr&auml;ge des "Eigenschaften"-Dialogs von
+          <code>*.docx</code>, <code>*.xlsx</code> und <code>*.pptx</code>
+          Dokumenten (nur, wenn die zlib verf&uuml;gbar ist).</p></dd>
+
+      <dt><b>EPUB Dokumente</b></dt>
+      <dd><p>Liest Titel, Autor und Beschreibung aus den Metadaten des
+          "Package Document" (nur, wenn die zlib verf&uuml;gbar ist).</p></dd>
+
       <dt><b>MP3</b></dt>
       <dd><p>Sucht nach dem ID3 tag (version 1.x und 2.x). Der Titel des
           Albums wird im Kommentar-Feld zur&uuml;ckgeliefert.</p></dd>
 
       <dt><b>OGG</b></dt>
-      <dd><p>Sucht nach dem "Comment header" am Anfang der Datei. Der Titel des
-          Albums wird im Kommentar-Feld zur&uuml;ckgeliefert.</p></dd>
+      <dd><p>Sucht nach dem "Comment header" am Anfang von Vorbis-
+          (<code>*.ogg</code>) und Opus-Dateien (<code>*.opus</code>). Der
+          Titel des Albums wird im Kommentar-Feld zur&uuml;ckgeliefert.</p></dd>
+
+      <dt><b>FLAC</b></dt>
+      <dd><p>Liest den "Vorbis comment". Der Titel des Albums wird im
+          Kommentar-Feld zur&uuml;ckgeliefert.</p></dd>
+
+      <dt><b>MPEG-4</b></dt>
+      <dd><p>Liest Titel, Interpret und Album (beziehungsweise den Kommentar,
+          wenn es kein Album gibt) aus den Metadaten (im Stil von iTunes) oder
+          den QuickTime "User Data" von MPEG-4- (<code>*.mp4</code>,
+          <code>*.m4a</code>, <code>*.m4b</code>, <code>*.m4v</code>) und
+          QuickTime-Dateien (<code>*.mov</code>).</p></dd>
 
       <dt><b>PDF</b></dt>
       <dd><p>PDF-Dokumente beinhalten ein sogenanntes <i>Document Information
             directory</i> mit verschiedenen Eintr&auml;gen. Der Inhalt dieses
           Verzeichnisses wird ausgelesen (mit dem "Subject"-Schl&uuml;ssel als
           Kommentar).</p>
+
+        <p>Dort nicht gefundene Werte werden den XMP-Metadaten des Dokuments
+          entnommen (wenn komprimiert, nur, wenn die zlib verf&uuml;gbar
+          ist).</p>
 
         <p>Verschl&uuml;sselte Dokumente werden nicht entschl&uuml;sselt!</p></dd>
       </dd>

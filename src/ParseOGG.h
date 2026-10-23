@@ -22,11 +22,13 @@
 
 struct Properties;
 
-/**Class to extract the comments (title, artist, album) of OGG/Vorbis files
+/**Class to extract the comments (title, artist, album) of OGG files (holding
+ * Vorbis, Opus or FLAC audio)
  */
 class ParseOGG {
   public:
     static void parse(std::istream& stream, Properties& result);
+    static void parseComments(const std::string& data, Properties& result);
 
   private:
     // Prohibited manager functions

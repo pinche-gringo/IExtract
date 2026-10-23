@@ -29,6 +29,8 @@
 #include "SpiritParser.h"
 
 #include "ParseJPG.h"
+#include "ParseTIFF.h"
+#include "ParseXMP.h"
 #include "Properties.h"
 
 // Markers
@@ -41,11 +43,8 @@ static const unsigned char M_APP1(0xe1);
 static const unsigned char M_APPD(0xed);
 static const unsigned char M_COM(0xfe);
 
-// Tags in the EXIF information (Windows XP)
-static const unsigned int TAG_TITLE(0x9c9b);
-static const unsigned int TAG_COMMENT(0x9c9c);
-static const unsigned int TAG_AUTHOR(0x9c9d);
-static const unsigned int TYPE_BYTE(1);
+// Identifier of the XMP packet (in an APP1 marker)
+static const std::string ID_XMP("http://ns.adobe.com/xap/1.0/\0", 29);
 
 // Resource-ID of the IPTC information in Photoshop's image resource blocks
 static const unsigned int RES_IPTC(0x0404);
@@ -67,29 +66,34 @@ void ParseJPEG::parse(std::istream& stream, Properties& result) {
 
     unsigned int marker(0);
     std::size_t length(0);
-    bool done(false);
+    std::string xmp;
 
     auto setMarker = [&marker](auto& ctx) { marker = x3::_attr(ctx); };
     // Checks if the marker has a length (and data) following
     auto hasLength = [&marker](auto& ctx) { x3::_pass(ctx) = (marker != M_TEM) && ((marker < M_RST0) || (marker > M_RST7)); };
-    auto isEnd = [&marker, &done](auto& ctx) { x3::_pass(ctx) = done || (marker == M_EOI) || (marker == M_SOS); };
+    auto isEnd = [&marker](auto& ctx) { x3::_pass(ctx) = (marker == M_EOI) || (marker == M_SOS); };
     auto setLength = [&length](auto& ctx) {
         length = x3::_attr(ctx);
         x3::_pass(ctx) = (length >= 2);
         length -= 2;
     };
+    // If the information is stored several times, the first found is used;
+    // XMP is only used for still empty properties
     auto segment = [&](auto& ctx) {
         const std::string& data(x3::_attr(ctx));
         TRACE8("ParseJPEG::parse (std::istream&, Properties&) - Marker " << std::hex << marker << std::dec << ": " << data.size()
                                                                          << " bytes");
         switch (marker) {
         case M_COM:
-            result.strComment = data;
-            done = !data.empty();
+            if (result.strComment.empty())
+                result.strComment = data;
             break;
 
         case M_APP1:
-            done = parseEXIF(data, result);
+            if (!data.compare(0, ID_XMP.size(), ID_XMP))
+                xmp = data.substr(ID_XMP.size());
+            else
+                parseEXIF(data, result);
             break;
 
         case M_APPD:
@@ -103,70 +107,21 @@ void ParseJPEG::parse(std::istream& stream, Properties& result) {
     auto image = x3::lit("\xff\xd8") >> *(markerID >> !x3::eps[isEnd] >> -markerData);
 
     SpiritParser::parse(SpiritParser::readStream(stream), image, _("JPEG image"));
+    if (!xmp.empty())
+        ParseXMP::parse(xmp, result);
 }
 
 //-----------------------------------------------------------------------------
-/// Parses the EXIF information (of an APP1 marker) for the Windows XP tags
-/// for title, comment and author
+/// Parses the EXIF information (of an APP1 marker); see ParseTIFF::parseIFD
 /// \param data: Data of the APP1 marker
-/// \param result: Out: Found information
+/// \param result: In/Out: Found information
 /// \returns bool: True, if the (first) image file directory contains entries
 //-----------------------------------------------------------------------------
 bool ParseJPEG::parseEXIF(const std::string& data, Properties& result) {
-    namespace x3 = boost::spirit::x3;
-    using SpiritParser::skip;
-
     static const std::string ID_EXIF("Exif\0\0", 6);
     if (data.compare(0, ID_EXIF.size(), ID_EXIF))
         return false;
-    const std::string tiff(data, ID_EXIF.size());
-
-    // Parses the image file directory with the passed parsers for words and
-    // double words (of the byte order of the data)
-    auto parseIFD = [&tiff, &result](auto word, auto dword) {
-        std::size_t offset(0), count(0);
-        unsigned int tag(0), type(0);
-        std::size_t cValues(0);
-
-        auto setValue = [](auto& value) { return [&value](auto& ctx) { value = x3::_attr(ctx); }; };
-        auto entry = [&](auto& ctx) {
-            static const std::pair<unsigned int, std::string Properties::*> tags[] = {
-                {TAG_TITLE, &Properties::strTitle}, {TAG_COMMENT, &Properties::strComment}, {TAG_AUTHOR, &Properties::strAuthor}};
-
-            // The value is stored in the entry, if it fits into the 4 bytes of the
-            // offset
-            std::size_t posValue((cValues > 4) ? static_cast<std::size_t>(x3::_attr(ctx))
-                                               : static_cast<std::size_t>(x3::_where(ctx).begin() - tiff.data()));
-            TRACE8("ParseJPEG::parseEXIF (const std::string&, Properties&) - Tag " << std::hex << tag << std::dec << " (" << type
-                                                                                   << "): " << cValues << " @ " << posValue);
-            if (type != TYPE_BYTE)
-                return;
-            for (const auto& t : tags)
-                if ((t.first == tag) && (posValue < tiff.size()))
-                    result.*(t.second) = tiff.substr(posValue, cValues);
-        };
-
-        SpiritParser::Iterator act(tiff.data());
-        SpiritParser::parse(act, tiff.data() + tiff.size(), x3::repeat(2)[x3::byte_] >> word >> dword[setValue(offset)],
-                            _("TIFF header"));
-        if (offset >= tiff.size())
-            throw YGP::ParseError(_("Invalid offset of image file directory"));
-
-        act = tiff.data() + offset;
-        SpiritParser::parse(
-            act, tiff.data() + tiff.size(),
-            word[setValue(count)] >>
-                SpiritParser::times(
-                    count)[word[setValue(tag)] >> word[setValue(type)] >> dword[setValue(cValues)] >> dword[entry]],
-            _("image file directory"));
-        return count > 0;
-    };
-
-    if (!tiff.compare(0, 2, "II"))
-        return parseIFD(x3::little_word, x3::little_dword);
-    if (!tiff.compare(0, 2, "MM"))
-        return parseIFD(x3::big_word, x3::big_dword);
-    throw YGP::ParseError(_("Invalid byte order of EXIF information"));
+    return ParseTIFF::parseIFD(data.substr(ID_EXIF.size()), result);
 }
 
 //-----------------------------------------------------------------------------
@@ -210,7 +165,8 @@ void ParseJPEG::parsePhotoshop(const std::string& data, Properties& result) {
 }
 
 //-----------------------------------------------------------------------------
-/// Parses the IPTC information for title, author and comment
+/// Parses the IPTC information for title, author and comment; only empty
+/// properties are set
 /// \param data: IPTC information
 /// \param result: Out: Found information
 //-----------------------------------------------------------------------------
@@ -232,17 +188,12 @@ void ParseJPEG::parseIPTC(const std::string& data, Properties& result) {
                                                                            << x3::_attr(ctx));
         if (record != 2)
             return;
-        switch (dataset) {
-        case IPTC_TITLE:
-            result.strTitle = x3::_attr(ctx);
-            break;
-        case IPTC_AUTHOR:
-            result.strAuthor = x3::_attr(ctx);
-            break;
-        case IPTC_COMMENT:
-            result.strComment = x3::_attr(ctx);
-            break;
-        }
+        std::string Properties::* entry((dataset == IPTC_TITLE)     ? &Properties::strTitle
+                                        : (dataset == IPTC_AUTHOR)  ? &Properties::strAuthor
+                                        : (dataset == IPTC_COMMENT) ? &Properties::strComment
+                                                                    : nullptr);
+        if (entry && (result.*entry).empty())
+            result.*entry = x3::_attr(ctx);
     };
 
     auto dataSet =

@@ -29,9 +29,18 @@
 #include "SpiritParser.h"
 
 #include "ParsePNG.h"
+#include "ParseXMP.h"
 #include "Properties.h"
+#ifdef HAVE_LIBZ
+#    include "ZipArchive.h"
+#endif
 
-static const unsigned int TYPE_TEXT(0x74455874); // "tEXt"
+static const unsigned int TYPE_TEXT(0x74455874);  // "tEXt"
+static const unsigned int TYPE_ZTEXT(0x7a545874); // "zTXt"
+static const unsigned int TYPE_ITEXT(0x69545874); // "iTXt"
+
+// Keyword of the international text chunk holding XMP data
+static const char* const KEY_XMP("XML:com.adobe.xmp");
 
 //-----------------------------------------------------------------------------
 /// Parses the PNG image
@@ -54,28 +63,66 @@ void ParsePNG::parse(std::istream& stream) {
     auto image = x3::lit("\x89PNG\x0d\x0a\x1a\x0a") >> x3::repeat(2, x3::inf)[chunk];
 
     SpiritParser::parse(SpiritParser::readStream(stream), image, _("PNG image"));
+    if (!xmp.empty())
+        ParseXMP::parse(xmp, prop);
 }
 
 //-----------------------------------------------------------------------------
 /// Handles a chunk of the image; stores the information of known text-chunks
 /// \param type: Type of the chunk
-/// \param data: Data of the chunk; for text-chunks: <keyword>\0<value>
+/// \param data: Data of the chunk; for text-chunks: <keyword>\0<value> (see
+/// the PNG specification for the details of compressed and international
+/// text chunks)
 //-----------------------------------------------------------------------------
 void ParsePNG::foundChunk(unsigned int type, const std::string& data) {
     TRACE8("ParsePNG::foundChunk (unsigned int, const std::string&) - " << std::hex << type << std::dec << ": " << data.size()
                                                                         << " bytes");
-    if (type != TYPE_TEXT)
+    if ((type != TYPE_TEXT) && (type != TYPE_ZTEXT) && (type != TYPE_ITEXT))
         return;
 
     std::string::size_type pos(data.find('\0'));
     if (pos == std::string::npos)
         return;
+    std::string key(data, 0, pos++);
 
-    std::string key(data, 0, pos);
+    bool compressed(false);
+    if (type == TYPE_ZTEXT) { // Compression method
+        compressed = true;
+        ++pos;
+    }
+    else if (type == TYPE_ITEXT) {
+        // Compression flag, compression method, language tag, translated keyword
+        if ((pos + 2) > data.size())
+            return;
+        compressed = data[pos];
+        pos = data.find('\0', pos + 2);
+        if (pos != std::string::npos)
+            pos = data.find('\0', pos + 1);
+        if (pos++ == std::string::npos)
+            return;
+    }
+
+    std::string value(data, std::min(pos, data.size()));
+    if (compressed) {
+#ifdef HAVE_LIBZ
+        try {
+            value = ZipArchive::inflate(value, false);
+        }
+        catch (const YGP::ParseError& err) {
+            TRACE1("ParsePNG::foundChunk (unsigned int, const std::string&) - " << err.what());
+            return;
+        }
+#else
+        return;
+#endif
+    }
+
     if (key == "Title")
-        prop.strTitle.assign(data, pos + 1);
+        prop.strTitle = value;
     else if (key == "Author")
-        prop.strAuthor.assign(data, pos + 1);
+        prop.strAuthor = value;
     else if (key == "Description")
-        prop.strComment.assign(data, pos + 1);
+        prop.strComment = value;
+    else if ((key == KEY_XMP) && (type == TYPE_ITEXT))
+        xmp = value;
 }

@@ -1,21 +1,37 @@
-iextract_sources = files('Writer.cpp', 'IExtract.cpp')
+iextract_sources = files('Writer.cpp', 'IExtract.cpp', 'ParseXMP.cpp')
+if zlib_dep.found()
+  iextract_sources += files('ZipArchive.cpp')
+endif
 
+# Sources needed for the formats (including the ones shared with other formats)
 format_sources = {
-  'abiword': files('ParseAbiword.cpp'),
-  'gif': files('ParseGIF.cpp'),
-  'html': files('ParseHTML.cpp'),
-  'jpeg': files('ParseJPG.cpp'),
-  'mp3': files('ParseMP3.cpp'),
-  'msoffice': files('ParseMSOffice.cpp', 'ParseOOXML.cpp'),
-  'ogg': files('ParseOGG.cpp'),
-  'oo': files('ParseSOffice.cpp', 'ParseOOffice.cpp'),
-  'pdf': files('ParsePDF.cpp'),
-  'png': files('ParsePNG.cpp'),
-  'rtf': files('ParseRTF.cpp'),
+  'abiword': ['ParseAbiword.cpp'],
+  'epub': ['ParseEPUB.cpp'],
+  'flac': ['ParseFLAC.cpp', 'ParseOGG.cpp'],
+  'gif': ['ParseGIF.cpp'],
+  'html': ['ParseHTML.cpp'],
+  'jpeg': ['ParseJPG.cpp', 'ParseTIFF.cpp'],
+  'mp3': ['ParseMP3.cpp'],
+  'mp4': ['ParseMP4.cpp'],
+  'msoffice': ['ParseMSOffice.cpp', 'ParseOOXML.cpp'],
+  'ogg': ['ParseOGG.cpp'],
+  'oo': ['ParseSOffice.cpp', 'ParseOOffice.cpp'],
+  'pdf': ['ParsePDF.cpp'],
+  'png': ['ParsePNG.cpp'],
+  'rtf': ['ParseRTF.cpp'],
+  'svg': ['ParseSVG.cpp'],
+  'tiff': ['ParseTIFF.cpp'],
+  'webp': ['ParseWebP.cpp', 'ParseTIFF.cpp'],
 }
+used_sources = []
 foreach format : enabled_formats
-  iextract_sources += format_sources[format]
+  foreach source : format_sources[format]
+    if source not in used_sources
+      used_sources += source
+    endif
+  endforeach
 endforeach
+iextract_sources += files(used_sources)
 
 # Generate the code to read/write the options from their declaration
 mgeni = find_program('mgeni.pl')

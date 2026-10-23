@@ -44,7 +44,10 @@ class ParsePDF {
     };
 
     static Dictionary parseXRefTable(const std::string& data, std::size_t offset, std::map<unsigned int, std::size_t>& offsets);
-    static Dictionary parseObject(const std::string& data, std::size_t offset, unsigned int id);
+    static Dictionary parseObject(const std::string& data, std::size_t offset, unsigned int id, const char* description,
+                                  std::size_t* end = nullptr);
+    static void parseMetadata(const std::string& data, const std::map<unsigned int, std::size_t>& offsets, unsigned int root,
+                              Properties& result);
     static unsigned int parseReference(const std::string& reference);
 };
 

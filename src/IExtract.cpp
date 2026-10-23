@@ -115,6 +115,24 @@ static constexpr const char* PLUGIN_CHECKTYPE("getFileType");
 #    include "ParseOOffice.h"
 #    include "ParseSOffice.h"
 #endif
+#ifdef SUPPORT_TIFF
+#    include "ParseTIFF.h"
+#endif
+#ifdef SUPPORT_WEBP
+#    include "ParseWebP.h"
+#endif
+#ifdef SUPPORT_FLAC
+#    include "ParseFLAC.h"
+#endif
+#ifdef SUPPORT_MP4
+#    include "ParseMP4.h"
+#endif
+#ifdef SUPPORT_EPUB
+#    include "ParseEPUB.h"
+#endif
+#ifdef SUPPORT_SVG
+#    include "ParseSVG.h"
+#endif
 
 static constexpr const char* DEFAULT_FORMAT = "%n|-|%t|%a|%c|%d";
 static constexpr const char* DEFAULT_XML_FORMAT = "<tr><td>%n</td><td>%t</td>"
@@ -207,6 +225,24 @@ class Application : public YGP::IVIOApplication {
 #endif
 #ifdef SUPPORT_ABIWORD
     static void processAbiword(std::istream& hFile, Properties& result);
+#endif
+#ifdef SUPPORT_TIFF
+    static void processTIFF(std::istream& hFile, Properties& result);
+#endif
+#ifdef SUPPORT_WEBP
+    static void processWebP(std::istream& hFile, Properties& result);
+#endif
+#ifdef SUPPORT_FLAC
+    static void processFLAC(std::istream& hFile, Properties& result);
+#endif
+#ifdef SUPPORT_MP4
+    static void processMP4(std::istream& hFile, Properties& result);
+#endif
+#ifdef SUPPORT_EPUB
+    static void processEPUB(std::istream& hFile, Properties& result);
+#endif
+#ifdef SUPPORT_SVG
+    static void processSVG(std::istream& hFile, Properties& result);
 #endif
 
     void showSupportedTypes() const;
@@ -314,6 +350,24 @@ Application::Application(const int argc, const char* argv[]) : YGP::IVIOApplicat
 #endif
 #ifdef SUPPORT_RTF
     handlers[YGP::FileTypeChecker::RTF] = &Application::processRTF;
+#endif
+#ifdef SUPPORT_TIFF
+    handlers[YGP::FileTypeChecker::TIFF] = &Application::processTIFF;
+#endif
+#ifdef SUPPORT_WEBP
+    handlers[YGP::FileTypeChecker::WEBP] = &Application::processWebP;
+#endif
+#ifdef SUPPORT_FLAC
+    handlers[YGP::FileTypeChecker::FLAC] = &Application::processFLAC;
+#endif
+#ifdef SUPPORT_MP4
+    handlers[YGP::FileTypeChecker::MP4] = &Application::processMP4;
+#endif
+#ifdef SUPPORT_EPUB
+    handlers[YGP::FileTypeChecker::EPUB] = &Application::processEPUB;
+#endif
+#ifdef SUPPORT_SVG
+    handlers[YGP::FileTypeChecker::SVG] = &Application::processSVG;
 #endif
 }
 
@@ -1054,6 +1108,60 @@ void Application::processPNG(std::istream& hFile, Properties& result) { ParsePNG
 void Application::processGIF(std::istream& hFile, Properties& result) { ParseGIF(result).parse(hFile); }
 #endif
 
+#ifdef SUPPORT_TIFF
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of a TIFF image
+/// \param hFile Stream to parse
+/// \param result Found properties
+//-----------------------------------------------------------------------------
+void Application::processTIFF(std::istream& hFile, Properties& result) { ParseTIFF::parse(hFile, result); }
+#endif
+
+#ifdef SUPPORT_WEBP
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of a WebP image
+/// \param hFile Stream to parse
+/// \param result Found properties
+//-----------------------------------------------------------------------------
+void Application::processWebP(std::istream& hFile, Properties& result) { ParseWebP::parse(hFile, result); }
+#endif
+
+#ifdef SUPPORT_FLAC
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of a FLAC file
+/// \param hFile Stream to parse
+/// \param result Found properties
+//-----------------------------------------------------------------------------
+void Application::processFLAC(std::istream& hFile, Properties& result) { ParseFLAC::parse(hFile, result); }
+#endif
+
+#ifdef SUPPORT_MP4
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of an MPEG-4 file
+/// \param hFile Stream to parse
+/// \param result Found properties
+//-----------------------------------------------------------------------------
+void Application::processMP4(std::istream& hFile, Properties& result) { ParseMP4::parse(hFile, result); }
+#endif
+
+#ifdef SUPPORT_EPUB
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of an EPUB document
+/// \param hFile Stream to parse
+/// \param result Found properties
+//-----------------------------------------------------------------------------
+void Application::processEPUB(std::istream& hFile, Properties& result) { ParseEPUB::parse(hFile, result); }
+#endif
+
+#ifdef SUPPORT_SVG
+//-----------------------------------------------------------------------------
+/// Tries to extract the properties of an SVG image
+/// \param hFile Stream to parse
+/// \param result Found properties
+//-----------------------------------------------------------------------------
+void Application::processSVG(std::istream& hFile, Properties& result) { ParseSVG::parse(hFile, result); }
+#endif
+
 //-----------------------------------------------------------------------------
 /// Returns a handling function to a filetype
 /// \param file Filename
@@ -1155,11 +1263,29 @@ void Application::showSupportedTypes() const {
 #ifdef SUPPORT_GIF
                  "  - GIF (*.gif)\n"
 #endif
+#ifdef SUPPORT_TIFF
+                 "  - TIFF (*.tif, *.tiff)\n"
+#endif
+#ifdef SUPPORT_WEBP
+                 "  - WebP (*.webp)\n"
+#endif
+#ifdef SUPPORT_SVG
+                 "  - SVG (*.svg)\n"
+#endif
 #ifdef SUPPORT_MP3
                  "  - MP3 (*.mp3)\n"
 #endif
 #ifdef SUPPORT_OGG
-                 "  - OGG (*.ogg)\n"
+                 "  - OGG (Vorbis (*.ogg) & Opus (*.opus))\n"
+#endif
+#ifdef SUPPORT_FLAC
+                 "  - FLAC (*.flac)\n"
+#endif
+#ifdef SUPPORT_MP4
+                 "  - MPEG-4 (*.mp4, *.m4a, *.m4b, *.m4v) & QuickTime (*.mov)\n"
+#endif
+#ifdef SUPPORT_EPUB
+                 "  - EPUB (*.epub)\n"
 #endif
 #ifdef SUPPORT_PDF
                  "  - PDF (*.pdf)\n"

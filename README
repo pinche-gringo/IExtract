@@ -18,17 +18,33 @@ configuring).
 
   - PNG: PNG images can contain text-chunks with keyword-value pairs. The
          content of the keywords "Title", "Author" and "Description" is
-         extracted.
+         extracted (out of plain, compressed or international text chunks;
+         compressed ones only, if the zlib is available). Properties not
+         found otherwise are taken from an XMP packet.
 
 
   - GIF: GIF images can contain a "comment extension". The contents of this
          block(s) is extracted. There are no title or author entries.
 
 
-  - JPEG: The program recognizes three types of comments:
+  - JPEG: The program recognizes four types of comments:
  	    - After an JPEG comment marker (0xfffe)
-            - In an APP1-Exif marker (as used by Windows XP)
+            - In an APP1-Exif marker (the Windows XP tags or ImageDescription
+              and Artist)
 	    - In an APPD marker (as written by PhotoShop)
+            - In an XMP packet (dc:title, dc:creator and dc:description);
+              used for properties not found otherwise
+
+
+  - TIFF: The first image file directory is inspected (like the Exif
+          information of JPEG images); furthermore an embedded XMP packet
+
+
+  - WebP: The Exif information (see TIFF) and the XMP packet are extracted
+
+
+  - SVG: The contents of the <title> and <desc> elements; the author is taken
+         out of the (Dublin Core) metadata, as written e.g. by Inkscape
 
 
   - HTML: The text in between <title> and </title> and/or the contents of
@@ -38,6 +54,8 @@ configuring).
 
   - PDF: The content of the "document information dictionary" is extracted
           (the content of the "Subject" key is returned as comment).
+          Properties not found there are taken from the XMP metadata of the
+          document (if compressed, only if the zlib is available).
           Note that encrypted information is not decrypted!
 
 
@@ -61,10 +79,28 @@ configuring).
 	  http://jakarta.apache.org/poi/index.html for details)
 
 
+  - MS Office Open XML documents (*.docx, *.xlsx, *.pptx); the entries of the
+          properties dialog are extracted (only if the zlib is available)
+
+
+  - EPUB documents: Title, creator and description are extracted out of the
+          metadata of the package document (only if the zlib is available)
+
+
   - MP3 files: Extracts the contents of the ID3 tag.
 
 
-  - OGG vorbis files: Extracts the contents of the comment header
+  - OGG files (Vorbis (*.ogg) and Opus (*.opus)): Extracts the contents of
+          the comment header (title, artist and album)
+
+
+  - FLAC files: Extracts the contents of the Vorbis comment (title, artist
+          and album)
+
+
+  - MPEG-4 files (*.mp4, *.m4a, *.m4b, *.m4v) and QuickTime movies (*.mov):
+          Extracts title, artist and album (or comment) out of the iTunes-
+          style metadata or the QuickTime user data
 
 
   - RTF documents: Extracts the contents of the \info section

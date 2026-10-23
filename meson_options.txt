@@ -18,10 +18,20 @@ option('png', type: 'boolean', value: true,
        description: 'Handle PNG-images')
 option('gif', type: 'boolean', value: true,
        description: 'Handle GIF-images')
+option('tiff', type: 'boolean', value: true,
+       description: 'Handle TIFF-images')
+option('webp', type: 'boolean', value: true,
+       description: 'Handle WebP-images')
+option('svg', type: 'boolean', value: true,
+       description: 'Handle SVG-images')
 option('mp3', type: 'boolean', value: true,
        description: 'Handle MP3-audio files')
 option('ogg', type: 'boolean', value: true,
-       description: 'Handle OGG-audio files')
+       description: 'Handle OGG-audio files (Vorbis, Opus)')
+option('flac', type: 'boolean', value: true,
+       description: 'Handle FLAC-audio files')
+option('mp4', type: 'boolean', value: true,
+       description: 'Handle MPEG-4/QuickTime-files (e.g. M4A-audio files)')
 option('pdf', type: 'boolean', value: true,
        description: 'Handle PDF-documents')
 option('oo', type: 'boolean', value: true,
@@ -32,3 +42,5 @@ option('rtf', type: 'boolean', value: true,
        description: 'Handle RTF-documents')
 option('msoffice', type: 'boolean', value: true,
        description: 'Handle MS-Office-documents (and OOXML, if zlib is available)')
+option('epub', type: 'boolean', value: true,
+       description: 'Handle EPUB-documents (if zlib is available)')

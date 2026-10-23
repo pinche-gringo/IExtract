@@ -40,7 +40,7 @@ if check_level >= 0
 endif
 
 # Dependencies
-deps = [dependency('YGP', version: '>= 0.9.30', include_type: 'system'),
+deps = [dependency('YGP', version: '>= 0.9.80', include_type: 'system'),
         dependency('boost', include_type: 'system')]
 if not cxx.has_header('boost/tokenizer.hpp', dependencies: deps)
   error('Required header boost/tokenizer.hpp not found')
@@ -71,12 +71,15 @@ if get_option('plugins')
 endif
 
 # Supported file types
-formats = ['html', 'jpeg', 'png', 'gif', 'mp3', 'ogg', 'pdf', 'oo', 'abiword',
-           'rtf', 'msoffice']
+formats = ['html', 'jpeg', 'png', 'gif', 'tiff', 'webp', 'svg', 'mp3', 'ogg',
+           'flac', 'mp4', 'pdf', 'oo', 'abiword', 'rtf', 'msoffice', 'epub']
+# Formats which can only be handled with the zlib
+zlib_formats = ['epub']
 enabled_formats = []
 foreach format : formats
-  conf.set('SUPPORT_' + format.to_upper(), get_option(format))
-  if get_option(format)
+  enabled = get_option(format) and (zlib_dep.found() or format not in zlib_formats)
+  conf.set('SUPPORT_' + format.to_upper(), enabled)
+  if enabled
     enabled_formats += format
   endif
 endforeach

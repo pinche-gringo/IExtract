@@ -17,10 +17,13 @@
 // along with libYGP.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <istream>
+#include <string>
 
 struct Properties;
 
-/**Class to extract the comments out of PNG images
+/**Class to extract the comments out of PNG images; out of the (plain,
+ * compressed or international) text chunks with the keywords Title, Author
+ * and Description. An XMP packet is used for still empty properties.
  *
  * The format of PNG images is described at
  *
@@ -41,6 +44,7 @@ class ParsePNG {
     void foundChunk(unsigned int type, const std::string& data);
 
     Properties& prop;
+    std::string xmp;
 };
 
 #endif

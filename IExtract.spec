@@ -23,13 +23,14 @@ BuildRequires:  perl
 BuildRequires:  python3
 BuildRequires:  boost-devel
 BuildRequires:  zlib-devel
-BuildRequires:  libYGP-devel
+BuildRequires:  libYGP-devel >= 0.9.80
 
 %description
 IExtract prints the meta-information (like title, author and comment) stored
-in files. Supported are HTML-, PDF-, RTF-, AbiWord-, OpenOffice.org- and
-MS-Office-documents (including OOXML), JPEG-, PNG- and GIF-images as well as
-MP3- and OGG-audio files.
+in files. Supported are HTML-, PDF-, RTF-, AbiWord-, OpenOffice.org-,
+MS-Office- (including OOXML) and EPUB-documents, JPEG-, PNG-, GIF-, TIFF-,
+WebP- and SVG-images, MP3-, OGG- (Vorbis and Opus), FLAC- and MPEG-4-audio
+files (like M4A) as well as QuickTime-movies.
 
 %package        devel
 Summary:        Header file to implement plug-ins for IExtract

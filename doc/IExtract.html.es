@@ -82,9 +82,11 @@
       <dd><p>Imagenes del formato PNG pueden contener entradas de texto
           en el formato <em>identificador</em> - <em>valor</em>.</p>
 
-	<p>El contenido (incomprimido) de los identificadores
-	  <em>Title</em>, <em>Author</em> y <em>Description</em>
-	  est&aacute; extraido.</p></dd>
+	<p>El contenido de los identificadores <em>Title</em>,
+	  <em>Author</em> y <em>Description</em> est&aacute; extraido (de
+	  entradas de texto simples, comprimidas o internacionales; las
+	  comprimidas s&oacute;lo si la zlib est&aacute; disponible). Las
+	  propiedades no encontradas se toman de un paquete XMP.</p></dd>
 
       <dt><b>GIF</b></dt>
       <dd><p>Imagenes del formato GIF pueden contener entradas de comentario.
@@ -95,8 +97,27 @@
       <dt><b>JPEG</b></dt>
       <dd><p>El programa reconoce comentarios despu&eacute;s de un
           "marcador de comentarios" (0xFFFE), en un "marcador APP1 Exif"
-	  (como le usa Windows XP) y en un "marcador APPD" (como le usan
-	  unas versiones de PhotoShop).</p></dd>
+	  (los tags que usa Windows XP o <em>ImageDescription</em> y
+	  <em>Artist</em>) y en un "marcador APPD" (como le usan
+	  unas versiones de PhotoShop).</p>
+
+        <p>Las propiedades no encontradas se toman de un paquete XMP
+          (<em>dc:title</em>, <em>dc:creator</em> y
+          <em>dc:description</em>).</p></dd>
+
+      <dt><b>TIFF</b></dt>
+      <dd><p>Se inspecciona el primer "Image File Directory" (como la
+          informaci&oacute;n Exif de imagenes JPEG); adem&aacute;s un
+          paquete XMP incluido.</p></dd>
+
+      <dt><b>WebP</b></dt>
+      <dd><p>Extrae la informaci&oacute;n Exif (v&eacute;ase TIFF) y el
+          paquete XMP.</p></dd>
+
+      <dt><b>SVG</b></dt>
+      <dd><p>Extrae el contenido de los elementos <code>&lt;title&gt;</code>
+          y <code>&lt;desc&gt;</code>. El autor se toma de los metadatos
+          (Dublin Core), como los escribe p.ej. Inkscape.</p></dd>
 
       <dt><b>Documentos de Microsoft Office</b></dt>
       <dd><p>Busca por el contenido de la ventana "propiedades".</p>
@@ -107,21 +128,48 @@
 	  le&iacute;ble (tal vez con la excepci&oacute;n de documentos
 	  m&aacute;s grande que 6.8 MB).</p></dd>
 
+      <dt><b>Documentos de Microsoft Office Open XML</b></dt>
+      <dd><p>Busca por el contenido de la ventana "propiedades" de
+          documentos <code>*.docx</code>, <code>*.xlsx</code> y
+          <code>*.pptx</code> (s&oacute;lo si la zlib est&aacute;
+          disponible).</p></dd>
+
+      <dt><b>Documentos de EPUB</b></dt>
+      <dd><p>Extrae el t&iacute;tulo, el autor y la descripci&oacute;n de los
+          metadatos del "package document" (s&oacute;lo si la zlib
+          est&aacute; disponible).</p></dd>
+
       <dt><b>MP3</b></dt>
       <dd><p>Extrae el contenido del tag ID3 (versi&oacute;n 1.x y
           2.x). El t&iacute;tulo del &aacute;lbun est&aacute; puesto
           en el campo comentario.</p></dd>
 
       <dt><b>OGG</b></dt>
-      <dd><p>Extrae el contenido del "comment header" (cabeza de comentario).
+      <dd><p>Extrae el contenido del "comment header" (cabeza de comentario)
+          de archivos Vorbis (<code>*.ogg</code>) y Opus (<code>*.opus</code>).
           El t&iacute;tulo del &aacute;lbun est&aacute; puesto
           en el campo comentario.</p></dd>
+
+      <dt><b>FLAC</b></dt>
+      <dd><p>Extrae el contenido del "Vorbis comment". El t&iacute;tulo del
+          &aacute;lbun est&aacute; puesto en el campo comentario.</p></dd>
+
+      <dt><b>MPEG-4</b></dt>
+      <dd><p>Extrae el t&iacute;tulo, el artista y el &aacute;lbun (o el
+          comentario, si no hay &aacute;lbun) de los metadatos (en el estilo
+          de iTunes) o de los "user data" de QuickTime de archivos MPEG-4
+          (<code>*.mp4</code>, <code>*.m4a</code>, <code>*.m4b</code>,
+          <code>*.m4v</code>) y QuickTime (<code>*.mov</code>).</p></dd>
 
       <dt><b>PDF</b></dt>
       <dd><p>Documentos de PDF contienen un llamado <i>Document Information
             directory</i> (Directorio de informaciones del documento) con varias
           llaves. El contenido de aquel directorio est&aacute; extraido (con el
           contenido de la llave "Subject" (sujecto) como comentario).</p>
+
+        <p>Las propiedades no encontradas ah&iacute; se toman de los metadatos
+          XMP del documento (si est&aacute;n comprimidos, s&oacute;lo si la
+          zlib est&aacute; disponible).</p>
 
         <p>&iexcl;Datos codificados no est&aacute;n decifrados!</p>
       </dd>
