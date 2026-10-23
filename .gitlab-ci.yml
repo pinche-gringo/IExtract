@@ -10,9 +10,10 @@
 # Tags matching Extract_V* should be protected, so the protected variable is available.
 #
 # The jobs run in an image with all dependencies (ci/Dockerfile), stored in the
-# container registry of the project. It's (re)built only if ci/Dockerfile changes
-# (e.g. a newer libYGP is used) or the pipeline is started manually (Build ->
-# Pipelines -> Run pipeline); do the latter once to create the image initially.
+# container registry of the project. It's (re)built only if ci/Dockerfile or
+# meson.build changes (e.g. a newer libYGP is used; ygp_version in meson.build)
+# or the pipeline is started manually (Build -> Pipelines -> Run pipeline); do
+# the latter once to create the image initially.
 # libYGP is installed from the RPMs of its release (package registry of libYGP),
 # downloaded with the job token, so this project must be allowed to access the
 # libYGP project (libYGP: Settings -> CI/CD -> Job token permissions).
@@ -37,6 +38,16 @@ default:
     VERSION=$(sed -n "s/^ *version: *'\([0-9][0-9.]*\)'.*/\1/p" meson.build | head -n 1)
   - echo "Project version $VERSION"
 
+.get_ygp_version: &get_ygp_version
+  - |
+    YGP_VERSION=$(sed -n "s/^ygp_version *= *'\([0-9][0-9.]*\)'.*/\1/p" meson.build | head -n 1)
+  - |
+    if [ -z "$YGP_VERSION" ]; then
+      echo "ygp_version not found in meson.build"
+      exit 1
+    fi
+  - echo "Required libYGP version $YGP_VERSION"
+
 # Builds the base image with the dependencies (with buildah, so no privileged
 # runner or docker-daemon is needed)
 build_image:
@@ -46,11 +57,13 @@ build_image:
     STORAGE_DRIVER: vfs
     BUILDAH_ISOLATION: chroot
   script:
+    - *get_ygp_version
     - buildah login --tls-verify=false --username "$CI_REGISTRY_USER" --password "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
     - printf '%s' "$CI_JOB_TOKEN" > "$CI_BUILDS_DIR/job_token"
     - buildah build --ulimit nofile=524288:524288 --layers
         --secret id=job_token,src="$CI_BUILDS_DIR/job_token"
         --build-arg YGP_PACKAGES="$YGP_PACKAGES"
+        --build-arg YGP_VERSION="$YGP_VERSION"
         --tag "$CI_IMAGE" ci/
     - buildah push --tls-verify=false "$CI_IMAGE"
   after_script:
@@ -62,6 +75,7 @@ build_image:
     - if: $CI_PIPELINE_SOURCE == "push"
       changes:
         - ci/Dockerfile
+        - meson.build
 
 .needs_image: &needs_image
   - job: build_image
@@ -156,10 +170,12 @@ rpm:
     - job: dist
       artifacts: true
   script:
+    - *get_ygp_version
     - TOPDIR="$CI_PROJECT_DIR/rpmbuild"
     - mkdir -p "$TOPDIR/SOURCES"
     - cp "build/meson-dist/$TARBALL" "$TOPDIR/SOURCES/"
-    - rpmbuild -ba --define "_topdir $TOPDIR" --define "iextract_version $VERSION" IExtract.spec
+    - rpmbuild -ba --define "_topdir $TOPDIR" --define "iextract_version $VERSION"
+        --define "ygp_version $YGP_VERSION" IExtract.spec
     # Upload all packages; remember the names of the (non-debug) ones for the release
     - |
       : > rpm.env

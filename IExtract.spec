@@ -1,10 +1,12 @@
 # RPM spec file for IExtract
 #
-# The version is passed from outside (it's maintained in meson.build only):
-#   rpmbuild -ba --define "iextract_version 0.9.41" IExtract.spec
+# The versions (of IExtract and the required libYGP) are passed from outside
+# (they're maintained in meson.build only):
+#   rpmbuild -ba --define "iextract_version 0.9.41" --define "ygp_version 0.9.81" IExtract.spec
 # with IExtract-<version>.tar.xz (from "meson dist") in the SOURCES directory.
 
 %{!?iextract_version: %{error:Define iextract_version (e.g. rpmbuild --define "iextract_version 0.9.41")}}
+%{!?ygp_version: %{error:Define ygp_version (e.g. rpmbuild --define "ygp_version 0.9.81")}}
 
 Name:           IExtract
 Version:        %{iextract_version}
@@ -23,7 +25,7 @@ BuildRequires:  perl
 BuildRequires:  python3
 BuildRequires:  boost-devel
 BuildRequires:  zlib-devel
-BuildRequires:  libYGP-devel >= 0.9.80
+BuildRequires:  libYGP-devel >= %{ygp_version}
 
 %description
 IExtract prints the meta-information (like title, author and comment) stored

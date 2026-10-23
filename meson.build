@@ -5,6 +5,10 @@ project('IExtract', 'cpp',
         default_options: ['cpp_std=c++26', 'warning_level=2',
                           'buildtype=debugoptimized'])
 
+# Required version of libYGP; also used for the releases (CI-image, RPM), so
+# it's maintained here only
+ygp_version = '0.9.81'
+
 package_name = 'Extract'
 bugreport = 'pelotudo.gringo@gmail.com'
 version = meson.project_version()
@@ -40,7 +44,7 @@ if check_level >= 0
 endif
 
 # Dependencies
-deps = [dependency('YGP', version: '>= 0.9.80', include_type: 'system'),
+deps = [dependency('YGP', version: '>= ' + ygp_version, include_type: 'system'),
         dependency('boost', include_type: 'system')]
 if not cxx.has_header('boost/tokenizer.hpp', dependencies: deps)
   error('Required header boost/tokenizer.hpp not found')

@@ -1,7 +1,7 @@
 # Base image for the CI-jobs of IExtract (see .gitlab-ci.yml)
 #
-# Changing this file (e.g. YGP_VERSION to use a newer libYGP) rebuilds the image
-# on the next push
+# Changing this file or meson.build (e.g. ygp_version to use a newer libYGP)
+# rebuilds the image on the next push
 FROM fedora:45
 
 RUN dnf install -y --setopt=install_weak_deps=False \
@@ -11,9 +11,10 @@ RUN dnf install -y --setopt=install_weak_deps=False \
     && dnf clean all
 
 # Version of libYGP to build the image with; its RPMs are taken from the package
-# registry of libYGP (uploaded by the release-pipeline of libYGP). Declared after
-# the installation of the packages, so changing it doesn't rebuild that layer
-ARG YGP_VERSION=0.9.80
+# registry of libYGP (uploaded by the release-pipeline of libYGP). Passed by the
+# build_image job (taken from ygp_version in meson.build). Declared after the
+# installation of the packages, so changing it doesn't rebuild that layer
+ARG YGP_VERSION
 ARG YGP_RELEASE=1
 # URL of the generic package libYGP in the package registry (passed by the build_image job)
 ARG YGP_PACKAGES
