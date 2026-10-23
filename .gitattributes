@@ -1,0 +1,3 @@
+# PDF documents are binary, even if they don't contain 0-bytes (e.g. the
+# trailing spaces of their cross reference tables are required)
+*.pdf binary
