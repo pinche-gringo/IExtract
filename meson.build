@@ -1,5 +1,5 @@
 project('IExtract', 'cpp',
-        version: '0.9.42',
+        version: '0.9.50',
         license: 'GPL-2.0-or-later',
         meson_version: '>= 1.5.0',
         default_options: ['cpp_std=c++26', 'warning_level=2',
