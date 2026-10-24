@@ -155,11 +155,12 @@ class Application : public YGP::IVIOApplication {
     const char* description() const override {
         static const std::string version([] {
             std::string version(PACKAGE " V" VERSION " - ");
-            version += (_("Compiled on %1 at %2\n\nCopyright (C) 2002 - 2009 Markus "
-                          "Schwab; email: g17m0@users.sourceforge.net\nDistributed "
+            version += (_("Compiled on %1 at %2\n\nCopyright (C) 2002 - 2026 Markus "
+                          "Schwab; email: %3\nDistributed "
                           "under the terms of the GNU General Public License"));
             version.replace(version.find("%1"), 2, __DATE__);
             version.replace(version.find("%2"), 2, __TIME__);
+            version.replace(version.find("%3"), 2, PACKAGE_BUGREPORT);
             return version;
         }());
         return version.c_str();
