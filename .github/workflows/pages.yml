@@ -1,0 +1,50 @@
+name: Publish documentation
+
+on:
+  push:
+    paths: ['doc/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    # Only publish from the repository's default branch
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build site
+        run: |
+          mkdir -p _site
+          for lang in en de es; do
+            sed -E 's/IExtract\.html\.(en|de|es)/IExtract.\1.html/g' \
+                doc/IExtract.html.$lang > _site/IExtract.$lang.html
+          done
+          cat > _site/index.html <<'EOF'
+          <!DOCTYPE html>
+          <html><head><meta charset="utf-8">
+          <meta http-equiv="refresh" content="0; url=IExtract.en.html">
+          <title>IExtract</title></head>
+          <body><a href="IExtract.en.html">English</a> ·
+          <a href="IExtract.de.html">Deutsch</a> ·
+          <a href="IExtract.es.html">Español</a></body></html>
+          EOF
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
