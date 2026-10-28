@@ -1,6 +1,6 @@
 <!-- -*-HTML-*- -->
 <!--
-  Copyright (C) 2003 - 2009 Markus Schwab (g17m0@users.sourceforge.net)
+  Copyright (C) 2003 - 2026 Markus Schwab (pelotudo.gringo@gmail.com)
 
   This file is part of IExtract.
 
@@ -22,13 +22,14 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
+    <meta charset="utf-8">
     <title>IExtract - Auslesen der Dokument-Informationen</title>
     <meta name="description" content="Documentation of the IExtract-utility">
     <meta name="keywords" content="documentation, docu, IExtract, iextract, utility, tool">
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Copyright (C) 2003 - 2009; vertrieben unter den Bedingungen der GNU General Public License">
+    <meta name="DC.Rights" content="Copyright (C) 2003 - 2026; vertrieben unter den Bedingungen der GNU General Public License">
 
     <style type="text/css">
       <!--
@@ -52,7 +53,7 @@
     href="http://www.gnu.org/licenses/">General Public License</a>
     vertrieben; in der Hoffnung, n&uuml;tzlich zu sein, aber OHNE
     JEGLICHE GEW&Auml;HRLEISTUNG; sogar ohne die implizite
-    Gew&auml;hrleistung der MARKTREIFE oder der EIGNUNG FÜR EINEN
+    Gew&auml;hrleistung der MARKTREIFE oder der EIGNUNG FÃœR EINEN
     BESTIMMTEN ZWECK.</p></tr> <tr><td
     class="selected">Deutsche&nbsp;Version</td> <td>&nbsp;</td></tr>
     <tr><td class="unselected"><a href="IExtract.html.es">
@@ -64,8 +65,8 @@
       sie in einer Liste (zur weiteren Bearbeitung) anzuzeigen.</p>
 
     <p>Die folgenden Dokumente werden unterst&uuml;tzt (weitere
-      Dokument-Typen können einfach durch <a
-      href="#Plugins">Plug-ins</a> hinzugefügt werden):</p>
+      Dokument-Typen kÃ¶nnen einfach durch <a
+      href="#Plugins">Plug-ins</a> hinzugefÃ¼gt werden):</p>
 
     <dl>
       <dt><b>HTML</b></dt>
@@ -85,8 +86,8 @@
 
       <dt><b>GIF</b></dt>
       <dd><p>GIF-Bilder k&ouml;nnen Kommentar-Eintr&auml;ge (in sogenannten
-          "Kommentar-Erweiterungen") enthalten. Die Werte für Titel
-          und Author werden (mangels Verfügbarkeit) nicht gesetzt.</p></dd>
+          "Kommentar-Erweiterungen") enthalten. Die Werte fÃ¼r Titel
+          und Author werden (mangels VerfÃ¼gbarkeit) nicht gesetzt.</p></dd>
 
       <dt><b>JPEG</b></dt>
       <dd><p>Es werden Kommentare nach einem "comment marker" (0xFFFE),
@@ -196,7 +197,7 @@
 
     <pre>   IExtract [OPTIONEN] &lt;Datei(en)&gt;</pre>
 
-    <p><a name="Fileformat"></a>Die gesuchten Dateien können die
+    <p><a name="Fileformat"></a>Die gesuchten Dateien kÃ¶nnen die
       UNIX-typischen Platzhalter (Stern (*) f&uuml;r eine beliebige
       Anzahl beliebiger Zeichen,Fragezeichen (?)  f&uuml;r genau ein
       beliebieges Zeichen sowie explizit angef&uuml;hrte g&uuml;ltige
@@ -393,18 +394,18 @@
 
       <tr valign="top"><td>&nbsp;&nbsp;&nbsp;<b>-M,&nbsp;--mode=[MODUS]</b></td>
         <td>Spezifiziert, wie der Typ der Dateien ermittelt
-          wird. Mögliche Werte sind:
+          wird. MÃ¶gliche Werte sind:
 
 	  <dl>
 	    <dt><b>Ext</b></dt><dd>Anhand der letzten Dateierweiterung
 	    (extension).</dd>
 	    <dt><b>EXT</b></dt><dd>Anhand der letzten Dateierweiterung
-	      (extension), wobei nicht zwischen Groß- und
+	      (extension), wobei nicht zwischen GroÃŸ- und
 	      Kleinschreibung unterschieden wird.</dd>
 	    <dt><b>AllExt</b></dt><dd>Anhand der letzten bekannten
 	      Dateierweiterung.</dd>
 	    <dt><b>AllEXT</b></dt><dd>Anhand der letzten bekannten
-	      Dateierweiterung, wobei nicht zwischen Groß- und
+	      Dateierweiterung, wobei nicht zwischen GroÃŸ- und
 	      Kleinschreibung unterschieden wird.</dd>
 	    <dt><b>Content</b></dt><dd>Anhand des Dateiinhalts. Dabei
 	      wird nach bestimmten Zeichenfolgen gesucht, die die
@@ -427,16 +428,16 @@
 
     <h2><a name="Plugins"></a>Plug-Ins</h2>
     <p>Plug-Ins sind kleine Erweiterungen (Zusatzmodule), durch die weitere
-      Dokument-Typen unterstützt werden.</p>
+      Dokument-Typen unterstÃ¼tzt werden.</p>
 
-    <p>Realisiert werden sie als shared libraries (für Unix) bzw DLLs
-      (für Windows), die zwei Funktionen enthalten müssen:</p>
+    <p>Realisiert werden sie als shared libraries (fÃ¼r Unix) bzw DLLs
+      (fÃ¼r Windows), die zwei Funktionen enthalten mÃ¼ssen:</p>
 
     <dl>
       <dt><b>processFile</b></dt>
-      <dd>Liest die Eigenschaften aus der übergebenen Datei</dd>
+      <dd>Liest die Eigenschaften aus der Ã¼bergebenen Datei</dd>
       <dt><b>getFileType</b></dt>
-      <dd>Überprüft, ob die übergebene Datei den richtigen Dateityp hat.</dd>
+      <dd>ÃœberprÃ¼ft, ob die Ã¼bergebene Datei den richtigen Dateityp hat.</dd>
     </dl>
 
     <p>Ein Beispiel befindet sich in <i>src/Plugins/Text.cpp</i>.</p>
@@ -464,6 +465,6 @@
     <p>Es werden die gleichen Ersetzungen wie f&uuml;r die Optionen durchgef&uuml;hrt!</p>
 
     <hr>
-    <address><a href="mailto:g17m0@users.sourceforge.net">Sende etwaige Kommentare</a></address>
+    <address><a href="mailto:pelotudo.gringo@gmail.com">Sende etwaige Kommentare</a></address>
   </body>
 </html>

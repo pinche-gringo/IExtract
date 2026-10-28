@@ -1,6 +1,6 @@
 <!-- -*-HTML-*- -->
 <!--
-  Copyright (C) 2003 - 2009 Markus Schwab (g17m0@users.sourceforge.net)
+  Copyright (C) 2003 - 2026 Markus Schwab (pelotudo.gringo@gmail.com)
 
   This file is part of IExtract.
 
@@ -22,13 +22,14 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
+    <meta charset="utf-8">
     <title>IExtract - Extraer informaciones de documentos</title>
     <meta name="description" content="Documentation of the IExtract-utility">
     <meta name="keywords" content="documentacion, docu, IExtract, iextract, utility, utilidad">
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Copyright (C) 2003 - 2009; distribuido bajo las condiciones de la GNU Licensia P˙blico">
+    <meta name="DC.Rights" content="Copyright (C) 2003 - 2026; distribuido bajo las condiciones de la GNU Licensia P√∫blico">
 
     <style type="text/css">
       <!--
@@ -70,7 +71,7 @@
       elaboraci&oacute;n posterior.</p>
 
     <p>Los documentos siguentes est&aacute;n procesados (se puede
-      aÒadir tipos adicionales con <a href="#Plugins">plugins</a>):</p>
+      a√±adir tipos adicionales con <a href="#Plugins">plugins</a>):</p>
 
     <dl>
       <dt><b>HTML</b></dt>
@@ -208,7 +209,7 @@
 
     <p><a name="Fileformat"></a>Los archivos busqueados pueden
       contener los comodines t&iacute;picales de UNIX (estrella (*) por cada
-      numero de todas las letras y, el signo de interrogaciÛn (?) por
+      numero de todas las letras y, el signo de interrogaci√≥n (?) por
       cualquiera letra sola y letras especificas en chorchetes ([) y
       (]), o detalladolos, especifacadolos por sus l&iacute;mites
       (separado por un gui&oacute;n) o sus clases (entre '[:' y
@@ -353,7 +354,7 @@
           letra de separaci&oacute;n del camino del sistema operativo
           (dos puntos (:) en Unices; punto y coma (;) en Windows).
 
-          <p>Los archivos pueden contener los comodines tÌpicales de UNIX.
+          <p>Los archivos pueden contener los comodines t√≠picales de UNIX.
             <a href="#Fileformat">Detalles</a> se encuentran
             m&aacute;s arriba en el documento.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
@@ -364,7 +365,7 @@
           letra de separaci&oacute;n del camino del sistema operativo (dos puntos (:) en Unices;
           punto y coma (;) en Windows).
 
-          <p>Los archivos pueden contener los comodines tÌpicales de UNIX.
+          <p>Los archivos pueden contener los comodines t√≠picales de UNIX.
             <a href="#Fileformat">Detalles</a> se encuentran
             m&aacute;s arriba en el documento.</p></td></tr>
       <tr><td>&nbsp;</td></tr>
@@ -424,7 +425,7 @@
       opci&oacute;n nuevo a&ntilde;ade su texto a los anteriores.</p>
 
     <h2><a name="Plugins"></a>Plugins</h2>
-    <p>Plugins son pequeÒas extensiones cual aÒaden m·s tipos de documentos.</p>
+    <p>Plugins son peque√±as extensiones cual a√±aden m√°s tipos de documentos.</p>
 
     <p>Son realisados como bibliotecas compartidas (para UNIX) o DLLs
       (para Windows) que ofrecen dos subrutinas:</p>
@@ -454,13 +455,13 @@
    Mode=Content
 
    [Handler]
-   &lt;ExtensiÛn1&gt;=&lt;Plugin1&gt;
-   &lt;ExtensiÛn2&gt;=&lt;Plugin2&gt;
-   &lt;ExtensiÛnN&gt;=&lt;PluginN&gt;</pre>
+   &lt;Extensi√≥n1&gt;=&lt;Plugin1&gt;
+   &lt;Extensi√≥n2&gt;=&lt;Plugin2&gt;
+   &lt;Extensi√≥nN&gt;=&lt;PluginN&gt;</pre>
 
     <p>&iexcl;Pasan los mismos cambios como con las opciones!</p>
 
     <hr>
-    <address><a href="mailto:g17m0@users.sourceforge.net">Envia comentarios</a></address>
+    <address><a href="mailto:pelotudo.gringo@gmail.com">Envia comentarios</a></address>
   </body>
 </html>

@@ -1,6 +1,6 @@
 <!-- -*-HTML-*- -->
 <!--
-  Copyright (C) 2003 - 2009 Markus Schwab (g17m0@users.sourceforge.net)
+  Copyright (C) 2003 - 2026 Markus Schwab (pelotudo.gringo@gmail.com)
 
   This file is part of IExtract.
 
@@ -22,13 +22,14 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
+    <meta charset="utf-8">
     <title>IExtract - Extracting information out of documents</title>
     <meta name="description" content="Documentation of the IExtract-utility">
     <meta name="keywords" content="documentation, docu, IExtract, iextract, utility">
 
     <meta name="DC.Creator" content="Markus Schwab">
     <meta name="DC.Date" content="2003-01-25">
-    <meta name="DC.Rights" content="Copyright (C) 2003 - 2009; distributed under the GNU General Public License">
+    <meta name="DC.Rights" content="Copyright (C) 2003 - 2026; distributed under the GNU General Public License">
 
     <style type="text/css">
       <!--
@@ -439,6 +440,6 @@
     <p>The same substituations as within the options are performed!</p>
 
     <hr>
-    <address><a href="mailto:g17m0@users.sourceforge.net">Mail comments</a></address>
+    <address><a href="mailto:pelotudo.gringo@gmail.com">Mail comments</a></address>
   </body>
 </html>
